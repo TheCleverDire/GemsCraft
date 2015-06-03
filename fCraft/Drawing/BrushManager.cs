@@ -1,5 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,37 +22,35 @@ namespace fCraft.Drawing {
         };
 
 
-        static void BrushHandler([NotNull] Player player, [NotNull] CommandReader cmd) {
+        static void BrushHandler( Player player, CommandReader cmd ) {
             string brushName = cmd.Next();
-            if (brushName == null) {
-                player.Message("Brush: {0}", player.BrushDescription);
+            if( brushName == null ) {
+                player.Message( player.Brush.Description );
             } else {
-                IBrushFactory brushFactory = GetBrushFactory(brushName);
-                if (brushFactory == null) {
-                    player.Message("Unrecognized brush \"{0}\"", brushName);
+                IBrushFactory brushFactory = GetBrushFactory( brushName );
+                if( brushFactory == null ) {
+                    player.Message( "Unrecognized brush \"{0}\"", brushName );
                 } else {
-                    player.BrushSet(brushFactory);
-                    if (cmd.HasNext) {
-                        player.ConfigureBrush(cmd);
+                    IBrush newBrush = brushFactory.MakeBrush( player, cmd );
+                    if( newBrush != null ) {
+                        player.Brush = newBrush;
+                        player.Message( "Brush set to {0}", player.Brush.Description );
                     }
-                    player.Message("Brush set to {0}", player.BrushDescription);
                 }
             }
         }
 
 
         internal static void Init() {
-            CommandManager.RegisterCommand(CdBrush);
-            RegisterBrush(NormalBrushFactory.Instance);
-            RegisterBrush(CheckeredBrushFactory.Instance);
-            RegisterBrush(RandomBrushFactory.Instance);
-            RegisterBrush(RainbowBrush.Instance);
-            RegisterBrush(CloudyBrushFactory.Instance);
-            RegisterBrush(ReplaceBrushFactory.Instance);
-            RegisterBrush(ReplaceNotBrushFactory.Instance);
-            RegisterBrush(ReplaceBrushBrushFactory.Instance);
-            RegisterBrush(PasteBrushFactory.PasteInstance);
-            RegisterBrush(PasteBrushFactory.PasteNotInstance);
+            CommandManager.RegisterCommand( CdBrush );
+            RegisterBrush( NormalBrushFactory.Instance );
+            RegisterBrush( CheckeredBrushFactory.Instance );
+            RegisterBrush( RandomBrushFactory.Instance );
+            RegisterBrush( RainbowBrush.Instance );
+            RegisterBrush( CloudyBrushFactory.Instance );
+            RegisterBrush( ReplaceBrushFactory.Instance );
+            RegisterBrush( ReplaceNotBrushFactory.Instance );
+            RegisterBrush( ReplaceBrushBrushFactory.Instance );
         }
 
 
@@ -61,20 +58,19 @@ namespace fCraft.Drawing {
         /// <param name="factory"> IBrushFactory that will be used to create new instances of the brush. </param>
         /// <exception cref="ArgumentNullException"> factory is null. </exception>
         /// <exception cref="ArgumentException"> brush with the same name or alias already exists. </exception>
-        public static void RegisterBrush([NotNull] IBrushFactory factory) {
-            if (factory == null) throw new ArgumentNullException("factory");
-            string helpString = String.Format("{0} brush: {1}",
-                                              factory.Name,
-                                              factory.Help);
+        public static void RegisterBrush( [NotNull] IBrushFactory factory ) {
+            if( factory == null ) throw new ArgumentNullException( "factory" );
+            string helpString = String.Format( "{0} brush: {1}",
+                                               factory.Name, factory.Help );
             string lowerName = factory.Name.ToLower();
-            BrushFactories.Add(lowerName, factory);
-            if (factory.Aliases != null) {
+            BrushFactories.Add( lowerName, factory );
+            if( factory.Aliases != null ) {
                 helpString += "Aliases: " + factory.Aliases.JoinToString();
-                foreach (string alias in factory.Aliases) {
-                    BrushAliases.Add(alias.ToLower(), factory);
+                foreach( string alias in factory.Aliases ) {
+                    BrushAliases.Add( alias.ToLower(), factory );
                 }
             }
-            CdBrush.HelpSections.Add(lowerName, helpString);
+            CdBrush.HelpSections.Add( lowerName, helpString );
             CdBrush.Help += factory.Name + " ";
         }
 
@@ -85,12 +81,12 @@ namespace fCraft.Drawing {
         /// <returns> IBrushFactory if brush was found; otherwise null. </returns>
         /// <exception cref="ArgumentNullException"> brushName is null. </exception>
         [CanBeNull]
-        public static IBrushFactory GetBrushFactory([NotNull] string brushName) {
-            if (brushName == null) throw new ArgumentNullException("brushName");
+        public static IBrushFactory GetBrushFactory( [NotNull] string brushName ) {
+            if( brushName == null ) throw new ArgumentNullException( "brushName" );
             IBrushFactory factory;
             string lowerName = brushName.ToLower();
-            if (BrushFactories.TryGetValue(lowerName, out factory) ||
-                BrushAliases.TryGetValue(lowerName, out factory)) {
+            if( BrushFactories.TryGetValue( lowerName, out factory ) ||
+                BrushAliases.TryGetValue( lowerName, out factory ) ) {
                 return factory;
             } else {
                 return null;
@@ -99,7 +95,6 @@ namespace fCraft.Drawing {
 
 
         /// <summary> Provides a list of all registered IBrushFactories. </summary>
-        [NotNull]
         public static IBrushFactory[] RegisteredFactories {
             get { return BrushFactories.Values.ToArray(); }
         }

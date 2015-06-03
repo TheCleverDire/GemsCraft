@@ -1,15 +1,12 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-
+﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
 using System;
 using System.Xml.Linq;
-using JetBrains.Annotations;
 
 namespace fCraft.MapGeneration {
     /// <summary> Basic empty map generator. Basically a fancy wrapper for Map constructor.
     /// This is a singleton class -- use EmptyMapGen.Instance. </summary>
     public sealed class EmptyMapGen : MapGenerator {
         public static EmptyMapGen Instance { get; private set; }
-
 
         static EmptyMapGen() {
             Instance = new EmptyMapGen {
@@ -19,29 +16,25 @@ namespace fCraft.MapGeneration {
             };
         }
 
-
         public override MapGeneratorParameters CreateDefaultParameters() {
             return new EmptyMapGenParams();
         }
 
-
-        public override MapGeneratorParameters CreateParameters(XElement serializedParameters) {
+        public override MapGeneratorParameters CreateParameters( XElement serializedParameters ) {
             return CreateDefaultParameters();
         }
 
-
-        public override MapGeneratorParameters CreateParameters(Player player, CommandReader cmd) {
-            if (cmd.HasNext) {
-                player.Message("Empty map generator does not take any parameters.");
+        public override MapGeneratorParameters CreateParameters( Player player, CommandReader cmd ) {
+            if( cmd.HasNext ) {
+                player.Message( "Empty map generator does not take any parameters." );
             }
             return CreateDefaultParameters();
         }
 
-
-        public override MapGeneratorParameters CreateParameters(string presetName) {
-            if (presetName == null) {
-                throw new ArgumentNullException("presetName");
-            } else if (presetName.Equals(Presets[0], StringComparison.OrdinalIgnoreCase)) {
+        public override MapGeneratorParameters CreateParameters( string presetName ) {
+            if( presetName == null ) {
+                throw new ArgumentNullException( "presetName" );
+            } else if( presetName.Equals( Presets[0], StringComparison.OrdinalIgnoreCase ) ) {
                 return CreateDefaultParameters();
             } else {
                 return null;
@@ -50,27 +43,24 @@ namespace fCraft.MapGeneration {
     }
 
 
-    internal class EmptyMapGenParams : MapGeneratorParameters {
+    class EmptyMapGenParams : MapGeneratorParameters {
         public EmptyMapGenParams() {
             Generator = EmptyMapGen.Instance;
         }
 
-
         public override MapGeneratorState CreateGenerator() {
-            return new EmptyMapGenState(this);
+            return new EmptyMapGenState( this );
         }
     }
 
 
-    internal class EmptyMapGenState : MapGeneratorState {
-        public EmptyMapGenState([NotNull] MapGeneratorParameters genParams) {
-            if (genParams == null) throw new ArgumentNullException("genParams");
+    class EmptyMapGenState : MapGeneratorState {
+        public EmptyMapGenState( MapGeneratorParameters genParams ) {
             Parameters = genParams;
         }
 
-
         public override Map Generate() {
-            return new Map(null, Parameters.MapWidth, Parameters.MapLength, Parameters.MapHeight, true);
+            return new Map( null, Parameters.MapWidth, Parameters.MapLength, Parameters.MapHeight, true );
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-
+﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
 using System;
 using System.Runtime.Serialization;
 using JetBrains.Annotations;
@@ -12,12 +11,16 @@ namespace fCraft.MapConversion {
         internal MapFormatException() {}
 
 
-        internal MapFormatException([NotNull] string message)
-            : base(message) {}
+        internal MapFormatException( [NotNull] string message )
+            : base( message ) {}
 
 
-        MapFormatException([NotNull] SerializationInfo info, StreamingContext context)
-            : base(info, context) {}
+        internal MapFormatException( [NotNull] string message, Exception innerException )
+            : base( message, innerException ) {}
+
+
+        MapFormatException( SerializationInfo info, StreamingContext context )
+            : base( info, context ) {}
     }
 
 
@@ -25,11 +28,18 @@ namespace fCraft.MapConversion {
     /// be found for the given map format, or a map format could not be identified at all. </summary>
     [Serializable]
     public sealed class NoMapConverterFoundException : Exception {
-        internal NoMapConverterFoundException([NotNull] string message)
-            : base(message) {}
+        internal NoMapConverterFoundException() {}
 
 
-        NoMapConverterFoundException([NotNull] SerializationInfo info, StreamingContext context)
-            : base(info, context) {}
+        internal NoMapConverterFoundException( [NotNull] string message )
+            : base( message ) {}
+
+
+        internal NoMapConverterFoundException( [NotNull] string message, Exception innerException )
+            : base( message, innerException ) {}
+
+
+        NoMapConverterFoundException( SerializationInfo info, StreamingContext context )
+            : base( info, context ) {}
     }
 }

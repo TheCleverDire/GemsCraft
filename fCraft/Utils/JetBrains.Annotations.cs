@@ -1,20 +1,4 @@
-﻿/*
- * Copyright 2007-2012 JetBrains s.r.o.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-using System;
+﻿using System;
 
 #pragma warning disable 1591
 // ReSharper disable UnusedMember.Global
@@ -23,8 +7,6 @@ using System;
 // ReSharper disable IntroduceOptionalParameters.Global
 // ReSharper disable MemberCanBeProtected.Global
 // ReSharper disable InconsistentNaming
-// ReSharper disable CodeAnnotationAnalyzer
-// ReSharper disable CommentTypo
 
 namespace JetBrains.Annotations {
     /// <summary>
@@ -39,11 +21,10 @@ namespace JetBrains.Annotations {
     /// }
     /// </code></example>
     [AttributeUsage(
-        AttributeTargets.Method | AttributeTargets.Parameter |
-        AttributeTargets.Property | AttributeTargets.Delegate |
-        AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public sealed class CanBeNullAttribute : Attribute {}
-
+      AttributeTargets.Method | AttributeTargets.Parameter |
+      AttributeTargets.Property | AttributeTargets.Delegate |
+      AttributeTargets.Field, AllowMultiple = false, Inherited = true )]
+    public sealed class CanBeNullAttribute : Attribute { }
 
     /// <summary>
     /// Indicates that the value of the marked element could never be <c>null</c>
@@ -54,11 +35,10 @@ namespace JetBrains.Annotations {
     /// }
     /// </code></example>
     [AttributeUsage(
-        AttributeTargets.Method | AttributeTargets.Parameter |
-        AttributeTargets.Property | AttributeTargets.Delegate |
-        AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
-    public sealed class NotNullAttribute : Attribute {}
-
+      AttributeTargets.Method | AttributeTargets.Parameter |
+      AttributeTargets.Property | AttributeTargets.Delegate |
+      AttributeTargets.Field, AllowMultiple = false, Inherited = true )]
+    public sealed class NotNullAttribute : Attribute { }
 
     /// <summary>
     /// Indicates that the marked method builds string by format pattern and (optional) arguments.
@@ -73,20 +53,18 @@ namespace JetBrains.Annotations {
     /// }
     /// </code></example>
     [AttributeUsage(
-        AttributeTargets.Constructor | AttributeTargets.Method,
-        AllowMultiple = false, Inherited = true)]
+      AttributeTargets.Constructor | AttributeTargets.Method,
+      AllowMultiple = false, Inherited = true )]
     public sealed class StringFormatMethodAttribute : Attribute {
         /// <param name="formatParameterName">
         /// Specifies which parameter of an annotated method should be treated as format-string
         /// </param>
-        public StringFormatMethodAttribute(string formatParameterName) {
+        public StringFormatMethodAttribute( string formatParameterName ) {
             FormatParameterName = formatParameterName;
         }
 
-
         public string FormatParameterName { get; private set; }
     }
-
 
     /// <summary>
     /// Describes dependency between method input and output
@@ -130,22 +108,19 @@ namespace JetBrains.Annotations {
     /// public bool TryParse(string s, out Person result)
     /// </code></item>
     /// </list></examples>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage( AttributeTargets.Method, AllowMultiple = true, Inherited = true )]
     public sealed class ContractAnnotationAttribute : Attribute {
-        public ContractAnnotationAttribute([NotNull] string contract)
-            : this(contract, false) {}
+        public ContractAnnotationAttribute( [NotNull] string contract )
+            : this( contract, false ) { }
 
-
-        public ContractAnnotationAttribute([NotNull] string contract, bool forceFullStates) {
+        public ContractAnnotationAttribute( [NotNull] string contract, bool forceFullStates ) {
             Contract = contract;
             ForceFullStates = forceFullStates;
         }
 
-
         public string Contract { get; private set; }
         public bool ForceFullStates { get; private set; }
     }
-
 
     /// <summary>
     /// Tells code analysis engine if the parameter is completely handled
@@ -154,9 +129,8 @@ namespace JetBrains.Annotations {
     /// If the parameter is an enumerable, indicates that it is enumerated
     /// while the method is executed
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter, Inherited = true)]
-    public sealed class InstantHandleAttribute : Attribute {}
-
+    [AttributeUsage( AttributeTargets.Parameter, Inherited = true )]
+    public sealed class InstantHandleAttribute : Attribute { }
 
     /// <summary>
     /// Indicates that a method does not make any observable state changes.
@@ -169,6 +143,6 @@ namespace JetBrains.Annotations {
     ///   Multiply(a, b); // Waring: Return value of pure method is not used
     /// }
     /// </code></example>
-    [AttributeUsage(AttributeTargets.Method, Inherited = true)]
-    public sealed class PureAttribute : Attribute {}
+    [AttributeUsage( AttributeTargets.Method, Inherited = true )]
+    public sealed class PureAttribute : Attribute { }
 }

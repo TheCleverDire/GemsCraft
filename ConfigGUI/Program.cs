@@ -1,16 +1,15 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-
+﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
 using System;
 using System.Windows.Forms;
 
 namespace fCraft.ConfigGUI {
-    internal static class Program {
+    static class Program {
         [STAThread]
         static void Main() {
             Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
+            Application.SetCompatibleTextRenderingDefault( false );
 #if DEBUG
-            Application.Run(new MainForm());
+            Application.Run( new MainForm() );
 #else
             try {
                 Application.Run( new MainForm() );

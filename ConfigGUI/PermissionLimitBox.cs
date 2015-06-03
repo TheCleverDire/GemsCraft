@@ -1,18 +1,17 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-
+﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
 using System;
 using System.Windows.Forms;
 
 namespace fCraft.ConfigGUI {
     public sealed partial class PermissionLimitBox : UserControl {
+
         public Permission Permission { get; private set; }
 
         public string FirstItem { get; private set; }
 
         public Rank Rank { get; private set; }
 
-
-        public PermissionLimitBox(string labelText, Permission permission, string firstItem) {
+        public PermissionLimitBox( string labelText, Permission permission, string firstItem ) {
             InitializeComponent();
 
             label.Text = labelText;
@@ -26,13 +25,13 @@ namespace fCraft.ConfigGUI {
         }
 
 
-        void OnPermissionLimitChanged(object sender, EventArgs args) {
-            if (Rank == null) return;
-            Rank rankLimit = RankManager.FindRank(comboBox.SelectedIndex - 1);
-            if (rankLimit == null) {
-                Rank.ResetLimit(Permission);
+        void OnPermissionLimitChanged( object sender, EventArgs args ) {
+            if( Rank == null ) return;
+            Rank rankLimit = RankManager.FindRank( comboBox.SelectedIndex - 1 );
+            if( rankLimit == null ) {
+                Rank.ResetLimit( Permission );
             } else {
-                Rank.SetLimit(Permission, rankLimit);
+                Rank.SetLimit( Permission, rankLimit );
             }
         }
 
@@ -44,35 +43,35 @@ namespace fCraft.ConfigGUI {
 
         public void RebuildList() {
             comboBox.Items.Clear();
-            comboBox.Items.Add(FirstItem);
-            foreach (Rank rank in RankManager.Ranks) {
-                comboBox.Items.Add(MainForm.ToComboBoxOption(rank));
+            comboBox.Items.Add( FirstItem );
+            foreach( Rank rank in RankManager.Ranks ) {
+                comboBox.Items.Add( MainForm.ToComboBoxOption( rank ) );
             }
         }
 
 
-        public void SelectRank(Rank rank) {
+        public void SelectRank( Rank rank ) {
             Rank = rank;
-            if (rank == null) {
+            if( rank == null ) {
                 comboBox.SelectedIndex = -1;
                 Visible = false;
             } else {
-                comboBox.SelectedIndex = GetLimitIndex(rank, Permission);
-                Visible = rank.Can(Permission);
+                comboBox.SelectedIndex = GetLimitIndex( rank, Permission );
+                Visible = rank.Can( Permission );
             }
         }
 
 
-        static int GetLimitIndex(Rank rank, Permission permission) {
-            if (rank.HasLimitSet(permission)) {
-                return rank.GetLimit(permission).Index + 1;
+        static int GetLimitIndex( Rank rank, Permission permission ) {
+            if( rank.HasLimitSet( permission ) ) {
+                return rank.GetLimit( permission ).Index + 1;
             } else {
                 return 0;
             }
         }
 
 
-        public void PermissionToggled(bool isOn) {
+        public void PermissionToggled( bool isOn ) {
             Visible = isOn;
         }
     }

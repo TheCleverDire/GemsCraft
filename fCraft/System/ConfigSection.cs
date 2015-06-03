@@ -1,8 +1,9 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
 namespace fCraft {
     /// <summary> ConfigKey section/category. </summary>
     public enum ConfigSection {
+
         /// <summary> General server configuration (name, port, default rank, etc). </summary>
         General,
 

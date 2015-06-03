@@ -1,5 +1,4 @@
-// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-
+// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 using System;
 using JetBrains.Annotations;
 
@@ -7,7 +6,7 @@ namespace fCraft {
     /// <summary> Describes the circumstances of server shutdown. </summary>
     public sealed class ShutdownParams {
         /// <summary> Creates a ShutdownParams object with given reason/delay/restart flag. </summary>
-        public ShutdownParams(ShutdownReason reason, TimeSpan delay, bool restart) {
+        public ShutdownParams( ShutdownReason reason, TimeSpan delay, bool restart ) {
             Reason = reason;
             Delay = delay;
             Restart = restart;
@@ -16,10 +15,10 @@ namespace fCraft {
 
         /// <summary> Creates a ShutdownParams object with given parameters.
         /// <param name="customReason"/> and <param name="initiatedBy"/> may be null. </summary>
-        public ShutdownParams(ShutdownReason reason, TimeSpan delay,
-                              bool restart, [CanBeNull] string customReason,
-                              [CanBeNull] Player initiatedBy)
-            : this(reason, delay, restart) {
+        public ShutdownParams( ShutdownReason reason, TimeSpan delay,
+                               bool restart, [CanBeNull] string customReason,
+                               [CanBeNull] Player initiatedBy ) :
+                                   this( reason, delay, restart ) {
             customReasonString = customReason;
             InitiatedBy = initiatedBy;
         }

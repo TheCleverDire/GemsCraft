@@ -1,6 +1,5 @@
-﻿// Part of fCraft | fCraft is copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-// Contributed by Jared Klopper. Opticraft is copyright (c) 2011 Jared Klopper
-
+﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+// Contributed by Jared Klopper. Opticraft is copyright (c) 2011, Jared Klopper
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -13,39 +12,26 @@ namespace fCraft.MapConversion {
     internal sealed class OpticraftMetaData {
         [DataMember]
         public int X { get; set; }
-
         [DataMember]
         public int Y { get; set; }
-
         [DataMember]
         public int Z { get; set; }
-
         [DataMember]
         public int SpawnX { get; set; }
-
         [DataMember]
         public int SpawnY { get; set; }
-
         [DataMember]
         public int SpawnZ { get; set; }
-
         [DataMember]
         public byte SpawnOrientation { get; set; }
-
         [DataMember]
         public byte SpawnPitch { get; set; }
-
-        [NotNull]
         [DataMember]
         public string MinimumBuildRank { get; set; }
-
-        [NotNull]
         [DataMember]
         public string MinimumJoinRank { get; set; }
-
         [DataMember]
         public bool Hidden { get; set; }
-
         [DataMember]
         public int CreationDate { get; set; }
     }
@@ -54,54 +40,49 @@ namespace fCraft.MapConversion {
     internal sealed class OpticraftDataStore {
         [DataMember]
         public OpticraftZone[] Zones;
+
     }
 
 
     internal sealed class OpticraftZone {
-        [NotNull]
         [DataMember]
         public string Name { get; set; }
-
         [DataMember]
         public int X1 { get; set; }
-
         [DataMember]
         public int X2 { get; set; }
-
         [DataMember]
         public int Y1 { get; set; }
-
         [DataMember]
         public int Y2 { get; set; }
-
         [DataMember]
         public int Z1 { get; set; }
-
         [DataMember]
         public int Z2 { get; set; }
-
-        [NotNull]
         [DataMember]
         public string MinimumRank { get; set; }
-
-        [NotNull]
         [DataMember]
         public string Owner { get; set; }
-
         [DataMember]
         public string[] Builders;
-
         [DataMember]
         public string[] Excluded;
     }
 
-
     /// <summary> Opticraft map conversion implementation, for converting Opticraft map format into fCraft's default map format. </summary>
-    internal sealed class MapOpticraft : IMapImporter, IMapExporter {
+    public sealed class MapOpticraft : IMapImporter, IMapExporter {
         const short MapVersion = 2;
 
         public string ServerName {
             get { return "Opticraft"; }
+        }
+
+        public bool SupportsImport {
+            get { return true; }
+        }
+
+        public bool SupportsExport {
+            get { return true; }
         }
 
         public string FileExtension {
@@ -117,82 +98,81 @@ namespace fCraft.MapConversion {
         }
 
 
-        public bool ClaimsName(string fileName) {
-            if (fileName == null) throw new ArgumentNullException("fileName");
-            return fileName.EndsWith(".save", StringComparison.Ordinal);
+        public bool ClaimsName( string fileName ) {
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
+            return fileName.EndsWith( ".save", StringComparison.Ordinal );
         }
 
 
-        public bool Claims(string fileName) {
-            if (fileName == null) throw new ArgumentNullException("fileName");
+        public bool Claims( string fileName ) {
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
             try {
-                using (FileStream mapStream = File.OpenRead(fileName)) {
-                    BinaryReader reader = new BinaryReader(mapStream);
+                using( FileStream mapStream = File.OpenRead( fileName ) ) {
+                    BinaryReader reader = new BinaryReader( mapStream );
                     return reader.ReadInt16() == MapVersion;
                 }
-            } catch (Exception) {
+            } catch( Exception ) {
                 return false;
             }
         }
 
 
-        public Map LoadHeader(string fileName) {
-            if (fileName == null) throw new ArgumentNullException("fileName");
-            using (FileStream mapStream = File.OpenRead(fileName)) {
-                return LoadMapMetadata(mapStream);
+        public Map LoadHeader( string fileName ) {
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
+            using( FileStream mapStream = File.OpenRead( fileName ) ) {
+                return LoadMapMetadata( mapStream );
             }
         }
 
 
-        [NotNull]
-        static Map LoadMapMetadata([NotNull] Stream mapStream) {
-            if (mapStream == null) throw new ArgumentNullException("mapStream");
-            BinaryReader reader = new BinaryReader(mapStream);
+        static Map LoadMapMetadata( [NotNull] Stream mapStream ) {
+            if( mapStream == null ) throw new ArgumentNullException( "mapStream" );
+            BinaryReader reader = new BinaryReader( mapStream );
             reader.ReadInt16();
             int metaDataSize = reader.ReadInt32();
-            DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(OpticraftMetaData));
+            DataContractJsonSerializer serializer = new DataContractJsonSerializer( typeof( OpticraftMetaData ) );
 
             byte[] rawMetaData = new byte[metaDataSize];
-            reader.Read(rawMetaData, 0, metaDataSize);
-            MemoryStream memStream = new MemoryStream(rawMetaData);
+            reader.Read( rawMetaData, 0, metaDataSize );
+            MemoryStream memStream = new MemoryStream( rawMetaData );
 
-            OpticraftMetaData metaData = (OpticraftMetaData)serializer.ReadObject(memStream);
+            OpticraftMetaData metaData = (OpticraftMetaData)serializer.ReadObject( memStream );
 
             // ReSharper disable UseObjectOrCollectionInitializer
-            Map mapFile = new Map(null, metaData.X, metaData.Y, metaData.Z, false);
+            Map mapFile = new Map( null, metaData.X, metaData.Y, metaData.Z, false );
             // ReSharper restore UseObjectOrCollectionInitializer
             mapFile.Spawn = new Position(
                 (short)(metaData.SpawnX),
                 (short)(metaData.SpawnY),
                 (short)(metaData.SpawnZ),
                 metaData.SpawnOrientation,
-                metaData.SpawnPitch);
+                metaData.SpawnPitch );
             return mapFile;
         }
 
 
-        public Map Load(string fileName) {
-            if (fileName == null) throw new ArgumentNullException("fileName");
-            using (FileStream mapStream = File.OpenRead(fileName)) {
-                BinaryReader reader = new BinaryReader(mapStream);
+        public Map Load( string fileName ) {
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
+            using( FileStream mapStream = File.OpenRead( fileName ) ) {
+                BinaryReader reader = new BinaryReader( mapStream );
                 // Load MetaData
-                Map mapFile = LoadMapMetadata(mapStream);
+                Map mapFile = LoadMapMetadata( mapStream );
 
                 // Load the data store
                 int dataBlockSize = reader.ReadInt32();
                 byte[] jsonDataBlock = new byte[dataBlockSize];
-                reader.Read(jsonDataBlock, 0, dataBlockSize);
-                MemoryStream memStream = new MemoryStream(jsonDataBlock);
-                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(OpticraftDataStore));
-                OpticraftDataStore dataStore = (OpticraftDataStore)serializer.ReadObject(memStream);
+                reader.Read( jsonDataBlock, 0, dataBlockSize );
+                MemoryStream memStream = new MemoryStream( jsonDataBlock );
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer( typeof( OpticraftDataStore ) );
+                OpticraftDataStore dataStore = (OpticraftDataStore)serializer.ReadObject( memStream );
                 reader.ReadInt32();
                 // Load Zones
-                LoadZones(mapFile, dataStore);
+                LoadZones( mapFile, dataStore );
 
                 // Load the block store
                 mapFile.Blocks = new Byte[mapFile.Volume];
-                using (GZipStream decompressor = new GZipStream(mapStream, CompressionMode.Decompress)) {
-                    decompressor.Read(mapFile.Blocks, 0, mapFile.Blocks.Length);
+                using( GZipStream decompressor = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
+                    decompressor.Read( mapFile.Blocks, 0, mapFile.Blocks.Length );
                 }
 
                 return mapFile;
@@ -200,75 +180,71 @@ namespace fCraft.MapConversion {
         }
 
 
-        static void LoadZones([NotNull] Map mapFile, [NotNull] OpticraftDataStore dataStore) {
-            if (mapFile == null) throw new ArgumentNullException("mapFile");
-            if (dataStore == null) throw new ArgumentNullException("dataStore");
-            if (dataStore.Zones.Length == 0) {
+        static void LoadZones( [NotNull] Map mapFile, [NotNull] OpticraftDataStore dataStore ) {
+            if( mapFile == null ) throw new ArgumentNullException( "mapFile" );
+            if( dataStore == null ) throw new ArgumentNullException( "dataStore" );
+            if( dataStore.Zones.Length == 0 ) {
                 return;
             }
 
-            PlayerInfo conversionPlayer = new PlayerInfo("OpticraftConversion",
-                                                         RankManager.HighestRank,
-                                                         true,
-                                                         RankChangeType.AutoPromoted);
-            foreach (OpticraftZone optiZone in dataStore.Zones) {
+            PlayerInfo conversionPlayer = new PlayerInfo( "OpticraftConversion",
+                                                          RankManager.HighestRank,
+                                                          true,
+                                                          RankChangeType.AutoPromoted );
+            foreach( OpticraftZone optiZone in dataStore.Zones ) {
                 // Make zone
                 Zone fZone = new Zone {
                     Name = optiZone.Name,
                 };
-                BoundingBox bBox = new BoundingBox(optiZone.X1,
-                                                   optiZone.Y1,
-                                                   optiZone.Z1,
-                                                   optiZone.X2,
-                                                   optiZone.X2,
-                                                   optiZone.Z2);
-                fZone.Create(bBox, conversionPlayer);
+                BoundingBox bBox = new BoundingBox( optiZone.X1, optiZone.Y1, optiZone.Z1,
+                                                    optiZone.X2, optiZone.X2, optiZone.Z2 );
+                fZone.Create( bBox, conversionPlayer );
 
                 // Min rank
-                Rank minRank = Rank.Parse(optiZone.MinimumRank);
-                if (minRank != null) {
+                Rank minRank = Rank.Parse( optiZone.MinimumRank );
+                if( minRank != null ) {
                     fZone.Controller.MinRank = minRank;
                 }
 
-                foreach (string playerName in optiZone.Builders) {
+                foreach( string playerName in optiZone.Builders ) {
                     // These are all lower case names
-                    if (!Player.IsValidPlayerName(playerName)) {
+                    if( !Player.IsValidPlayerName( playerName ) ) {
                         continue;
                     }
-                    PlayerInfo pInfo = PlayerDB.FindPlayerInfoExact(playerName);
-                    if (pInfo != null) {
-                        fZone.Controller.Include(pInfo);
+                    PlayerInfo pInfo = PlayerDB.FindPlayerInfoExact( playerName );
+                    if( pInfo != null ) {
+                        fZone.Controller.Include( pInfo );
                     }
                 }
                 // Excluded names are not as of yet implemented in opticraft, but will be soon
                 // So add compatibility for them when they arrive.
-                if (optiZone.Excluded != null) {
-                    foreach (string playerName in optiZone.Excluded) {
+                if( optiZone.Excluded != null ) {
+                    foreach( string playerName in optiZone.Excluded ) {
                         // These are all lower case names
-                        if (!Player.IsValidPlayerName(playerName)) {
+                        if( !Player.IsValidPlayerName( playerName ) ) {
                             continue;
                         }
-                        PlayerInfo pInfo = PlayerDB.FindPlayerInfoExact(playerName);
-                        if (pInfo != null) {
-                            fZone.Controller.Exclude(pInfo);
+                        PlayerInfo pInfo = PlayerDB.FindPlayerInfoExact( playerName );
+                        if( pInfo != null ) {
+                            fZone.Controller.Exclude( pInfo );
                         }
                     }
                 }
-                mapFile.Zones.Add(fZone);
+                mapFile.Zones.Add( fZone );
             }
         }
 
 
-        public void Save(Map mapToSave, string fileName) {
-            if (mapToSave == null) throw new ArgumentNullException("mapToSave");
-            if (fileName == null) throw new ArgumentNullException("fileName");
-            using (FileStream mapStream = File.OpenWrite(fileName)) {
-                BinaryWriter writer = new BinaryWriter(mapStream);
+        public void Save( Map mapToSave, string fileName ) {
+            if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
+            using( FileStream mapStream = File.OpenWrite( fileName ) ) {
+                BinaryWriter writer = new BinaryWriter( mapStream );
                 // Version
-                writer.Write(MapVersion);
+                writer.Write( MapVersion );
 
                 MemoryStream serializationStream = new MemoryStream();
-                DataContractJsonSerializer serializer = new DataContractJsonSerializer(typeof(OpticraftMetaData));
+                DataContractJsonSerializer serializer = new DataContractJsonSerializer( typeof( OpticraftMetaData ) );
                 // Create and serialize core meta data
                 OpticraftMetaData oMetadata = new OpticraftMetaData {
                     X = mapToSave.Width,
@@ -282,7 +258,7 @@ namespace fCraft.MapConversion {
                     SpawnPitch = mapToSave.Spawn.L
                 };
                 // World related values.
-                if (mapToSave.World != null) {
+                if( mapToSave.World != null ) {
                     oMetadata.Hidden = mapToSave.World.IsHidden;
                     oMetadata.MinimumJoinRank = mapToSave.World.AccessSecurity.MinRank.Name;
                     oMetadata.MinimumBuildRank = mapToSave.World.BuildSecurity.MinRank.Name;
@@ -291,12 +267,11 @@ namespace fCraft.MapConversion {
                     oMetadata.MinimumJoinRank = oMetadata.MinimumBuildRank = "guest";
                 }
 
-                oMetadata.CreationDate = 0;
-                // This is ctime for when the world was created. Unsure on how to extract it. Opticraft makes no use of it as of yet
-                serializer.WriteObject(serializationStream, oMetadata);
+                oMetadata.CreationDate = 0; // This is ctime for when the world was created. Unsure on how to extract it. Opticraft makes no use of it as of yet
+                serializer.WriteObject( serializationStream, oMetadata );
                 byte[] jsonMetaData = serializationStream.ToArray();
-                writer.Write(jsonMetaData.Length);
-                writer.Write(jsonMetaData);
+                writer.Write( jsonMetaData.Length );
+                writer.Write( jsonMetaData );
 
                 // Now create and serialize core data store (zones)
                 Zone[] zoneCache = mapToSave.Zones.Cache;
@@ -304,7 +279,7 @@ namespace fCraft.MapConversion {
                     Zones = new OpticraftZone[zoneCache.Length]
                 };
                 int i = 0;
-                foreach (Zone zone in zoneCache) {
+                foreach( Zone zone in zoneCache ) {
                     OpticraftZone oZone = new OpticraftZone {
                         Name = zone.Name,
                         MinimumRank = zone.Controller.MinRank.Name,
@@ -322,34 +297,36 @@ namespace fCraft.MapConversion {
 
                     // Builders
                     int j = 0;
-                    foreach (PlayerInfo pInfo in zone.Controller.ExceptionList.Included) {
+                    foreach( PlayerInfo pInfo in zone.Controller.ExceptionList.Included ) {
                         oZone.Builders[j++] = pInfo.Name;
                     }
 
                     // Excluded players
                     oZone.Excluded = new string[zone.Controller.ExceptionList.Excluded.Length];
                     j = 0;
-                    foreach (PlayerInfo pInfo in zone.Controller.ExceptionList.Excluded) {
+                    foreach( PlayerInfo pInfo in zone.Controller.ExceptionList.Excluded ) {
                         oZone.Builders[j++] = pInfo.Name;
                     }
                     oDataStore.Zones[i++] = oZone;
                 }
                 // Serialize it
                 serializationStream = new MemoryStream();
-                serializer = new DataContractJsonSerializer(typeof(OpticraftDataStore));
-                serializer.WriteObject(serializationStream, oDataStore);
+                serializer = new DataContractJsonSerializer( typeof( OpticraftDataStore ) );
+                serializer.WriteObject( serializationStream, oDataStore );
                 byte[] jsonDataStore = serializationStream.ToArray();
-                writer.Write(jsonDataStore.Length);
-                writer.Write(jsonDataStore);
+                writer.Write( jsonDataStore.Length );
+                writer.Write( jsonDataStore );
+
 
                 // Blocks
                 MemoryStream blockStream = new MemoryStream();
-                using (GZipStream zipper = new GZipStream(blockStream, CompressionMode.Compress, true)) {
-                    zipper.Write(mapToSave.Blocks, 0, mapToSave.Blocks.Length);
+                using( GZipStream zipper = new GZipStream( blockStream, CompressionMode.Compress, true ) ) {
+                    zipper.Write( mapToSave.Blocks, 0, mapToSave.Blocks.Length );
                 }
                 byte[] compressedBlocks = blockStream.ToArray();
-                writer.Write(compressedBlocks.Length);
-                writer.Write(compressedBlocks);
+                writer.Write( compressedBlocks.Length );
+                writer.Write( compressedBlocks );
+
             }
         }
     }

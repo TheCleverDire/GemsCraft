@@ -1,21 +1,24 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 using System;
 
 namespace fCraft.Drawing {
     /// <summary> A self-contained DrawOperation that provides its own brush.
     /// Purpose of this class is mostly to take care of the boilerplate code. </summary>
-    public abstract class DrawOpWithBrush : DrawOperation, IBrushFactory, IBrush {
-        public abstract override string Description { get; }
+    public abstract class DrawOpWithBrush : DrawOperation, IBrushFactory, IBrush, IBrushInstance {
 
+        public override abstract string Description {
+            get;
+        }
 
-        protected DrawOpWithBrush(Player player)
-            : base(player) {}
+        protected DrawOpWithBrush( Player player )
+            : base( player ) {
+        }
 
+        public abstract bool ReadParams( CommandReader cmd );
 
-        public abstract bool ReadParams(CommandReader cmd);
 
         protected abstract Block NextBlock();
+
 
         #region IBrushFactory Members
 
@@ -31,17 +34,12 @@ namespace fCraft.Drawing {
             get { return null; }
         }
 
-
-        IBrush IBrushFactory.MakeBrush(Player player, CommandReader cmd) {
+        IBrush IBrushFactory.MakeBrush( Player player, CommandReader cmd ) {
             return this;
         }
 
-
-        IBrush IBrushFactory.MakeDefault() {
-            throw new NotImplementedException();
-        }
-
         #endregion
+
 
         #region IBrush Members
 
@@ -50,30 +48,43 @@ namespace fCraft.Drawing {
         }
 
         string IBrush.Description {
+            get { throw new NotImplementedException(); }
+        }
+
+        IBrushInstance IBrush.MakeInstance( Player player, CommandReader cmd, DrawOperation op ) {
+            if( ReadParams( cmd ) ) {
+                return this;
+            } else {
+                return null;
+            }
+        }
+
+        #endregion
+
+
+        #region IBrushInstance Members
+
+        IBrush IBrushInstance.Brush {
+            get { return this; }
+        }
+
+        string IBrushInstance.InstanceDescription {
             get { return Description; }
         }
 
-        int IBrush.AlternateBlocks {
+        int IBrushInstance.AlternateBlocks {
             get { return 1; }
         }
 
-
-        bool IBrush.Begin(Player player, DrawOperation op) {
+        bool IBrushInstance.Begin( Player player, DrawOperation op ) {
             return true;
         }
 
-
-        Block IBrush.NextBlock(DrawOperation op) {
+        Block IBrushInstance.NextBlock( DrawOperation op ) {
             return NextBlock();
         }
 
-
-        void IBrush.End() {}
-
-
-        IBrush IBrush.Clone() {
-            throw new NotImplementedException();
-        }
+        void IBrushInstance.End() { }
 
         #endregion
     }

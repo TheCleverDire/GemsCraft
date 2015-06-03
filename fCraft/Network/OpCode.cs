@@ -1,7 +1,7 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
 namespace fCraft {
-    /// <summary> Minecraft protocol's opCodes. 
+    /// <summary> Minecraft protocol's opcodes. 
     /// For detailed explanation of Minecraft Classic protocol, see http://wiki.vg/Classic_Protocol </summary>
     public enum OpCode {
         /// <summary> Client/server packet. Client provides name and mppass.
@@ -14,7 +14,7 @@ namespace fCraft {
         /// <summary> Server packet. Notifies player of incoming level data. </summary>
         MapBegin = 2,
 
-        /// <summary> Server packet. Contains a chunk of GZipped map. </summary>
+        /// <summary> Server packet. Contains a chunk of gzipped map. </summary>
         MapChunk = 3,
 
         /// <summary> Server packet. Sent after level data is complete and gives map dimensions. </summary>
@@ -51,55 +51,7 @@ namespace fCraft {
         /// <summary> Server packet. Tells client that they're being kicked. </summary>
         Kick = 14,
 
-        /// <summary> Server packet. Sets permission to delete admincrete. </summary>
-        SetPermission = 15,
-
-        /// <summary> Extended client/server packet. Initiates CPE negotiation. </summary>
-        ExtInfo = 16,
-
-        /// <summary> Extended client/server packet. Lists supported extensions. </summary>
-        ExtEntry = 17,
-
-        /// <summary> Extended server packet. Changes player's allowed click distance. </summary>
-        SetClickDistance = 18,
-
-        /// <summary> Extended client/server packet. Declares CustomBlocks support level. </summary>
-        CustomBlockSupportLevel = 19,
-
-        /// <summary> Extended server packet. Tells client which block to hold. </summary>
-        HoldThis = 20,
-
-        /// <summary> Extended server packet. Defines chat macros ties to hotkeys. </summary>
-        SetTextHotKey = 21,
-
-        /// <summary> Extended server packet. Adds or updates a name to the player list. </summary>
-        ExtAddPlayerName = 22,
-
-        /// <summary> Extended server packet. Adds or updates an entity (replaces AddEntity). </summary>
-        ExtAddEntity = 23,
-
-        /// <summary> Extended server packet. Removes a name from the player list. </summary>
-        ExtRemovePlayerName = 24,
-
-        /// <summary> Extended server packet. Sets environmental colors (sky/cloud/fog/ambient/diffuse color). </summary>
-        EnvSetColor = 25,
-
-        /// <summary> Extended server packet. Adds or updates a selection cuboid. </summary>
-        MakeSelection = 26,
-
-        /// <summary> Extended server packet. Removes a selection cuboid. </summary>
-        RemoveSelection = 27,
-
-        /// <summary> Extended server packet. Sets permission to place/delete a block type (replaces SetPermission). </summary>
-        SetBlockPermission = 28,
-
-        /// <summary> Extended server packet. Allows changing the 3D model that entity/player shows up as. </summary>
-        ChangeModel = 29,
-
-        /// <summary> Extended server packet. Specifies terrain textures, and tweaks appearance of map edges. </summary>
-        EnvMapAppearance = 30,
-
-        /// <summary> Extended server packet. Triggers special weather conditions (like rain and snow) on demand. </summary>
-        EnvSetWeatherType = 31
+        /// <summary> Server packet. Sent when a player is opped/deopped. </summary>
+        SetPermission = 15
     }
 }

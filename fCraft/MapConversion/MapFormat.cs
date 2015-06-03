@@ -1,4 +1,4 @@
-// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
 
 namespace fCraft.MapConversion {
     /// <summary> An enumeration of map formats supported by fCraft. </summary>
@@ -14,9 +14,6 @@ namespace fCraft.MapConversion {
 
         /// <summary> Map format used by MCSharp and its forks (MCZall/MCLawl). Initial support added by Tyler (TkTech). </summary>
         MCSharp,
-
-        /// <summary> Map format used by MCForge-Redux. </summary>
-        MCF,
 
         /// <summary> Map format used by MinerCPP and LuaCraft. Initial support added by Tyler (TkTech). </summary>
         MinerCPP,
@@ -36,23 +33,11 @@ namespace fCraft.MapConversion {
         /// <summary> Map format used by D3 server. </summary>
         D3,
 
-        /// <summary> Folder-based map format used by newer D3 servers. </summary>
-        D3Folder,
-
         /// <summary> Format used by Opticraft v0.2+. Support contributed by Jared Klopper (LgZ-optical). </summary>
         Opticraft,
 
         /// <summary> Raw byte array, with no header. For export only. </summary>
-        Raw,
-
-        /// <summary> Map format used by CloudBox, ClassiCube client, and fCraft 0.900+ </summary>
-        ClassicWorld,
-
-        /// <summary> Map-fragment format used by MCEdit, WorldEdit, etc. Classic materials. </summary>
-        Schematic,
-
-        /// <summary> Map-fragment format used by MCEdit, WorldEdit, etc. Converted modern materials. </summary>
-        ModernSchematic
+        Raw
     }
 
 

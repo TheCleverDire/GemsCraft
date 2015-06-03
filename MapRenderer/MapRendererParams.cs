@@ -1,14 +1,13 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-
+﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
 using System;
 using System.Drawing.Imaging;
 using System.Text.RegularExpressions;
+using fCraft.GUI;
 using fCraft.MapConversion;
-using fCraft.MapRendering;
 
 namespace fCraft.MapRenderer {
     /// <summary> Holds all parameters for MapRenderer program, and sets some defaults. </summary>
-    internal class MapRendererParams {
+    class MapRendererParams {
         public int Angle { get; set; }
         public IsoCatMode Mode { get; set; }
         public ImageFormat ExportFormat { get; set; }
@@ -25,7 +24,7 @@ namespace fCraft.MapRenderer {
         public bool SeeThroughWater { get; set; }
         public bool SeeThroughLava { get; set; }
         public bool Recursive { get; set; }
-        public OverwritePolicy OverwritePolicy { get; set; }
+        public bool AlwaysOverwrite { get; set; }
         public bool Uncropped { get; set; }
         public string InputFilter { get; set; }
         public bool OutputDirGiven { get; set; }
@@ -34,7 +33,6 @@ namespace fCraft.MapRenderer {
         public bool UseRegex { get; set; }
         public Regex FilterRegex { get; set; }
 
-
         public MapRendererParams() {
             Mode = IsoCatMode.Normal;
             Region = BoundingBox.Empty;
@@ -42,7 +40,6 @@ namespace fCraft.MapRenderer {
             ThreadCount = Environment.ProcessorCount;
             ExportFormat = ImageFormat.Png;
             ImageFileExtension = ".png";
-            OverwritePolicy = OverwritePolicy.Ask;
         }
     }
 }

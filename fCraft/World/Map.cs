@@ -1,7 +1,5 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -9,19 +7,15 @@ using System.Linq;
 using System.Net;
 using fCraft.Drawing;
 using fCraft.MapConversion;
-using fNbt;
 using JetBrains.Annotations;
 
 namespace fCraft {
     /// <summary> Represents a map file (associated with a world or not).
     /// Maps can be created blank (using Map constructor), generated terrain (using RealisticMapGenState),
     /// or loaded from file (using fCraft.MapConversion.MapUtility). </summary>
-    public sealed unsafe class Map {
-        /// <summary> Default map format for saving. </summary>
-        public const MapFormat SaveFormat = MapFormat.ClassicWorld;
-
-        /// <summary> File extension (including the dot) for current SaveFormat. </summary>
-        public static readonly string SaveExt = "." + SaveFormat.GetExtension();
+    public unsafe sealed class Map {
+        /// <summary> Current default map format for saving. </summary>
+        public const MapFormat SaveFormat = MapFormat.FCMv3;
 
         /// <summary> The world associated with this map, if any. May be null. </summary>
         [CanBeNull]
@@ -42,59 +36,38 @@ namespace fCraft {
         /// <summary> Map volume, in terms of blocks. </summary>
         public readonly int Volume;
 
+
         /// <summary> Default spawning point on the map. A warning is logged when given coordinates are outside the map. </summary>
         public Position Spawn {
-            get { return spawn; }
+            get {
+                return spawn;
+            }
             set {
-                if (spawn != value) {
-                    spawn = value;
-                    HasChangedSinceSave = true;
-                    if (value.X > Width*32 || value.Y > Length*32 || value.X < 0 || value.Y < 0 || value.Z < 0) {
-                        Logger.Log(LogType.Warning, "Map.Spawn: Coordinates are outside the map!");
-                    }
+                if( value.X > Width * 32 || value.Y > Length * 32 || value.X < 0 || value.Y < 0 || value.Z < 0 ) {
+                    Logger.Log( LogType.Warning, "Map.Spawn: Coordinates are outside the map!" );
+                    return;
                 }
+                spawn = value;
+                HasChangedSinceSave = true;
             }
         }
-
         Position spawn;
 
-
-        /// <summary> Resets spawn to the default location.
-        /// Sets the spawn point 1 block above the surface of the map (above the first non-air block), right in the center. </summary>
+        /// <summary> Resets spawn to the default location (top center of the map). </summary>
         public void ResetSpawn() {
-            if (Blocks == null) {
-                // fallback for maps that don't have a block array yet
-                Spawn = new Position(Width*16,
-                                     Length*16,
-                                     Math.Min(Height*32, Int16.MaxValue));
-                return;
-            }
-            int spawnZ = 0;
-            for (int z = Height - 1; z > 0; z--) {
-                if (GetBlock(Width/2, Length/2, z) != Block.Air) {
-                    spawnZ = z + 1;
-                    break;
-                }
-            }
-            Spawn = new Position(Width*16,
-                                 Length*16,
-                                 spawnZ);
+            Spawn = new Position( Width * 16,
+                                  Length * 16,
+                                  Math.Min( short.MaxValue, Height * 32 ) );
         }
 
 
         /// <summary> Whether the map was modified since last time it was saved. </summary>
         public bool HasChangedSinceSave { get; internal set; }
 
-        /// <summary> Date when this map was last modified.
-        /// Both block- and metadata changes affect this date. </summary>
+
+        // FCMv3 additions
         public DateTime DateModified { get; set; }
-
-        /// <summary> Date when this map was originally created.
-        /// Set at generation time, or at conversion time for imported maps. </summary>
         public DateTime DateCreated { get; set; }
-
-        /// <summary> Unique identifier of this map file.
-        /// Set at generation time, and at conversion time for imported maps. </summary>
         public Guid Guid { get; set; }
 
         /// <summary> Array of map blocks.
@@ -104,15 +77,10 @@ namespace fCraft {
         public byte[] Blocks;
 
         /// <summary> Map metadata, excluding zones. </summary>
-        [NotNull]
         public MetadataCollection<string> Metadata { get; private set; }
 
         /// <summary> All zones within a map. </summary>
-        [NotNull]
         public ZoneCollection Zones { get; private set; }
-
-        [CanBeNull]
-        internal NbtCompound ForeignMetadata { get; set; }
 
 
         /// <summary> Creates an empty new map of given dimensions.
@@ -124,12 +92,12 @@ namespace fCraft {
         /// <param name="initBlockArray"> If true, the Blocks array will be created. </param>
         /// <exception cref="ArgumentOutOfRangeException"> Width, length, or height is not between 16 and 2048. </exception>
         /// <exception cref="ArgumentException"> Map volume exceeds Int32.MaxValue. </exception>
-        public Map([CanBeNull] World world, int width, int length, int height, bool initBlockArray) {
-            if (!IsValidDimension(width)) throw new ArgumentOutOfRangeException("width", "Invalid map width.");
-            if (!IsValidDimension(length)) throw new ArgumentOutOfRangeException("length", "Invalid map length.");
-            if (!IsValidDimension(height)) throw new ArgumentOutOfRangeException("height", "Invalid map height.");
-            if ((long)width*length*height > Int32.MaxValue) {
-                throw new ArgumentException("Map volume exceeds Int32.MaxValue.");
+        public Map( World world, int width, int length, int height, bool initBlockArray ) {
+            if( !IsValidDimension( width ) ) throw new ArgumentOutOfRangeException( "width", "Invalid map width." );
+            if( !IsValidDimension( length ) ) throw new ArgumentOutOfRangeException( "length", "Invalid map length." );
+            if( !IsValidDimension( height ) ) throw new ArgumentOutOfRangeException( "height", "Invalid map height." );
+            if( (long)width * length * height > Int32.MaxValue ) {
+                throw new ArgumentException( "Map volume exceeds Int32.MaxValue." );
             }
             DateCreated = DateTime.UtcNow;
             DateModified = DateCreated;
@@ -146,10 +114,10 @@ namespace fCraft {
             Width = width;
             Length = length;
             Height = height;
-            Bounds = new BoundingBox(Vector3I.Zero, Width, Length, Height);
+            Bounds = new BoundingBox( Vector3I.Zero, Width, Length, Height );
             Volume = Bounds.Volume;
 
-            if (initBlockArray) {
+            if( initBlockArray ) {
                 Blocks = new byte[Volume];
             }
 
@@ -157,50 +125,52 @@ namespace fCraft {
         }
 
 
-        void OnMetaOrZoneChange([CanBeNull] object sender, [CanBeNull] EventArgs args) {
+        void OnMetaOrZoneChange( object sender, EventArgs args ) {
             HasChangedSinceSave = true;
         }
+
 
         #region Saving
 
         /// <summary> Saves this map to a file in the default format (FCMv3). </summary>
         /// <returns> Whether the saving succeeded. </returns>
-        public bool Save([NotNull] string fileName) {
-            if (fileName == null) throw new ArgumentNullException("fileName");
+        public bool Save( [NotNull] string fileName ) {
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
             string tempFileName = fileName + ".temp";
 
             // save to a temporary file
             try {
-                HasChangedSinceSave = !MapUtility.TrySave(this, tempFileName, SaveFormat);
-            } catch (IOException ex) {
+                HasChangedSinceSave = !MapUtility.TrySave( this, tempFileName, SaveFormat );
+            } catch( IOException ex ) {
                 HasChangedSinceSave = true;
-                Logger.Log(LogType.Error,
-                           "Map.Save: Unable to open file \"{0}\" for writing: {1}",
-                           tempFileName,
-                           ex);
-                if (File.Exists(tempFileName)) File.Delete(tempFileName);
+                Logger.Log( LogType.Error,
+                            "Map.Save: Unable to open file \"{0}\" for writing: {1}",
+                            tempFileName, ex );
+                if( File.Exists( tempFileName ) )
+                    File.Delete( tempFileName );
                 return false;
             }
 
             // move newly-written file into its permanent destination
             try {
-                Paths.MoveOrReplaceFile(tempFileName, fileName);
-                Logger.Log(LogType.SystemActivity,
-                           "Saved map to {0}",
-                           fileName);
-            } catch (Exception ex) {
+                Paths.MoveOrReplaceFile( tempFileName, fileName );
+                Logger.Log( LogType.SystemActivity,
+                            "Saved map to {0}", fileName );
+
+            } catch( Exception ex ) {
                 HasChangedSinceSave = true;
-                Logger.Log(LogType.Error,
-                           "Map.Save: Error trying to replace file \"{0}\": {1}",
-                           fileName,
-                           ex);
-                if (File.Exists(tempFileName)) File.Delete(tempFileName);
+                Logger.Log( LogType.Error,
+                            "Map.Save: Error trying to replace file \"{0}\": {1}",
+                            fileName, ex );
+                if( File.Exists( tempFileName ) )
+                    File.Delete( tempFileName );
                 return false;
             }
             return true;
         }
 
         #endregion
+
 
         #region Block Getters / Setters
 
@@ -209,16 +179,16 @@ namespace fCraft {
         /// <param name="y"> Y coordinate (length, Notch's Z). </param>
         /// <param name="z"> Z coordinate (height, Notch's Y). </param>
         /// <returns> Index of the block in Map.Blocks array. </returns>
-        public int Index(int x, int y, int z) {
-            return (z*Length + y)*Width + x;
+        public int Index( int x, int y, int z ) {
+            return (z * Length + y) * Width + x;
         }
 
 
         /// <summary> Converts given coordinates to a block array index. </summary>
         /// <param name="coords"> Coordinate vector (X,Y,Z). </param>
         /// <returns> Index of the block in Map.Blocks array. </returns>
-        public int Index(Vector3I coords) {
-            return (coords.Z*Length + coords.Y)*Width + coords.X;
+        public int Index( Vector3I coords ) {
+            return (coords.Z * Length + coords.Y) * Width + coords.X;
         }
 
 
@@ -229,9 +199,9 @@ namespace fCraft {
         /// <param name="y"> Y coordinate (length, Notch's Z). </param>
         /// <param name="z"> Z coordinate (height, Notch's Y). </param>
         /// <param name="type"> Block type to set. </param>
-        public void SetBlock(int x, int y, int z, Block type) {
-            if (x < Width && y < Length && z < Height && x >= 0 && y >= 0 && z >= 0) {
-                Blocks[Index(x, y, z)] = (byte)type;
+        public void SetBlock( int x, int y, int z, Block type ) {
+            if( x < Width && y < Length && z < Height && x >= 0 && y >= 0 && z >= 0 ) {
+                Blocks[Index( x, y, z )] = (byte)type;
                 HasChangedSinceSave = true;
                 compressedCopyCache = null;
             }
@@ -241,10 +211,9 @@ namespace fCraft {
         /// <summary> Sets a block at given coordinates. Checks bounds. </summary>
         /// <param name="coords"> Coordinate vector (X,Y,Z). </param>
         /// <param name="type"> Block type to set. </param>
-        public void SetBlock(Vector3I coords, Block type) {
-            if (coords.X < Width && coords.Y < Length && coords.Z < Height && coords.X >= 0 && coords.Y >= 0 &&
-                coords.Z >= 0 && (byte)type < 50) {
-                Blocks[Index(coords)] = (byte)type;
+        public void SetBlock( Vector3I coords, Block type ) {
+            if( coords.X < Width && coords.Y < Length && coords.Z < Height && coords.X >= 0 && coords.Y >= 0 && coords.Z >= 0 && (byte)type < 50 ) {
+                Blocks[Index( coords )] = (byte)type;
                 HasChangedSinceSave = true;
                 compressedCopyCache = null;
             }
@@ -254,7 +223,7 @@ namespace fCraft {
         /// <summary> Sets a block at given coordinates. </summary>
         /// <param name="index"> Index of the block (use map.Index(x,y,z)). </param>
         /// <param name="type"> Block type to set. </param>
-        public void SetBlock(int index, Block type) {
+        public void SetBlock( int index, Block type ) {
             Blocks[index] = (byte)type;
             HasChangedSinceSave = true;
             compressedCopyCache = null;
@@ -266,8 +235,9 @@ namespace fCraft {
         /// <param name="y"> Y coordinate (length, Notch's Z). </param>
         /// <param name="z"> Z coordinate (height, Notch's Y). </param>
         /// <returns> Block type, as a Block enumeration. Block.None if coordinates were out of bounds. </returns>
-        public Block GetBlock(int x, int y, int z) {
-            if (x < Width && y < Length && z < Height && x >= 0 && y >= 0 && z >= 0) return (Block)Blocks[Index(x, y, z)];
+        public Block GetBlock( int x, int y, int z ) {
+            if( x < Width && y < Length && z < Height && x >= 0 && y >= 0 && z >= 0 )
+                return (Block)Blocks[Index( x, y, z )];
             return Block.None;
         }
 
@@ -275,9 +245,9 @@ namespace fCraft {
         /// <summary> Gets a block at given coordinates. Checks bounds. </summary>
         /// <param name="coords"> Coordinate vector (X,Y,Z). </param>
         /// <returns> Block type, as a Block enumeration. Undefined if coordinates were out of bounds. </returns>
-        public Block GetBlock(Vector3I coords) {
-            if (coords.X < Width && coords.Y < Length && coords.Z < Height && coords.X >= 0 && coords.Y >= 0 &&
-                coords.Z >= 0) return (Block)Blocks[Index(coords)];
+        public Block GetBlock( Vector3I coords ) {
+            if( coords.X < Width && coords.Y < Length && coords.Z < Height && coords.X >= 0 && coords.Y >= 0 && coords.Z >= 0 )
+                return (Block)Blocks[Index( coords )];
             return Block.None;
         }
 
@@ -286,98 +256,100 @@ namespace fCraft {
         /// <param name="x"> X coordinate (width). </param>
         /// <param name="y"> Y coordinate (length, Notch's Z). </param>
         /// <param name="z"> Z coordinate (height, Notch's Y). </param>
-        public bool InBounds(int x, int y, int z) {
+        public bool InBounds( int x, int y, int z ) {
             return x < Width && y < Length && z < Height && x >= 0 && y >= 0 && z >= 0;
         }
 
 
         /// <summary> Checks whether the given coordinate (in block units) is within the bounds of the map. </summary>
         /// <param name="vec"> Coordinate vector (X,Y,Z). </param>
-        public bool InBounds(Vector3I vec) {
+        public bool InBounds( Vector3I vec ) {
             return vec.X < Width && vec.Y < Length && vec.Z < Height && vec.X >= 0 && vec.Y >= 0 && vec.Z >= 0;
         }
 
         #endregion
+
 
         #region Block Updates & Simulation
 
         // Queue of block updates. Updates are applied by ProcessUpdates()
         readonly ConcurrentQueue<BlockUpdate> updates = new ConcurrentQueue<BlockUpdate>();
 
+
         /// <summary> Number of blocks that are waiting to be processed. </summary>
         public int UpdateQueueLength {
-            get { return updates.Count; }
+            get { return updates.Length; }
         }
 
 
         /// <summary> Queues a new block update to be processed.
         /// Due to concurrent nature of the server, there is no guarantee
         /// that updates will be applied in any specific order. </summary>
-        public void QueueUpdate(BlockUpdate update) {
-            updates.Enqueue(update);
+        public void QueueUpdate( BlockUpdate update ) {
+            updates.Enqueue( update );
         }
 
 
         /// <summary> Clears all pending updates. </summary>
         public void ClearUpdateQueue() {
-            BlockUpdate ignored;
-            while (updates.TryDequeue(out ignored)) {}
+            updates.Clear();
         }
 
 
         // Applies pending updates and sends them to players (if applicable).
         internal void ProcessUpdates() {
-            if (World == null) {
-                throw new InvalidOperationException("Map must be assigned to a world to process updates.");
+            if( World == null ) {
+                throw new InvalidOperationException( "Map must be assigned to a world to process updates." );
             }
 
-            if (World.IsLocked) {
-                if (World.IsPendingMapUnload) {
-                    World.UnloadMap(true);
+            if( World.IsLocked ) {
+                if( World.IsPendingMapUnload ) {
+                    World.UnloadMap( true );
                 }
                 return;
             }
 
             int packetsSent = 0;
             bool canFlush = false;
-            int maxPacketsPerUpdate = Server.CalculateMaxPacketsPerUpdate(World);
-            while (packetsSent < maxPacketsPerUpdate) {
+            int maxPacketsPerUpdate = Server.CalculateMaxPacketsPerUpdate( World );
+            while( packetsSent < maxPacketsPerUpdate ) {
                 BlockUpdate update;
-                if (!updates.TryDequeue(out update)) {
-                    if (World.IsFlushing) {
+                if( !updates.Dequeue( out update ) ) {
+                    if( World.IsFlushing ) {
                         canFlush = true;
                     }
                     break;
                 }
                 HasChangedSinceSave = true;
                 compressedCopyCache = null;
-                if (!InBounds(update.X, update.Y, update.Z)) continue;
-                int blockIndex = Index(update.X, update.Y, update.Z);
+                if( !InBounds( update.X, update.Y, update.Z ) ) continue;
+                int blockIndex = Index( update.X, update.Y, update.Z );
                 Blocks[blockIndex] = (byte)update.BlockType;
 
-                if (!World.IsFlushing) {
-                    Packet packet = Packet.MakeSetBlock(update.X, update.Y, update.Z, update.BlockType);
-                    World.Players.SendLowPriority(update.Origin, packet);
+                if( !World.IsFlushing ) {
+                    Packet packet = Packet.MakeSetBlock( update.X, update.Y, update.Z, update.BlockType );
+                    World.Players.SendLowPriority( update.Origin, packet );
                 }
                 packetsSent++;
             }
 
-            if (drawOps.Count > 0) {
-                lock (drawOpLock) {
-                    if (drawOps.Count > 0) {
-                        packetsSent += ProcessDrawOps(maxPacketsPerUpdate - packetsSent);
+            if( drawOps.Count > 0 ) {
+                lock( drawOpLock ) {
+                    if( drawOps.Count > 0 ) {
+                        packetsSent += ProcessDrawOps( maxPacketsPerUpdate - packetsSent );
                     }
                 }
-            } else if (canFlush) {
+            } else if( canFlush ) {
                 World.EndFlushMapBuffer();
             }
 
-            if (packetsSent == 0 && World.IsPendingMapUnload) {
-                World.UnloadMap(true);
+            if( packetsSent == 0 && World.IsPendingMapUnload ) {
+                World.UnloadMap( true );
             }
         }
 
         #endregion
+
 
         #region Draw Operations
 
@@ -389,8 +361,8 @@ namespace fCraft {
         /// <summary> Total estimated number of blocks left to process, from all draw operations combined. </summary>
         public long DrawQueueBlockCount {
             get {
-                lock (drawOpLock) {
-                    return drawOps.Sum(op => (long)op.BlocksLeftToProcess);
+                lock( drawOpLock ) {
+                    return drawOps.Sum( op => (long)op.BlocksLeftToProcess );
                 }
             }
         }
@@ -400,33 +372,33 @@ namespace fCraft {
         readonly object drawOpLock = new object();
 
 
-        internal void QueueDrawOp([NotNull] DrawOperation op) {
-            if (op == null) throw new ArgumentNullException("op");
-            lock (drawOpLock) {
-                drawOps.Add(op);
+        internal void QueueDrawOp( [NotNull] DrawOperation op ) {
+            if( op == null ) throw new ArgumentNullException( "op" );
+            lock( drawOpLock ) {
+                drawOps.Add( op );
             }
         }
 
 
-        int ProcessDrawOps(int maxTotalUpdates) {
-            if (World == null) throw new InvalidOperationException("No world assigned");
+        int ProcessDrawOps( int maxTotalUpdates ) {
+            if( World == null ) throw new InvalidOperationException( "No world assigned" );
             int blocksDrawnTotal = 0;
-            for (int i = 0; i < drawOps.Count; i++) {
+            for( int i = 0; i < drawOps.Count; i++ ) {
                 DrawOperation op = drawOps[i];
 
                 // remove a cancelled drawOp from the list
-                if (op.IsCancelled) {
+                if( op.IsCancelled ) {
                     op.End();
-                    drawOps.RemoveAt(i);
+                    drawOps.RemoveAt( i );
                     i--;
                     continue;
                 }
 
                 // draw a batch of blocks
-                int blocksToDraw = maxTotalUpdates/(drawOps.Count - i);
+                int blocksToDraw = maxTotalUpdates / (drawOps.Count - i);
                 op.StartBatch();
 #if DEBUG
-                int blocksDrawn = op.DrawBatch(blocksToDraw);
+                int blocksDrawn = op.DrawBatch( blocksToDraw );
 #else
                 int blocksDrawn;
                 try{
@@ -441,15 +413,15 @@ namespace fCraft {
                 }
 #endif
                 blocksDrawnTotal += blocksDrawn;
-                if (blocksDrawn > 0) {
+                if( blocksDrawn > 0 ) {
                     HasChangedSinceSave = true;
                 }
                 maxTotalUpdates -= blocksDrawn;
 
                 // remove a completed drawOp from the list
-                if (op.IsDone) {
+                if( op.IsDone ) {
                     op.End();
-                    drawOps.RemoveAt(i);
+                    drawOps.RemoveAt( i );
                     i--;
                 }
             }
@@ -459,8 +431,8 @@ namespace fCraft {
 
         /// <summary> Cancels and stops all active draw operations. </summary>
         public void CancelAllDrawOps() {
-            lock (drawOpLock) {
-                for (int i = 0; i < drawOps.Count; i++) {
+            lock( drawOpLock ) {
+                for( int i = 0; i < drawOps.Count; i++ ) {
                     drawOps[i].Cancel();
                     drawOps[i].End();
                 }
@@ -470,18 +442,18 @@ namespace fCraft {
 
         #endregion
 
-        #region Utilities
 
+        #region Utilities
         /// <summary> Checks if a given map dimension (width, height, or length) is acceptable.
         /// Values between 1 and 2047 are technically allowed. </summary>
-        public static bool IsValidDimension(int dimension) {
+        public static bool IsValidDimension( int dimension ) {
             return dimension >= 16 && dimension <= 2048;
         }
 
 
         /// <summary> Checks if a given map dimension (width, height, or length) is among the set of recommended values
         /// Recommended values are: 16, 32, 64, 128, 256, 512, 1024 </summary>
-        public static bool IsRecommendedDimension(int dimension) {
+        public static bool IsRecommendedDimension( int dimension ) {
             return dimension >= 16 && (dimension & (dimension - 1)) == 0 && dimension <= 1024;
         }
 
@@ -489,45 +461,41 @@ namespace fCraft {
         /// <summary> Converts nonstandard (50-255) blocks using the given mapping. </summary>
         /// <param name="mapping"> Byte array of length 256. </param>
         /// <returns> True if any blocks needed conversion/mapping. </returns>
-        public bool ConvertBlockTypes([NotNull] byte[] mapping) {
-            if (mapping == null) throw new ArgumentNullException("mapping");
-            if (mapping.Length != 256) throw new ArgumentException("Mapping must list all 256 blocks", "mapping");
+        public bool ConvertBlockTypes( [NotNull] byte[] mapping ) {
+            if( mapping == null ) throw new ArgumentNullException( "mapping" );
+            if( mapping.Length != 256 ) throw new ArgumentException( "Mapping must list all 256 blocks", "mapping" );
 
             bool mapped = false;
-            fixed (byte* ptr = Blocks) {
-                for (int j = 0; j < Blocks.Length; j++) {
-                    if (ptr[j] > 49) { // TODO: CustomBlocks
+            fixed( byte* ptr = Blocks ) {
+                for( int j = 0; j < Blocks.Length; j++ ) {
+                    if( ptr[j] > 49 ) {
                         ptr[j] = mapping[ptr[j]];
                         mapped = true;
                     }
                 }
             }
-            if (mapped) HasChangedSinceSave = true;
+            if( mapped ) HasChangedSinceSave = true;
             return mapped;
         }
 
-
         static readonly byte[] ZeroMapping = new byte[256];
-
 
         /// <summary> Replaces all nonstandard (50-255) blocks with air. </summary>
         /// <returns> True if any blocks needed replacement. </returns>
-        public bool RemoveUnknownBlockTypes() {
-            return ConvertBlockTypes(ZeroMapping);
+        public bool RemoveUnknownBlocktypes() {
+            return ConvertBlockTypes( ZeroMapping );
         }
 
 
         static readonly Dictionary<string, Block> BlockNames = new Dictionary<string, Block>();
         static readonly Dictionary<Block, string> BlockEdgeTextures = new Dictionary<Block, string>();
 
-
         static Map() {
             // add default names for blocks, and their numeric codes
-            foreach (Block block in Enum.GetValues(typeof(Block))) {
-                BlockNames.Add(block.ToString().ToLower(), block);
-                BlockNames.Add(((int)block).ToStringInvariant(), block);
+            foreach( Block block in Enum.GetValues( typeof( Block ) ) ) {
+                BlockNames.Add( block.ToString().ToLower(), block );
+                BlockNames.Add( ( (int)block ).ToStringInvariant(), block );
             }
-            // ReSharper disable StringLiteralTypo
 
             // alternative names for blocks
             BlockNames["skip"] = Block.None;
@@ -732,7 +700,6 @@ namespace fCraft {
             BlockEdgeTextures[Block.White] = "d7d91aef7f07a0e0dbafca3b6387619098916953";
             BlockEdgeTextures[Block.Wood] = "af65cd0d0756d357a1abd5390b8de2e5ad1f29af";
             BlockEdgeTextures[Block.Yellow] = "eff6823a987deb65ad21020a3151bb809d3d062c";
-            // ReSharper restore StringLiteralTypo
         }
 
 
@@ -740,18 +707,17 @@ namespace fCraft {
         /// Air, Brown/Red mushrooms, Glass, Leaves, Red/Yellow flowers, and Saplings are considered non-solid. </summary>
         /// <returns> A 2D array of same Width/Length as the map.
         /// Value at each coordinate corresponds to the highest solid point on the map. </returns>
-        [NotNull]
         public short[][] ComputeHeightmap() {
-            fixed (byte* blocks = Blocks) {
+            fixed( byte* blocks = Blocks ) {
                 int layer = Width*Length;
                 short[][] shadows = new short[Width][];
-                for (int x = 0; x < Width; x++) {
+                for( int x = 0; x < Width; x++ ) {
                     shadows[x] = new short[Length];
                     var sx = shadows[x];
-                    for (int y = 0; y < Length; y++) {
-                        int index = Index(x, y, Height - 1);
-                        for (int z = (Height - 1); z >= 0; z--) {
-                            switch ((Block)blocks[index]) {
+                    for( int y = 0; y < Length; y++ ) {
+                        int index = Index( x, y, Height - 1 );
+                        for( int z = (Height - 1); z >= 0; z-- ) {
+                            switch( (Block)blocks[index] ) {
                                 case Block.Air:
                                 case Block.BrownMushroom:
                                 case Block.Glass:
@@ -782,10 +748,10 @@ namespace fCraft {
         /// Block.Undefined if value could not be parsed. </param>
         /// <returns> True if given blockName was parsed as an acceptable block type. </returns>
         /// <exception cref="ArgumentNullException"> blockName is null. </exception>
-        public static bool GetBlockByName([NotNull] string blockName, bool allowNoneBlock, out Block block) {
-            if (blockName == null) throw new ArgumentNullException("blockName");
-            if (BlockNames.TryGetValue(blockName.ToLower(), out block)) {
-                if (block == Block.None) {
+        public static bool GetBlockByName( [NotNull] string blockName, bool allowNoneBlock, out Block block ) {
+            if( blockName == null ) throw new ArgumentNullException( "blockName" );
+            if( BlockNames.TryGetValue( blockName.ToLower(), out block ) ) {
+                if( block == Block.None ) {
                     return allowNoneBlock;
                 } else {
                     return true;
@@ -798,12 +764,12 @@ namespace fCraft {
 
 
         /// <summary> Tries to find WoM file hashes for edge textures. </summary>
-        /// <param name="block"> Block type to find edge texture hash for. </param>
+        /// <param name="block"> Blocktype to find edge texture hash for. </param>
         /// <returns> Hash string if found, or null if not found. </returns>
         [CanBeNull]
-        internal static string GetEdgeTexture(Block block) {
+        internal static string GetEdgeTexture( Block block ) {
             string result;
-            if (BlockEdgeTextures.TryGetValue(block, out result)) {
+            if( BlockEdgeTextures.TryGetValue( block, out result ) ) {
                 return result;
             } else {
                 return null;
@@ -813,17 +779,16 @@ namespace fCraft {
 
         /// <summary> Gets a compressed (GZip) copy of the map (raw block data with signed, 32bit, big-endian block count prepended).
         /// If the map has not been modified since last GetCompressedCopy call, returns a cached copy. </summary>
-        [NotNull]
         public byte[] GetCompressedCopy() {
             byte[] currentCopy = compressedCopyCache;
-            if (currentCopy == null) {
-                using (MemoryStream ms = new MemoryStream()) {
-                    using (GZipStream compressor = new GZipStream(ms, CompressionMode.Compress)) {
+            if( currentCopy == null ) {
+                using( MemoryStream ms = new MemoryStream() ) {
+                    using( GZipStream compressor = new GZipStream( ms, CompressionMode.Compress ) ) {
                         // convert block count to big-endian
-                        int convertedBlockCount = IPAddress.HostToNetworkOrder(Blocks.Length);
+                        int convertedBlockCount = IPAddress.HostToNetworkOrder( Blocks.Length );
                         // write block count to gzip stream
-                        compressor.Write(BitConverter.GetBytes(convertedBlockCount), 0, 4);
-                        compressor.Write(Blocks, 0, Blocks.Length);
+                        compressor.Write( BitConverter.GetBytes( convertedBlockCount ), 0, 4 );
+                        compressor.Write( Blocks, 0, Blocks.Length );
                     }
                     currentCopy = ms.ToArray();
                     compressedCopyCache = currentCopy;
@@ -831,8 +796,6 @@ namespace fCraft {
             }
             return currentCopy;
         }
-
-
         volatile byte[] compressedCopyCache;
 
 
@@ -840,10 +803,10 @@ namespace fCraft {
         /// <param name="x"> X coordinate (width). </param>
         /// <param name="y"> Y coordinate (length, Notch's Z). </param>
         /// <param name="id"> Block type to search for. </param>
-        /// <returns> Height (Z coordinate; Notch's X) of the block type's first appearance.
-        /// -1 if given block type was not found. </returns>
-        public int SearchColumn(int x, int y, Block id) {
-            return SearchColumn(x, y, id, Height - 1);
+        /// <returns> Height (Z coordinate; Notch's X) of the blocktype's first appearance.
+        /// -1 if given blocktype was not found. </returns>
+        public int SearchColumn( int x, int y, Block id ) {
+            return SearchColumn( x, y, id, Height - 1 );
         }
 
 
@@ -852,11 +815,11 @@ namespace fCraft {
         /// <param name="y"> Y coordinate (length, Notch's Z). </param>
         /// <param name="id"> Block type to search for. </param>
         /// <param name="zStart"> Starting height. No blocks above this point will be checked. </param>
-        /// <returns> Height (Z coordinate; Notch's X) of the block type's first appearance.
-        /// -1 if given block type was not found. </returns>
-        public int SearchColumn(int x, int y, Block id, int zStart) {
-            for (int z = zStart; z > 0; z--) {
-                if (GetBlock(x, y, z) == id) {
+        /// <returns> Height (Z coordinate; Notch's X) of the blocktype's first appearance.
+        /// -1 if given blocktype was not found. </returns>
+        public int SearchColumn( int x, int y, Block id, int zStart ) {
+            for( int z = zStart; z > 0; z-- ) {
+                if( GetBlock( x, y, z ) == id ) {
                     return z;
                 }
             }

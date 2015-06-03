@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>fCraft</RootNamespace>
     <AssemblyName>fCraft</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>
     </StartupObject>
@@ -44,8 +44,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>..\bin\Debug\fCraft.xml</DocumentationFile>
-    <ErrorReport>none</ErrorReport>
+    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,8 +55,7 @@
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <DocumentationFile>..\bin\Debug\fCraft.xml</DocumentationFile>
-    <ErrorReport>none</ErrorReport>
+    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_Events|AnyCPU' ">
     <OutputPath>..\bin\Debug\</OutputPath>
@@ -66,7 +64,7 @@
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>..\bin\Debug\fCraft.xml</DocumentationFile>
+    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_IRC|AnyCPU' ">
     <OutputPath>..\bin\Debug\</OutputPath>
@@ -75,7 +73,7 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>..\bin\Debug\fCraft.xml</DocumentationFile>
+    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_Scheduler|AnyCPU' ">
     <OutputPath>..\bin\Debug\</OutputPath>
@@ -84,53 +82,39 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>..\bin\Debug\fCraft.xml</DocumentationFile>
+    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_Networking|AnyCPU' ">
     <OutputPath>..\bin\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DEBUG_NETWORKING</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\bin\Debug\fCraft.xml</DocumentationFile>
+    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="fNbt">
-      <HintPath>lib\fNbt.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.ServiceModel.Web">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\DrawCommands.cs" />
-    <Compile Include="Drawing\BlockPalette.cs" />
-    <Compile Include="Drawing\Brushes\PasteBrush.cs" />
     <Compile Include="Drawing\DrawOperation.cs" />
+    <Compile Include="AutoRank\AutoRankManager.cs" />
     <Compile Include="Commands\ModerationCommands.cs" />
     <Compile Include="Commands\MaintenanceCommands.cs" />
     <Compile Include="Commands\ZoneCommands.cs" />
     <Compile Include="Drawing\DrawOps\Fill3DDrawOperation.cs" />
-    <Compile Include="Drawing\DrawOps\ImageDrawOperation.cs" />
-    <Compile Include="Drawing\IBrushFactory.cs" />
-    <Compile Include="MapConversion\MapD3Folder.cs" />
-    <Compile Include="MapConversion\MapMCF.cs" />
-    <Compile Include="MapConversion\MapModernSchematic.cs" />
-    <Compile Include="MapConversion\MapSchematic.cs" />
-    <Compile Include="MapRendering\IsoCat.cs" />
-    <Compile Include="MapRendering\IsoCatMode.cs" />
-    <Compile Include="MapRendering\IsoCatResult.cs" />
-    <Compile Include="MapConversion\MapCW.cs" />
     <Compile Include="MapConversion\MapFCMv3.cs" />
     <Compile Include="MapGeneration\EmptyMapGen.cs" />
     <Compile Include="MapGeneration\FloatingIslandMapGen.cs" />
@@ -142,17 +126,9 @@
     <Compile Include="MapGeneration\RealisticMapGen.cs" />
     <Compile Include="MapGeneration\RealisticMapGenBlockTheme.cs" />
     <Compile Include="MapGeneration\VanillaMapGen.cs" />
-    <Compile Include="Network\CpeConstants.cs" />
-    <Compile Include="Player\Player.Chat.cs" />
     <Compile Include="Player\SearchOptions.cs" />
     <Compile Include="Player\SecurityController.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Drawing\BitMap3D.cs" />
-    <Compile Include="Utils\ConsoleUtil.cs" />
+    <Compile Include="Utils\BitMap3D.cs" />
     <Compile Include="Utils\Paths.cs" />
     <Compile Include="System\Scheduler.cs" />
     <Compile Include="Utils\Vector3F.cs" />
@@ -172,18 +148,20 @@
     <Compile Include="MapConversion\MapMinerCPP.cs" />
     <Compile Include="MapConversion\MapIndev.cs" />
     <Compile Include="MapConversion\MapUtility.cs" />
+    <Compile Include="MapConversion\NBTag.cs" />
     <Compile Include="Network\IRC.cs" />
     <Compile Include="Network\IPBanList.cs" />
     <Compile Include="Network\IRCCommands.cs" />
     <Compile Include="Network\IRCMessage.cs" />
     <Compile Include="Player\PlayerConstants.cs" />
     <Compile Include="Utils\BoundingBox.cs" />
+    <Compile Include="Utils\ConcurrentQueue.cs" />
     <Compile Include="System\ConfigKey.cs" />
     <Compile Include="Utils\Noise.cs" />
     <Compile Include="Utils\Updater.cs" />
     <Compile Include="Player\RankManager.cs" />
     <Compile Include="Player\Permission.cs" />
-    <Compile Include="Utils\ChatColor.cs" />
+    <Compile Include="Utils\Color.cs" />
     <Compile Include="Network\Heartbeat.cs" />
     <Compile Include="System\Server.cs" />
     <Compile Include="System\Config.cs" />
@@ -246,6 +224,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AutoRank\Conditions.cs" />
+    <Compile Include="AutoRank\Criterion.cs" />
     <Compile Include="Commands\ChatCommands.cs" />
     <Compile Include="Drawing\Brushes\ReplaceBrushBrush.cs" />
     <Compile Include="Drawing\DrawOps\BlockDBDrawOperation.cs" />
@@ -328,17 +308,7 @@
     <Compile Include="World\World.Events.cs" />
     <Compile Include="Utils\JetBrains.Annotations.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="MapRendering\Tileset.png" />
-    <Content Include="MapRendering\TilesetShadowed.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

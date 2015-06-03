@@ -1,6 +1,7 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
 namespace fCraft {
+
     // See comment at the top of Config.cs for a history of changes.
 
     /// <summary> Enumeration of permission types/categories.

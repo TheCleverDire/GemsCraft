@@ -1,5 +1,6 @@
-﻿// Part of fCraft | fCraft is copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-/* Based, in part, on SmartIrc4net code. Original license is reproduced below.
+﻿/* Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+ * 
+ * Based, in part, on SmartIrc4net code. Original license is reproduced below.
  * 
  *
  *
@@ -39,11 +40,9 @@ namespace fCraft {
         public IRCMessageType Type { get; private set; }
         public IRCReplyCode ReplyCode { get; private set; }
 
-
-        public IRCMessage(string from, string nick, string ident, string host, string channel, string message,
-                          string rawMessage, IRCMessageType type, IRCReplyCode replyCode) {
+        public IRCMessage( string from, string nick, string ident, string host, string channel, string message, string rawMessage, IRCMessageType type, IRCReplyCode replyCode ) {
             RawMessage = rawMessage;
-            RawMessageArray = rawMessage.Split(new[] { ' ' });
+            RawMessageArray = rawMessage.Split( new[] { ' ' } );
             Type = type;
             ReplyCode = replyCode;
             From = from;
@@ -51,10 +50,10 @@ namespace fCraft {
             Ident = ident;
             Host = host;
             Channel = channel;
-            if (message != null) {
+            if( message != null ) {
                 // message is optional
                 Message = message;
-                MessageArray = message.Split(new[] { ' ' });
+                MessageArray = message.Split( new[] { ' ' } );
             }
         }
     }

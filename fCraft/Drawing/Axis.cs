@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright 2009-2013 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
 
 namespace fCraft.Drawing {
     /// <summary> Axis/orientation in a 3D space. </summary>
