@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System.Threading;
 
 namespace fCraft {
@@ -37,13 +37,14 @@ namespace fCraft {
         }
 
 
-        public bool Dequeue( out T t ) {
-            t = default( T );
+        public bool Dequeue( ref T t ) {
+            Pointer tempHead;
+
             // Keep trying until deque is done
             bool bDequeNotDone = true;
             while( bDequeNotDone ) {
                 // read head
-                Pointer tempHead = head;
+                tempHead = head;
 
                 // read tail
                 Pointer tempTail = tail;
@@ -58,7 +59,7 @@ namespace fCraft {
                 if( tempHead.Ptr == tempTail.Ptr ) {
                     // is the queue empty?
                     if( null == next.Ptr ) {
-                        // queue is empty cannot dequeue
+                        // queue is empty cannnot dequeue
                         return false;
                     }
 
@@ -120,8 +121,8 @@ namespace fCraft {
 
 
         public void Clear() {
-            T t;
-            while( Dequeue( out t ) ) { }
+            T t = default( T );
+            while( Dequeue( ref t ) ) { }
         }
     }
 }

@@ -1,4 +1,4 @@
-// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -6,8 +6,7 @@ using System.Net;
 using JetBrains.Annotations;
 
 namespace fCraft.MapConversion {
-    /// <summary> Myne map conversion implementation, for converting Myne map format into fCraft's default map format. </summary>
-    public sealed class MapMyne : IMapImporter {
+    public sealed class MapMyne : IMapConverter {
 
         const string BlockStoreFileName = "blocks.gz";
         const string MetaDataFileName = "world.meta";
@@ -17,28 +16,18 @@ namespace fCraft.MapConversion {
             get { return "Myne/MyneCraft/HyveBuild/iCraft"; }
         }
 
-        public bool SupportsImport {
-            get { return true; }
-        }
-
-        public bool SupportsExport {
-            get { return false; }
-        }
-
-        public string FileExtension {
-            get { throw new NotSupportedException(); }
-        }
 
         public MapStorageType StorageType {
             get { return MapStorageType.Directory; }
         }
+
 
         public MapFormat Format {
             get { return MapFormat.Myne; }
         }
 
 
-        public bool ClaimsName( string path ) {
+        public bool ClaimsName( [NotNull] string path ) {
             if( path == null ) throw new ArgumentNullException( "path" );
             return Directory.Exists( path ) &&
                    File.Exists( Path.Combine( path, BlockStoreFileName ) ) &&
@@ -46,13 +35,13 @@ namespace fCraft.MapConversion {
         }
 
 
-        public bool Claims( string path ) {
+        public bool Claims( [NotNull] string path ) {
             if( path == null ) throw new ArgumentNullException( "path" );
             return ClaimsName( path );
         }
 
 
-        public Map LoadHeader( string path ) {
+        public Map LoadHeader( [NotNull] string path ) {
             if( path == null ) throw new ArgumentNullException( "path" );
             string fullMetaDataFileName = Path.Combine( path, MetaDataFileName );
             Map map;
@@ -63,7 +52,7 @@ namespace fCraft.MapConversion {
         }
 
 
-        public Map Load( string path ) {
+        public Map Load( [NotNull] string path ) {
             if( path == null ) throw new ArgumentNullException( "path" );
             string fullBlockStoreFileName = Path.Combine( path, BlockStoreFileName );
             string fullMetaDataFileName = Path.Combine( path, MetaDataFileName );
@@ -85,14 +74,15 @@ namespace fCraft.MapConversion {
 
 
         static void LoadBlocks( [NotNull] Map map, [NotNull] Stream mapStream ) {
+            mapStream.Seek( 0, SeekOrigin.Begin );
+
             // Setup a GZipStream to decompress and read the map file
             GZipStream gs = new GZipStream( mapStream, CompressionMode.Decompress, true );
             BinaryReader bs = new BinaryReader( gs );
 
             int blockCount = IPAddress.HostToNetworkOrder( bs.ReadInt32() );
             if( blockCount != map.Volume ) {
-                throw new MapFormatException(
-                    "MapMyne: Map dimensions in the metadata do not match dimensions of the block array." );
+                throw new Exception( "Map dimensions in the metadata do not match dimensions of the block array." );
             }
 
             map.Blocks = new byte[blockCount];
@@ -103,12 +93,12 @@ namespace fCraft.MapConversion {
 
         static Map LoadMeta( [NotNull] Stream stream ) {
             if( stream == null ) throw new ArgumentNullException( "stream" );
-            MyneMetaFile metaFile = new MyneMetaFile( stream );
+            INIFile metaFile = new INIFile( stream );
             if( metaFile.IsEmpty ) {
-                throw new MapFormatException( "MapMyne: Metadata file is empty or incorrectly formatted." );
+                throw new Exception( "Metadata file is empty or incorrectly formatted." );
             }
             if( !metaFile.Contains( "size", "x", "y", "z" ) ) {
-                throw new MapFormatException( "MapMyne: Metadata file is missing map dimensions." );
+                throw new Exception( "Metadata file is missing map dimensions." );
             }
 
             int width = Int32.Parse( metaFile["size", "x"] );
@@ -117,15 +107,27 @@ namespace fCraft.MapConversion {
 
             Map map = new Map( null, width, length, height, false );
 
+            if( !map.ValidateHeader() ) {
+                throw new MapFormatException( "One or more of the map dimensions are invalid." );
+            }
 
             if( metaFile.Contains( "spawn", "x", "y", "z", "h" ) ) {
-                map.Spawn = new Position( (short)(Int16.Parse( metaFile["spawn", "x"] )*32 + 16),
-                                          (short)(Int16.Parse( metaFile["spawn", "z"] )*32 + 16),
-                                          (short)(Int16.Parse( metaFile["spawn", "y"] )*32 + 16),
-                                          (byte)(Int32.Parse( metaFile["spawn", "h"] )*255/360),
-                                          0 );
+                map.Spawn = new Position {
+                    X = (short)(Int16.Parse( metaFile["spawn", "x"] ) * 32 + 16),
+                    Y = (short)(Int16.Parse( metaFile["spawn", "z"] ) * 32 + 16),
+                    Z = (short)(Int16.Parse( metaFile["spawn", "y"] ) * 32 + 16),
+                    R = Byte.Parse( metaFile["spawn", "h"] ),
+                    L = 0
+                };
             }
             return map;
+        }
+
+
+        public bool Save( [NotNull] Map mapToSave, [NotNull] string fileName ) {
+            if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
+            throw new NotImplementedException();
         }
     }
 }

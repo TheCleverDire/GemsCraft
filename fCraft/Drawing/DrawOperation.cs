@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 //#define DEBUG_CHECK_DUPLICATE_COORDS
 using System;
 using System.Collections.Generic;
@@ -6,11 +6,15 @@ using fCraft.Drawing;
 using fCraft.Events;
 using JetBrains.Annotations;
 
+// ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable MemberCanBeProtected.Global
 namespace fCraft.Drawing {
     /// <summary> Abstract class representing a drawing operation. </summary>
     public abstract class DrawOperation {
         /// <summary> Expected number of marks to pass to DrawOperation.Prepare() </summary>
-        public abstract int ExpectedMarks { get; }
+        public virtual int ExpectedMarks {
+            get { return 2; }
+        }
 
         /// <summary> Player who is executing this command.
         /// Used for both permission checks and messaging. </summary>
@@ -34,7 +38,7 @@ namespace fCraft.Drawing {
         /// Set by DrawOperation.Prepare() </summary>
         public Vector3I[] Marks { get; protected set; }
 
-        /// <summary> Time when the draw operation began. Set by DrawOperation.Begin() </summary>
+        /// <summary> Time when the draw operatation began. Set by DrawOperation.Begin() </summary>
         public DateTime StartTime { get; protected set; }
 
         /// <summary> Area that bounds the DrawOperation's extent, if possible to estimate in advance.
@@ -69,6 +73,8 @@ namespace fCraft.Drawing {
         /// Used for volume permission checks. Must not be negative. </summary>
         public int BlocksTotalEstimate { get; protected set; }
 
+        public static Position tempPos = new Position();
+
         /// <summary> Estimated total blocks left to process. </summary>
         public int BlocksLeftToProcess {
             get {
@@ -84,10 +90,10 @@ namespace fCraft.Drawing {
             get {
                 if( !HasBegun ) {
                     return 0;
-                } else if( IsDone || BlocksTotalEstimate == 0 ) {
+                }else if( IsDone ) {
                     return 100;
                 } else {
-                    return (int)Math.Min( 100, Math.Max( 0, (BlocksProcessed * 100L) / BlocksTotalEstimate ) );
+                    return Math.Min( 100, Math.Max( 0, (BlocksProcessed * 100) / BlocksTotalEstimate ) );
                 }
             }
         }
@@ -96,9 +102,8 @@ namespace fCraft.Drawing {
         public Vector3I Coords;
 
         /// <summary> Whether the brush should use alternate block (if available)
-        /// for filling insides of hollow DrawOps. Currently only supported by NormalBrush. 
-        /// Used with CuboidH/CuboidW/EllipsoidH draw ops. </summary>
-        public int AlternateBlockIndex { get; set; }
+        /// for filling insides of hollow DrawOps. Currently only usable with NormalBrush. </summary>
+        public bool UseAlternateBlock { get; set; }
 
         /// <summary> General name of this type of draw operation. Should be same for all instances. </summary>
         public abstract string Name { get; }
@@ -117,7 +122,6 @@ namespace fCraft.Drawing {
 
         /// <summary> Whether completion or cancellation of this DrawOperation should be logged. </summary>
         public bool LogCompletion { get; set; }
-
 
         const int MaxBlocksToProcessPerBatch = 25000;
         int batchStartProcessedCount;
@@ -140,18 +144,17 @@ namespace fCraft.Drawing {
 
             Context |= BlockChangeContext.Drawn;
             AnnounceCompletion = true;
-            LogCompletion = true;
+            if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
+            {
+                LogCompletion = true;
+            }
+            else
+            {
+                LogCompletion = false;
+            }
         }
 
 
-        /// <summary> Prepares DrawOperation to start. Called after the player made a selection,
-        /// usually on player's I/O thread. Brush property must be set before calling Prepare. </summary>
-        /// <param name="marks"> Array of marks given by the player. </param>
-        /// <returns> True if both DrawOperation and Brush have been prepared successfully.
-        /// False if either of them failed. </returns>
-        /// <exception cref="ArgumentNullException"> marks is null. </exception>
-        /// <exception cref="ArgumentException"> Wrong number of marks is given. </exception>
-        /// <exception cref="NullReferenceException"> DrawOperation's Brush property is not set before calling Prepare. </exception>
         public virtual bool Prepare( [NotNull] Vector3I[] marks ) {
             if( marks == null ) throw new ArgumentNullException( "marks" );
             if( marks.Length != ExpectedMarks ) {
@@ -170,10 +173,6 @@ namespace fCraft.Drawing {
         }
 
 
-        /// <summary> Begins the execution of this DrawOperation.
-        /// Raises DrawOperation.Beginning (cancelable) and DrawOperation.Began events. </summary>
-        /// <returns> True if operation started successfully.
-        /// False if operation was cancelled by an event callback. </returns>
         public virtual bool Begin() {
             if( !RaiseBeginningEvent( this ) ) return false;
             UndoState = Player.DrawBegin( this );
@@ -188,7 +187,6 @@ namespace fCraft.Drawing {
         public abstract int DrawBatch( int maxBlocksToDraw );
 
 
-        /// <summary> Asynchronously cancels this draw operation. </summary>
         public void Cancel() {
             IsCancelled = true;
         }
@@ -219,7 +217,7 @@ namespace fCraft.Drawing {
 #endif
 
             Block newBlock = Brush.NextBlock( this );
-            if( newBlock == Block.None ) return false;
+            if( newBlock == Block.Undefined ) return false;
 
             int blockIndex = Map.Index( Coords );
 
@@ -234,11 +232,11 @@ namespace fCraft.Drawing {
                 return false;
             }
 
-            Map.SetBlock( blockIndex, newBlock );
+            Map.Blocks[blockIndex] = (byte)newBlock;
 
             World world = Map.World;
             if( world != null && !world.IsFlushing ) {
-                world.Players.SendLowPriority( Packet.MakeSetBlock( Coords, newBlock ) );
+                world.Players.SendLowPriority( PacketWriter.MakeSetBlock( Coords, newBlock ) );
             }
 
             Player.RaisePlayerPlacedBlockEvent( Player, Map, Coords,
@@ -255,9 +253,46 @@ namespace fCraft.Drawing {
             return true;
         }
 
+        //Experimental, doesn't work, might as well leave it here in case I need it later
+        public static IEnumerable<Position> PositionLineEnumerator(Position a, Position b)
+        {
+            //determine total distance of the line
+            short groundDistance = (short)Math.Sqrt(Math.Pow((a.X - b.X), 2) + Math.Pow((a.Y - b.Y), 2));
+            short trueDistance = (short)Math.Sqrt(Math.Pow((groundDistance), 2) + Math.Pow((a.Z - b.Z), 2));
+
+            //determine the change in all axes
+            short deltaZ = (short)(a.Z - b.Z);
+            short deltaY = (short)(a.Y - b.Y);
+            short deltaX = (short)(a.X - b.X);
+
+            //number of positions to be put into IEnum, round to the nearest whole digit
+            short posCount = (short)Math.Round((double)trueDistance / Bot.speed, 0, MidpointRounding.AwayFromZero);
+
+            //determine the change in all axis for each new position, again, keep positions to the nearest whole digit
+            short intervalZ = (short)Math.Round((double)(deltaZ / posCount), 0, MidpointRounding.AwayFromZero);
+            short intervalY = (short)Math.Round((double)(deltaY / posCount), 0, MidpointRounding.AwayFromZero);
+            short intervalX = (short)Math.Round((double)(deltaX / posCount), 0, MidpointRounding.AwayFromZero);
+
+            int i = 0;
+            tempPos = a;
+
+            while (i != posCount)
+            {
+                Position newPosition = new Position
+                {
+                    X = (short)(tempPos.X + intervalX),
+                    Y = (short)(tempPos.Y + intervalY),
+                    Z = (short)(tempPos.Z + intervalZ),
+                };
+
+                yield return newPosition;
+                tempPos = newPosition;
+                i++;
+            }
+        }
 
         // Contributed by Conrad "Redshift" Morgan
-        protected static IEnumerable<Vector3I> LineEnumerator( Vector3I a, Vector3I b ) {
+        public static IEnumerable<Vector3I> LineEnumerator( Vector3I a, Vector3I b ) {
             Vector3I pixel = a;
             Vector3I d = b - a;
             Vector3I inc = new Vector3I( Math.Sign( d.X ),
@@ -296,6 +331,7 @@ namespace fCraft.Drawing {
         }
 
 
+
         void OnCompletion() {
             if( AnnounceCompletion ) {
                 if( BlocksUpdated > 0 ) {
@@ -323,7 +359,7 @@ namespace fCraft.Drawing {
                     }
                 }
             }
-            if( AnnounceCompletion && Map.World != null ) {
+            if( AnnounceCompletion && Map.World != null && Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev)) {
                 Logger.Log( LogType.UserActivity,
                             "Player {0} executed {1} on world {2} (between {3} and {4}). Processed {5}, Updated {6}, Skipped {7}, Denied {8} blocks.",
                             Player.Name, Description, Map.World.Name,
@@ -347,11 +383,12 @@ namespace fCraft.Drawing {
                                     BlocksProcessed, BlocksUpdated );
                 }
             }
-            if( LogCompletion && Map.World != null ) {
+            if (LogCompletion && Map.World != null && Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
+            {
                 Logger.Log( LogType.UserActivity,
                             "Player {0} cancelled {1} on world {2}. Processed {3}, Updated {4}, Skipped {5}, Denied {6} blocks.",
                             Player, Description, Map.World.Name,
-                            BlocksProcessed, BlocksUpdated, BlocksSkipped, BlocksDenied );
+                            BlocksProcessed, BlocksUpdated, BlocksSkipped, BlocksDenied, Updater.CurrentRelease.FlagsString);
             }
         }
 
@@ -406,7 +443,7 @@ namespace fCraft.Events {
     }
 
 
-    public sealed class DrawOperationBeginningEventArgs : EventArgs, ICancelableEvent {
+    public sealed class DrawOperationBeginningEventArgs : EventArgs, ICancellableEvent {
         public DrawOperationBeginningEventArgs( DrawOperation drawOp ) {
             DrawOp = drawOp;
         }

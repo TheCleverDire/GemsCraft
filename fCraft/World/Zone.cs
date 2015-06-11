@@ -1,10 +1,13 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Xml.Linq;
+using fCraft.MapConversion;
 using JetBrains.Annotations;
 
 namespace fCraft {
-    /// <summary> A bounding box selection that is designated as a sub area within a world.
-    /// Zones can have restriction just like worlds on access, and block modification. </summary>
+
     public sealed class Zone : IClassy, INotifiesOnChange {
 
         /// <summary> Zone boundaries. </summary>
@@ -34,8 +37,6 @@ namespace fCraft {
         [CanBeNull]
         public string CreatedBy { get; private set; }
 
-        /// <summary> Classy name of the player who created this zone.
-        /// Returns "?" if CreatedBy name is unknown, unrecognized, or null. </summary>
         public string CreatedByClassy {
             get {
                 return PlayerDB.FindExactClassyName( CreatedBy );
@@ -46,8 +47,6 @@ namespace fCraft {
         [CanBeNull]
         public string EditedBy { get; private set; }
 
-        /// <summary> Decorated name of the player who was the last to edit this zone.
-        /// Returns "?" if EditedBy name is unknown, unrecognized, or null. </summary>
         public string EditedByClassy {
             get {
                 return PlayerDB.FindExactClassyName( EditedBy );
@@ -58,10 +57,11 @@ namespace fCraft {
         [NotNull]
         public Map Map { get; set; }
 
+		public string Message { get; set; }
 
         /// <summary> Creates the zone boundaries, and sets CreatedDate/CreatedBy. </summary>
         /// <param name="bounds"> New zone boundaries. </param>
-        /// <param name="createdBy"> Player who created this zone. </param>
+        /// <param name="createdBy"> Player who created this zone. May not be null. </param>
         public void Create( [NotNull] BoundingBox bounds, [NotNull] PlayerInfo createdBy ) {
             if( bounds == null ) throw new ArgumentNullException( "bounds" );
             if( createdBy == null ) throw new ArgumentNullException( "createdBy" );
@@ -71,13 +71,10 @@ namespace fCraft {
         }
 
 
-        /// <summary> Sets EditedBy and EditedDate fields, and raises Changed event. </summary>
-        /// <param name="editedBy"> Name of player or entity who edited this zone. </param>
-        /// <exception cref="ArgumentNullException"> editedBy is null. </exception>
-        public void OnEdited( [NotNull] string editedBy ) {
+        public void Edit( [NotNull] PlayerInfo editedBy ) {
             if( editedBy == null ) throw new ArgumentNullException( "editedBy" );
             EditedDate = DateTime.UtcNow;
-            EditedBy = editedBy;
+            EditedBy = editedBy.Name;
             RaiseChangedEvent();
         }
 
@@ -97,30 +94,36 @@ namespace fCraft {
             Bounds = new BoundingBox( Int32.Parse( header[1] ), Int32.Parse( header[2] ), Int32.Parse( header[3] ),
                                       Int32.Parse( header[4] ), Int32.Parse( header[5] ), Int32.Parse( header[6] ) );
 
-            // If no ranks are loaded (e.g. MapConverter/MapRenderer)(
-            if( RankManager.Ranks.Count > 0 ) {
-                Rank buildRank = Rank.Parse( header[7] );
-                // if all else fails, fall back to lowest class
-                if( buildRank == null ) {
-                    if( world != null ) {
-                        Controller.MinRank = world.BuildSecurity.MinRank;
-                    } else {
-                        Controller.ResetMinRank();
-                    }
-                    Logger.Log( LogType.Error,
-                                "Zone: Error parsing zone definition: unknown rank \"{0}\". Permission reset to default ({1}).",
-                                header[7], Controller.MinRank.Name );
-                } else {
-                    Controller.MinRank = buildRank;
+            Rank buildRank = Rank.Parse( header[7] );
+            if (header[0].Contains("Door_"))
+            {
+                buildRank = RankManager.DefaultRank;
+            }
+            // if all else fails, fall back to lowest class... ignore door instances
+            if( buildRank == null && !header[0].Contains("Door_"))
+            {
+                if( world != null )
+                {
+                    Controller.MinRank = world.BuildSecurity.MinRank;
+                } 
+                else
+                {
+                    Controller.ResetMinRank();
                 }
+                Logger.Log( LogType.Error,
+                            "Zone: Error parsing zone definition: unknown rank \"{0}\". Permission reset to default ({1}). Ignore this message if you have recently changed rank permissions.",
+                            header[7], Controller.MinRank.Name );
+            } 
+            else 
+            {
+                Controller.MinRank = buildRank;
             }
 
-            // If PlayerDB is not loaded (e.g. ConfigGUI)
             if( PlayerDB.IsLoaded ) {
                 // Part 2:
                 if( parts[1].Length > 0 ) {
                     foreach( string playerName in parts[1].Split( ' ' ) ) {
-                        if( !Player.IsValidPlayerName( playerName ) ) {
+                        if( !Player.IsValidName( playerName ) ) {
                             Logger.Log( LogType.Warning,
                                         "Invalid entry in zone \"{0}\" whitelist: {1}", Name, playerName );
                             continue;
@@ -138,7 +141,7 @@ namespace fCraft {
                 // Part 3: excluded list
                 if( parts[2].Length > 0 ) {
                     foreach( string playerName in parts[2].Split( ' ' ) ) {
-                        if( !Player.IsValidPlayerName( playerName ) ) {
+                        if( !Player.IsValidName( playerName ) ) {
                             Logger.Log( LogType.Warning,
                                         "Invalid entry in zone \"{0}\" blacklist: {1}", Name, playerName );
                             continue;
@@ -153,8 +156,8 @@ namespace fCraft {
                     }
                 }
             } else {
-                RawWhitelist = parts[1];
-                RawBlacklist = parts[2];
+                rawWhitelist = parts[1];
+                rawBlacklist = parts[2];
             }
 
             // Part 4: extended header
@@ -176,10 +179,15 @@ namespace fCraft {
                     EditedDate = DateTime.Parse( xheader[3] );
                 }
             }
+
+			//message
+			if (parts.Length > 4 && !string.IsNullOrWhiteSpace(parts[4]))
+				Message = parts[4].Replace('\\',',');
+			else
+				Message = null;
         }
 
-        internal readonly string RawWhitelist,
-                                 RawBlacklist;
+        internal string rawWhitelist, rawBlacklist;
 
 
         public string ClassyName {
@@ -189,6 +197,64 @@ namespace fCraft {
         }
 
 
+        #region Xml Serialization
+
+        const string XmlRootElementName = "Zone";
+
+        public Zone( [NotNull] XContainer root ) {
+            if( root == null ) throw new ArgumentNullException( "root" );
+            // ReSharper disable PossibleNullReferenceException
+            Name = root.Element( "name" ).Value;
+
+            if( root.Element( "created" ) != null ) {
+                XElement created = root.Element( "created" );
+                CreatedBy = created.Attribute( "by" ).Value;
+                CreatedDate = DateTime.Parse( created.Attribute( "on" ).Value );
+            }
+
+            if( root.Element( "edited" ) != null ) {
+                XElement edited = root.Element( "edited" );
+                EditedBy = edited.Attribute( "by" ).Value;
+                EditedDate = DateTime.Parse( edited.Attribute( "on" ).Value );
+            }
+
+            XElement temp = root.Element( BoundingBox.XmlRootElementName );
+            if( temp == null ) throw new FormatException( "No BoundingBox specified for zone." );
+            Bounds = new BoundingBox( temp );
+
+            temp = root.Element( SecurityController.XmlRootElementName );
+            if( temp == null ) throw new FormatException( "No SecurityController specified for zone." );
+            Controller = new SecurityController( temp, true );
+            // ReSharper restore PossibleNullReferenceException
+        }
+
+
+        public XElement Serialize() {
+            XElement root = new XElement( XmlRootElementName );
+            root.Add( new XElement( "name", Name ) );
+
+            if( CreatedBy != null ) {
+                XElement created = new XElement( "created" );
+                created.Add( new XAttribute( "by", CreatedBy ) );
+                created.Add( new XAttribute( "on", CreatedDate.ToCompactString() ) );
+                root.Add( created );
+            }
+
+            if( EditedBy != null ) {
+                XElement edited = new XElement( "edited" );
+                edited.Add( new XAttribute( "by", EditedBy ) );
+                edited.Add( new XAttribute( "on", EditedDate.ToCompactString() ) );
+                root.Add( edited );
+            }
+
+            root.Add( Bounds.Serialize() );
+            root.Add( Controller.Serialize() );
+            return root;
+        }
+
+        #endregion
+
+
         public event EventHandler Changed;
 
         void RaiseChangedEvent() {
@@ -196,4 +262,75 @@ namespace fCraft {
             if( h != null ) h( null, EventArgs.Empty );
         }
     }
+
+	public class ZoneConverterExtension : IConverterExtension
+	{
+		private static List<string> _group = new List<string> {"zones"};
+		public IEnumerable<string> AcceptedGroups { get { return _group; } }
+
+		public int Serialize(Map map, Stream stream, IMapConverterEx converter)
+		{
+			BinaryWriter writer = new BinaryWriter(stream);
+			int count = 0;
+			Zone[] zoneList = map.Zones.Cache;
+			foreach (Zone zone in zoneList)
+			{
+				converter.WriteMetadataEntry(_group[0], zone.Name, SerializeZone(zone), writer); 
+				++count;
+			}
+			return count;
+		}
+
+		static string SerializeZone([NotNull] Zone zone)
+		{
+			if (zone == null) throw new ArgumentNullException("zone");
+			string xheader;
+			if (zone.CreatedBy != null)
+			{
+				xheader = zone.CreatedBy + " " + zone.CreatedDate.ToCompactString() + " ";
+			}
+			else
+			{
+				xheader = "- - ";
+			}
+
+			if (zone.EditedBy != null)
+			{
+				xheader += zone.EditedBy + " " + zone.EditedDate.ToCompactString();
+			}
+			else
+			{
+				xheader += "- -";
+			}
+
+			var zoneExceptions = zone.Controller.ExceptionList;
+
+			string whitelist = zone.rawWhitelist ?? zoneExceptions.Included.JoinToString(" ", p => p.Name);
+			string blacklist = zone.rawBlacklist ?? zoneExceptions.Excluded.JoinToString(" ", p => p.Name);
+
+			return String.Format("{0},{1},{2},{3},{4}",
+								  String.Format("{0} {1} {2} {3} {4} {5} {6} {7}",
+												 zone.Name,
+												 zone.Bounds.XMin, zone.Bounds.YMin, zone.Bounds.ZMin,
+												 zone.Bounds.XMax, zone.Bounds.YMax, zone.Bounds.ZMax,
+												 zone.Controller.MinRank.FullName),
+								  whitelist,
+								  blacklist,
+								  xheader,
+								  null==zone.Message?"":zone.Message.Replace(',','\\'));
+		}
+
+		public void Deserialize(string group, string key, string value, Map map)
+		{
+			try
+			{
+				map.Zones.Add(new Zone(value, map.World));
+			}
+			catch (Exception ex)
+			{
+				Logger.Log(LogType.Error,
+							"ZoneConverterExtension.Deserialize: Error importing zone definition: {0}", ex);
+			}
+		}
+	}
 }

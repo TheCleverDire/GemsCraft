@@ -1,18 +1,13 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that creates a hollow cuboid, optionally filling the center. </summary>
     public sealed class CuboidHollowDrawOperation : DrawOperation {
         bool fillInner;
 
         public override string Name {
             get { return "CuboidH"; }
-        }
-
-        public override int ExpectedMarks {
-            get { return 2; }
         }
 
         public CuboidHollowDrawOperation( Player player )
@@ -23,12 +18,11 @@ namespace fCraft.Drawing {
         public override bool Prepare( Vector3I[] marks ) {
             if( !base.Prepare( marks ) ) return false;
 
-            fillInner = ( Brush.AlternateBlocks > 1 ) && Bounds.Width > 2 && Bounds.Length > 2 && Bounds.Height > 2;
+            fillInner = Brush.HasAlternateBlock && Bounds.Width > 2 && Bounds.Length > 2 && Bounds.Height > 2;
 
             BlocksTotalEstimate = Bounds.Volume;
             if( !fillInner ) {
-                BlocksTotalEstimate -= Math.Max( 0, Bounds.Width - 2 ) * Math.Max( 0, Bounds.Length - 2 ) *
-                                       Math.Max( 0, Bounds.Height - 2 );
+                BlocksTotalEstimate -= Math.Max( 0, Bounds.Width - 2 ) * Math.Max( 0, Bounds.Length - 2 ) * Math.Max( 0, Bounds.Height - 2 );
             }
 
             coordEnumerator = BlockEnumerator().GetEnumerator();
@@ -83,7 +77,7 @@ namespace fCraft.Drawing {
             }
 
             if( fillInner ) {
-                AlternateBlockIndex = 1;
+                UseAlternateBlock = true;
                 for( int x = Bounds.XMin + 1; x < Bounds.XMax; x++ ) {
                     for( int y = Bounds.YMin + 1; y < Bounds.YMax; y++ ) {
                         for( int z = Bounds.ZMin + 1; z < Bounds.ZMax; z++ ) {

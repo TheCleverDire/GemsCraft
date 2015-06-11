@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 
 // This file condenses some of the player-related enumerations
@@ -27,8 +27,8 @@ namespace fCraft {
         [Obsolete]
         InvalidSetTileKick = 0x13,
 
-        /// <summary> Unknown opCode or packet </summary>
-        InvalidOpCodeKick = 0x14,
+        /// <summary> Unknown opcode or packet </summary>
+        InvalidOpcodeKick = 0x14,
 
         /// <summary> Triggered antigrief / block spam </summary>
         BlockSpamKick = 0x15,
@@ -66,7 +66,10 @@ namespace fCraft {
         UnverifiedName = 0x42,
 
         /// <summary> Login denied for some other reason </summary>
-        LoginFailed = 0x43
+        LoginFailed = 0x43,
+
+        /// <summary> When a player ragequits from the server </summary>
+        RageQuit = 0x44,
     }
 
 
@@ -158,11 +161,12 @@ namespace fCraft {
 
         /// <summary> A plugin callback cancelled block placement/deletion.
         /// A copy of the old block will not be sent to the player (he may go out of sync). </summary>
-        PluginDeniedNoUpdate
+        PluginDeniedNoUpdate,
+        
+        Revert
     }
 
 
-    /// <summary> List possible reasons for players joining/changing worlds. </summary>
     public enum WorldChangeReason {
         /// <summary> First world that the player joins upon entering the server (main). </summary>
         FirstWorld,
@@ -186,11 +190,13 @@ namespace fCraft {
         WorldRemoved,
 
         /// <summary> Previous world's access permissions changed, and player was forced to main. </summary>
-        PermissionChanged
+        PermissionChanged,
+
+        /// <summary> Player entered a portal. </summary>
+        Portal
     }
 
 
-    /// <summary> Lists possible ban states of players (banned, not banned, and exempt). </summary>
     public enum BanStatus : byte {
         /// <summary> Player is not banned. </summary>
         NotBanned,
@@ -203,7 +209,6 @@ namespace fCraft {
     }
 
 
-    /// <summary> Describes the action that player performed to click a block (left or right click). </summary>
     public enum ClickAction : byte {
         /// <summary> Deleting a block (left-click in Minecraft). </summary>
         Delete = 0,
@@ -213,7 +218,6 @@ namespace fCraft {
     }
 
 
-    /// <summary> Describes the state of a connected Player's session. </summary>
     public enum SessionState {
         /// <summary> There is no session associated with this player (e.g. Console). </summary>
         Offline,
@@ -232,20 +236,5 @@ namespace fCraft {
 
         /// <summary> Session has ended - player disconnected. </summary>
         Disconnected
-    }
-
-
-    /// <summary> Type of Minecraft.net account associated with the player. </summary>
-    public enum AccountType : byte {
-        /// <summary> Unknown (could be free or paid).
-        /// Default value for players whose accounts haven't been checked. </summary>
-        Unknown = 0,
-
-        /// <summary> Free minecraft.net account.
-        /// Keep in mind that any free account can become paid some time in the future. </summary>
-        Free = 1,
-
-        /// <summary> Paid minecraft.net account. </summary>
-        Paid = 2
     }
 }

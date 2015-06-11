@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 
 namespace fCraft {
 
@@ -43,9 +43,6 @@ namespace fCraft {
         /// <summary> Ability to see any players' IP addresses. </summary>
         ViewPlayerIPs,
 
-        /// <summary> Ability to see full emails of players with Mojang'ed accounts. </summary>
-        ViewEmails,
-
         /// <summary> Ability to edit the player database directly.
         /// This also adds the ability to promote/demote/ban players by name,
         /// even if they have not visited the server yet. Also allows to
@@ -55,17 +52,11 @@ namespace fCraft {
         /// <summary> Ability to use /Say command. </summary>
         Say,
 
-        /// <summary> Ability to use /Timer command. </summary>
-        UseTimers,
-
         /// <summary> Ability to read /Staff chat. </summary>
         ReadStaffChat,
 
         /// <summary> Ability to use color codes in chat messages. </summary>
         UseColorCodes,
-
-        /// <summary> Ability to use color codes in chat messages. </summary>
-        UseEmotes,
 
         /// <summary> Ability to move at a faster-than-normal rate (using hacks). </summary>
         UseSpeedHack,
@@ -80,7 +71,8 @@ namespace fCraft {
         BanIP,
 
         /// <summary> Ability to ban/unban a player account, his IP, and all other
-        /// accounts that used the IP. </summary>
+        /// accounts that used the IP. BanAll/UnbanAll commands can be used
+        /// on players who keep evading bans. </summary>
         BanAll,
 
         /// <summary> Ability to promote players to a higher rank. </summary>
@@ -102,15 +94,15 @@ namespace fCraft {
         /// <summary> Ability to use advanced draw commands: sphere, torus, brushes. </summary>
         DrawAdvanced,
 
+        /// <summary> Ability to draw trees of any height and shape. </summary>
+        Tree, 
+
         /// <summary> Ability to copy (or cut) and paste blocks. The total number of
         /// blocks that can be copied or pasted at a time is affected by the draw limit. </summary>
         CopyAndPaste,
 
         /// <summary> Ability to undo actions of other players (UndoArea and UndoPlayer). </summary>
         UndoOthersActions,
-
-        /// <summary> Ability to undo actions of everyone at once, regardless of UndoOthersActions limit. </summary>
-        UndoAll,
 
         /// <summary> Ability to teleport to other players. </summary>
         Teleport,
@@ -123,7 +115,8 @@ namespace fCraft {
         BringAll,
 
         /// <summary> Ability to patrol lower-ranked players.
-        /// "Patrolling" means teleporting to other players to check on them, usually while hidden. </summary>
+        /// "Patrolling" means teleporting to other players to check on them,
+        /// usually while hidden. </summary>
         Patrol,
 
         /// <summary> Ability to use /Spectate. </summary>
@@ -154,9 +147,6 @@ namespace fCraft {
         /// changing per-world permissions, and using the map generator. </summary>
         ManageWorlds,
 
-        /// <summary> Ability to flush pending draw commands with /WFlush. </summary>
-        FlushWorlds,
-
         /// <summary> Ability to enable/disable, clear, and configure BlockDB. </summary>
         ManageBlockDB,
 
@@ -169,6 +159,126 @@ namespace fCraft {
 
         /// <summary> Ability to shut down or restart the server remotely.
         /// Useful for servers that run on dedicated machines. </summary>
-        ShutdownServer
+        ShutdownServer,
+
+        UsePortal,
+        /// <summary> Ability to create or delete a portal. </summary>
+        ManagePortal,
+
+        /// <summary> Ability to high five someone. </summary>
+        HighFive,
+
+        /// <summary> Ability to chat in capital letters. </summary>
+        ChatWithCaps,
+
+        /// <summary> Ability to swear. </summary>
+        Swear,       
+
+        /// <summary> Ability to start VoteKicks in /vote kick</summary>
+        MakeVoteKicks,
+
+        /// <summary> Ability to start bromode. </summary>
+        BroMode,
+
+        /// <summary> Ability to impersonate other players (Power Abusable Tool). </summary>
+        Troll,
+
+        /// <summary> Ability to hide selected ranks. </summary>
+        HideRanks,
+
+        /// <summary> Ability to read admin chat. </summary>
+        ReadAdminChat,
+
+        /// <summary> Ability to read from the custom chat channel. </summary>
+        ReadCustomChat,
+
+        /// <summary> Ability to use realms. </summary>
+        Realm,
+
+        /// <summary> Ability to possess other players. </summary>
+        Possess,
+
+        /// <summary> Ability to manually disconnect other players. </summary>
+        Gtfo,
+
+        /// <summary> Ability to Ragequit from the server. </summary>
+        RageQuit,
+
+        /// <summary> Ability to tower safely with invisible water towers that cannot harm builds. </summary>
+        Tower,
+
+        /// <summary> Ability to tempban. </summary>
+        TempBan,
+
+        /// <summary> Ability to warn other players. </summary>
+        Warn,
+
+        /// <summary> Ability to slap players to the sky. </summary>
+        Slap,
+
+        /// <summary> Ability to kill other players. </summary>
+        Kill,
+
+        /// <summary> Ability to blast players out of the server (kick). </summary>
+        Basscannon,
+
+        /// <summary> Ability to turn physics on and off. </summary>
+        Physics,
+
+        /// <summary> Ability to turn turn firework mode on/off. </summary>
+        Fireworks,
+
+        /// <summary> Ability to use the /Gun for killing, exploding TNT and Portals. </summary>
+        Gun,
+
+        /// <summary> Ability to use the manage game modes. </summary>
+        Games,
+
+        /// <summary> Permission to create a server-wide silence, muting all players, and to voice players while the moderation is in affect. </summary>
+        Moderation,
+
+        /// <summary> Allows a player to become immortal, immune to all damage. </summary>
+        Immortal,
+        
+        ///<summary> Ability to punch.</summary>
+        Punch,
+
+        ///<summary> Ability to use brofist.</summary>
+        Brofist,
+
+        ///<summary> Ability to troll a player with STFU.</summary>
+        STFU,
+
+        ///<summary> Permission to use /muteall. </summary>
+        MuteAll,
+
+        ///<summary>Permissions to use LeBot.</summary>
+        LeBot,
+
+        ///<summary>Permission to use LegendCraft Economy</summary>
+        Economy,
+
+        ///<summary>Permission to manage the economy. (Use /give and /take)</summary>
+        ManageEconomy,
+
+        /// <summary> Ability to Make votes in /vote </summary>
+        MakeVotes,
+         
+        ///<summary> Permission to toggle WorldChat.</summary>
+        ManageWorldChat,      
+       
+        ///<summary> Permission to use /tpa.</summary>
+        TPA, 
+        
+        /// <summary> Permission for players to change their own Displayed Name with the /Name command</summary>
+        Name,
+
+        /// <summary> Permission to manage and edit bots.</summary>
+        Bots,
+
+        /// <summary>
+        /// Permission to completely undo a target player's block modifications.
+        /// </summary>
+        UndoAll
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Linq;
 using System.Net;
@@ -18,8 +18,7 @@ namespace fCraft {
         /// <param name="reason"> Reason for ban. May be empty, if permitted by server configuration. </param>
         /// <param name="announce"> Whether ban should be publicly announced on the server. </param>
         /// <param name="raiseEvents"> Whether BanChanging and BanChanged events should be raised. </param>
-        /// <exception cref="ArgumentNullException"> player is null. </exception>
-        /// <exception cref="fCraft.PlayerOpException"> If anything goes wrong. </exception>
+        /// <exception cref="fCraft.PlayerOpException" />
         public void Ban( [NotNull] Player player, [CanBeNull] string reason, bool announce, bool raiseEvents ) {
             BanPlayerInfoInternal( player, reason, false, announce, raiseEvents );
         }
@@ -30,8 +29,7 @@ namespace fCraft {
         /// <param name="reason"> Reason for unban. May be empty, if permitted by server configuration. </param>
         /// <param name="announce"> Whether unban should be publicly announced on the server. </param>
         /// <param name="raiseEvents"> Whether BanChanging and BanChanged events should be raised. </param>
-        /// <exception cref="ArgumentNullException"> player is null. </exception>
-        /// <exception cref="fCraft.PlayerOpException"> If anything goes wrong. </exception>
+        /// <exception cref="fCraft.PlayerOpException" />
         public void Unban( [NotNull] Player player, [CanBeNull] string reason, bool announce, bool raiseEvents ) {
             BanPlayerInfoInternal( player, reason, true, announce, raiseEvents );
         }
@@ -40,9 +38,7 @@ namespace fCraft {
         void BanPlayerInfoInternal( [NotNull] Player player, [CanBeNull] string reason,
                                     bool unban, bool announce, bool raiseEvents ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-
-            if( reason != null ) reason = reason.Trim( ' ' );
-            if( reason != null && reason.Length == 0 ) reason = null;
+            if( reason != null && reason.Trim().Length == 0 ) reason = null;
 
             lock( actionLock ) {
                 // Check if player can ban/unban in general
@@ -113,6 +109,7 @@ namespace fCraft {
                             } else {
                                 kickReason = String.Format( "Banned by {0}", player.Name );
                             }
+                            // TODO: check side effects of not using DoKick
                             target.Kick( kickReason, LeaveReason.Ban );
                         }
                     } else {
@@ -150,14 +147,10 @@ namespace fCraft {
         /// <param name="announce"> Whether ban should be publicly announced on the server. </param>
         /// <param name="raiseEvents"> Whether AddingIPBan, AddedIPBan,
         /// BanChanging, and BanChanged events should be raised. </param>
-        /// <exception cref="ArgumentNullException"> player is null. </exception>
-        /// <exception cref="fCraft.PlayerOpException"> If anything goes wrong. </exception>
+        /// <exception cref="fCraft.PlayerOpException" />
         public void BanIP( [NotNull] Player player, [CanBeNull] string reason, bool announce, bool raiseEvents ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-
-            if( reason != null ) reason = reason.Trim( ' ' );
-            if( reason != null && reason.Length == 0 ) reason = null;
-
+            if( reason != null && reason.Trim().Length == 0 ) reason = null;
             lock( actionLock ) {
                 if( !player.Can( Permission.Ban, Permission.BanIP ) ) {
                     PlayerOpException.ThrowPermissionMissing( player, this, "IP-ban", Permission.Ban, Permission.BanIP );
@@ -176,10 +169,10 @@ namespace fCraft {
                 }
 
                 // Check if any high-ranked players use this address
-                PlayerInfo infoWhomPlayerCantBan = PlayerDB.FindPlayers( address )
-                                                           .FirstOrDefault( info => !player.Can( Permission.Ban, info.Rank ) );
-                if( infoWhomPlayerCantBan != null ) {
-                    PlayerOpException.ThrowPermissionLimitIP( player, infoWhomPlayerCantBan, address );
+                PlayerInfo unbannable = PlayerDB.FindPlayers( address )
+                                                .FirstOrDefault( info => !player.Can( Permission.Ban, info.Rank ) );
+                if( unbannable != null ) {
+                    PlayerOpException.ThrowPermissionLimitIP( player, unbannable, address );
                 }
 
                 // Check existing ban statuses
@@ -211,12 +204,12 @@ namespace fCraft {
                     throw new PlayerOpException( player, this, PlayerOpExceptionCode.TargetIsExempt, msg, colorMsg );
                 }
 
-                PlayerOpException.CheckBanReason( reason, player, this, false );
-
                 // Ban the name
                 if( needNameBan ) {
                     Ban( player, reason, announce, raiseEvents );
                 }
+
+                PlayerOpException.CheckBanReason( reason, player, this, false );
 
                 // Ban the IP
                 if( needIPBan ) {
@@ -255,19 +248,6 @@ namespace fCraft {
                         throw new PlayerOpException( player, null, PlayerOpExceptionCode.NoActionNeeded, msg, colorMsg );
                     }
                 }
-                
-                // Kick all players connected from address
-                string kickReason;
-                if( reason != null ) {
-                    kickReason = String.Format( "IP-Banned by {0}: {1}", player.Name, reason );
-                } else {
-                    kickReason = String.Format( "IP-Banned by {0}", player.Name );
-                }
-                foreach( Player other in Server.Players.FromIP( address ) ) {
-                    if( other.Info.BanStatus != BanStatus.IPBanExempt ) {
-                        other.Kick( kickReason, LeaveReason.BanIP );
-                    }
-                }
             }
         }
 
@@ -278,14 +258,10 @@ namespace fCraft {
         /// <param name="announce"> Whether unban should be publicly announced on the server. </param>
         /// <param name="raiseEvents"> Whether RemovingIPBan, RemovedIPBan,
         /// BanChanging, and BanChanged events should be raised. </param>
-        /// <exception cref="ArgumentNullException"> player is null. </exception>
-        /// <exception cref="fCraft.PlayerOpException"> If anything goes wrong. </exception>
+        /// <exception cref="fCraft.PlayerOpException" />
         public void UnbanIP( [NotNull] Player player, [CanBeNull] string reason, bool announce, bool raiseEvents ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-
-            if( reason != null ) reason = reason.Trim( ' ' );
-            if( reason != null && reason.Length == 0 ) reason = null;
-
+            if( reason != null && reason.Trim().Length == 0 ) reason = null;
             lock( actionLock ) {
                 if( !player.Can( Permission.Ban, Permission.BanIP ) ) {
                     PlayerOpException.ThrowPermissionMissing( player, this, "IP-unban", Permission.Ban, Permission.BanIP );
@@ -349,19 +325,16 @@ namespace fCraft {
         /// <param name="player"> Player who is banning. </param>
         /// <param name="reason"> Reason for ban. May be empty, if permitted by server configuration. </param>
         /// <param name="announce"> Whether ban should be publicly announced on the server. </param>
-        /// <param name="raiseEvents"> Whether AddingIPBan, AddedIPBan, BanChanging, and BanChanged events should be raised. </param>
-        /// <exception cref="ArgumentNullException"> player is null. </exception>
-        /// <exception cref="fCraft.PlayerOpException"> If anything goes wrong. </exception>
+        /// <param name="raiseEvents"> Whether AddingIPBan, AddedIPBan,
+        /// BanChanging, and BanChanged events should be raised. </param>
+        /// <exception cref="fCraft.PlayerOpException" />
         public void BanAll( [NotNull] Player player, [CanBeNull] string reason, bool announce, bool raiseEvents ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-
-            if( reason != null ) reason = reason.Trim( ' ' );
-            if( reason != null && reason.Length == 0 ) reason = null;
-
+            if( reason != null && reason.Trim().Length == 0 ) reason = null;
             lock( actionLock ) {
                 if( !player.Can( Permission.Ban, Permission.BanIP, Permission.BanAll ) ) {
                     PlayerOpException.ThrowPermissionMissing( player, this, "ban-all",
-                                                              Permission.Ban, Permission.BanIP, Permission.BanAll );
+                                                         Permission.Ban, Permission.BanIP, Permission.BanAll );
                 }
 
                 IPAddress address = LastIP;
@@ -462,9 +435,7 @@ namespace fCraft {
                         kickReason = String.Format( "Banned by {0}", player.Name );
                     }
                     for( int i = 0; i < targetsOnline.Length; i++ ) {
-                        if( targetsOnline[i].Info.BanStatus != BanStatus.IPBanExempt ) {
-                            targetsOnline[i].Kick( kickReason, LeaveReason.BanAll );
-                        }
+                        targetsOnline[i].Kick( kickReason, LeaveReason.BanAll );
                     }
                 }
             }
@@ -478,18 +449,14 @@ namespace fCraft {
         /// <param name="announce"> Whether unban should be publicly announced on the server. </param>
         /// <param name="raiseEvents"> Whether RemovingIPBan, RemovedIPBan,
         /// BanChanging, and BanChanged events should be raised. </param>
-        /// <exception cref="ArgumentNullException"> player is null. </exception>
-        /// <exception cref="fCraft.PlayerOpException"> If anything goes wrong. </exception>
+        /// <exception cref="fCraft.PlayerOpException" />
         public void UnbanAll( [NotNull] Player player, [CanBeNull] string reason, bool announce, bool raiseEvents ) {
             if( player == null ) throw new ArgumentNullException( "player" );
-
-            if( reason != null ) reason = reason.Trim( ' ' );
-            if( reason != null && reason.Length == 0 ) reason = null;
-
+            if( reason != null && reason.Trim().Length == 0 ) reason = null;
             lock( actionLock ) {
                 if( !player.Can( Permission.Ban, Permission.BanIP, Permission.BanAll ) ) {
                     PlayerOpException.ThrowPermissionMissing( player, this, "unban-all",
-                                                              Permission.Ban, Permission.BanIP, Permission.BanAll );
+                                                         Permission.Ban, Permission.BanIP, Permission.BanAll );
                 }
 
                 IPAddress address = LastIP;
@@ -634,15 +601,13 @@ namespace fCraft {
         /// <param name="announce"> Whether rank change should be publicly announced or not. </param>
         /// <param name="raiseEvents"> Whether PlayerInfo.RankChanging and PlayerInfo.RankChanged events should be raised. </param>
         /// <param name="auto"> Whether rank change should be marked as "automatic" or manual. </param>
-        /// <exception cref="ArgumentNullException"> player is null. </exception>
-        /// <exception cref="fCraft.PlayerOpException"> If anything goes wrong. </exception>
+        /// <exception cref="fCraft.PlayerOpException" />
         public void ChangeRank( [NotNull] Player player, [NotNull] Rank newRank, [CanBeNull] string reason,
                                 bool announce, bool raiseEvents, bool auto ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( newRank == null ) throw new ArgumentNullException( "newRank" );
 
-            if( reason != null ) reason = reason.Trim( ' ' );
-            if( reason != null && reason.Length == 0 ) reason = null;
+            if( reason != null && reason.Trim().Length == 0 ) reason = null;
 
             bool promoting = (newRank > Rank);
             string verb = (promoting ? "promote" : "demote");
@@ -707,6 +672,8 @@ namespace fCraft {
             Logger.Log( LogType.UserActivity,
                         "{0} {1} {2} from {3} to {4}. Reason: {5}",
                         player.Name, verbed, Name, Rank.Name, newRank.Name, reason ?? "" );
+            //add promocount
+            if (promoting) player.Info.PromoCount++;
 
             // Actually change rank
             Rank oldRank = Rank;
@@ -726,13 +693,8 @@ namespace fCraft {
                 // reset binds (water, lava, admincrete)
                 target.ResetAllBinds();
 
-                // reset /SetGen if needed
-                if( !target.Can( Permission.ManageWorlds ) ) {
-                    target.GenParams = null;
-                }
-
                 // reset admincrete deletion permission
-                target.Send( Packet.MakeSetPermission( target ) );
+                target.Send( PacketWriter.MakeSetPermission( target ) );
 
                 // cancel selection in progress
                 if( target.IsMakingSelection ) {
@@ -765,7 +727,7 @@ namespace fCraft {
                 }
 
                 // ensure copy slot consistency
-                target.MaxCopySlots = target.Info.Rank.CopySlots;
+                target.InitCopySlots();
 
                 // inform the player of the rank change
                 target.Message( "You were {0} to {1}&S by {2}",
@@ -860,10 +822,7 @@ namespace fCraft {
 
                 // Apply side effects
                 Player target = PlayerObject;
-                if( target != null ) {
-                    target.IsDeaf = false;
-                    target.StopSpectating();
-                }
+                if( target != null ) target.IsDeaf = false;
 
                 // Log and announce
                 Logger.Log( LogType.UserActivity,
@@ -1049,10 +1008,10 @@ namespace fCraft {
                 if( !player.Can( Permission.Mute ) ) {
                     PlayerOpException.ThrowPermissionMissing( player, this, "unmute", Permission.Mute );
                 }
-
                 // Check if player has sufficient rank permissions
-                if( !player.Can( Permission.Mute, Rank ) ) {
-                    PlayerOpException.ThrowPermissionLimit( player, this, "unmute", Permission.Mute );
+                if (!player.Can(Permission.Mute, Rank))
+                {
+                    PlayerOpException.ThrowPermissionLimit(player, this, "mute", Permission.Mute);
                 }
 
                 if( timeLeft <= TimeSpan.Zero ) {

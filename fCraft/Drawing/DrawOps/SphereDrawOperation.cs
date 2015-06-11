@@ -1,8 +1,7 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that creates a solid sphere. </summary>
     public sealed class SphereDrawOperation : EllipsoidDrawOperation {
         public override string Name {
             get { return "Sphere"; }

@@ -1,53 +1,40 @@
-Thank you for downloading fCraft, the custom Minecraft server.
+﻿All bugs and glitches randomly found in the game are meant to happen, they add to the fun :D
 
-If you like fCraft, support its development by donating!
-    http://donate.fCraft.net
+Thank you for downloading LegendCraft, a custom Minecraft server based on fCraft and 800craft.
 
+Special thanks to fragmer, for creating fCraft! Special thanks to Jonty800, GlennMR and LaoTszy for creating 800Craft!
+LegendCraft is a modified version of 800Craft. LegendCraft configGUIs and serverGUIs were moddeled after 800Craft's.
 
 
 === Installation (Windows) ====================================================
 
-fCraft requires Microsoft .NET Framework 3.5. Your system may already have it
+LegendCraft requires Microsoft .NET Framework 4.0. Your system may already have it
 installed, and you can download it from microsoft.com
-For more information, see http://fCraft.net/wiki/Installation_Instructions
-
-
 
 === Installation (Linux, Unix, MacOS X) =======================================
 
-fCraft requires Mono 2.8+ (minumum) or Mono 3.0+ (recommended). You can
+LegendCraft requires Mono 2.10 (recommended). You can
 download it from www.mono-project.org, or (on some Linux distributions) install
-it through your package manager. To be able to use graphical fCraft components
-(ServerGUI and ConfigGUI) you will also need GDI+ library (libgdiplus).
+it through your package manager.
 
-Before starting fCraft, make sure that it has read/write permissions in the
-fCraft directory. Working directory and other paths can be set via command-
-line options (see below).
+To be able to use graphical LegendCraft components (ServerGUI and ConfigGUI) you
+will also need GDI+ library (libgdiplus). Before starting LegendCraft, make sure
+that it has read/write permissions in the LegendCraft directory.
 
 To run ".exe" files with Mono, use the following syntax:
-    Mono 2.8+:  "mono --gc=sgen SomeFile.exe"
-    Mono 3.0+:  "mono SomeFile.exe"
+Mono 2.6.4: "mono SomeFile.exe"
+Mono 2.8+:  "mono --gc=sgen SomeFile.exe"
 
-Also check out "fcraftd", unofficial script by Hellenion that makes fCraft
-easier to deploy and maintain under Linux: http://fCraft.net/wiki/fcraftd
-
-For more information, see http://fCraft.net/wiki/Installation_Instructions
-
-
+If you're intending to run a public server that appears on minecraft.net's server list, 	
+you need to import https certificates to tell mono you trust them, this can be done by 
+running mozroots --import --ask-remove as the 800Craft user on your system.
 
 === Initial Setup =============================================================
 
 Before starting the server for the first time, run ConfigGUI.exe to choose
 your server's name and settings.
 
-By default, fCraft servers are private. That means it will not be listed on
-minecraft.net, and only players who have the link will be able to join. To set
-your server to public, set Visibility: [Public] in ConfigGUI, (or set
-"IsPublic" key to "true" in config.xml). Remember that if the serveris running
-while you make configuration changes, you need to restart it or use
-"/Reload config" command.
-
-You may need to add firewall exceptions for fCraft applications (ConfigGUI,
+You may need to add firewall exceptions for LegendCraft applications (ConfigGUI,
 ServerGUI, or ServerCLI, or ServerWinService) to allow incoming TCP connections
 on the listening port. Default port is 25565.
 
@@ -57,23 +44,21 @@ on the same port. See www.port-forward.com for further guidance.
 When you are ready to start the server, run ONE of the available server
 front-ends (GUI, CLI, or WinService).
 
-
-
 === Troubleshooting ===========================================================
 
 Server does not show up on minecraft.net list:
-    Make sure that server is public. See 2nd paragraph of "Initial Setup"
-    section, above.
+    Make sure that server is public. Open ConfigGUI, set Visibility: [Public]
+        (or set <IsPublic> to true in config.xml).
 
 "Could not connect to server: it's probably down":
-    Make sure that you added firewall exception for fCraft (if applicable),
+    Make sure that you added firewall exception for 800Craft (if applicable),
     and forwarded the port on your router. If you are connecting from same
     computer that the server is working on, try connecting to:
-    http://www.minecraft.net/classic/play?ip=127.0.0.1&port=_____
+    http://www.minecraft.net/play.jsp?ip=127.0.0.1&port=____
         (fill in the blank with your server's port number)
 
 "Could not verify player name":
-    Verification problems occur when your fCraft server cannot verify identity
+    Verification problems occur when your 800Craft server cannot verify identity
     of connecting players. Here are some things that may cause or fix
     verification problems:
     1. If minecraft.net is offline or slow, wait for it to stabilize.
@@ -96,23 +81,14 @@ Other players cannot connect from the same LAN/network as me:
     be able to connect via the public URL. There is a workaround:
 
     1. Check "Allow connections from LAN without verification" in ConfigGUI.
-        (or set AllowUnverifiedLAN config key to "true").
+        (or set <AllowUnverifiedLAN> to true in config.xml).
     2. Find your local IP address.
         * In Windows XP+, go to Start -> type "cmd" to open a terminal ->
             type "ipconfig". The address you need is labeled "IPv4 Address"
             under "Local Area Connection".
         * In Unix/Linux, use "ifconfig" utility. 
-   3. Connect to http://www.minecraft.net/classic/play?ip=_____&port=_____
+   3. Connect to http://www.minecraft.net/play.jsp?ip=____&port=____
         (fill in the blanks with your server's IP address and port number)
-
-"Error getting response stream (Write: The authentication or decryption..."
-    Common problem for Mono users. You need to import certificates for Mono to
-    work with HTTPS. See http://is.gd/MonoHttps
-    Alternatively, set BypassHttpsCertificateValidation config key to "true"
-    (slightly less safe).
-
-Other problems:
-    See http://fCraft.net/wiki/Troubleshooting
 
 
 
@@ -128,23 +104,19 @@ Other problems:
        ConfigCLI.exe - A simple command-line configuration tool.
 
           fCraft.dll - Core of the server, used by all other applications.
-       fCraftGUI.dll - Provides shared functionality for Config and Server GUI.
+          fCraftGUI.dll - Provides shared functionality for Config and Server GUI.
 
-       ServerCLI.exe - Command-line interface (CLI) for the server.
-       ServerGUI.exe - Graphical interface (GUI) for the server.
-
-  HeartbeatSaver.exe - Standalone heartbeat sender tool (CLI).
-    MapConverter.exe - Batch map format converter tool (CLI).
-     MapRenderer.exe - Tool that creates images of map files (CLI).
+       ServerCLI.exe - Command-line interface for the server.
+       ServerGUI.exe - Graphical interface for the server.
 
 
 
 === Command-line Options ======================================================
 
-In addition to many settings stored in config.xml, fCraft has several special
+In addition to many settings stored in config.xml, LegendCraft has several special
 options that can only be set via command-line switches:
 
-    --path=<path>       Working path (directory) that fCraft should use. If the
+    --path=<path>       Working path (directory) that LegendCraft should use. If the
                         given path is relative, it's computed against the
                         location of fCraft.dll
 
@@ -160,24 +132,18 @@ options that can only be set via command-line switches:
                         filename (typically "config.xml"). If the given path
                         is relative, it's computed against the working path.
 
-    --norestart         If this flag is present, fCraft will shutdown whenever
+    --norestart         If this flag is present, LegendCraft will shutdown whenever
                         it would normally restart (e.g. automatic updates or
                         /restart command). This may be useful if you are using
                         an auto-restart script or a process monitor.
 
-    --exitoncrash       If this flag is present, fCraft frontends will exit
+    --exitoncrash       If this flag is present, LegendCraft frontends will exit
                         at once in the event of an unrecoverable crash, instead
                         of showing a message and prompting for user input.
 
-    --noupdater         If this flag is present, fCraft will not launch the
-                        downloaded UpdateInstaller.exe when restarting for
-                        update/shutdown. It will handle all other aspects of
-                        the update process, including exiting with the correct
-                        exit-code, but not launch the updater.
-
     --nolog             If this flag is present, all logging is disabled.
 
-    --noconsolecolor    If this flag is present, ServerCLI will not use any
+    --nocolor           If this flag is present, ServerCLI will not use any
                         colors or formatting in its console output.
 
 
@@ -189,28 +155,20 @@ When you first join the server, promote yourself by typing...
 ...in the server's console. Replace "owner" if you renamed your highest rank.
 
 Type "/help" in-game or in server console to get started. Type "/commands" for
-a list of available commands. For detailed information, please visit:
-    http://fCraft.net/wiki
+a list of available commands. 
 
 To request features, report bugs, or receive support, please visit:
-    http://forum.fCraft.net
-
-For quick help/support, join #fCraft.dev channel on Esper.net IRC:
-    irc://irc.esper.net:5555/fCraft.dev
-
-See CHANGELOG.txt or visit http://fCraft.net/wiki/Version_history for complete
-information about changes in this release compared to previous versions of
-fCraft.
+    http://dingusserver.forumotion.com/f9-legendcraft
 
 
 
 === Licensing =================================================================
+LegendCraft code and binaries are covered by the MIT license.
 
-fCraft is open-source and free for all uses. fCraft code and binaries are
-licensed and distributed under the permissive MIT License, reproduced here:
+LegendCraft license:
 
-----
-Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+-------------------------------------------------------------------------------
+Copyright (c) <2012 - 2014> <LeChosenOne, DingusBingus>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -220,7 +178,7 @@ copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+all copies or substantial portions of the software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -229,49 +187,102 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+The 800Craft HeartBeatSaver is Copyright (C) <2011, 2012> Jon Baker 
+and is ONLY to be distributed with copies of 800Craft.
+All LegendCraft files do NOT contain a heartbeatsaver. If you did recieve a heartbeat saver, please contact LeChosenOne immediately.
+
+800Craft's license:
+
+-------------------------------------------------------------------------------
+Copyright (C) <2012> <Jon Baker, Glenn Mari�n and Lao Tszy>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+fCraft code and binaries are
+licensed and distributed under the permissive MIT License, reproduced here:
+
 ----
+Copyright 2009, 2010, 2011, 2012 Matvei Stefarov <me@matvei.org>
 
-If you create fCraft plugins that do not include any substantial portions of
-fCraft's original code, they belong to you and you are free to do absolutely
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+-------------------------------------------------------------------------------
+
+If you create 800Craft plugins that do not include any substantial portions of
+fCraft's original code or 800Craft's code, they belong to you and you are free to do absolutely
 anything with them. However, if you would like to distribute whole modified
-copies of fCraft, please follow the MIT License terms.
+copies of 800Craft, please follow the MIT and the GPLv3 License terms.
 
-Original Minecraft was developed by Markus "Notch" Persson of Mojang, and is 
+Original Minecraft was developed by Markus "Notch" Petersson of Mojang, and is 
 not affiliated with fCraft in any way. fCraft does not use any code, assets,
-or any other files from Minecraft.
+or any other files from Minecraft... neither does 800Craft or LegendCraft.
 
 
 
 === Credits ===================================================================
 
-fCraft was developed by Matvei Stefarov (me@matvei.org) in 2009-2014
+LegendCraft was developed by LeChosenOne, and DingusBungus
+  
+  -With code contribution by Jonty800 (he lifts) and Eeyle.
+
+Thanks to 800Craft code contributers:
+    Rebelliousdude, boblol0909, WaterGod469 and Maicke98 for trying. 
 
 Thanks to fCraft code contributors and modders:
-    Asiekierka, Dag10, Dankirk, Destroyer, FontPeg, Hellenion, Jonty800,
-    M1_Abrams, Optical-Lza, Redshift, SystemX17, TkTech, Wootalyzer.
+    Asiekierka, Dag10, Destroyer, FontPeg, M1_Abrams, Optical-Lza,
+    Redshift, SystemX17, TkTech, Wootalyzer
 
 Thanks to people who supported fCraft development through donations:
-    fCraft.net community, Allie, D3M0N, Destoned, DreamPhreak, Pandorum,
-    Redshift, TkTech, ven000m, wtfmejt, Team9000 and SpecialAttack.net
-    communities, and others who donated anonymously.
+    800Craft.net community, Astelyn, D3M0N, Destoned, DreamPhreak, Pandorum,
+    Redshift, TkTech, ven000m,  wtfmejt, Team9000 and SpecialAttack.net
+    communities, and others who donated anonymously
 
 Thanks to people whose code has been ported to fCraft:
     Dudecon (Forester), Osici (Omen), vLK (MinerCPP), Tim Van Wassenhove,
-    Paul Bourke, Chris Wilson.
+    Paul Bourke
+
+Thanks to Minecraft servers that helped test and improve 800Craft:
+    Au70 Galaxy, Project Vanilla.
 
 Thanks to Minecraft servers that helped test and improve fCraft:
     TheOne's Zombie Survival, SpecialAttack.net Freebuild, Team9000 Freebuild,
-    D3M0Ns FreeBuild, ~The Best Freebuild 24/7~, fCraft Freebuild Official,
-    Red Solidus Freebuild, Platinum Moon Freebuild.
+    D3M0Ns FreeBuild, ~The Best Freebuild 24/7~, 800Craft Freebuild Official
 
-Thanks to people who submitted bug reports and feature requests:
-    Allie, Clhdrums87, Darklight, David00143, Dogwatch, Epiclolwut, Fehzor,
-    Gamma-Metroid, Hellenion, Sunfall, maintrain97, Mavinstar, Sukinorules,
-    Unison, and all others.
+Thanks to the bug Testers and helpers for LegendCraft:
+    Ascending Blackout Server Community, Pure2k12, ThunderCraft Server Community, and Dingus and Jake's Server
 
-Special thanks for inspiration and suggestions:
-    CO2, Descension, ElectricFuzzball, Exe, Hearty0, iKJames, LG_Legacy,
-    PyroPyro, Revenant, Varriount, Voziv, Wallbraker, Zaneo,
-    #mcc on Esper.net, HyveBuild/iCraft team, MinerCPP team, OpenCraft team.
+Special Thanks to Pure2K12 for catching for inspiration and getting me started in this mess!
+Special Thanks to Jonty800 being exceptionally awesome!
 
-And thank You for using fCraft!
+And thank You for using LegendCraft!

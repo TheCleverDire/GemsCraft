@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 // With contributions by Conrad "Redshift" Morgan
 using System;
 using fCraft.Drawing;
@@ -6,30 +6,28 @@ using fCraft.Drawing;
 namespace fCraft {
     /// <summary> Integer 3D vector. </summary>
     public struct Vector3I : IEquatable<Vector3I>, IComparable<Vector3I>, IComparable<Vector3F> {
-        /// <summary> Zero-length vector (0,0,0) </summary>
         public static readonly Vector3I Zero = new Vector3I( 0, 0, 0 );
-
-        /// <summary> Upwards-facing unit vector (0,0,1) </summary>
         public static readonly Vector3I Up = new Vector3I( 0, 0, 1 );
-
-        /// <summary> Downwards-facing unit vector (0,0,-1) </summary>
         public static readonly Vector3I Down = new Vector3I( 0, 0, -1 );
 
+        /// <summary>
+        /// Depth and Length Axis
+        /// </summary>
+        public int X;
 
-        public int X, Y, Z;
+        /// <summary>
+        /// Depth and Length Axis
+        /// </summary>
+        public int Y;
 
-        public int X2 {
-            get { return X * X; }
-        }
+        /// <summary>
+        /// Height Axis
+        /// </summary>
+        public int Z;
 
-        public int Y2 {
-            get { return Y * Y; }
-        }
-
-        public int Z2 {
-            get { return Z * Z; }
-        }
-
+        public int X2 { get { return X * X; } }
+        public int Y2 { get { return Y * Y; } }
+        public int Z2 { get { return Z * Z; } }
 
         public Vector3I( int x, int y, int z ) {
             X = x;
@@ -37,13 +35,11 @@ namespace fCraft {
             Z = z;
         }
 
-
         public Vector3I( Vector3I other ) {
             X = other.X;
             Y = other.Y;
             Z = other.Z;
         }
-
 
         public Vector3I( Vector3F other ) {
             X = (int)other.X;
@@ -53,63 +49,48 @@ namespace fCraft {
 
 
         public float Length {
-            get { return (float)Math.Sqrt( (double)X * X + (double)Y * Y + (double)Z * Z ); }
+            get {
+                return (float)Math.Sqrt( (double)X * X + (double)Y * Y + (double)Z * Z );
+            }
         }
 
         public int LengthSquared {
-            get { return X * X + Y * Y + Z * Z; }
-        }
-
-
-        public int this[ int i ] {
             get {
-                switch( i ) {
-                    case 0:
-                        return X;
-                    case 1:
-                        return Y;
-                    default:
-                        return Z;
-                }
-            }
-            set {
-                switch( i ) {
-                    case 0:
-                        X = value;
-                        return;
-                    case 1:
-                        Y = value;
-                        return;
-                    default:
-                        Z = value;
-                        return;
-                }
+                return X * X + Y * Y + Z * Z;
             }
         }
 
 
-        public int this[ Axis i ] {
+        public int this[int i] {
             get {
                 switch( i ) {
-                    case Axis.X:
-                        return X;
-                    case Axis.Y:
-                        return Y;
-                    default:
-                        return Z;
+                    case 0: return X;
+                    case 1: return Y;
+                    default: return Z;
                 }
             }
             set {
                 switch( i ) {
-                    case Axis.X:
-                        X = value;
-                        return;
-                    case Axis.Y:
-                        Y = value;
-                        return;
-                    default:
-                        Z = value;
-                        return;
+                    case 0: X = value; return;
+                    case 1: Y = value; return;
+                    default: Z = value; return;
+                }
+            }
+        }
+
+        public int this[Axis i] {
+            get {
+                switch( i ) {
+                    case Axis.X: return X;
+                    case Axis.Y: return Y;
+                    default: return Z;
+                }
+            }
+            set {
+                switch( i ) {
+                    case Axis.X: X = value; return;
+                    case Axis.Y: Y = value; return;
+                    default: Z = value; return;
                 }
             }
         }
@@ -131,16 +112,13 @@ namespace fCraft {
             return new Vector3I( a.X * scalar, a.Y * scalar, a.Z * scalar );
         }
 
-
         public static Vector3I operator *( int scalar, Vector3I a ) {
             return new Vector3I( a.X * scalar, a.Y * scalar, a.Z * scalar );
         }
 
-
         public static Vector3F operator *( Vector3I a, float scalar ) {
             return new Vector3F( a.X * scalar, a.Y * scalar, a.Z * scalar );
         }
-
 
         public static Vector3F operator *( float scalar, Vector3I a ) {
             return new Vector3F( a.X * scalar, a.Y * scalar, a.Z * scalar );
@@ -151,7 +129,6 @@ namespace fCraft {
         public static Vector3I operator /( Vector3I a, int scalar ) {
             return new Vector3I( a.X / scalar, a.Y / scalar, a.Z / scalar );
         }
-
 
         public static Vector3F operator /( Vector3I a, float scalar ) {
             return new Vector3F( a.X / scalar, a.Y / scalar, a.Z / scalar );
@@ -171,16 +148,14 @@ namespace fCraft {
             }
         }
 
-
         public bool Equals( Vector3I other ) {
-            return ( X == other.X ) && ( Y == other.Y ) && ( Z == other.Z );
+            return (X == other.X) && (Y == other.Y) && (Z == other.Z);
         }
 
 
         public static bool operator ==( Vector3I a, Vector3I b ) {
             return a.Equals( b );
         }
-
 
         public static bool operator !=( Vector3I a, Vector3I b ) {
             return !a.Equals( b );
@@ -200,7 +175,6 @@ namespace fCraft {
             return Math.Sign( LengthSquared - other.LengthSquared );
         }
 
-
         public int CompareTo( Vector3F other ) {
             return Math.Sign( LengthSquared - other.LengthSquared );
         }
@@ -210,16 +184,13 @@ namespace fCraft {
             return a.LengthSquared > b.LengthSquared;
         }
 
-
         public static bool operator <( Vector3I a, Vector3I b ) {
             return a.LengthSquared < b.LengthSquared;
         }
 
-
         public static bool operator >=( Vector3I a, Vector3I b ) {
             return a.LengthSquared >= b.LengthSquared;
         }
-
 
         public static bool operator <=( Vector3I a, Vector3I b ) {
             return a.LengthSquared <= b.LengthSquared;
@@ -229,26 +200,23 @@ namespace fCraft {
 
 
         public int Dot( Vector3I b ) {
-            return ( X * b.X ) + ( Y * b.Y ) + ( Z * b.Z );
+            return (X * b.X) + (Y * b.Y) + (Z * b.Z);
         }
-
 
         public float Dot( Vector3F b ) {
-            return ( X * b.X ) + ( Y * b.Y ) + ( Z * b.Z );
+            return (X * b.X) + (Y * b.Y) + (Z * b.Z);
         }
-
 
         public Vector3I Cross( Vector3I b ) {
-            return new Vector3I( ( Y * b.Z ) - ( Z * b.Y ),
-                                 ( Z * b.X ) - ( X * b.Z ),
-                                 ( X * b.Y ) - ( Y * b.X ) );
+            return new Vector3I( (Y * b.Z) - (Z * b.Y),
+                                 (Z * b.X) - (X * b.Z),
+                                 (X * b.Y) - (Y * b.X) );
         }
 
-
         public Vector3F Cross( Vector3F b ) {
-            return new Vector3F( ( Y * b.Z ) - ( Z * b.Y ),
-                                 ( Z * b.X ) - ( X * b.Z ),
-                                 ( X * b.Y ) - ( Y * b.X ) );
+            return new Vector3F( (Y * b.Z) - (Z * b.Y),
+                                 (Z * b.X) - (X * b.Z),
+                                 (X * b.Y) - (Y * b.X) );
         }
 
 
@@ -275,11 +243,9 @@ namespace fCraft {
             return String.Format( "({0},{1},{2})", X, Y, Z );
         }
 
-
         public Vector3I Abs() {
             return new Vector3I( Math.Abs( X ), Math.Abs( Y ), Math.Abs( Z ) );
         }
-
 
         public Vector3F Normalize() {
             if( X == 0 && Y == 0 && Z == 0 ) return Vector3F.Zero;
@@ -294,11 +260,9 @@ namespace fCraft {
             return new Position( a.X, a.Y, a.Z );
         }
 
-
         public static explicit operator Vector3F( Vector3I a ) {
             return new Vector3F( a.X, a.Y, a.Z );
         }
-
 
         public Position ToPlayerCoords() {
             return new Position( X * 32 + 16, Y * 32 + 16, Z * 32 + 16 );

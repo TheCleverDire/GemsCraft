@@ -1,15 +1,18 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Linq;
 using fCraft.Drawing;
 using fCraft.MapConversion;
-using System.Collections.Generic;
 using JetBrains.Annotations;
+using System.IO;
+using System.Collections.Generic;
+using System.Globalization;
 
 namespace fCraft {
     /// <summary> Commands for placing specific blocks (solid, water, grass),
     /// and switching block placement modes (paint, bind). </summary>
     static class BuildingCommands {
+
         public static int MaxUndoCount = 2000000;
 
         const string GeneralDrawingHelp = " Use &H/Cancel&S to cancel selection mode. " +
@@ -19,13 +22,13 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdBind );
             CommandManager.RegisterCommand( CdGrass );
             CommandManager.RegisterCommand( CdLava );
-            CommandManager.RegisterCommand( CdWater );
-            CommandManager.RegisterCommand( CdSolid );
             CommandManager.RegisterCommand( CdPaint );
+            CommandManager.RegisterCommand( CdSolid );
+            CommandManager.RegisterCommand( CdWater );
+
 
             CommandManager.RegisterCommand( CdCancel );
             CommandManager.RegisterCommand( CdMark );
-            CommandManager.RegisterCommand( CdDoNotMark );
             CommandManager.RegisterCommand( CdUndo );
             CommandManager.RegisterCommand( CdRedo );
 
@@ -81,20 +84,926 @@ namespace fCraft {
             CdTorus.Help += GeneralDrawingHelp;
 
             CommandManager.RegisterCommand( CdFill2D );
-            CommandManager.RegisterCommand( CdFill3D );
             CdFill2D.Help += GeneralDrawingHelp;
-            CdFill3D.Help += GeneralDrawingHelp;
 
             CommandManager.RegisterCommand( CdUndoArea );
+            CommandManager.RegisterCommand(CdUndoAreaNot);
             CommandManager.RegisterCommand( CdUndoPlayer );
-            CommandManager.RegisterCommand( CdUndoAreaNot );
-            CommandManager.RegisterCommand( CdUndoPlayerNot );
+            CommandManager.RegisterCommand(CdUndoPlayerNot);
             CdUndoArea.Help += GeneralDrawingHelp;
-            CdUndoAreaNot.Help += GeneralDrawingHelp;
-
             CommandManager.RegisterCommand( CdStatic );
+
+            CommandManager.RegisterCommand(CdTree);
+            CommandManager.RegisterCommand(CdWalls);
+            CommandManager.RegisterCommand(CdBanx);
+            CommandManager.RegisterCommand(CdFly);
+            CommandManager.RegisterCommand(CdPlace);
+            CommandManager.RegisterCommand(CdTower);
+            CommandManager.RegisterCommand(CdCylinder);
+            CommandManager.RegisterCommand(CdCenter);
+
+            CommandManager.RegisterCommand(CdUndoAll);
+            //CommandManager.RegisterCommand(CdMessageBlock);
+            //CommandManager.RegisterCommand(CdBanX2);
+            CommandManager.RegisterCommand(CdDoubleStair);
+            CommandManager.RegisterCommand(CdAbortAll);
+            CommandManager.RegisterCommand(Cdzz);
+            CommandManager.RegisterCommand(CdHighlight);
+
+
         }
 
+        sealed class BlockDBUndoArgs
+        {
+            public Player Player;
+            public PlayerInfo[] Targets;
+            public World World;
+            public int CountLimit;
+            public TimeSpan AgeLimit;
+            public BlockDBEntry[] Entries;
+            public BoundingBox Area;
+            public bool Not;
+        }
+
+        // parses and checks command parameters (for both UndoPlayer and UndoArea)
+        [CanBeNull]
+        static BlockDBUndoArgs ParseBlockDBUndoParams(Player player, Command cmd, string cmdName, bool not)
+        {
+            // check if command's being called by a worldless player (e.g. console)
+            World playerWorld = player.World;
+            if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
+
+            // ensure that BlockDB is enabled
+            if (!BlockDB.IsEnabledGlobally)
+            {
+                player.Message("&W{0}: BlockDB is disabled on this server.", cmdName);
+                return null;
+            }
+            if (!playerWorld.BlockDB.IsEnabled)
+            {
+                player.Message("&W{0}: BlockDB is disabled in this world.", cmdName);
+                return null;
+            }
+
+            // parse the first parameter - either numeric or time limit
+            string range = cmd.Next();
+            if (range == null)
+            {
+                CdUndoPlayer.PrintUsage(player);
+                return null;
+            }
+            int countLimit;
+            TimeSpan ageLimit = TimeSpan.Zero;
+            if (!Int32.TryParse(range, out countLimit) && !range.TryParseMiniTimespan(out ageLimit))
+            {
+                player.Message("{0}: First parameter should be a number or a timespan.", cmdName);
+                return null;
+            }
+            if (ageLimit > DateTimeUtil.MaxTimeSpan)
+            {
+                player.MessageMaxTimeSpan();
+                return null;
+            }
+
+            // parse second and consequent parameters (player names)
+            HashSet<PlayerInfo> targets = new HashSet<PlayerInfo>();
+            bool allPlayers = false;
+            while (true)
+            {
+                string name = cmd.Next();
+                if (name == null)
+                {
+                    break;
+                }
+                else if (name == "*")
+                {
+                    // all players
+                    if (not)
+                    {
+                        player.Message("{0}: \"*\" not allowed (cannot undo \"everyone except everyone\")", cmdName);
+                        return null;
+                    }
+                    if (allPlayers)
+                    {
+                        player.Message("{0}: \"*\" was listed twice.", cmdName);
+                        return null;
+                    }
+                    allPlayers = true;
+
+                }
+                else
+                {
+                    // individual player
+                    PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, name);
+                    if (target == null)
+                    {
+                        return null;
+                    }
+                    if (targets.Contains(target))
+                    {
+                        player.Message("{0}: Player {1}&S was listed twice.",
+                                        target.ClassyName, cmdName);
+                        return null;
+                    }
+                    // make sure player has the permission
+                    if (!not &&
+                        player.Info != target && !player.Can(Permission.UndoAll) &&
+                        !player.Can(Permission.UndoOthersActions, target.Rank))
+                    {
+                        player.Message("&W{0}: You may only undo actions of players ranked {1}&S or lower.",
+                                        cmdName,
+                                        player.Info.Rank.GetLimit(Permission.UndoOthersActions).ClassyName);
+                        player.Message("Player {0}&S is ranked {1}",
+                                        target.ClassyName, target.Rank.ClassyName);
+                        return null;
+                    }
+                    targets.Add(target);
+                }
+            }
+            if (targets.Count == 0 && !allPlayers)
+            {
+                player.Message("{0}: Specify at least one player name, or \"*\" to undo everyone.", cmdName);
+                return null;
+            }
+            if (targets.Count > 0 && allPlayers)
+            {
+                player.Message("{0}: Cannot mix player names and \"*\".", cmdName);
+                return null;
+            }
+
+            // undoing everyone ('*' in place of player name) requires UndoAll permission
+            if ((not || allPlayers) && !player.Can(Permission.UndoAll))
+            {
+                player.MessageNoAccess(Permission.UndoAll);
+                return null;
+            }
+
+            // Queue UndoPlayerCallback to run
+            return new BlockDBUndoArgs
+            {
+                Player = player,
+                AgeLimit = ageLimit,
+                CountLimit = countLimit,
+                Area = player.WorldMap.Bounds,
+                World = playerWorld,
+                Targets = targets.ToArray(),
+                Not = not
+            };
+        }
+
+        #region LegendCraft
+        /* Copyright (c) <2012-2014> <LeChosenOne, DingusBungus>
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.*/
+        
+        static readonly CommandDescriptor CdHighlight = new CommandDescriptor 
+        {
+            Name = "Highlight",
+            Aliases = new[] { "SelectionCuboid", "Select", "hl" },
+            IsConsoleSafe = false,
+            Permissions = new[] { Permission.DrawAdvanced },
+            Category = CommandCategory.Building,
+            Help = "Highlights a specific location of the world. Use /help Highlight [option] for more options",
+            Usage = "/Highlight [Create | Remove | List | Clear]",
+            HelpSections = new System.Collections.Generic.Dictionary<string, string>{
+                { "create", "&H/Highlight create [highlight name] [color or #htmlcolor] [Percent Opaque]\n&S" +
+                                "Creates a new highlighted zone with the given name, color (or html color), and percent opacity." },
+                { "remove", "&H/Highlight remove [highlight name]\n&S" +
+                                "Removes the given highlighted zone." },
+                { "list", "&H/Highlight list [world name]\n&S" +
+                                "Lists all highlighted zones in a world. Use 'all' for [world name] to list all highlights."},  
+                { "clear", "&H/Highlight clear [world name]\n&S" +
+                                "Removes all highlight from a given world. Use 'all' for [world name] to remove all highlights."}  
+            },
+            Handler = HighlightHandler
+        };
+
+        static void HighlightHandler(Player player, Command cmd)
+        {
+            string option = cmd.Next();
+            if (String.IsNullOrEmpty(option))
+            {
+                CdHighlight.PrintUsage(player);
+                return;
+            }
+
+            switch (option.ToLower())
+            {
+                case "create":
+                case "new":
+                case "add":
+                    string name = cmd.Next();
+                    if (String.IsNullOrEmpty(name))
+                    {
+                        player.Message("Usage is /Highlight create [highlight name]");
+                        return;
+                    }
+
+                    if (Server.Highlights.Keys.Contains(name))
+                    {
+                        player.Message("A highlight with that name already exists!");
+                        return;
+                    }
+                    System.Drawing.Color systemColor;
+
+                    string color = cmd.Next();
+                    if (String.IsNullOrEmpty(color))
+                    {
+                        player.Message("Usage is /Highlight create [highlight name] [color or #htmlcolor] [Percent Opaque]");
+                        return;
+                    }
+
+                    if (color.Contains('#'))
+                    {
+                        try
+                        {
+                            systemColor = System.Drawing.ColorTranslator.FromHtml(color);
+                        }
+                        catch
+                        {
+                            player.Message("Unrecognized color! Please use a valid color name or html color code.");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            systemColor = System.Drawing.Color.FromName(color);
+                        }
+                        catch
+                        {
+                            player.Message("Unrecognized color! Please use a valid color name or html color code.");
+                            return;
+                        }
+                    }
+
+                    string opacity = cmd.Next();
+                    int percentOpacity;
+                    if (String.IsNullOrEmpty(opacity))
+                    {
+                        player.Message("Usage is /Highlight create [highlight name] [color or #htmlcolor] [Percent Opaque]");
+                        return;
+                    }
+
+                    if (!Int32.TryParse(opacity, out percentOpacity))
+                    {
+                        player.Message("Percent opacity must be from 0-100, where 0 would be transparent, and 100 would be completely opaque.");
+                        return;
+                    }
+
+                    player.highlightName = name;
+                    player.cmd = cmd.Name;
+                    player.color = systemColor;
+                    player.percentOpacity = percentOpacity;
+                    player.SelectMarks();
+                    break;
+                case "remove":
+                case "delete":
+                    string targetHighlight = cmd.Next();
+                    if (String.IsNullOrEmpty(targetHighlight))
+                    {
+                        CdHighlight.PrintUsage(player);
+                            return;
+                    }
+                    if(!Server.Highlights.Keys.Contains(targetHighlight))
+                    {
+                        player.Message("That highlight zone was not found! Please make sure you spelled it correctly!");
+                        return;
+                    }
+
+                    //get the value of the highlight key, item one of the value tuple is the ID
+                    Tuple<int, Vector3I, Vector3I, System.Drawing.Color, int> val;
+                    Server.Highlights.TryGetValue(targetHighlight, out val);
+
+                    player.World.Players.Send(PacketWriter.RemoveSelectionCuboid((byte)val.Item1));
+                    Server.Highlights.Remove(targetHighlight);
+
+                    break;
+                case "list":
+                case "show":
+                    string worldName = cmd.Next();
+                    if (String.IsNullOrEmpty(worldName))
+                    {
+                        CdHighlight.PrintUsage(player);
+                        return;
+                    }
+
+                    if (worldName == "all")
+                    {
+                        player.Message("_Listing all the highlights on {0}_", ConfigKey.ServerName.GetString());
+                        foreach (string s in Server.Highlights.Keys)
+                        {
+                            player.Message(s);
+                        }
+                    }
+                    else
+                    {
+                        World targetWorld = WorldManager.FindWorldOrPrintMatches(player, worldName);
+                        if (targetWorld == null)
+                        {
+                            return;
+                        }
+
+                        player.Message("_Listing all highlights on {0}_", targetWorld.Name);
+                        foreach (string s in targetWorld.Highlights.Keys)
+                        {
+                            player.Message(s);
+                        }
+                    }
+                    break;
+                case "clear":
+                case "empty":
+                    string worldTarget = cmd.Next();
+                    if (String.IsNullOrEmpty(worldTarget))
+                    {
+                        CdHighlight.PrintUsage(player);
+                        return;
+                    }
+
+                    if (worldTarget == "all")
+                    {
+                        player.Message("_Removing all highlights {0}_", ConfigKey.ServerName.GetString());
+                        foreach (Player p in Server.Players.Where(p => p.usesCPE))
+                        {
+                            //physically remove all highlights where players are connected to specific worlds
+                            if (p.World.Highlights.Count > 0)
+                            {
+                                foreach (var i in p.World.Highlights.Values)
+                                {
+                                    p.Send(PacketWriter.RemoveSelectionCuboid((byte)i.Item1));
+                                }
+                            }
+                        }
+
+                        //remove all traces of highlights on each world
+                        var worldWithHighlights = from w in WorldManager.Worlds
+                                                  where w.Highlights.Count > 0
+                                                  select w;
+
+                        foreach (World world in worldWithHighlights)
+                        {
+                            world.Highlights.Clear();
+                        }
+
+                        //remove all traces of highlights on the server
+                        Server.Highlights.Clear();
+                    }
+                    else
+                    {
+                        World targetWorld = WorldManager.FindWorldOrPrintMatches(player, worldTarget);
+                        if (targetWorld == null)
+                        {
+                            return;
+                        }
+
+                        player.Message("_Removing all highlights on {0}_", targetWorld.Name);
+                        foreach (Player p in targetWorld.Players.Where(p => p.usesCPE))
+                        {
+                            foreach (var i in targetWorld.Highlights.Values)
+                            {
+                                p.Send(PacketWriter.RemoveSelectionCuboid((byte)i.Item1));
+                            }
+                        }
+
+                        targetWorld.Highlights.Clear();
+                    }
+                    break;
+                default:
+                    CdHighlight.PrintUsage(player);
+                    break;
+            }
+
+        }
+
+        static readonly CommandDescriptor Cdzz = new CommandDescriptor
+        {
+            Name = "zz",
+            Aliases = new[] { "staticz", "cc" },
+            Permissions = new[] { Permission.Draw },
+            Category = CommandCategory.Building,
+            Help = "Allows you to use cuboid subsequently.",
+            Handler = zzHandler
+        };
+
+        static void zzHandler(Player player, Command cmd)
+        {
+            bool zz = false;
+            if (zz == false)
+            {
+                StaticHandler(player, new Command("/static"));
+                CuboidHandler(player, new Command("/cuboid"));
+                zz = true;
+            }
+            else
+            {
+                StaticHandler(player, new Command("/static"));
+                zz = false;
+            }
+        }
+        
+         static readonly CommandDescriptor CdDoubleStair = new CommandDescriptor //a copy and paste of /lava
+        {
+            Name = "DoubleStair",
+            Aliases = new[] { "ds" },
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.PlaceGrass },
+            Help = "Toggles the DoubleStair placement mode. When enabled, any Stair block you place is replaced with DoubleStair.",
+            Handler = DoubleStairHandler
+        };
+
+        static void DoubleStairHandler(Player player, Command cmd)
+        {
+            if (player.GetBind(Block.Stair) == Block.DoubleStair)
+            {
+                player.ResetBind(Block.Stair);
+                player.Message("DoubleStair: OFF");
+            }
+
+            else
+            {
+                player.Bind(Block.Stair, Block.DoubleStair);
+                player.Message("DoubleStair: ON. Stair blocks are replaced with DoubleStairs.");
+            }
+        }
+        
+        static readonly CommandDescriptor CdMessageBlock = new CommandDescriptor
+        {
+            Name = "MessageBlock",
+            Aliases = new[] { "MsgBlock" },
+            Category = CommandCategory.Moderation,
+            IsConsoleSafe = false,
+            IsHidden = false,
+            Permissions = new[] { Permission.Ban },
+            Usage = "/MessageBlock Message",
+            Help = "Creates a message that is sent to the player whenever the touch the messageblock.",
+            Handler = MsgBlockHandler
+        };
+
+        public static void MsgBlockHandler(Player player, Command cmd)
+        {
+            String message = cmd.NextAll();
+            if (message == null) 
+            {
+                CdMessageBlock.PrintUsage(player);
+            }
+             Vector3I MessageBlock = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z / 32) - 2);
+        }
+
+        static readonly CommandDescriptor CdUndoAll = new CommandDescriptor
+        {
+            Name = "UndoAll",
+            Aliases = new[] { "Revert" },
+            Category = CommandCategory.Moderation,
+            IsConsoleSafe = false,
+            IsHidden = false,
+            Permissions = new[] { Permission.Ban },
+            Usage = "/UndoAll playername",
+            Help = "Completely undo's a player's blocks.",
+            Handler = UndoAllHandler
+        };
+
+        public static void UndoAllHandler(Player player, Command cmd)
+        {
+            string targetName = cmd.Next();
+            if (targetName == null)
+            {
+                CdUndoAll.PrintUsage(player);
+            }
+            PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, targetName);
+            if (target == null)
+            {
+                player.MessageNoPlayer(targetName);
+                return;
+            }
+            UndoAllHandler(player, new Command("/undoall " + target.Name));
+        }
+        
+        
+        
+        
+        static readonly CommandDescriptor CdAbortAll = new CommandDescriptor 
+    	{
+		Name = "AbortAll",
+		Aliases = new[] { "abort", "aba" },
+		Category = CommandCategory.Building,
+		Help = "Sets all toggles to false (paint, static, etc)",
+		Handler = AbortAllHandler
+	};
+
+	static void AbortAllHandler( Player player, Command cmd ) 
+	{
+		player.IsPainting = false;			// /paint
+		player.ResetAllBinds();				// /bind
+		player.ParseMessage( "/brush normal", false, false );  // /brush (totally not a sneaky way to do this)
+		player.BuildingPortal = false;			// /portal
+		player.fireworkMode = false;			// /fireworks
+		player.GunMode = false;				// /gun
+		player.IsRepeatingSelection = false;		// /static
+		player.SelectionCancel();			// /cancel
+		player.StopSpectating();			// /spectate
+		player.towerMode = false;			// /tower
+		player.ParseMessage( "/nvm", false, false );		// /nvm
+	}
+        
+        #endregion
+
+
+        #region 800Craft
+
+        //Copyright (C) <2012>  <Jon Baker, Glenn Mariën and Lao Tszy>
+
+        //This program is free software: you can redistribute it and/or modify
+        //it under the terms of the GNU General Public License as published by
+        //the Free Software Foundation, either version 3 of the License, or
+        //(at your option) any later version.
+
+        //This program is distributed in the hope that it will be useful,
+        //but WITHOUT ANY WARRANTY; without even the implied warranty of
+        //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        //GNU General Public License for more details.
+
+        //You should have received a copy of the GNU General Public License
+        //along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+
+        static readonly CommandDescriptor CdTree = new CommandDescriptor
+        {
+            Name = "Tree",
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.Tree },
+            Usage = "/Tree Shape Height",
+            Help = "&SPlants a tree of given shape and height. Available shapes: Normal, Bamboo, Palm, Cone, Round, Rainforest, Mangrove",
+            Handler = TreeHandler
+        };
+
+        static void TreeHandler(Player player, Command cmd)
+        {
+            string shapeName = cmd.Next();
+            int height;
+            Forester.TreeShape shape;
+
+            // that's one ugly if statement... does the job though.
+            if (shapeName == null ||
+                !cmd.NextInt(out height) ||
+                !EnumUtil.TryParse(shapeName, out shape, true) ||
+                shape == Forester.TreeShape.Stickly ||
+                shape == Forester.TreeShape.Procedural)
+            {
+                CdTree.PrintUsage(player);
+                player.Message("Available shapes: Normal, Bamboo, Palm, Cone, Round, Rainforest, Mangrove.");
+                return;
+            }
+
+            if (height < 6 || height > 1024)
+            {
+                player.Message("Tree height must be 6 blocks or above");
+                return;
+            }
+
+            Map map = player.World.Map;
+
+            ForesterArgs args = new ForesterArgs
+            {
+                Height = height - 1,
+                Operation = Forester.ForesterOperation.Add,
+                Map = map,
+                Shape = shape,
+                TreeCount = 1,
+                RootButtresses = false,
+                Roots = Forester.RootMode.None,
+                Rand = new Random()
+            };
+            player.SelectionStart(1, TreeCallback, args, CdTree.Permissions);
+            player.MessageNow("Tree: Place a block or type /Mark to use your location.");
+        }
+
+        static void TreeCallback(Player player, Vector3I[] marks, object tag)
+        {
+            ForesterArgs args = (ForesterArgs)tag;
+            int blocksPlaced = 0, blocksDenied = 0;
+            UndoState undoState = player.DrawBegin(null);
+            args.BlockPlacing +=
+                (sender, e) =>
+               DrawOneBlock(player, player.World.Map, e.Block, new Vector3I(e.Coordinate.X, e.Coordinate.Y, e.Coordinate.Z),
+                              BlockChangeContext.Drawn,
+                              ref blocksPlaced, ref blocksDenied, undoState);
+            Forester.SexyPlant(args, marks[0]);
+            DrawingFinished(player, "/Tree: Planted", blocksPlaced, blocksDenied);
+        }
+
+
+        static readonly CommandDescriptor CdCylinder = new CommandDescriptor
+        {
+            Name = "Cylinder",
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.Build },
+            IsConsoleSafe = false,
+            NotRepeatable = false,
+            RepeatableSelection = true,
+            Help = "&SFills the selected rectangular area with a cylinder of blocks. " +
+                   "Unless two blocks are specified, leaves the inside hollow.",
+            UsableByFrozenPlayers = false,
+            Handler = CylinderHandler
+        };
+
+        static void CylinderHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new CylinderDrawOperation(player));
+        }
+        
+        
+        static readonly CommandDescriptor CdPlace = new CommandDescriptor
+        {
+            Name = "Place",
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.Build },
+            IsConsoleSafe = false,
+            NotRepeatable = false,
+            Usage = "/Place",
+            Help = "&SPlaces a block below your feet.",
+            UsableByFrozenPlayers = false,
+            Handler = Place
+        };
+
+        static void Place(Player player, Command cmd)
+        {
+            Block block;
+            if (player.LastUsedBlockType == Block.Undefined)
+            {
+                block = Block.Stone;
+            }
+            else
+            {
+                block = player.LastUsedBlockType;
+            }
+            Vector3I Pos = new Vector3I(player.Position.X / 32, player.Position.Y / 32, (player.Position.Z / 32) - 2);
+
+            if (player.CanPlace(player.World.Map, Pos, player.GetBind(block), BlockChangeContext.Manual) != CanPlaceResult.Allowed)
+            {
+                player.Message("&WYou are not allowed to build here");
+                return;
+            }
+
+            Player.RaisePlayerPlacedBlockEvent(player, player.WorldMap, Pos, player.WorldMap.GetBlock(Pos), block, BlockChangeContext.Manual);
+            BlockUpdate blockUpdate = new BlockUpdate(null, Pos, block);
+            player.World.Map.QueueUpdate(blockUpdate);
+            player.Message("Block placed below your feet");
+        }
+
+        static readonly CommandDescriptor CdCenter = new CommandDescriptor
+        {
+            Name = "Center",
+            Aliases = new[] {"Centre", "Middle", "Mid"},
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.Build },
+            IsConsoleSafe = false,
+            NotRepeatable = false,
+            Usage = "/Center",
+            Help = "Places a block at the center for a chosen cuboided area",
+            UsableByFrozenPlayers = false,
+            Handler = CenterHandler
+        };
+
+        static void CenterHandler( Player player, Command cmd ) {
+            player.SelectionStart( 2, CenterCallback, null, CdCenter.Permissions );
+            player.MessageNow( "Center: Place a block or type /Mark to use your location." );
+        }
+
+
+        static void CenterCallback(Player player, Vector3I[] marks, object tag)
+        {
+            if (player.LastUsedBlockType != Block.Undefined)
+            {
+                int sx = Math.Min(marks[0].X, marks[1].X), ex = Math.Max(marks[0].X, marks[1].X),
+                sy = Math.Min(marks[0].Y, marks[1].Y), ey = Math.Max(marks[0].Y, marks[1].Y),
+                sz = Math.Min(marks[0].Z, marks[1].Z), ez = Math.Max(marks[0].Z, marks[1].Z);
+
+                BoundingBox bounds = new BoundingBox(sx, sy, sz, ex, ey, ez);
+                Vector3I cPos = new Vector3I((bounds.XMin + bounds.XMax) / 2,
+                    (bounds.YMin + bounds.YMax) / 2,
+                    (bounds.ZMin + bounds.ZMax) / 2);
+                int blocksDrawn = 0,
+                blocksSkipped = 0;
+                UndoState undoState = player.DrawBegin(null);
+
+                World playerWorld = player.World;
+                if (playerWorld == null) PlayerOpException.ThrowNoWorld(player);
+                Map map = player.WorldMap;
+                DrawOneBlock(player, player.World.Map, player.GetBind(player.LastUsedBlockType), cPos,
+                          BlockChangeContext.Drawn,
+                          ref blocksDrawn, ref blocksSkipped, undoState);
+                DrawingFinished(player, "Placed", blocksDrawn, blocksSkipped);
+            }else{
+                player.Message("&WCannot deduce desired block. Click a block or type out the block name.");
+            }
+        }
+
+
+       
+        static readonly CommandDescriptor CdTower = new CommandDescriptor
+        {
+            Name = "Tower",
+            Category = CommandCategory.Building,
+            Permissions = new[] { Permission.Tower },
+            IsConsoleSafe = false,
+            NotRepeatable = false,
+            Usage = "/Tower [/Tower Remove]",
+            Help = "&SToggles tower mode on for yourself. All Iron blocks will be replaced with towers.",
+            UsableByFrozenPlayers = false,
+            Handler = towerHandler
+        };
+
+        static void towerHandler(Player player, Command cmd)
+        {
+            string Param = cmd.Next();
+            if (Param == null)
+            {
+                if (player.towerMode)
+                {
+                    player.towerMode = false;
+                    player.Message("TowerMode has been turned off.");
+                    return;
+                }
+                else
+                {
+                    player.towerMode = true;
+                    player.Message("TowerMode has been turned on. " +
+                        "All Iron blocks are now being replaced with Towers.");
+                }
+            }
+            else if (Param.ToLower() == "remove")
+            {
+                if (player.TowerCache != null)
+                {
+                    World world = player.World;
+                    if (world.Map != null)
+                    {
+                        player.World.Map.QueueUpdate(new BlockUpdate(null, player.towerOrigin, Block.Air));
+                        foreach (Vector3I block in player.TowerCache.Values)
+                        {
+                            if (world.Map != null)
+                            {
+                                player.Send(PacketWriter.MakeSetBlock(block, player.WorldMap.GetBlock(block)));
+                            }
+                        }
+                    }
+                    player.TowerCache.Clear();
+                    return;
+                }
+                else
+                {
+                    player.Message("&WThere is no Tower to remove");
+                }
+            }
+
+            else CdTower.PrintUsage(player);
+        }
+        static readonly CommandDescriptor CdFly = new CommandDescriptor
+        {
+            Name = "Fly",
+            Category = CommandCategory.Building | CommandCategory.Fun,
+            IsConsoleSafe = false,
+            NotRepeatable = false,
+            Usage = "/fly",
+            Help = "&SAllows a player to fly on a sheet of glass.",
+            UsableByFrozenPlayers = false,
+            Handler = Fly
+        };
+
+        static void Fly(Player player, Command cmd)
+        {
+            if (player.IsFlying)
+            {
+                fCraft.Utils.FlyHandler.GetInstance().StopFlying(player);
+                player.Message("You are no longer flying.");
+                return;
+            }
+            else
+            {
+                if (player.IsUsingWoM)
+                {
+                    player.Message("You cannot use /fly when using WOM");
+                    return;
+                }
+                fCraft.Utils.FlyHandler.GetInstance().StartFlying(player);
+                player.Message("You are now flying, jump!");
+            }
+        }
+
+         
+        #region banx
+        static readonly CommandDescriptor CdBanx = new CommandDescriptor
+        {
+            Name = "Banx",
+            Category = CommandCategory.Moderation,
+            IsConsoleSafe = false,
+            IsHidden = false,
+            Permissions = new[] { Permission.Ban },
+            Usage = "/Banx playerName reason",
+            Help = "Bans and undoes a players actions up to 100000 blocks",
+            Handler = BanXHandler
+        };
+
+        static void BanXHandler(Player player, Command cmd)
+        {
+            string ban = cmd.Next();
+
+            if (ban == null)
+            {
+                player.Message("&WError: Enter a player name to BanX");
+                return;
+            }
+
+            //parse
+            if (ban == "-")
+            {
+                if (player.LastUsedPlayerName != null)
+                {
+                    ban = player.LastUsedPlayerName;
+                }
+                else
+                {
+                    player.Message("Cannot repeat player name: you haven't used any names yet.");
+                    return;
+                }
+            }
+            PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, ban);
+            if (target == null) return;
+            if (!Player.IsValidName(ban))
+            {
+                CdBanx.PrintUsage(player);
+                return;
+            }else{
+                UndoAllHandler(player, new Command("/undoall " + target.Name));
+
+                string reason = cmd.NextAll();
+
+                if (reason.Length < 1)
+                    reason = "Reason Undefined: BanX";
+                try{
+                    Player targetPlayer = target.PlayerObject;
+                    target.Ban(player, reason, false, true);
+                }catch (PlayerOpException ex){
+                    player.Message(ex.MessageColored);
+                    return;
+                }
+                    if (player.Can(Permission.Demote, target.Rank))
+                    {
+                        if (target.Rank != RankManager.LowestRank)
+                        {
+                            player.LastUsedPlayerName = target.Name;
+                            target.ChangeRank(player, RankManager.LowestRank, cmd.NextAll(), false, true, false);
+                        }
+                        Server.Players.Message("{0}&S was BanX'd by {1}&S (with auto-demote):&W {2}", target.ClassyName, player.ClassyName, reason);
+                        IRC.PlayerSomethingMessage(player, "BanX'd (with auto-demote)", target, reason);
+                        return;
+                    }
+                    else
+                    {
+                        player.Message("&WAuto demote failed: You didn't have the permissions to demote the target player");
+                        Server.Players.Message("{0}&S was BanX'd by {1}: &W{2}", target.ClassyName, player.ClassyName, reason);
+                        IRC.PlayerSomethingMessage(player, "BanX'd", target, reason);
+                    }
+                player.Message("&SConfirm the undo with &A/ok");
+            }
+        }
+      
+        #endregion
+
+
+        static readonly CommandDescriptor CdWalls = new CommandDescriptor
+        {
+            Name = "Walls",
+            IsConsoleSafe = false,
+            RepeatableSelection = true,
+            Category = CommandCategory.Building,
+            IsHidden = false,
+            Permissions = new[] { Permission.Draw },
+            Help = "&SFills a rectangular area of walls",
+            Handler = WallsHandler
+        };
+
+        static void WallsHandler(Player player, Command cmd)
+        {
+            DrawOperationBegin(player, cmd, new WallsDrawOperation(player));
+        }
+        #endregion
 
         #region DrawOperations & Brushes
 
@@ -108,7 +1017,7 @@ namespace fCraft {
             Handler = CuboidHandler
         };
 
-        static void CuboidHandler( Player player, CommandReader cmd ) {
+        static void CuboidHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new CuboidDrawOperation( player ) );
         }
 
@@ -116,7 +1025,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdCuboidWireframe = new CommandDescriptor {
             Name = "CuboidW",
-            Aliases = new[] { "cubw", "cw", "bfb" },
+            Aliases = new[] { "cubw", "cw", "bfb", "frame", "wire" },
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
             RepeatableSelection = true,
@@ -124,7 +1033,7 @@ namespace fCraft {
             Handler = CuboidWireframeHandler
         };
 
-        static void CuboidWireframeHandler( Player player, CommandReader cmd ) {
+        static void CuboidWireframeHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new CuboidWireframeDrawOperation( player ) );
         }
 
@@ -141,7 +1050,7 @@ namespace fCraft {
             Handler = CuboidHollowHandler
         };
 
-        static void CuboidHollowHandler( Player player, CommandReader cmd ) {
+        static void CuboidHollowHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new CuboidHollowDrawOperation( player ) );
         }
 
@@ -157,7 +1066,7 @@ namespace fCraft {
             Handler = EllipsoidHandler
         };
 
-        static void EllipsoidHandler( Player player, CommandReader cmd ) {
+        static void EllipsoidHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new EllipsoidDrawOperation( player ) );
         }
 
@@ -173,7 +1082,7 @@ namespace fCraft {
             Handler = EllipsoidHollowHandler
         };
 
-        static void EllipsoidHollowHandler( Player player, CommandReader cmd ) {
+        static void EllipsoidHollowHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new EllipsoidHollowDrawOperation( player ) );
         }
 
@@ -191,7 +1100,7 @@ namespace fCraft {
             Handler = SphereHandler
         };
 
-        static void SphereHandler( Player player, CommandReader cmd ) {
+        static void SphereHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new SphereDrawOperation( player ) );
         }
 
@@ -209,7 +1118,7 @@ namespace fCraft {
             Handler = SphereHollowHandler
         };
 
-        static void SphereHollowHandler( Player player, CommandReader cmd ) {
+        static void SphereHollowHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new SphereHollowDrawOperation( player ) );
         }
 
@@ -226,7 +1135,7 @@ namespace fCraft {
             Handler = LineHandler
         };
 
-        static void LineHandler( Player player, CommandReader cmd ) {
+        static void LineHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new LineDrawOperation( player ) );
         }
 
@@ -242,7 +1151,7 @@ namespace fCraft {
             Handler = TriangleWireframeHandler
         };
 
-        static void TriangleWireframeHandler( Player player, CommandReader cmd ) {
+        static void TriangleWireframeHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new TriangleWireframeDrawOperation( player ) );
         }
 
@@ -258,7 +1167,7 @@ namespace fCraft {
             Handler = TriangleHandler
         };
 
-        static void TriangleHandler( Player player, CommandReader cmd ) {
+        static void TriangleHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new TriangleDrawOperation( player ) );
         }
 
@@ -266,7 +1175,7 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdTorus = new CommandDescriptor {
             Name = "Torus",
-            Aliases = new[] { "doughnut", "donut", "bagel" },
+            Aliases = new[] { "donut", "bagel", "circle" },
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
             RepeatableSelection = true,
@@ -276,13 +1185,13 @@ namespace fCraft {
             Handler = TorusHandler
         };
 
-        static void TorusHandler( Player player, CommandReader cmd ) {
+        static void TorusHandler( Player player, Command cmd ) {
             DrawOperationBegin( player, cmd, new TorusDrawOperation( player ) );
         }
 
 
 
-        static void DrawOperationBegin( Player player, CommandReader cmd, DrawOperation op ) {
+        public static void DrawOperationBegin( Player player, Command cmd, DrawOperation op ) {
             // try to create instance of player's currently selected brush
             // all command parameters are passed to the brush
             IBrushInstance brush = player.Brush.MakeInstance( player, cmd, op );
@@ -291,7 +1200,7 @@ namespace fCraft {
             if( brush == null ) return;
             op.Brush = brush;
             player.SelectionStart( op.ExpectedMarks, DrawOperationCallback, op, Permission.Draw );
-            player.Message( "{0}: Click or &H/Mark&S {1} blocks.",
+            player.Message( "{0}: Click {1} blocks or use &H/Mark&S to make a selection.",
                             op.Description, op.ExpectedMarks );
         }
 
@@ -329,13 +1238,9 @@ namespace fCraft {
             Handler = Fill2DHandler
         };
 
-        static void Fill2DHandler( Player player, CommandReader cmd ) {
+        static void Fill2DHandler( Player player, Command cmd ) {
             Fill2DDrawOperation op = new Fill2DDrawOperation( player );
-
-            IBrushInstance brush = player.Brush.MakeInstance( player, cmd, op );
-            if( brush == null ) return;
-            op.Brush = brush;
-
+            op.ReadParams( cmd );
             player.SelectionStart( 1, Fill2DCallback, op, Permission.Draw );
             player.Message( "{0}: Click a block to start filling.", op.Description );
         }
@@ -345,12 +1250,6 @@ namespace fCraft {
             DrawOperation op = (DrawOperation)tag;
             if( !op.Prepare( marks ) ) return;
             if( player.WorldMap.GetBlock( marks[0] ) == Block.Air ) {
-                Logger.Log( LogType.UserActivity,
-                            "Fill2D: Asked {0} to confirm replacing air on world {1}",
-                            player.Name,
-                            // ReSharper disable PossibleNullReferenceException
-                            player.World.Name );
-                            // ReSharper restore PossibleNullReferenceException
                 player.Confirm( Fill2DConfirmCallback, op, "{0}: Replace air?", op.Description );
             } else {
                 Fill2DConfirmCallback( player, op, false );
@@ -360,62 +1259,10 @@ namespace fCraft {
 
         static void Fill2DConfirmCallback( Player player, object tag, bool fromConsole ) {
             Fill2DDrawOperation op = (Fill2DDrawOperation)tag;
-            int maxDim = Math.Max( op.Bounds.Width, Math.Max( op.Bounds.Length, op.Bounds.Height ) );
-            int otherDim = op.Bounds.Volume/maxDim;
-            player.Message( "{0}: Filling in a {1}x{2} area...",
-                            op.Description, maxDim, otherDim );
+            player.Message( "{0}: Filling in a {1}x{1} area...",
+                            op.Description, player.Info.Rank.FillLimit );
             op.Begin();
         }
-
-
-
-
-        static readonly CommandDescriptor CdFill3D = new CommandDescriptor {
-            Name = "Fill3D",
-            Aliases = new[] { "f3d" },
-            Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Draw, Permission.DrawAdvanced },
-            RepeatableSelection = true,
-            Help = "Fills a continuous volume with blocks, in 3D. " +
-                   "Takes just 1 mark, and replaces blocks of the same type as the block you clicked.",
-            Handler = Fill3DHandler
-        };
-
-        static void Fill3DHandler( Player player, CommandReader cmd ) {
-            Fill3DDrawOperation op = new Fill3DDrawOperation( player );
-
-            IBrushInstance brush = player.Brush.MakeInstance( player, cmd, op );
-            if( brush == null ) return;
-            op.Brush = brush;
-
-            player.SelectionStart( 1, Fill3DCallback, op, Permission.Draw );
-            player.Message( "{0}: Click a block to start filling.", op.Description );
-        }
-
-
-        static void Fill3DCallback( Player player, Vector3I[] marks, object tag ) {
-            DrawOperation op = (DrawOperation)tag;
-            if( !op.Prepare( marks ) ) return;
-            if( player.WorldMap.GetBlock( marks[0] ) == Block.Air ) {
-                Logger.Log( LogType.UserActivity,
-                            "Fill3D: Asked {0} to confirm replacing air on world {1}",
-                            player.Name,
-                            player.World.Name );
-                player.Confirm( Fill3DConfirmCallback, op, "{0}: Replace air?", op.Description );
-            } else {
-                Fill3DConfirmCallback( player, op, false );
-            }
-        }
-
-
-        static void Fill3DConfirmCallback( Player player, object tag, bool fromConsole ) {
-            Fill3DDrawOperation op = (Fill3DDrawOperation)tag;
-            player.Message( "{0}: Filling in a {1}x{2}x{3} area...",
-                            op.Description, op.Bounds.Width, op.Bounds.Length, op.Bounds.Height );
-            op.Begin();
-        }
-
-
 
         #endregion
 
@@ -426,26 +1273,18 @@ namespace fCraft {
             Name = "Solid",
             Aliases = new[] { "s" },
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build, Permission.PlaceAdmincrete },
+            Permissions = new[] { Permission.PlaceAdmincrete },
             Help = "Toggles the admincrete placement mode. When enabled, any stone block you place is replaced with admincrete.",
-            Usage = "/Solid [on/off]",
             Handler = SolidHandler
         };
 
-        static void SolidHandler( Player player, CommandReader cmd ) {
-            bool turnSolidOn = (player.GetBind( Block.Stone ) != Block.Admincrete);
-
-            if( cmd.HasNext && !cmd.NextOnOff( out turnSolidOn ) ) {
-                CdSolid.PrintUsage( player );
-                return;
-            }
-
-            if( turnSolidOn ) {
-                player.Bind( Block.Stone, Block.Admincrete );
-                player.Message( "Solid: ON. Stone blocks are replaced with admincrete." );
-            } else {
+        static void SolidHandler( Player player, Command cmd ) {
+            if( player.GetBind( Block.Stone ) == Block.Admincrete ) {
                 player.ResetBind( Block.Stone );
                 player.Message( "Solid: OFF" );
+            } else {
+                player.Bind( Block.Stone, Block.Admincrete );
+                player.Message( "Solid: ON. Stone blocks are replaced with admincrete." );
             }
         }
 
@@ -454,27 +1293,17 @@ namespace fCraft {
         static readonly CommandDescriptor CdPaint = new CommandDescriptor {
             Name = "Paint",
             Aliases = new[] { "p" },
-            Permissions = new[] { Permission.Build, Permission.Delete },
             Category = CommandCategory.Building,
             Help = "When paint mode is on, any block you delete will be replaced with the block you are holding. " +
                    "Paint command toggles this behavior on and off.",
-            Usage = "/Paint [on/off]",
             Handler = PaintHandler
         };
 
-        static void PaintHandler( Player player, CommandReader cmd ) {
-            bool turnPaintOn = (!player.IsPainting);
-
-            if( cmd.HasNext && !cmd.NextOnOff( out turnPaintOn ) ) {
-                CdPaint.PrintUsage( player );
-                return;
-            }
-
-            if( turnPaintOn ) {
-                player.IsPainting = true;
+        static void PaintHandler( Player player, Command cmd ) {
+            player.IsPainting = !player.IsPainting;
+            if( player.IsPainting ) {
                 player.Message( "Paint mode: ON" );
             } else {
-                player.IsPainting = false;
                 player.Message( "Paint mode: OFF" );
             }
         }
@@ -485,26 +1314,18 @@ namespace fCraft {
             Name = "Grass",
             Aliases = new[] { "g" },
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build, Permission.PlaceGrass },
+            Permissions = new[] { Permission.PlaceGrass },
             Help = "Toggles the grass placement mode. When enabled, any dirt block you place is replaced with a grass block.",
-            Usage = "/Grass [on/off]",
             Handler = GrassHandler
         };
 
-        static void GrassHandler( Player player, CommandReader cmd ) {
-            bool turnGrassOn = (player.GetBind( Block.Dirt ) != Block.Grass);
-
-            if( cmd.HasNext && !cmd.NextOnOff( out turnGrassOn ) ) {
-                CdGrass.PrintUsage( player );
-                return;
-            }
-
-            if( turnGrassOn ) {
-                player.Bind( Block.Dirt, Block.Grass );
-                player.Message( "Grass: ON. Dirt blocks are replaced with grass." );
-            } else {
+        static void GrassHandler( Player player, Command cmd ) {
+            if( player.GetBind( Block.Dirt ) == Block.Grass ) {
                 player.ResetBind( Block.Dirt );
                 player.Message( "Grass: OFF" );
+            } else {
+                player.Bind( Block.Dirt, Block.Grass );
+                player.Message( "Grass: ON. Dirt blocks are replaced with grass." );
             }
         }
 
@@ -514,30 +1335,22 @@ namespace fCraft {
             Name = "Water",
             Aliases = new[] { "w" },
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build, Permission.PlaceWater },
+            Permissions = new[] { Permission.PlaceWater },
             Help = "Toggles the water placement mode. When enabled, any blue or cyan block you place is replaced with water.",
-            Usage = "/Water [on/off]",
             Handler = WaterHandler
         };
 
-        static void WaterHandler( Player player, CommandReader cmd ) {
-            bool turnWaterOn = (player.GetBind( Block.Aqua ) != Block.Water ||
-                                player.GetBind( Block.Cyan ) != Block.Water ||
-                                player.GetBind( Block.Blue ) != Block.Water);
-
-            if( cmd.HasNext && !cmd.NextOnOff( out turnWaterOn ) ) {
-                CdWater.PrintUsage( player );
-                return;
-            }
-
-            if( turnWaterOn ) {
+        static void WaterHandler( Player player, Command cmd ) {
+            if( player.GetBind( Block.Aqua ) == Block.Water ||
+                player.GetBind( Block.Cyan ) == Block.Water ||
+                player.GetBind( Block.Blue ) == Block.Water ) {
+                player.ResetBind( Block.Aqua, Block.Cyan, Block.Blue );
+                player.Message( "Water: OFF" );
+            } else {
                 player.Bind( Block.Aqua, Block.Water );
                 player.Bind( Block.Cyan, Block.Water );
                 player.Bind( Block.Blue, Block.Water );
                 player.Message( "Water: ON. Blue blocks are replaced with water." );
-            } else {
-                player.ResetBind( Block.Aqua, Block.Cyan, Block.Blue );
-                player.Message( "Water: OFF" );
             }
         }
 
@@ -547,53 +1360,48 @@ namespace fCraft {
             Name = "Lava",
             Aliases = new[] { "l" },
             Category = CommandCategory.Building,
-            Permissions = new[] { Permission.Build, Permission.PlaceLava },
+            Permissions = new[] { Permission.PlaceLava },
             Help = "Toggles the lava placement mode. When enabled, any red block you place is replaced with lava.",
-            Usage = "/Lava [on/off]",
             Handler = LavaHandler
         };
 
-        static void LavaHandler( Player player, CommandReader cmd ) {
-            bool turnLavaOn = (player.GetBind( Block.Red ) != Block.Lava);
-
-            if( cmd.HasNext && !cmd.NextOnOff( out turnLavaOn ) ) {
-                CdLava.PrintUsage( player );
-                return;
-            }
-
-            if( turnLavaOn ) {
-                player.Bind( Block.Red, Block.Lava );
-                player.Message( "Lava: ON. Red blocks are replaced with lava." );
-            } else {
+        static void LavaHandler( Player player, Command cmd ) {
+            if( player.GetBind( Block.Red ) == Block.Lava ) {
                 player.ResetBind( Block.Red );
                 player.Message( "Lava: OFF" );
+            } else {
+                player.Bind( Block.Red, Block.Lava );
+                player.Message( "Lava: ON. Red blocks are replaced with lava." );
             }
         }
-
 
 
         static readonly CommandDescriptor CdBind = new CommandDescriptor {
             Name = "Bind",
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.Build },
-            Help = "Assigns one blocktype to another. " +
+            Help = "&SAssigns one blocktype to another. " +
                    "Allows to build blocktypes that are not normally buildable directly: admincrete, lava, water, grass, double step. " +
                    "Calling &H/Bind BlockType&S without second parameter resets the binding. If used with no params, ALL bindings are reset.",
             Usage = "/Bind OriginalBlockType ReplacementBlockType",
             Handler = BindHandler
         };
 
-        static void BindHandler( Player player, CommandReader cmd ) {
-            if( !cmd.HasNext ) {
+        static void BindHandler( Player player, Command cmd ) {
+            string originalBlockName = cmd.Next();
+            if( originalBlockName == null ) {
                 player.Message( "All bindings have been reset." );
                 player.ResetAllBinds();
                 return;
             }
+            Block originalBlock = Map.GetBlockByName( originalBlockName );
+            if( originalBlock == Block.Undefined ) {
+                player.Message( "Bind: Unrecognized block name: {0}", originalBlockName );
+                return;
+            }
 
-            Block originalBlock;
-            if( !cmd.NextBlock( player, false, out originalBlock ) ) return;
-
-            if( !cmd.HasNext ) {
+            string replacementBlockName = cmd.Next();
+            if( replacementBlockName == null ) {
                 if( player.GetBind( originalBlock ) != originalBlock ) {
                     player.Message( "{0} is no longer bound to {1}",
                                     originalBlock,
@@ -606,34 +1414,36 @@ namespace fCraft {
                 return;
             }
 
-            Block replacementBlock;
-            if( !cmd.NextBlock( player, false, out replacementBlock ) ) return;
-
             if( cmd.HasNext ) {
                 CdBind.PrintUsage( player );
                 return;
             }
 
-            Permission permission = Permission.Build;
-            switch( replacementBlock ) {
-                case Block.Grass:
-                    permission = Permission.PlaceGrass;
-                    break;
-                case Block.Admincrete:
-                    permission = Permission.PlaceAdmincrete;
-                    break;
-                case Block.Water:
-                    permission = Permission.PlaceWater;
-                    break;
-                case Block.Lava:
-                    permission = Permission.PlaceLava;
-                    break;
-            }
-            if( player.Can( permission ) ) {
-                player.Bind( originalBlock, replacementBlock );
-                player.Message( "{0} is now replaced with {1}", originalBlock, replacementBlock );
+            Block replacementBlock = Map.GetBlockByName( replacementBlockName );
+            if( replacementBlock == Block.Undefined ) {
+                player.Message( "Bind: Unrecognized block name: {0}", replacementBlockName );
             } else {
-                player.Message( "&WYou do not have {0} permission.", permission );
+                Permission permission = Permission.Build;
+                switch( replacementBlock ) {
+                    case Block.Grass:
+                        permission = Permission.PlaceGrass;
+                        break;
+                    case Block.Admincrete:
+                        permission = Permission.PlaceAdmincrete;
+                        break;
+                    case Block.Water:
+                        permission = Permission.PlaceWater;
+                        break;
+                    case Block.Lava:
+                        permission = Permission.PlaceLava;
+                        break;
+                }
+                if( player.Can( permission ) ) {
+                    player.Bind( originalBlock, replacementBlock );
+                    player.Message( "{0} is now replaced with {1}", originalBlock, replacementBlock );
+                } else {
+                    player.Message( "&WYou do not have {0} permission.", permission );
+                }
             }
         }
 
@@ -691,14 +1501,14 @@ namespace fCraft {
 
         #region Replace
 
-        static void ReplaceHandlerInternal( IBrush factory, Player player, CommandReader cmd ) {
+        static void ReplaceHandlerInternal( IBrush factory, Player player, Command cmd ) {
             CuboidDrawOperation op = new CuboidDrawOperation( player );
             IBrushInstance brush = factory.MakeInstance( player, cmd, op );
             if( brush == null ) return;
             op.Brush = brush;
 
             player.SelectionStart( 2, DrawOperationCallback, op, Permission.Draw );
-            player.MessageNow( "{0}: Click or &H/Mark&S 2 blocks.",
+            player.MessageNow( "{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
                                op.Brush.InstanceDescription );
         }
 
@@ -714,7 +1524,7 @@ namespace fCraft {
             Handler = ReplaceHandler
         };
 
-        static void ReplaceHandler( Player player, CommandReader cmd ) {
+        static void ReplaceHandler( Player player, Command cmd ) {
             var replaceBrush = ReplaceBrushFactory.Instance.MakeBrush( player, cmd );
             if( replaceBrush == null ) return;
             ReplaceHandlerInternal( replaceBrush, player, cmd );
@@ -733,7 +1543,7 @@ namespace fCraft {
             Handler = ReplaceNotHandler
         };
 
-        static void ReplaceNotHandler( Player player, CommandReader cmd ) {
+        static void ReplaceNotHandler( Player player, Command cmd ) {
             var replaceBrush = ReplaceNotBrushFactory.Instance.MakeBrush( player, cmd );
             if( replaceBrush == null ) return;
             ReplaceHandlerInternal( replaceBrush, player, cmd );
@@ -753,7 +1563,7 @@ namespace fCraft {
             Handler = ReplaceBrushHandler
         };
 
-        static void ReplaceBrushHandler( Player player, CommandReader cmd ) {
+        static void ReplaceBrushHandler( Player player, Command cmd ) {
             var replaceBrush = ReplaceBrushBrushFactory.Instance.MakeBrush( player, cmd );
             if( replaceBrush == null ) return;
             ReplaceHandlerInternal( replaceBrush, player, cmd );
@@ -767,12 +1577,12 @@ namespace fCraft {
             Name = "Undo",
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
-            Help = "Selectively removes changes from your last drawing command. " +
+            Help = "&SSelectively removes changes from your last drawing command. " +
                    "Note that commands involving over 2 million blocks cannot be undone due to memory restrictions.",
             Handler = UndoHandler
         };
 
-        static void UndoHandler( Player player, CommandReader cmd ) {
+        static void UndoHandler( Player player, Command cmd ) {
             World playerWorld = player.World;
             if( playerWorld == null ) PlayerOpException.ThrowNoWorld( player );
             if( cmd.HasNext ) {
@@ -806,11 +1616,14 @@ namespace fCraft {
             }
 
             // no need to set player.drawingInProgress here because this is done on the user thread
-            Logger.Log( LogType.UserActivity,
-                        "Player {0} initiated /Undo affecting {1} blocks (on world {2})",
-                        player.Name,
-                        undoState.Buffer.Count,
-                        playerWorld.Name );
+            if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
+            {
+                Logger.Log(LogType.UserActivity,
+                            "Player {0} initiated /Undo affecting {1} blocks (on world {2})",
+                            player.Name,
+                            undoState.Buffer.Count,
+                            playerWorld.Name);
+            }
 
             msg += String.Format( "Restoring {0} blocks. Type &H/Redo&S to reverse.",
                                   undoState.Buffer.Count );
@@ -826,12 +1639,12 @@ namespace fCraft {
             Name = "Redo",
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.Draw },
-            Help = "Selectively removes changes from your last drawing command. " +
+            Help = "&SSelectively removes changes from your last drawing command. " +
                    "Note that commands involving over 2 million blocks cannot be undone due to memory restrictions.",
             Handler = RedoHandler
         };
 
-        static void RedoHandler( Player player, CommandReader cmd ) {
+        static void RedoHandler( Player player, Command cmd ) {
             if( cmd.HasNext ) {
                 CdRedo.PrintUsage( player );
                 return;
@@ -881,11 +1694,11 @@ namespace fCraft {
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.CopyAndPaste },
             Usage = "/CopySlot [#]",
-            Help = "Selects a slot to copy to/paste from. The maximum number of slots is limited per-rank.",
+            Help = "&SSelects a slot to copy to/paste from. The maximum number of slots is limited per-rank.",
             Handler = CopySlotHandler
         };
 
-        static void CopySlotHandler( Player player, CommandReader cmd ) {
+        static void CopySlotHandler( Player player, Command cmd ) {
             int slotNumber;
             if( cmd.NextInt( out slotNumber ) ) {
                 if( cmd.HasNext ) {
@@ -896,25 +1709,24 @@ namespace fCraft {
                     player.Message( "CopySlot: Select a number between 1 and {0}", player.Info.Rank.CopySlots );
                 } else {
                     player.CopySlot = slotNumber - 1;
-                    CopyState info = player.GetCopyState();
+                    CopyState info = player.GetCopyInformation();
                     if( info == null ) {
                         player.Message( "Selected copy slot {0} (unused).", slotNumber );
                     } else {
                         player.Message( "Selected copy slot {0}: {1} blocks from {2}, {3} old.",
-                                        slotNumber, info.Blocks.Length,
+                                        slotNumber, info.Buffer.Length,
                                         info.OriginWorld, DateTime.UtcNow.Subtract( info.CopyTime ).ToMiniString() );
                     }
                 }
             } else {
-                CopyState[] slots = player.CopyStates;
+                CopyState[] slots = player.CopyInformation;
                 player.Message( "Using {0} of {1} slots. Selected slot: {2}",
                                 slots.Count( info => info != null ), player.Info.Rank.CopySlots, player.CopySlot + 1 );
                 for( int i = 0; i < slots.Length; i++ ) {
                     if( slots[i] != null ) {
                         player.Message( "  {0}: {1} blocks from {2}, {3} old",
-                                        i + 1, slots[i].Blocks.Length,
-                                        slots[i].OriginWorld,
-                                        DateTime.UtcNow.Subtract( slots[i].CopyTime ).ToMiniString() );
+                                        i + 1, slots[i].Buffer.Length,
+                                        slots[i].OriginWorld, DateTime.UtcNow.Subtract( slots[i].CopyTime ).ToMiniString() );
                     }
                 }
             }
@@ -923,22 +1735,22 @@ namespace fCraft {
 
 
         static readonly CommandDescriptor CdCopy = new CommandDescriptor {
-            Name = "Copy",
+            Name = "Copy", 
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.CopyAndPaste },
-            Help = "Copy blocks for pasting. " +
+            Help = "&SCopy blocks for pasting. " +
                    "Used together with &H/Paste&S and &H/PasteNot&S commands. " +
                    "Note that pasting starts at the same corner that you started &H/Copy&S from.",
             Handler = CopyHandler
         };
 
-        static void CopyHandler( Player player, CommandReader cmd ) {
+        static void CopyHandler( Player player, Command cmd ) {
             if( cmd.HasNext ) {
                 CdCopy.PrintUsage( player );
                 return;
             }
             player.SelectionStart( 2, CopyCallback, null, CdCopy.Permissions );
-            player.MessageNow( "Copy: Click or &H/Mark&S 2 blocks." );
+            player.MessageNow( "Copy: Place a block or type /Mark to use your location." );
         }
 
 
@@ -953,8 +1765,8 @@ namespace fCraft {
 
             int volume = bounds.Volume;
             if( !player.CanDraw( volume ) ) {
-                player.MessageNow( "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
-                                   player.Info.Rank.DrawLimit, volume );
+                player.MessageNow( String.Format( "You are only allowed to run commands that affect up to {0} blocks. This one would affect {1} blocks.",
+                                               player.Info.Rank.DrawLimit, volume ) );
                 return;
             }
 
@@ -968,22 +1780,24 @@ namespace fCraft {
             for( int x = sx; x <= ex; x++ ) {
                 for( int y = sy; y <= ey; y++ ) {
                     for( int z = sz; z <= ez; z++ ) {
-                        copyInfo.Blocks[x - sx, y - sy, z - sz] = map.GetBlock( x, y, z );
+                        copyInfo.Buffer[x - sx, y - sy, z - sz] = map.GetBlock( x, y, z );
                     }
                 }
             }
 
             copyInfo.OriginWorld = playerWorld.Name;
             copyInfo.CopyTime = DateTime.UtcNow;
-            player.SetCopyState( copyInfo );
+            player.SetCopyInformation( copyInfo );
 
-            player.MessageNow( "{0} blocks copied into slot #{1}, origin at {2} corner. You can now &H/Paste",
-                               volume,
-                               player.CopySlot + 1,
-                               copyInfo.OriginCorner );
+            player.MessageNow( "{0} blocks copied into slot #{1}. You can now &H/Paste",
+                               volume, player.CopySlot + 1 );
+            player.MessageNow( "Origin at {0} {1}{2} corner.",
+                               (copyInfo.Orientation.X == 1 ? "bottom" : "top"),
+                               (copyInfo.Orientation.Y == 1 ? "south" : "north"),
+                               (copyInfo.Orientation.Z == 1 ? "east" : "west") );
 
             Logger.Log( LogType.UserActivity,
-                        "{0} copied {1} blocks from world {2} (between {3} and {4}).",
+                        "{0} copied {1} blocks from {2} (between {3} and {4}).",
                         player.Name, volume, playerWorld.Name,
                         bounds.MinVertex, bounds.MaxVertex );
         }
@@ -992,20 +1806,22 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdCut = new CommandDescriptor {
             Name = "Cut",
+            Aliases = new[] { "x" , "snip" , "cutout"},
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.CopyAndPaste },
             RepeatableSelection = true,
-            Help = "Copies and removes blocks for pasting. Unless a different block type is specified, the area is filled with air. " +
+            Help = "&SCopies and removes blocks for pasting. Unless a different block type is specified, the area is filled with air. " +
                    "Used together with &H/Paste&S and &H/PasteNot&S commands. " +
                    "Note that pasting starts at the same corner that you started &H/Cut&S from.",
             Usage = "/Cut [FillBlock]",
             Handler = CutHandler
         };
 
-        static void CutHandler( Player player, CommandReader cmd ) {
+        static void CutHandler( Player player, Command cmd ) {
             Block fillBlock = Block.Air;
             if( cmd.HasNext ) {
-                if( !cmd.NextBlock( player, false, out fillBlock ) ) return;
+                fillBlock = cmd.NextBlock( player );
+                if( fillBlock == Block.Undefined ) return;
                 if( cmd.HasNext ) {
                     CdCut.PrintUsage( player );
                     return;
@@ -1017,8 +1833,12 @@ namespace fCraft {
             };
 
             player.SelectionStart( 2, DrawOperationCallback, op, Permission.Draw );
-            player.Message( "{0}: Click 2 or &H/Mark&S 2 blocks.",
-                            op.Description );
+            if( fillBlock != Block.Air ) {
+                player.Message( "Cut/{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
+                                fillBlock );
+            } else {
+                player.Message( "Cut: Click 2 blocks or use &H/Mark&S to make a selection." );
+            }
         }
 
 
@@ -1034,8 +1854,8 @@ namespace fCraft {
             Handler = MirrorHandler
         };
 
-        static void MirrorHandler( Player player, CommandReader cmd ) {
-            CopyState originalInfo = player.GetCopyState();
+        static void MirrorHandler( Player player, Command cmd ) {
+            CopyState originalInfo = player.GetCopyInformation();
             if( originalInfo == null ) {
                 player.MessageNow( "Nothing to flip! Copy something first." );
                 return;
@@ -1063,13 +1883,13 @@ namespace fCraft {
 
             if( flipX ) {
                 int left = 0;
-                int right = info.Bounds.Width - 1;
+                int right = info.Dimensions.X - 1;
                 while( left < right ) {
-                    for( int y = info.Bounds.Length - 1; y >= 0; y-- ) {
-                        for( int z = info.Bounds.Height - 1; z >= 0; z-- ) {
-                            block = info.Blocks[left, y, z];
-                            info.Blocks[left, y, z] = info.Blocks[right, y, z];
-                            info.Blocks[right, y, z] = block;
+                    for( int y = info.Dimensions.Y - 1; y >= 0; y-- ) {
+                        for( int z = info.Dimensions.Z - 1; z >= 0; z-- ) {
+                            block = info.Buffer[left, y, z];
+                            info.Buffer[left, y, z] = info.Buffer[right, y, z];
+                            info.Buffer[right, y, z] = block;
                         }
                     }
                     left++;
@@ -1079,13 +1899,13 @@ namespace fCraft {
 
             if( flipY ) {
                 int left = 0;
-                int right = info.Bounds.Length - 1;
+                int right = info.Dimensions.Y - 1;
                 while( left < right ) {
-                    for( int x = info.Bounds.Width - 1; x >= 0; x-- ) {
-                        for( int z = info.Bounds.Height - 1; z >= 0; z-- ) {
-                            block = info.Blocks[x, left, z];
-                            info.Blocks[x, left, z] = info.Blocks[x, right, z];
-                            info.Blocks[x, right, z] = block;
+                    for( int x = info.Dimensions.X - 1; x >= 0; x-- ) {
+                        for( int z = info.Dimensions.Z - 1; z >= 0; z-- ) {
+                            block = info.Buffer[x, left, z];
+                            info.Buffer[x, left, z] = info.Buffer[x, right, z];
+                            info.Buffer[x, right, z] = block;
                         }
                     }
                     left++;
@@ -1095,13 +1915,13 @@ namespace fCraft {
 
             if( flipH ) {
                 int left = 0;
-                int right = info.Bounds.Height - 1;
+                int right = info.Dimensions.Z - 1;
                 while( left < right ) {
-                    for( int x = info.Bounds.Width - 1; x >= 0; x-- ) {
-                        for( int y = info.Bounds.Length - 1; y >= 0; y-- ) {
-                            block = info.Blocks[x, y, left];
-                            info.Blocks[x, y, left] = info.Blocks[x, y, right];
-                            info.Blocks[x, y, right] = block;
+                    for( int x = info.Dimensions.X - 1; x >= 0; x-- ) {
+                        for( int y = info.Dimensions.Y - 1; y >= 0; y-- ) {
+                            block = info.Buffer[x, y, left];
+                            info.Buffer[x, y, left] = info.Buffer[x, y, right];
+                            info.Buffer[x, y, right] = block;
                         }
                     }
                     left++;
@@ -1135,7 +1955,7 @@ namespace fCraft {
                 }
             }
 
-            player.SetCopyState( info );
+            player.SetCopyInformation( info );
         }
 
 
@@ -1150,8 +1970,8 @@ namespace fCraft {
             Handler = RotateHandler
         };
 
-        static void RotateHandler( Player player, CommandReader cmd ) {
-            CopyState originalInfo = player.GetCopyState();
+        static void RotateHandler( Player player, Command cmd ) {
+            CopyState originalInfo = player.GetCopyInformation();
             if( originalInfo == null ) {
                 player.MessageNow( "Nothing to rotate! Copy something first." );
                 return;
@@ -1184,7 +2004,7 @@ namespace fCraft {
             }
 
             // allocate the new buffer
-            Block[, ,] oldBuffer = originalInfo.Blocks;
+            Block[, ,] oldBuffer = originalInfo.Buffer;
             Block[, ,] newBuffer;
 
             if( degrees == 180 ) {
@@ -1204,7 +2024,7 @@ namespace fCraft {
             CopyState info = new CopyState( originalInfo, newBuffer );
 
             // construct the rotation matrix
-            int[,] matrix = {
+            int[,] matrix = new[,]{
                 {1,0,0},
                 {0,1,0},
                 {0,0,1}
@@ -1266,7 +2086,7 @@ namespace fCraft {
 
             player.Message( "Rotated copy (slot {0}) by {1} degrees around {2} axis.",
                             info.Slot + 1, degrees, axis );
-            player.SetCopyState( info );
+            player.SetCopyInformation( info );
         }
 
 
@@ -1284,8 +2104,12 @@ namespace fCraft {
             Handler = PasteXHandler
         };
 
-        static void PasteXHandler( Player player, CommandReader cmd ) {
-            PasteOpHandler( player, cmd, 2, new PasteDrawOperation( player, false ) );
+        static void PasteXHandler( Player player, Command cmd ) {
+            PasteDrawOperation op = new PasteDrawOperation( player, false );
+            if( !op.ReadParams( cmd ) ) return;
+            player.SelectionStart( 2, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste );
+            player.MessageNow( "{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
+                               op.Description );
         }
 
 
@@ -1303,26 +2127,35 @@ namespace fCraft {
             Handler = PasteNotXHandler
         };
 
-        static void PasteNotXHandler( Player player, CommandReader cmd ) {
-            PasteOpHandler( player, cmd, 2, new PasteDrawOperation( player, true ) );
+        static void PasteNotXHandler( Player player, Command cmd ) {
+            PasteDrawOperation op = new PasteDrawOperation( player, true );
+            if( !op.ReadParams( cmd ) ) return;
+            player.SelectionStart( 2, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste );
+            player.MessageNow( "{0}: Click 2 blocks or use &H/Mark&S to make a selection.",
+                               op.Description );
         }
 
 
 
         static readonly CommandDescriptor CdPaste = new CommandDescriptor {
             Name = "Paste",
+            Aliases = new string[] { "v" },
             Category = CommandCategory.Building,
             Permissions = new[] { Permission.CopyAndPaste },
             RepeatableSelection = true,
-            Help = "Pastes previously copied blocks. Used together with &H/Copy&S command. " +
+            Help = "&SPastes previously copied blocks. Used together with &H/Copy&S command. " +
                    "If one or more optional IncludedBlock parameters are specified, ONLY pastes blocks of specified type(s). " +
                    "Alignment semantics are... complicated.",
             Usage = "/Paste [IncludedBlock [AnotherOne etc]]",
             Handler = PasteHandler
         };
 
-        static void PasteHandler( Player player, CommandReader cmd ) {
-            PasteOpHandler( player, cmd, 1, new QuickPasteDrawOperation( player, false ) );
+        static void PasteHandler( Player player, Command cmd ) {
+            QuickPasteDrawOperation op = new QuickPasteDrawOperation( player, false );
+            if( !op.ReadParams( cmd ) ) return;
+            player.SelectionStart( 1, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste );
+            player.MessageNow( "{0}: Click a block or use &H/Mark&S to begin pasting.",
+                               op.Description );
         }
 
 
@@ -1340,22 +2173,12 @@ namespace fCraft {
             Handler = PasteNotHandler
         };
 
-        static void PasteNotHandler( Player player, CommandReader cmd ) {
-            PasteOpHandler( player, cmd, 1, new QuickPasteDrawOperation( player, true ) );
-        }
-
-
-        static void PasteOpHandler( Player player, CommandReader cmd, int expectedMarks, DrawOpWithBrush op ) {
+        static void PasteNotHandler( Player player, Command cmd ) {
+            QuickPasteDrawOperation op = new QuickPasteDrawOperation( player, true );
             if( !op.ReadParams( cmd ) ) return;
-            player.SelectionStart( expectedMarks, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste );
-            CopyState copyInfo = player.GetCopyState();
-            if( copyInfo != null ) {
-                player.MessageNow( "{0}: Click or &H/Mark&S the {1} corner.",
-                                   op.Description, copyInfo.OriginCorner );
-            } else {
-                player.MessageNow( "{0}: Click or &H/Mark&S a block.",
-                                   op.Description );
-            }
+            player.SelectionStart( 1, DrawOperationCallback, op, Permission.Draw, Permission.CopyAndPaste );
+            player.MessageNow( "{0}: Click a block or use &H/Mark&S to begin pasting.",
+                               op.Description );
         }
 
         #endregion
@@ -1377,13 +2200,12 @@ namespace fCraft {
             },
             RepeatableSelection = true,
             Usage = "/Restore FileName",
-            Help = "Selectively restores/pastes part of map file into the current world. "+
-                   "Map file must have the same dimensions as the current world. " +
-                   "If the file name contains spaces, surround it with quote marks.",
+            Help = "&SSelectively restores/pastes part of mapfile into the current world. "+
+                   "If the filename contains spaces, surround it with quote marks.",
             Handler = RestoreHandler
         };
 
-        static void RestoreHandler( Player player, CommandReader cmd ) {
+        static void RestoreHandler( Player player, Command cmd ) {
             string fileName = cmd.Next();
             if( fileName == null ) {
                 CdRestore.PrintUsage( player );
@@ -1398,14 +2220,14 @@ namespace fCraft {
             if( fullFileName == null ) return;
 
             Map map;
-            if( !MapUtility.TryLoad( fullFileName, true, out map ) ) {
+            if( !MapUtility.TryLoad( fullFileName, out map ) ) {
                 player.Message( "Could not load the given map file ({0})", fileName );
                 return;
             }
 
             Map playerMap = player.WorldMap;
             if( playerMap.Width != map.Width || playerMap.Length != map.Length || playerMap.Height != map.Height ) {
-                player.Message( "Map file dimensions must match your current world's dimensions ({0}x{1}x{2})",
+                player.Message( "Mapfile dimensions must match your current world's dimensions ({0}x{1}x{2})",
                                 playerMap.Width,
                                 playerMap.Length,
                                 playerMap.Height );
@@ -1414,7 +2236,7 @@ namespace fCraft {
 
             map.Metadata["fCraft.Temp", "FileName"] = fullFileName;
             player.SelectionStart( 2, RestoreCallback, map, CdRestore.Permissions );
-            player.MessageNow( "Restore: Click or &H/Mark&S 2 blocks." );
+            player.MessageNow( "Restore: Select the area to restore. To mark a corner, place/click a block or type &H/Mark" );
         }
 
 
@@ -1437,11 +2259,10 @@ namespace fCraft {
             World playerWorld = player.World;
             if( playerWorld == null ) PlayerOpException.ThrowNoWorld( player );
             Map playerMap = player.WorldMap;
-            Vector3I coord = new Vector3I();
-            for( coord.X = selection.XMin; coord.X <= selection.XMax; coord.X++ ) {
-                for( coord.Y = selection.YMin; coord.Y <= selection.YMax; coord.Y++ ) {
-                    for( coord.Z = selection.ZMin; coord.Z <= selection.ZMax; coord.Z++ ) {
-                        DrawOneBlock( player, playerMap, map.GetBlock( coord ), coord,
+            for( int x = selection.XMin; x <= selection.XMax; x++ ) {
+                for( int y = selection.YMin; y <= selection.YMax; y++ ) {
+                    for( int z = selection.ZMin; z <= selection.ZMax; z++ ) {
+                        DrawOneBlock( player, playerMap, map.GetBlock( x, y, z ), new Vector3I( x, y, z ),
                                       RestoreContext,
                                       ref blocksDrawn, ref blocksSkipped, undoState );
                     }
@@ -1468,13 +2289,13 @@ namespace fCraft {
             Name = "Mark",
             Aliases = new[] { "m" },
             Category = CommandCategory.Building,
-            Usage = "/Mark&S or &H/Mark X Y Z",
+            Usage = "/Mark&S or &H/Mark X Y H",
             Help = "When making a selection (for drawing or zoning) use this to make a marker at your position in the world. " +
                    "If three numbers are given, those coordinates are used instead.",
             Handler = MarkHandler
         };
 
-        static void MarkHandler( Player player, CommandReader cmd ) {
+        static void MarkHandler( Player player, Command cmd ) {
             Map map = player.WorldMap;
             int x, y, z;
             Vector3I coords;
@@ -1489,48 +2310,46 @@ namespace fCraft {
             }
             coords.X = Math.Min( map.Width - 1, Math.Max( 0, coords.X ) );
             coords.Y = Math.Min( map.Length - 1, Math.Max( 0, coords.Y ) );
-            coords.Z = Math.Min( map.Height - 1, Math.Max( 0, coords.Z ) );
+            coords.Z = Math.Min(map.Height - 1, Math.Max(0, coords.Z));
 
-            if( player.SelectionMarksExpected > 0 ) {
-                player.SelectionAddMark( coords, true, true );
-            } else {
-                player.MessageNow( "Cannot mark - no selection in progress." );
+            if (player.SelectionMarksExpected > 0)
+            {
+                player.SelectionAddMark(coords, true);
+            }
+            else if(player.markSet > 0)
+            {
+                player.selectedMarks.Add(coords);
+                player.SelectMarks();
+            }
+            else
+            {
+                player.MessageNow("Cannot mark - no selection in progress.");
             }
         }
 
-
-        static readonly CommandDescriptor CdDoNotMark = new CommandDescriptor {
-            Name = "DoNotMark",
-            Aliases = new[] { "dontmark", "dm" },
-            Category = CommandCategory.Building,
-            Usage = "/DoNotMark",
-            Help = "Toggles whether clicking blocks adds to a selection.",
-            Handler = DoNotMarkHandler
-        };
-
-        static void DoNotMarkHandler( Player player, CommandReader cmd ) {
-            player.DisableClickToMark = !player.DisableClickToMark;
-            if( player.DisableClickToMark ) {
-                player.Message( "Click-to-mark disabled." );
-            } else {
-                player.Message( "Click-to-mark re-enabled." );
-            }
-        }
 
 
         static readonly CommandDescriptor CdCancel = new CommandDescriptor {
             Name = "Cancel",
-            Aliases = new[] { "Nvm" },
-            Category = CommandCategory.Building | CommandCategory.Chat,
+            Category = CommandCategory.Building,
             NotRepeatable = true,
-            Help = "If you are writing a partial/multiline message, it's cancelled. " +
-                   "Otherwise, cancels current selection (for drawing or zoning). " +
-                   "If you wish to stop a drawing in-progress, use &H/Undo&S instead. ",
+            Help = "&SCancels current selection (for drawing or zoning) operation, for instance if you misclicked on the first block. " +
+                   "If you wish to stop a drawing in-progress, use &H/Undo&S instead.",
             Handler = CancelHandler
         };
 
-        static void CancelHandler( Player player, CommandReader cmd ) {
-            throw new NotSupportedException( "/Cancel handler may not be used directly. Use Player.SelectionCancel() instead." );
+        static void CancelHandler( Player player, Command cmd ) {
+            if( cmd.HasNext ) {
+                CdCancel.PrintUsage( player );
+                return;
+            }
+            if( player.IsMakingSelection ) {
+                player.SelectionCancel();
+                player.MessageNow( "Selection cancelled." );
+                player.ParseMessage("/nvm", false, false);//LOL lazy
+            } else {
+                player.MessageNow( "There is currently nothing to cancel." );
+            }
         }
 
         #endregion
@@ -1538,193 +2357,31 @@ namespace fCraft {
 
         #region UndoPlayer and UndoArea
 
-        sealed class BlockDBUndoArgs {
-            public Player Player;
-            public PlayerInfo[] Targets;
+        /*struct UndoAreaCountArgs {
+            [NotNull]
+            public PlayerInfo Target;
+
+            [NotNull]
             public World World;
-            public int CountLimit;
-            public TimeSpan AgeLimit;
-            public BlockDBEntry[] Entries;
+
+            public int MaxBlocks;
+
+            [NotNull]
             public BoundingBox Area;
-            public bool Not;
         }
 
+        struct UndoAreaTimeArgs {
+            [NotNull]
+            public PlayerInfo Target;
 
-        // parses and checks command parameters (for both UndoPlayer and UndoArea)
-        [CanBeNull]
-        static BlockDBUndoArgs ParseBlockDBUndoParams( Player player, CommandReader cmd, string cmdName, bool not ) {
-            // check if command's being called by a worldless player (e.g. console)
-            World playerWorld = player.World;
-            if( playerWorld == null ) PlayerOpException.ThrowNoWorld( player );
+            [NotNull]
+            public World World;
 
-            // ensure that BlockDB is enabled
-            if( !BlockDB.IsEnabledGlobally ) {
-                player.Message( "&W{0}: BlockDB is disabled on this server.", cmdName );
-                return null;
-            }
-            if( !playerWorld.BlockDB.IsEnabled ) {
-                player.Message( "&W{0}: BlockDB is disabled in this world.", cmdName );
-                return null;
-            }
+            public TimeSpan Time;
 
-            // parse the first parameter - either numeric or time limit
-            string range = cmd.Next();
-            if( range == null ) {
-                CdUndoPlayer.PrintUsage( player );
-                return null;
-            }
-            int countLimit;
-            TimeSpan ageLimit = TimeSpan.Zero;
-            if( !Int32.TryParse( range, out countLimit ) && !range.TryParseMiniTimeSpan( out ageLimit ) ) {
-                player.Message( "{0}: First parameter should be a number or a timespan.", cmdName );
-                return null;
-            }
-            if( ageLimit > DateTimeUtil.MaxTimeSpan ) {
-                player.MessageMaxTimeSpan();
-                return null;
-            }
-
-            // parse second and consequent parameters (player names)
-            HashSet<PlayerInfo> targets = new HashSet<PlayerInfo>();
-            bool allPlayers = false;
-            while( true ) {
-                string name = cmd.Next();
-                if( name == null ) {
-                    break;
-                } else if( name == "*" ) {
-                    // all players
-                    if( not ) {
-                        player.Message( "{0}: \"*\" not allowed (cannot undo \"everyone except everyone\")", cmdName );
-                        return null;
-                    }
-                    if( allPlayers ) {
-                        player.Message( "{0}: \"*\" was listed twice.", cmdName );
-                        return null;
-                    }
-                    allPlayers = true;
-
-                } else {
-                    // individual player
-                    PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches( player, name, SearchOptions.IncludeSelf );
-                    if( target == null ) {
-                        return null;
-                    }
-                    if( targets.Contains( target ) ) {
-                        player.Message( "{0}: Player {1}&S was listed twice.",
-                                        target.ClassyName, cmdName );
-                        return null;
-                    }
-                    // make sure player has the permission
-                    if( !not &&
-                        player.Info != target && !player.Can( Permission.UndoAll ) &&
-                        !player.Can( Permission.UndoOthersActions, target.Rank ) ) {
-                        player.Message( "&W{0}: You may only undo actions of players ranked {1}&S or lower.",
-                                        cmdName,
-                                        player.Info.Rank.GetLimit( Permission.UndoOthersActions ).ClassyName );
-                        player.Message( "Player {0}&S is ranked {1}",
-                                        target.ClassyName, target.Rank.ClassyName );
-                        return null;
-                    }
-                    targets.Add( target );
-                }
-            }
-            if( targets.Count == 0 && !allPlayers ) {
-                player.Message( "{0}: Specify at least one player name, or \"*\" to undo everyone.", cmdName );
-                return null;
-            }
-            if( targets.Count > 0 && allPlayers ) {
-                player.Message( "{0}: Cannot mix player names and \"*\".", cmdName );
-                return null;
-            }
-
-            // undoing everyone ('*' in place of player name) requires UndoAll permission
-            if( ( not || allPlayers ) && !player.Can( Permission.UndoAll ) ) {
-                player.MessageNoAccess( Permission.UndoAll );
-                return null;
-            }
-
-            // Queue UndoPlayerCallback to run
-            return new BlockDBUndoArgs {
-                Player = player,
-                AgeLimit = ageLimit,
-                CountLimit = countLimit,
-                Area = player.WorldMap.Bounds,
-                World = playerWorld,
-                Targets = targets.ToArray(),
-                Not = not
-            };
-        }
-
-
-        // called after player types "/ok" to the confirmation prompt.
-        static void BlockDBUndoConfirmCallback( Player player, object tag, bool fromConsole ) {
-            BlockDBUndoArgs args = (BlockDBUndoArgs)tag;
-            string cmdName = ( args.Area == null ? "UndoArea" : "UndoPlayer" );
-            if( args.Not ) cmdName += "Not";
-
-            // Produce 
-            Vector3I[] coords;
-            if( args.Area != null ) {
-                coords = new[] { args.Area.MinVertex, args.Area.MaxVertex };
-            } else {
-                coords = new Vector3I[0];
-            }
-
-            // Produce a brief param description for BlockDBDrawOperation
-            string description;
-            if( args.CountLimit > 0 ) {
-                if( args.Targets.Length == 0 ) {
-                    description = args.CountLimit.ToStringInvariant();
-                } else if( args.Not ) {
-                    description = String.Format( "{0} by everyone except {1}",
-                                                 args.CountLimit,
-                                                 args.Targets.JoinToString( p => p.Name ) );
-                } else {
-                    description = String.Format( "{0} by {1}",
-                                                 args.CountLimit,
-                                                 args.Targets.JoinToString( p => p.Name ) );
-                }
-            } else {
-                if( args.Targets.Length == 0 ) {
-                    description = args.AgeLimit.ToMiniString();
-                } else if( args.Not ) {
-                    description = String.Format( "{0} by everyone except {1}",
-                                                 args.AgeLimit.ToMiniString(),
-                                                 args.Targets.JoinToString( p => p.Name ) );
-                } else {
-                    description = String.Format( "{0} by {1}",
-                                                 args.AgeLimit.ToMiniString(),
-                                                 args.Targets.JoinToString( p => p.Name ) );
-                }
-            }
-
-            // start undoing (using DrawOperation infrastructure)
-            var op = new BlockDBDrawOperation( player, cmdName, description, coords.Length );
-            op.Prepare( coords, args.Entries );
-
-            // log operation
-            string targetList;
-            if( args.Targets.Length == 0 ) {
-                targetList = "(everyone)";
-            } else if( args.Not ) {
-                targetList = "(everyone) except " + args.Targets.JoinToClassyString();
-            } else {
-                targetList = args.Targets.JoinToClassyString();
-            }
-            Logger.Log( LogType.UserActivity,
-                        "{0}: Player {1} will undo {2} changes (limit of {3}) by {4} on world {5}",
-                        cmdName,
-                        player.Name,
-                        args.Entries.Length,
-                        args.CountLimit == 0 ? args.AgeLimit.ToMiniString() : args.CountLimit.ToStringInvariant(),
-                        targetList,
-                        args.World.Name );
-
-            op.Begin();
-        }
-
-
-        #region UndoArea
+            [NotNull]
+            public BoundingBox Area;
+        }*/
 
         static readonly CommandDescriptor CdUndoArea = new CommandDescriptor {
             Name = "UndoArea",
@@ -1732,249 +2389,376 @@ namespace fCraft {
             Category = CommandCategory.Moderation,
             Permissions = new[] { Permission.UndoOthersActions },
             RepeatableSelection = true,
-            Usage = "/UndoArea (TimeSpan|BlockCount) PlayerName [AnotherName...]",
-            Help = "Reverses changes made by the given player(s). " +
-                   "Applies to a selected area in the current world. " +
-                   "More than one player name can be given at a time. " +
-                   "Players with UndoAll permission can use '*' in place of player name to undo everyone's changes at once.",
+            Usage = "/UndoArea PlayerName [TimeSpan|BlockCount]",
+            Help = "Reverses changes made by a given player in the current world, in the given area.",
             Handler = UndoAreaHandler
         };
 
-        static void UndoAreaHandler( Player player, CommandReader cmd ) {
-            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, "UndoArea", false );
-            if( args == null ) return;
+        static void UndoAreaHandler( Player player, Command cmd ) {
+
+            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoArea", false);
+            if (args == null) return;
 
             Permission permission;
-            if( args.Targets.Length == 0 ) {
+            if (args.Targets.Length == 0)
+            {
                 permission = Permission.UndoAll;
-            } else {
+            }
+            else
+            {
                 permission = Permission.UndoOthersActions;
             }
-            player.SelectionStart( 2, UndoAreaSelectionCallback, args, permission );
-            player.MessageNow( "UndoArea: Click or &H/Mark&S 2 blocks." );
+            player.SelectionStart(2, UndoAreaSelectionCallback, args, permission);
+            player.MessageNow("UndoArea: Click or &H/Mark&S 2 blocks.");
         }
 
-
-        static readonly CommandDescriptor CdUndoAreaNot = new CommandDescriptor {
+        static readonly CommandDescriptor CdUndoAreaNot = new CommandDescriptor
+        {
             Name = "UndoAreaNot",
             Aliases = new[] { "uan", "una" },
             Category = CommandCategory.Moderation,
             Permissions = new[] { Permission.UndoOthersActions, Permission.UndoAll },
             RepeatableSelection = true,
-            Usage = "/UndoAreaNot (TimeSpan|BlockCount) PlayerName [AnotherName...]",
+            Usage = "/UndoArea (TimeSpan|BlockCount) PlayerName [AnotherName]",
             Help = "Reverses changes made by everyone EXCEPT the given player(s). " +
                    "Applies to a selected area in the current world. " +
                    "More than one player name can be given at a time.",
             Handler = UndoAreaNotHandler
         };
 
-        static void UndoAreaNotHandler( Player player, CommandReader cmd ) {
-            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, "UndoAreaNot", true );
-            if( args == null ) return;
+        static void UndoAreaNotHandler(Player player, Command cmd)
+        {
+            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoAreaNot", true);
+            if (args == null) return;
 
-            player.SelectionStart( 2, UndoAreaSelectionCallback, args, CdUndoAreaNot.Permissions );
-            player.MessageNow( "UndoAreaNot: Click or &H/Mark&S 2 blocks." );
+            player.SelectionStart(2, UndoAreaSelectionCallback, args, CdUndoAreaNot.Permissions);
+            player.MessageNow("UndoAreaNot: Click or &H/Mark&S 2 blocks.");
         }
 
-
-        // Queues UndoAreaLookup to run in the background
-        static void UndoAreaSelectionCallback( Player player, Vector3I[] marks, object tag ) {
+        static void UndoAreaSelectionCallback(Player player, Vector3I[] marks, object tag)
+        {
             BlockDBUndoArgs args = (BlockDBUndoArgs)tag;
-            args.Area = new BoundingBox( marks[0], marks[1] );
-            Scheduler.NewBackgroundTask( UndoAreaLookup )
-                     .RunOnce( args, TimeSpan.Zero );
+            args.Area = new BoundingBox(marks[0], marks[1]);
+            Scheduler.NewBackgroundTask(UndoAreaLookup)
+                     .RunOnce(args, TimeSpan.Zero);
         }
 
+        // called after player types "/ok" to the confirmation prompt.
+        static void BlockDBUndoConfirmCallback(Player player, object tag, bool fromConsole)
+        {
+            BlockDBUndoArgs args = (BlockDBUndoArgs)tag;
+            string cmdName = (args.Area == null ? "UndoArea" : "UndoPlayer");
+            if (args.Not) cmdName += "Not";
+
+            // Produce 
+            Vector3I[] coords;
+            if (args.Area != null)
+            {
+                coords = new[] { args.Area.MinVertex, args.Area.MaxVertex };
+            }
+            else
+            {
+                coords = new Vector3I[0];
+            }
+
+            // Produce a brief param description for BlockDBDrawOperation
+            string description;
+            if (args.CountLimit > 0)
+            {
+                if (args.Targets.Length == 0)
+                {
+                    description = args.CountLimit.ToString(NumberFormatInfo.InvariantInfo);
+                }
+                else if (args.Not)
+                {
+                    description = String.Format("{0} by everyone except {1}",
+                                                 args.CountLimit,
+                                                 args.Targets.JoinToString(p => p.Name));
+                }
+                else
+                {
+                    description = String.Format("{0} by {1}",
+                                                 args.CountLimit,
+                                                 args.Targets.JoinToString(p => p.Name));
+                }
+            }
+            else
+            {
+                if (args.Targets.Length == 0)
+                {
+                    description = args.AgeLimit.ToMiniString();
+                }
+                else if (args.Not)
+                {
+                    description = String.Format("{0} by everyone except {1}",
+                                                 args.AgeLimit.ToMiniString(),
+                                                 args.Targets.JoinToString(p => p.Name));
+                }
+                else
+                {
+                    description = String.Format("{0} by {1}",
+                                                 args.AgeLimit.ToMiniString(),
+                                                 args.Targets.JoinToString(p => p.Name));
+                }
+            }
+
+            // start undoing (using DrawOperation infrastructure)
+            var op = new BlockDBDrawOperation(player, cmdName, description, coords.Length);
+            op.Prepare(coords, args.Entries);
+
+            // log operation
+            string targetList;
+            if (args.Targets.Length == 0)
+            {
+                targetList = "(everyone)";
+            }
+            else if (args.Not)
+            {
+                targetList = "(everyone) except " + args.Targets.JoinToClassyString();
+            }
+            else
+            {
+                targetList = args.Targets.JoinToClassyString();
+            }
+            Logger.Log(LogType.UserActivity,
+                        "{0}: Player {1} will undo {2} changes (limit of {3}) by {4} on world {5}",
+                        cmdName,
+                        player.Name,
+                        args.Entries.Length,
+                        args.CountLimit == 0 ? args.AgeLimit.ToMiniString() : args.CountLimit.ToString(NumberFormatInfo.InvariantInfo),
+                        targetList,
+                        args.World.Name);
+
+            op.Begin();
+        }
 
         // Looks up the changes in BlockDB and prints a confirmation prompt. Runs on a background thread.
-        static void UndoAreaLookup( SchedulerTask task ) {
+        static void UndoAreaLookup(SchedulerTask task)
+        {
             BlockDBUndoArgs args = (BlockDBUndoArgs)task.UserState;
             bool allPlayers = (args.Targets.Length == 0);
-            string cmdName = ( args.Not ? "UndoAreaNot" : "UndoArea" );
+            string cmdName = (args.Not ? "UndoAreaNot" : "UndoArea");
 
             // prepare to look up
             string targetList;
-            if( allPlayers ) {
+            if (allPlayers)
+            {
                 targetList = "EVERYONE";
-            } else if( args.Not ) {
+            }
+            else if (args.Not)
+            {
                 targetList = "EVERYONE except " + args.Targets.JoinToClassyString();
-            }else{
+            }
+            else
+            {
                 targetList = args.Targets.JoinToClassyString();
             }
             BlockDBEntry[] changes;
 
-            if( args.CountLimit > 0 ) {
+            if (args.CountLimit > 0)
+            {
                 // count-limited lookup
-                if( args.Targets.Length == 0 ) {
-                    changes = args.World.BlockDB.Lookup( args.CountLimit, args.Area );
-                } else {
-                    changes = args.World.BlockDB.Lookup( args.CountLimit, args.Area, args.Targets, args.Not );
+                if (args.Targets.Length == 0)
+                {
+                    changes = args.World.BlockDB.Lookup(args.CountLimit, args.Area);
                 }
-                if( changes.Length > 0 ) {
-                    Logger.Log( LogType.UserActivity,
+                else
+                {
+                    changes = args.World.BlockDB.Lookup(args.CountLimit, args.Area, args.Targets, args.Not);
+                }
+                if (changes.Length > 0)
+                {
+                    Logger.Log(LogType.UserActivity,
                                 "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name );
-                    args.Player.Confirm( BlockDBUndoConfirmCallback, args,
+                                cmdName, args.Player.Name, args.World.Name);
+                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
                                          "Undo last {0} changes made here by {1}&S?",
-                                         changes.Length, targetList );
+                                         changes.Length, targetList);
                 }
 
-            } else {
+            }
+            else
+            {
                 // time-limited lookup
-                if( args.Targets.Length == 0 ) {
-                    changes = args.World.BlockDB.Lookup( Int32.MaxValue, args.Area, args.AgeLimit );
-                } else {
-                    changes = args.World.BlockDB.Lookup( Int32.MaxValue, args.Area, args.Targets, args.Not, args.AgeLimit );
+                if (args.Targets.Length == 0)
+                {
+                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.Area, args.AgeLimit);
                 }
-                if( changes.Length > 0 ) {
-                    Logger.Log( LogType.UserActivity,
+                else
+                {
+                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.Area, args.Targets, args.Not, args.AgeLimit);
+                }
+                if (changes.Length > 0)
+                {
+                    Logger.Log(LogType.UserActivity,
                                 "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name );
-                    args.Player.Confirm( BlockDBUndoConfirmCallback, args,
+                                cmdName, args.Player.Name, args.World.Name);
+                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
                                          "Undo changes ({0}) made here by {1}&S in the last {2}?",
-                                         changes.Length, targetList, args.AgeLimit.ToMiniString() );
+                                         changes.Length, targetList, args.AgeLimit.ToMiniString());
                 }
             }
 
             // stop if there's nothing to undo
-            if( changes.Length == 0 ) {
-                args.Player.Message( "{0}: Found nothing to undo.", cmdName );
-            } else {
+            if (changes.Length == 0)
+            {
+                args.Player.Message("{0}: Found nothing to undo.", cmdName);
+            }
+            else
+            {
                 args.Entries = changes;
             }
         }
 
-        #endregion
 
+        static void UndoAreaTimeSelectionCallback( Player player, Vector3I[] marks, object tag ) {
+            BlockDBUndoArgs args = (BlockDBUndoArgs)tag;
+            args.Area = new BoundingBox(marks[0], marks[1]);
+            Scheduler.NewBackgroundTask(UndoAreaLookup)
+                     .RunOnce(args, TimeSpan.Zero);
+        }
+      
 
-        #region UndoPlayer
 
         static readonly CommandDescriptor CdUndoPlayer = new CommandDescriptor {
             Name = "UndoPlayer",
             Aliases = new[] { "up", "undox" },
             Category = CommandCategory.Moderation,
             Permissions = new[] { Permission.UndoOthersActions },
-            Usage = "/UndoPlayer (TimeSpan|BlockCount) PlayerName [AnotherName...]",
-            Help = "Reverses changes made by a given player in the current world. " +
-                   "More than one player name can be given at a time. " +
-                   "Players with UndoAll permission can use '*' in place of player name to undo everyone's changes at once.",
+            Usage = "/UndoPlayer PlayerName [TimeSpan|BlockCount]",
+            Help = "Reverses changes made by a given player in the current world.",
             Handler = UndoPlayerHandler
         };
 
-        static void UndoPlayerHandler( Player player, CommandReader cmd ) {
-            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, "UndoPlayer", false );
-            if( args == null ) return;
-            Scheduler.NewBackgroundTask( UndoPlayerLookup )
-                     .RunOnce( args, TimeSpan.Zero );
+        static void UndoPlayerHandler( Player player, Command cmd ) {
+            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoPlayer", false);
+            if (args == null) return;
+            Scheduler.NewBackgroundTask(UndoPlayerLookup)
+                     .RunOnce(args, TimeSpan.Zero);
         }
 
-
-        static readonly CommandDescriptor CdUndoPlayerNot = new CommandDescriptor {
+        static readonly CommandDescriptor CdUndoPlayerNot = new CommandDescriptor
+        {
             Name = "UndoPlayerNot",
             Aliases = new[] { "upn", "unp" },
             Category = CommandCategory.Moderation,
             Permissions = new[] { Permission.UndoOthersActions, Permission.UndoAll },
             Usage = "/UndoPlayerNot (TimeSpan|BlockCount) PlayerName [AnotherName...]",
-            Help = "Reverses changes made by everyone EXCEPT the given player(s). " +
-                   "Applies to the whole world. " +
+            Help = "Reverses changes made by a given player in the current world. " +
                    "More than one player name can be given at a time.",
             Handler = UndoPlayerNotHandler
         };
 
-        static void UndoPlayerNotHandler( Player player, CommandReader cmd ) {
-            BlockDBUndoArgs args = ParseBlockDBUndoParams( player, cmd, "UndoPlayerNot", true );
-            if( args == null ) return;
-            Scheduler.NewBackgroundTask( UndoPlayerLookup )
-                     .RunOnce( args, TimeSpan.Zero );
+        static void UndoPlayerNotHandler(Player player, Command cmd)
+        {
+            BlockDBUndoArgs args = ParseBlockDBUndoParams(player, cmd, "UndoPlayerNot", true);
+            if (args == null) return;
+            Scheduler.NewBackgroundTask(UndoPlayerLookup)
+                     .RunOnce(args, TimeSpan.Zero);
         }
 
 
         // Looks up the changes in BlockDB and prints a confirmation prompt. Runs on a background thread.
-        static void UndoPlayerLookup( SchedulerTask task ) {
+        static void UndoPlayerLookup(SchedulerTask task)
+        {
             BlockDBUndoArgs args = (BlockDBUndoArgs)task.UserState;
-            bool allPlayers = ( args.Targets.Length == 0 );
-            string cmdName = ( args.Not ? "UndoPlayerNot" : "UndoPlayer" );
+            bool allPlayers = (args.Targets.Length == 0);
+            string cmdName = (args.Not ? "UndoPlayerNot" : "UndoPlayer");
 
             // prepare to look up
             string targetList;
-            if( allPlayers ) {
+            if (allPlayers)
+            {
                 targetList = "EVERYONE";
-            } else if( args.Not ) {
+            }
+            else if (args.Not)
+            {
                 targetList = "EVERYONE except " + args.Targets.JoinToClassyString();
-            } else {
+            }
+            else
+            {
                 targetList = args.Targets.JoinToClassyString();
             }
             BlockDBEntry[] changes;
 
-            if( args.CountLimit > 0 ) {
+            if (args.CountLimit > 0)
+            {
                 // count-limited lookup
-                if( args.Targets.Length == 0 ) {
-                    changes = args.World.BlockDB.Lookup( args.CountLimit );
-                } else {
-                    changes = args.World.BlockDB.Lookup( args.CountLimit, args.Targets, args.Not );
+                if (args.Targets.Length == 0)
+                {
+                    changes = args.World.BlockDB.Lookup(args.CountLimit);
                 }
-                if( changes.Length > 0 ) {
-                    Logger.Log( LogType.UserActivity,
+                else
+                {
+                    changes = args.World.BlockDB.Lookup(args.CountLimit, args.Targets, args.Not);
+                }
+                if (changes.Length > 0)
+                {
+                    Logger.Log(LogType.UserActivity,
                                 "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name );
-                    args.Player.Confirm( BlockDBUndoConfirmCallback, args,
+                                cmdName, args.Player.Name, args.World.Name);
+                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
                                          "Undo last {0} changes made by {1}&S?",
-                                         changes.Length, targetList );
+                                         changes.Length, targetList);
                 }
 
-            } else {
+            }
+            else
+            {
                 // time-limited lookup
-                if( args.Targets.Length == 0 ) {
-                    changes = args.World.BlockDB.Lookup( Int32.MaxValue, args.AgeLimit );
-                } else {
-                    changes = args.World.BlockDB.Lookup( Int32.MaxValue, args.Targets, args.Not, args.AgeLimit );
+                if (args.Targets.Length == 0)
+                {
+                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.AgeLimit);
                 }
-                if( changes.Length > 0 ) {
-                    Logger.Log( LogType.UserActivity,
+                else
+                {
+                    changes = args.World.BlockDB.Lookup(Int32.MaxValue, args.Targets, args.Not, args.AgeLimit);
+                }
+                if (changes.Length > 0)
+                {
+                    Logger.Log(LogType.UserActivity,
                                 "{0}: Asked {1} to confirm undo on world {2}",
-                                cmdName, args.Player.Name, args.World.Name );
-                    args.Player.Confirm( BlockDBUndoConfirmCallback, args,
+                                cmdName, args.Player.Name, args.World.Name);
+                    args.Player.Confirm(BlockDBUndoConfirmCallback, args,
                                          "Undo changes ({0}) made by {1}&S in the last {2}?",
-                                         changes.Length, targetList, args.AgeLimit.ToMiniString() );
+                                         changes.Length, targetList, args.AgeLimit.ToMiniString());
                 }
             }
 
             // stop if there's nothing to undo
-            if( changes.Length == 0 ) {
-                args.Player.Message( "{0}: Found nothing to undo.", cmdName );
-            } else {
+            if (changes.Length == 0)
+            {
+                args.Player.Message("{0}: Found nothing to undo.", cmdName);
+            }
+            else
+            {
                 args.Entries = changes;
             }
         }
 
         #endregion
 
-        #endregion
 
 
         static readonly CommandDescriptor CdStatic = new CommandDescriptor {
             Name = "Static",
             Category = CommandCategory.Building,
-            Help = "Toggles repetition of last selection on or off.",
-            Usage = "/Static [on/off]",
+            Help = "&SToggles repetition of last selection on or off.",
             Handler = StaticHandler
         };
 
-        static void StaticHandler( Player player, CommandReader cmd ) {
-            bool turnStaticOn = (!player.IsRepeatingSelection);
-
-            if( cmd.HasNext && !cmd.NextOnOff( out turnStaticOn ) ) {
+        static void StaticHandler( Player player, Command cmd ) {
+            if( cmd.HasNext ) {
                 CdStatic.PrintUsage( player );
                 return;
             }
-
-            if( turnStaticOn ) {
-                player.Message( "Static: On" );
-                player.IsRepeatingSelection = true;
-            } else {
+            if( player.IsRepeatingSelection ) {
                 player.Message( "Static: Off" );
                 player.IsRepeatingSelection = false;
                 player.SelectionCancel();
+            } else {
+                player.Message( "Static: On" );
+                player.IsRepeatingSelection = true;
             }
         }
     }

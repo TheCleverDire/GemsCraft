@@ -1,11 +1,9 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that handles /Undo and /Redo commands.
-    /// Applies changes stored in a given UndoState object. </summary>
     public sealed class UndoDrawOperation : DrawOpWithBrush {
-        readonly BlockChangeContext undoContext = BlockChangeContext.Drawn | BlockChangeContext.UndoneSelf;
+        const BlockChangeContext UndoContext = BlockChangeContext.Drawn | BlockChangeContext.UndoneSelf;
 
         public UndoState State { get; private set; }
 
@@ -34,9 +32,6 @@ namespace fCraft.Drawing {
             : base( player ) {
             State = state;
             Redo = redo;
-            if( Redo ) {
-                undoContext |= BlockChangeContext.Redone;
-            }
         }
 
 
@@ -44,11 +39,10 @@ namespace fCraft.Drawing {
             Brush = this;
             if( !base.Prepare( marks ) ) return false;
             BlocksTotalEstimate = State.Buffer.Count;
-            Context = undoContext;
-            Bounds = State.CalculateBounds();
+            Context = UndoContext;
+            Bounds = State.GetBounds();
             return true;
         }
-
 
         public override bool Begin() {
             if( !RaiseBeginningEvent( this ) ) return false;
@@ -63,7 +57,6 @@ namespace fCraft.Drawing {
             RaiseBeganEvent( this );
             return true;
         }
-
 
         int undoBufferIndex;
         Block block;
@@ -91,7 +84,7 @@ namespace fCraft.Drawing {
             return block;
         }
 
-        public override bool ReadParams( CommandReader cmd ) {
+        public override bool ReadParams( Command cmd ) {
             return true;
         }
     }

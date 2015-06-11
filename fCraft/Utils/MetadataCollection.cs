@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +9,7 @@ using JetBrains.Annotations;
 namespace fCraft {
     /// <summary> A string metadata entry. </summary>
     /// <typeparam name="TValue"> Value type. Must be a reference type. </typeparam>
+    [DebuggerDisplay( "Count = {Count}" )]
     public struct MetadataEntry<TValue> where TValue : class {
         string group;
         [NotNull]
@@ -45,7 +46,6 @@ namespace fCraft {
     /// <summary> A collection of metadata entries, addressable by pairs of string group/key names.
     /// Group names, key names, and values may not be null. </summary>
     /// <typeparam name="TValue"> Value type. Must be a reference type. </typeparam>
-    [DebuggerDisplay( "Count = {Count}" )]
     public sealed class MetadataCollection<TValue> : ICollection<MetadataEntry<TValue>>, ICollection, ICloneable, INotifiesOnChange where TValue : class {
 
         readonly Dictionary<string, Dictionary<string, TValue>> store = new Dictionary<string, Dictionary<string, TValue>>();
@@ -94,8 +94,8 @@ namespace fCraft {
         public bool Remove( [NotNull] string group, [NotNull] string key ) {
             if( group == null ) throw new ArgumentNullException( "group" );
             if( key == null ) throw new ArgumentNullException( "key" );
+            Dictionary<string, TValue> pair;
             lock( syncRoot ) {
-                Dictionary<string, TValue> pair;
                 if( !store.TryGetValue( group, out pair ) ) return false;
                 if( pair.Remove( key ) ) {
                     RaiseChangedEvent();
@@ -227,6 +227,7 @@ namespace fCraft {
 
         public bool ContainsValue( [NotNull] TValue value ) {
             lock( syncRoot ) {
+                // ReSharper disable LoopCanBeConvertedToQuery
                 foreach( var group in store ) {
                     foreach( var key in group.Value ) {
                         if( value.Equals( key.Value ) ) {
@@ -234,6 +235,7 @@ namespace fCraft {
                         }
                     }
                 }
+                // ReSharper restore LoopCanBeConvertedToQuery
             }
             return false;
         }
@@ -241,6 +243,7 @@ namespace fCraft {
 
         public bool ContainsValue( [NotNull] TValue value, IEqualityComparer<TValue> comparer ) {
             lock( syncRoot ) {
+                // ReSharper disable LoopCanBeConvertedToQuery
                 foreach( var group in store ) {
                     foreach( var key in group.Value ) {
                         if( comparer.Equals( key.Value, value ) ) {
@@ -248,6 +251,7 @@ namespace fCraft {
                         }
                     }
                 }
+                // ReSharper restore LoopCanBeConvertedToQuery
             }
             return false;
         }
@@ -258,8 +262,8 @@ namespace fCraft {
         public bool TryGetValue( [NotNull] string group, [NotNull] string key, out TValue value ) {
             if( group == null ) throw new ArgumentNullException( "group" );
             if( key == null ) throw new ArgumentNullException( "key" );
+            Dictionary<string, TValue> pair;
             lock( syncRoot ) {
-                Dictionary<string, TValue> pair;
                 if( !store.TryGetValue( group, out pair ) ) {
                     value = null;
                     return false;
@@ -306,12 +310,12 @@ namespace fCraft {
         }
 
 
-        public bool Contains( MetadataEntry<TValue> item ) {
+        public bool Contains( [NotNull] MetadataEntry<TValue> item ) {
             return ContainsKey( item.Group, item.Key );
         }
 
 
-        public void CopyTo( MetadataEntry<TValue>[] array, int arrayIndex ) {
+        public void CopyTo( [NotNull] MetadataEntry<TValue>[] array, int arrayIndex ) {
             if( array == null ) throw new ArgumentNullException( "array" );
 
             if( arrayIndex < 0 || arrayIndex >= array.Length ) {
@@ -355,6 +359,7 @@ namespace fCraft {
         /// <summary> Enumerates all keys in this collection. </summary>
         /// <remarks> Lock SyncRoot if this is used in a loop. </remarks>
         public IEnumerator<MetadataEntry<TValue>> GetEnumerator() {
+            // ReSharper disable LoopCanBeConvertedToQuery
             foreach( var group in store ) {
                 foreach( var key in group.Value ) {
                     yield return new MetadataEntry<TValue> {
@@ -364,6 +369,7 @@ namespace fCraft {
                     };
                 }
             }
+            // ReSharper restore LoopCanBeConvertedToQuery
         }
 
         #endregion
@@ -380,7 +386,7 @@ namespace fCraft {
 
         #region ICollection Members
 
-        public void CopyTo( Array array, int index ) {
+        public void CopyTo( [NotNull] Array array, int index ) {
             if( array == null ) throw new ArgumentNullException( "array" );
             var castArray = array as MetadataEntry<TValue>[];
             if( castArray == null ) {

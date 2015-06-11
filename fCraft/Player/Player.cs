@@ -1,37 +1,36 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text.RegularExpressions;
+using System.Net.Cache;
 using System.Threading;
 using fCraft.Drawing;
 using fCraft.Events;
-using fCraft.MapGeneration;
+using System.Timers;
+using System.Diagnostics;
 using JetBrains.Annotations;
+using System.Collections.Concurrent;
 
-namespace fCraft {
-    /// <summary> Represents a callback method for a player-made selection of one or more blocks on a map.
+namespace fCraft
+{
+    /// <summary> Callback for a player-made selection of one or more blocks on a map.
     /// A command may request a number of marks/blocks to select, and a specify callback
     /// to be executed when the desired number of marks/blocks is reached. </summary>
     /// <param name="player"> Player who made the selection. </param>
     /// <param name="marks"> An array of 3D marks/blocks, in terms of block coordinates. </param>
     /// <param name="tag"> An optional argument to pass to the callback,
     /// the value of player.selectionArgs </param>
-    public delegate void SelectionCallback( Player player, Vector3I[] marks, object tag );
+    public delegate void SelectionCallback(Player player, Vector3I[] marks, object tag);
 
-
-    /// <summary> Represents the method that responds to a confirmation command. </summary>
-    /// <param name="player"> Player who confirmed the action. </param>
-    /// <param name="tag"> Parameter that was passed to Player.Confirm() </param>
-    /// <param name="fromConsole"> Whether player is console. </param>
-    public delegate void ConfirmationCallback( Player player, object tag, bool fromConsole );
+    public delegate void ConfirmationCallback(Player player, object tag, bool fromConsole);
 
 
     /// <summary> Object representing volatile state ("session") of a connected player.
     /// For persistent state of a known player account, see PlayerInfo. </summary>
-    public sealed partial class Player : IClassy {
+    public sealed partial class Player : IClassy
+    {
 
         /// <summary> The godly pseudo-player for commands called from the server console.
         /// Console has all the permissions granted.
@@ -44,6 +43,7 @@ namespace fCraft {
 
         public readonly bool IsSuper;
 
+
         /// <summary> Whether the player has completed the login sequence. </summary>
         public SessionState State { get; private set; }
 
@@ -54,14 +54,19 @@ namespace fCraft {
         public bool HasFullyConnected { get; private set; }
 
         /// <summary> Whether the client is currently connected. </summary>
-        public bool IsOnline {
-            get {
+        public bool IsOnline
+        {
+            get
+            {
                 return State == SessionState.Online;
             }
         }
 
         /// <summary> Whether the player name was verified at login. </summary>
         public bool IsVerified { get; private set; }
+
+        /// <summary> Whether the player is exempt from autorank rank changes. </summary>
+        public bool IsAutoRankExempt { get; set; }
 
         /// <summary> Persistent information record associated with this player. </summary>
         public PlayerInfo Info { get; private set; }
@@ -73,6 +78,14 @@ namespace fCraft {
         /// Deaf players can't hear anything. </summary>
         public bool IsDeaf { get; set; }
 
+        /// <summary>Determines whether or not a player is using a CC compatable client.</summary>       
+        public bool ClassiCube = false;
+
+        /// <summary>Determines whether or not a player is using a CPE compatable client.</summary>       
+        public bool usesCPE = false;
+        
+        /// <summary> Has a custom click distance set by the server </summary>
+        public bool hasCustomClickDistance { get; set; }
 
         /// <summary> The world that the player is currently on. May be null.
         /// Use .JoinWorld() to make players teleport to another world. </summary>
@@ -83,17 +96,19 @@ namespace fCraft {
         /// Throws PlayerOpException if player does not have a world.
         /// Loads the map if it's not loaded. Guaranteed to not return null. </summary>
         [NotNull]
-        public Map WorldMap {
-            get {
+        public Map WorldMap
+        {
+            get
+            {
                 World world = World;
-                if( world == null ) PlayerOpException.ThrowNoWorld( this );
+                if (world == null) PlayerOpException.ThrowNoWorld(this);
+
                 return world.LoadMap();
             }
         }
 
         /// <summary> Player's position in the current world. </summary>
         public Position Position;
-
 
         /// <summary> Time when the session connected. </summary>
         public DateTime LoginTime { get; private set; }
@@ -104,35 +119,72 @@ namespace fCraft {
         /// <summary> Last time when this player was patrolled by someone. </summary>
         public DateTime LastPatrolTime { get; set; }
 
-
         /// <summary> Last command called by the player. </summary>
         [CanBeNull]
-        public CommandReader LastCommand { get; private set; }
+        public Command LastCommand { get; private set; }
 
 
-        /// <summary> Plain version of the name (no formatting). </summary>
+        /// <summary> Plain version of the name (no formatting). </summary>      
         [NotNull]
-        public string Name {
+        public string Name
+        {
             get { return Info.Name; }
         }
 
+        /// <summary>
+        /// The name used when the server extracts the skin for a player
+        /// </summary>
+        public string Skinname { get; set; }
+
+        /// <summary>
+        /// Model of a player, "humanoid" is the default
+        /// </summary>
+        public string Model = "humanoid";
+
         /// <summary> Name formatted for display in the player list. </summary>
         [NotNull]
-        public string ListName {
-            get {
-                string formattedName = Name;
-                if( ConfigKey.RankPrefixesInList.Enabled() ) {
-                    formattedName = Info.Rank.Prefix + formattedName;
+        public string ListName
+        {
+            get
+            {
+                string displayedName = Name;
+                if (iName != null) displayedName = Color.ReplacePercentCodes(iName); //impersonate
+                if (ConfigKey.RankPrefixesInList.Enabled())
+                {
+                    displayedName = Info.Rank.Prefix + displayedName;
                 }
-                if( ConfigKey.RankColorsInChat.Enabled() && Info.Rank.Color != Color.White ) {
-                    formattedName = Info.Rank.Color + formattedName;
+                if (ConfigKey.RankColorsInChat.Enabled() && Info.Rank.Color != Color.White && iName == null)
+                {
+                    displayedName = Info.Rank.Color + displayedName;
                 }
-                return formattedName;
+                return displayedName;
+            }
+        }
+
+        ///<summary>Name formatted for title display.</summary>
+        [NotNull]
+        public string TitleName
+        {
+            get
+            {
+                string titleName = Name;
+                string displayedName = Name;
+                if (ConfigKey.RankPrefixesInList.Enabled())
+                {
+                    titleName = Info.Rank.Prefix + "[" + titleName + "] " + displayedName;
+                }
+                if (ConfigKey.RankColorsInChat.Enabled() && Info.Rank.Color != Color.White && iName == null)
+                {
+                    displayedName = Info.Rank.Color + "[" + titleName + "] " + displayedName;
+                }
+                return titleName;
             }
         }
 
         /// <summary> Name formatted for display in chat. </summary>
-        public string ClassyName {
+        [NotNull]
+        public string ClassyName
+        {
             get { return Info.ClassyName; }
         }
 
@@ -144,572 +196,975 @@ namespace fCraft {
         [NotNull]
         public MetadataCollection<object> Metadata { get; private set; }
 
-        public MapGeneratorParameters GenParams { get; set; }
-
         #endregion
+        public bool IsAway;
+
+        public bool IsFlying = false;
+        public ConcurrentDictionary<String, Vector3I> FlyCache;
+        public readonly object FlyLock = new object();
+
+        public ConcurrentDictionary<String, Vector3I> TowerCache = new ConcurrentDictionary<String, Vector3I>();
+        public bool towerMode = false;
+        public Vector3I towerOrigin;
+
+        public ConcurrentDictionary<String, Vector3I> GunCache = new ConcurrentDictionary<String, Vector3I>();
+
+        public List<Vector3I> bluePortal = new List<Vector3I>();
+        public List<Vector3I> orangePortal = new List<Vector3I>();
+        public List<Block> blueOld = new List<Block>();
+        public List<Block> orangeOld = new List<Block>();
+        public byte blueOut;
+        public byte orangeOut;
+        public bool GunMode = false;
+
+        public bool GlobalChatAllowed = false;
+        public bool GlobalChatIgnore = false;
+
+        public Position previousLocation;
+        public World previousWorld = null;
+
+        public bool fireworkMode = false;
+
+        public DateTime LastTimeKilled;
+        public bool Immortal = false;
+
+        public bool SpeedMode = false;
+
+        //For console, decides on if to send response to webpanel or not
+        public bool sendToWebPanel = false;
+        public string WebPanelData = "";
+
+        //general purpose state storage for plugins
+        private readonly ConcurrentDictionary<string, object> _publicAuxStateObjects = new ConcurrentDictionary<string, object>();
+        public IDictionary<string, object> PublicAuxStateObjects { get { return _publicAuxStateObjects; } }
+
+        //Portals
+        public bool StandingInPortal = false;
+        public bool CanUsePortal = true;
+        public String PortalWorld;
+        public String PortalName;
+        public bool BuildingPortal = true;
+        public DateTime LastUsedPortal;
+        public DateTime LastWarnedPortal;
+        public bool PortalsEnabled = true;
+        public readonly object PortalLock = new object();
+
+        //StopWatch
+        public static Stopwatch stopwatch = new Stopwatch();
+        public static bool stopwatchRunning = false;
+        public static string noStopwatch = "&cStopWatch:&f There is no stopwatch currently running!";
+        public static string alreadyStopwatch = "&cStopWatch&f: There is already a stopwatch running!";
+
+        //Physics
+        public DateTime DrownTime;
+        public DateTime LastTimeTNTFired = DateTime.MinValue;
+        //note that this method updates the fired time, assuming that following this check the TNT will be fired
+        //this is a bad design generally, but sometimes its tempting to dont give a fuck
+        public bool CanFireTNT()
+        {
+            bool ret = (DateTime.UtcNow - LastTimeTNTFired) > TimeSpan.FromSeconds(1);
+            if (ret)
+                LastTimeTNTFired = DateTime.UtcNow;
+            return ret;
+        }
+
+        //Kill protection
+        public bool CanBeKilled()
+        {
+            if (Immortal) return false;
+            if ((DateTime.UtcNow - LastTimeKilled).TotalSeconds < 15)
+            {
+                return false;
+            }
+            return true;
+        }
 
 
-        // This constructor is used to create pseudoplayers (such as Console and /dummy).
+        //List of weapons usable in game modes
+        //byte ID will be used for gungame
+        public enum GameWeapon : byte
+        {
+            Bat = 1,
+            DelayedGun = 2,
+            FreezeGun = 3,
+            Gun = 4,
+            TNT = 5,
+            PortalGun = 6,
+            MineLauncher = 7,
+            MachineGun = 8,
+            FlameThrower = 9,
+        }
+
+        //used for impersonation (skin changing)
+        //if null, default skin is used
+        public string iName = null;
+        public bool entityChanged = false;
+        public List<Player> playersWhoHaveSeenEntityChanges = new List<Player>(); //exactly what the name says lol
+
+
+        // This constructor is used to create pseudoplayers (such as Console).
         // Such players have unlimited permissions, but no world.
         // This should be replaced by a more generic solution, like an IEntity interface.
-        internal Player( [NotNull] string name ) {
-            if( name == null ) throw new ArgumentNullException( "name" );
-            Info = new PlayerInfo( name, RankManager.HighestRank, true, RankChangeType.AutoPromoted );
-            spamBlockLog = new Queue<DateTime>( Info.Rank.AntiGriefBlocks );
+        internal Player([NotNull] string name)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+            Info = new PlayerInfo(name, RankManager.HighestRank, true, RankChangeType.AutoPromoted);
+            spamBlockLog = new Queue<DateTime>(Info.Rank.AntiGriefBlocks);
             IP = IPAddress.Loopback;
             ResetAllBinds();
             State = SessionState.Offline;
             IsSuper = true;
         }
 
+        // This constructor is used to create pseudoplayers (such as bots)
+        // This should be replaced by a more generic solution, like an IEntity interface.
+        internal Player([NotNull] string name, World world)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+            Info = new PlayerInfo(name, RankManager.LowestRank, true, RankChangeType.AutoPromoted);
+            spamBlockLog = new Queue<DateTime>(Info.Rank.AntiGriefBlocks);
+            IP = IPAddress.Loopback;
+            ResetAllBinds();
+            State = SessionState.Online;
+            IsSuper = true;
+            World = world;
+        }
+
+        public void BassKick([NotNull] Player player, [NotNull] string reason, LeaveReason context,
+                        bool announce, bool raiseEvents, bool recordToPlayerDB)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (reason == null) throw new ArgumentNullException("reason");
+            if (!Enum.IsDefined(typeof(LeaveReason), context))
+            {
+                throw new ArgumentOutOfRangeException("context");
+            }
+
+
+            // Check if player can ban/unban in general
+            if (!player.Can(Permission.Kick))
+            {
+                PlayerOpException.ThrowPermissionMissing(player, Info, "kick", Permission.Kick);
+            }
+
+            // Check if player is trying to ban/unban self
+            if (player == this)
+            {
+                PlayerOpException.ThrowCannotTargetSelf(player, Info, "kick");
+            }
+
+            // Check if player has sufficiently high permission limit
+            if (!player.Can(Permission.Kick, Info.Rank))
+            {
+                PlayerOpException.ThrowPermissionLimit(player, Info, "kick", Permission.Kick);
+            }
+
+            // check if kick reason is missing but required
+            PlayerOpException.CheckKickReason(reason, player, Info);
+
+            // raise Player.BeingKicked event
+            if (raiseEvents)
+            {
+                var e = new PlayerBeingKickedEventArgs(this, player, reason, announce, recordToPlayerDB, context);
+                RaisePlayerBeingKickedEvent(e);
+                if (e.Cancel) PlayerOpException.ThrowCancelled(player, Info);
+                recordToPlayerDB = e.RecordToPlayerDB;
+            }
+
+            // actually kick
+            string kickReason;
+            if (reason.Length > 0)
+            {
+                kickReason = String.Format("Got blasted out of the server with the BASSCANNON executed by {0}: {1}", player.Name, reason);
+            }
+            else
+            {
+                kickReason = String.Format("Got blasted out of the server with the BASSCANNON executed by {0}", player.Name);
+            }
+            Kick(kickReason, context);
+
+            // log and record kick to PlayerDB
+            Logger.Log(LogType.UserActivity, "{0} was kicked by {1}. Reason: {2} (Basscannon)",
+                        Name, player.Name, reason);
+            if (recordToPlayerDB)
+            {
+                Info.ProcessKick(player, reason);
+            }
+
+            // announce kick
+            if (announce)
+            {
+                if (reason.Length > 0 && ConfigKey.AnnounceKickAndBanReasons.Enabled())
+                {
+                    Server.Message("{0}&W Got blasted out of the server with the BASSCANNON executed by {1}&W: {2}",
+                                    ClassyName, player.ClassyName, reason);
+                }
+                else
+                {
+                    Server.Message("{0}&W Got blasted out of the server with the BASSCANNON executed by {1}",
+                                    ClassyName, player.ClassyName);
+                }
+            }
+
+            // raise Player.Kicked event
+            if (raiseEvents)
+            {
+                var e = new PlayerKickedEventArgs(this, player, reason, announce, recordToPlayerDB, context);
+                RaisePlayerKickedEvent(e);
+            }
+        }
 
         #region Chat and Messaging
 
-        static readonly TimeSpan ConfirmationTimeout = TimeSpan.FromSeconds( 60 );
-        const string WoMAlertPrefix = "^detail.user.alert=";
-        int muteWarnings;
+        static readonly TimeSpan ConfirmationTimeout = TimeSpan.FromSeconds(60);
 
+        int muteWarnings;
         [CanBeNull]
         string partialMessage;
 
-        [CanBeNull]
-        internal string lastPrivateMessageSender;
-
-
-        /// <summary> Parses a message on behalf of this player. </summary>
-        /// <param name="rawMessage"> Message to parse. </param>
-        /// <param name="fromConsole"> Whether the message originates from console. </param>
-        /// <exception cref="ArgumentNullException"> rawMessage is null. </exception>
-        public void ParseMessage( [NotNull] string rawMessage, bool fromConsole ) {
-            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
-
-            // handle canceling selections and partial messages
-            if( rawMessage.StartsWith( "/nvm", StringComparison.OrdinalIgnoreCase ) ||
-                rawMessage.StartsWith( "/cancel", StringComparison.OrdinalIgnoreCase ) ) {
-                if( partialMessage != null ) {
-                    MessageNow( "Partial message cancelled." );
+        // Parses message incoming from the player
+        public void ParseMessage([NotNull] string rawMessage, bool fromConsole, bool sendMessage)
+        {
+            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
+            if (rawMessage == null) throw new ArgumentNullException("fromConsole");
+            if (rawMessage == null) throw new ArgumentNullException("sendMessage");
+            if (rawMessage.Equals("/nvm", StringComparison.OrdinalIgnoreCase))
+            {
+                if (partialMessage != null)
+                {
+                    if (sendMessage)
+                    {
+                        MessageNow("Partial message cancelled.");
+                    }
                     partialMessage = null;
-                } else if( IsMakingSelection ) {
-                    SelectionCancel();
-                    MessageNow( "Selection cancelled." );
-                } else {
-                    MessageNow( "There is currently nothing to cancel." );
+                }
+                else
+                {
+                    if (sendMessage)
+                    {
+                        MessageNow("No partial message to cancel.");
+                    }
                 }
                 return;
             }
 
-            if( partialMessage != null ) {
+            if (partialMessage != null)
+            {
                 rawMessage = partialMessage + rawMessage;
                 partialMessage = null;
             }
-            
+
             // replace %-codes with &-codes
-            if( Can( Permission.UseColorCodes ) ) {
-                rawMessage = Chat.ReplacePercentColorCodes( rawMessage, true );
+            if (Can(Permission.UseColorCodes))
+            {
+                rawMessage = Color.ReplacePercentCodes(rawMessage);
             }
-            // replace emotes
-            if( Can( Permission.UseEmotes ) ) {
-                rawMessage = Chat.ReplaceEmoteKeywords( rawMessage );
-            }
-            rawMessage = Chat.UnescapeBackslashes( rawMessage );
 
-            switch( Chat.GetRawMessageType( rawMessage ) ) {
-                case RawMessageType.Chat: {
-                        if( !Can( Permission.Chat ) ) return;
+            switch (Chat.GetRawMessageType(rawMessage))
+            {
+                case RawMessageType.Chat:
+                    {
+                        if (!Can(Permission.Chat)) return;
 
-                        if( Info.IsMuted ) {
+                        if (Info.IsMuted)
+                        {
                             MessageMuted();
                             return;
                         }
 
-                        if( DetectChatSpam() ) return;
+                        if (DetectChatSpam()) return;
 
                         // Escaped slash removed AFTER logging, to avoid confusion with real commands
-                        if( rawMessage.StartsWith( "//" ) ) {
-                            rawMessage = rawMessage.Substring( 1 );
+                        if (rawMessage.StartsWith("//"))
+                        {
+                            rawMessage = rawMessage.Substring(1);
                         }
 
-                        if( rawMessage.EndsWith( "//" ) ) {
-                            rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
+                        if (rawMessage.EndsWith("//"))
+                        {
+                            rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
                         }
 
-                        Chat.SendGlobal( this, rawMessage );
+                        Chat.SendGlobal(this, rawMessage);
                     } break;
 
 
-                case RawMessageType.Command: {
-                        if( rawMessage.EndsWith( "//" ) ) {
-                            rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
+                case RawMessageType.Command:
+                    {
+                        if (rawMessage.EndsWith("//"))
+                        {
+                            rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
                         }
-                        CommandReader cmd = new CommandReader( rawMessage );
-                        CommandDescriptor commandDescriptor = CommandManager.GetDescriptor( cmd.Name, true );
+                        Command cmd = new Command(rawMessage);
+                        CommandDescriptor commandDescriptor = CommandManager.GetDescriptor(cmd.Name, true);
 
-                        if( commandDescriptor == null ) {
-                            MessageNow( "Unknown command \"{0}\". See &H/Commands", cmd.Name );
-                        } else if( Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers ) {
-                            MessageNow( "&WYou cannot use this command while frozen." );
-                        } else {
-                            if( !commandDescriptor.DisableLogging ) {
-                                Logger.Log( LogType.UserCommand,
-                                            "{0}: {1}", Name, rawMessage );
+                        if (commandDescriptor == null)
+                        {
+                            MessageNow("Unknown command \"{0}\". See &H/Commands", cmd.Name);
+                        }
+                        else if (Info.IsFrozen && !commandDescriptor.UsableByFrozenPlayers)
+                        {
+                            MessageNow("&WYou cannot use this command while frozen.");
+                        }
+                        else
+                        {
+                            if (!commandDescriptor.DisableLogging)
+                            {
+                                Logger.Log(LogType.UserCommand,
+                                            "{0}: {1}", Name, rawMessage);
                             }
-                            if( commandDescriptor.RepeatableSelection ) {
+                            if (commandDescriptor.RepeatableSelection)
+                            {
                                 selectionRepeatCommand = cmd;
                             }
-                            SendToSpectators( cmd.RawMessage );
-                            CommandManager.ParseCommand( this, cmd, fromConsole );
-                            if( !commandDescriptor.NotRepeatable ) {
+                            SendToSpectators(cmd.RawMessage);
+                            try
+                            {
+                                CommandManager.ParseCommand(this, cmd, fromConsole);
+                            }
+                            catch (Exception e) 
+                            {
+                                if (e is NullReferenceException)
+                                {
+                                    //chill
+                                }
+                                else
+                                {
+                                    //panic
+                                    Logger.Log(LogType.Error, e.Message);
+                                }
+                            }
+
+                            if (!commandDescriptor.NotRepeatable)
+                            {
                                 LastCommand = cmd;
                             }
                         }
                     } break;
 
 
-                case RawMessageType.RepeatCommand: {
-                        if( LastCommand == null ) {
-                            Message( "No command to repeat." );
-                        } else {
-                            if( Info.IsFrozen && ( LastCommand.Descriptor == null ||
-                                                   !LastCommand.Descriptor.UsableByFrozenPlayers ) ) {
-                                MessageNow( "&WYou cannot use this command while frozen." );
+                case RawMessageType.RepeatCommand:
+                    {
+                        if (LastCommand == null)
+                        {
+                            Message("No command to repeat.");
+                        }
+                        else
+                        {
+                            if (Info.IsFrozen && !LastCommand.Descriptor.UsableByFrozenPlayers)
+                            {
+                                MessageNow("&WYou cannot use this command while frozen.");
                                 return;
                             }
                             LastCommand.Rewind();
-                            Logger.Log( LogType.UserCommand,
+                            Logger.Log(LogType.UserCommand,
                                         "{0} repeated: {1}",
-                                        Name, LastCommand.RawMessage );
-                            Message( "Repeat: {0}", LastCommand.RawMessage );
-                            SendToSpectators( LastCommand.RawMessage );
-                            CommandManager.ParseCommand( this, LastCommand, fromConsole );
+                                        Name, LastCommand.RawMessage);
+                            Message("Repeat: {0}", LastCommand.RawMessage);
+                            SendToSpectators(LastCommand.RawMessage);
+                            CommandManager.ParseCommand(this, LastCommand, fromConsole);
                         }
                     } break;
 
 
-                case RawMessageType.PrivateChat: {
-                        if( !Can( Permission.Chat ) ) return;
+                case RawMessageType.PrivateChat:
+                    {
+                        if (!Can(Permission.Chat)) return;
 
-                        if( Info.IsMuted ) {
+                        if (Info.IsMuted)
+                        {
                             MessageMuted();
                             return;
                         }
 
-                        if( DetectChatSpam() ) return;
+                        if (DetectChatSpam()) return;
 
-                        if( rawMessage.EndsWith( "//" ) ) {
-                            rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
+                        if (rawMessage.EndsWith("//"))
+                        {
+                            rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
                         }
 
                         string otherPlayerName, messageText;
-                        if( rawMessage[1] == ' ' ) {
-                            otherPlayerName = rawMessage.Substring( 2, rawMessage.IndexOf( ' ', 2 ) - 2 );
-                            messageText = rawMessage.Substring( rawMessage.IndexOf( ' ', 2 ) + 1 );
-                        } else {
-                            otherPlayerName = rawMessage.Substring( 1, rawMessage.IndexOf( ' ' ) - 1 );
-                            messageText = rawMessage.Substring( rawMessage.IndexOf( ' ' ) + 1 );
+                        if (rawMessage[1] == ' ')
+                        {
+                            otherPlayerName = rawMessage.Substring(2, rawMessage.IndexOf(' ', 2) - 2);
+                            messageText = rawMessage.Substring(rawMessage.IndexOf(' ', 2) + 1);
+                        }
+                        else
+                        {
+                            otherPlayerName = rawMessage.Substring(1, rawMessage.IndexOf(' ') - 1);
+                            messageText = rawMessage.Substring(rawMessage.IndexOf(' ') + 1);
                         }
 
-                        if( otherPlayerName == "-" ) {
-                            if( LastUsedPlayerName != null ) {
+                        if (otherPlayerName == "-")
+                        {
+                            if (LastUsedPlayerName != null)
+                            {
                                 otherPlayerName = LastUsedPlayerName;
-                            } else {
-                                Message( "Cannot repeat player name: you haven't used any names yet." );
+                            }
+                            else
+                            {
+                                Message("Cannot repeat player name: you haven't used any names yet.");
                                 return;
                             }
                         }
 
                         // first, find ALL players (visible and hidden)
-                        Player[] allPlayers = Server.FindPlayers( otherPlayerName, SearchOptions.Default );
+                        Player[] allPlayers = Server.FindPlayers(otherPlayerName, true);
 
                         // if there is more than 1 target player, exclude hidden players
-                        if( allPlayers.Length > 1 ) {
-                            allPlayers = Server.FindPlayers( this, otherPlayerName, SearchOptions.ReturnSelfIfOnlyMatch );
+                        if (allPlayers.Length > 1)
+                        {
+                            allPlayers = Server.FindPlayers(this, otherPlayerName, true);
                         }
 
-                        if( allPlayers.Length == 1 ) {
+                        if (allPlayers.Length == 1)
+                        {
                             Player target = allPlayers[0];
-                            if( target == this ) {
-                                Message( "Trying to talk to yourself?" );
+                            if (target == this)
+                            {
+                                MessageNow("Trying to talk to yourself?");
                                 return;
                             }
-                            bool messageSent = false;
-                            if( target.CanHear( this ) ) {
-                                messageSent = Chat.SendPM( this, target, messageText );
-                                SendToSpectators( "to {0}&F: {1}", target.ClassyName, messageText );
+                            if (!target.IsIgnoring(Info) && !target.IsDeaf)
+                            {
+                                Chat.SendPM(this, target, messageText);
+                                SendToSpectators("to {0}&F: {1}", target.ClassyName, messageText);
                             }
 
-                            if( !CanSee( target ) ) {
+                            if (!CanSee(target))
+                            {
                                 // message was sent to a hidden player
-                                MessageNoPlayer( otherPlayerName );
-                                if( messageSent ) {
-                                    Info.DecrementMessageWritten();
-                                }
+                                MessageNoPlayer(otherPlayerName);
 
-                            } else {
+                            }
+                            else
+                            {
                                 // message was sent normally
                                 LastUsedPlayerName = target.Name;
-                                if( target.IsIgnoring( Info ) ) {
-                                    if( CanSee( target ) ) {
-                                        MessageNow( "&WCannot PM {0}&W: you are ignored.", target.ClassyName );
+                                if (target.IsIgnoring(Info))
+                                {
+                                    if (CanSee(target))
+                                    {
+                                        MessageNow("&WCannot PM {0}&W: you are ignored.", target.ClassyName);
                                     }
-                                } else if( target.IsDeaf ) {
-                                    MessageNow( "Cannot PM {0}&S: they are currently deaf.", target.ClassyName );
-                                } else {
-                                    MessageNow( "&Pto {0}: {1}",
-                                                target.Name, messageText );
+                                }
+                                else if (target.IsDeaf)
+                                {
+                                    MessageNow("&SCannot PM {0}&S: they are currently deaf.", target.ClassyName);
+                                }
+                                else
+                                {
+                                    MessageNow("&Pto {0}: {1}",
+                                                target.Name, messageText);
                                 }
                             }
 
-                        } else if( allPlayers.Length == 0 ) {
-                            // Cannot PM: target player not found/offline
-                            MessageNoPlayer( otherPlayerName );
+                        }
+                        else if (allPlayers.Length == 0)
+                        {
+                            MessageNoPlayer(otherPlayerName);
 
-                        } else {
-                            // Cannot PM: more than one player matched
-                            MessageManyMatches( "player", allPlayers );
+                        }
+                        else
+                        {
+                            MessageManyMatches("player", allPlayers);
                         }
                     } break;
 
 
-                case RawMessageType.RankChat: {
-                        if( !Can( Permission.Chat ) ) return;
+                case RawMessageType.RankChat:
+                    {
+                        if (!Can(Permission.Chat)) return;
 
-                        if( Info.IsMuted ) {
+                        if (Info.IsMuted)
+                        {
                             MessageMuted();
                             return;
                         }
 
-                        if( DetectChatSpam() ) return;
+                        if (DetectChatSpam()) return;
 
-                        if( rawMessage.EndsWith( "//" ) ) {
-                            rawMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
+                        if (rawMessage.EndsWith("//"))
+                        {
+                            rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
                         }
 
                         Rank rank;
-                        if( rawMessage[2] == ' ' ) {
+                        if (rawMessage[2] == ' ')
+                        {
                             rank = Info.Rank;
-                        } else {
-                            string rankName = rawMessage.Substring( 2, rawMessage.IndexOf( ' ' ) - 2 );
-                            rank = RankManager.FindRank( rankName );
-                            if( rank == null ) {
-                                MessageNoRank( rankName );
+                        }
+                        else
+                        {
+                            string rankName = rawMessage.Substring(2, rawMessage.IndexOf(' ') - 2);
+                            rank = RankManager.FindRank(rankName);
+                            if (rank == null)
+                            {
+                                MessageNoRank(rankName);
                                 break;
                             }
                         }
 
-                        string messageText = rawMessage.Substring( rawMessage.IndexOf( ' ' ) + 1 );
+                        string messageText = rawMessage.Substring(rawMessage.IndexOf(' ') + 1);
 
-                        Player[] spectators = Server.Players.NotRanked( Info.Rank )
-                                                            .Where( p => p.spectatedPlayer == this )
+                        Player[] spectators = Server.Players.NotRanked(Info.Rank)
+                                                            .Where(p => p.spectatedPlayer == this)
                                                             .ToArray();
-                        if( spectators.Length > 0 ) {
-                            spectators.Message( "[Spectate]: &Fto rank {0}&F: {1}", rank.ClassyName, messageText );
+                        if (spectators.Length > 0)
+                        {
+                            spectators.Message("[Spectate]: &Fto rank {0}&F: {1}", rank.ClassyName, messageText);
                         }
 
-                        Chat.SendRank( this, rank, messageText );
+                        Chat.SendRank(this, rank, messageText);
                     } break;
 
+                case RawMessageType.WorldChat:
+                    {
+                        if (!Can(Permission.Chat)) return;
 
-                case RawMessageType.Confirmation: {
-                        if( Info.IsFrozen ) {
-                            MessageNow( "&WYou cannot use any commands while frozen." );
+                        if (Info.IsMuted)
+                        {
+                            MessageMuted();
                             return;
                         }
-                        if( ConfirmCallback != null ) {
-                            if( DateTime.UtcNow.Subtract( ConfirmRequestTime ) < ConfirmationTimeout ) {
-                                Logger.Log( LogType.UserCommand, "{0}: /ok", Name );
-                                SendToSpectators( "/ok" );
-                                ConfirmCallback( this, ConfirmParameter, fromConsole );
-                                ConfirmCancel();
-                            } else {
-                                MessageNow( "Confirmation timed out. Enter the command again." );
+
+                        if (DetectChatSpam()) return;
+
+                        if (rawMessage.EndsWith("//"))
+                        {
+                            rawMessage = rawMessage.Substring(0, rawMessage.Length - 1);
+                        }
+
+                        World world;
+                        string worldName = rawMessage.Substring(1, rawMessage.IndexOf(' ') - 1);
+                        string messageText = rawMessage.Substring(rawMessage.IndexOf(' ') + 1);
+
+                        if (rawMessage[1] == ' ')
+                        {
+                            world = World;
+                            messageText = rawMessage.Substring(2);
+                        }
+                        else
+                        {
+                            if (worldName == "-")
+                            {
+                                if (LastUsedWorldName != null)
+                                {
+                                    worldName = LastUsedWorldName;
+                                    messageText = rawMessage.Substring(4);
+                                }
+                                else
+                                {
+                                    Message("Cannot repeat world name: you haven't used any world names yet.");
+                                    return;
+                                }
                             }
-                        } else {
-                            MessageNow( "There is no command to confirm." );
+                            world = WorldManager.FindWorldExact(worldName);
+                            if (world == null)
+                            {
+                                MessageNoWorld(worldName);
+                                break;
+                            }
+                            if (world != null)
+                            {
+                                messageText = rawMessage.Substring(rawMessage.IndexOf(' ') + 1);
+                                LastUsedWorldName = worldName;
+                            }
+                        }
+
+                        Player[] spectators = Server.Players.NotRanked(Info.Rank)
+                                                            .Where(p => p.spectatedPlayer == this)
+                                                            .ToArray();
+                        if (spectators.Length > 0)
+                        {
+                            spectators.Message("[Spectate]: &Fto world {0}&F: {1}", world.ClassyName, messageText);
+                        }
+                        Chat.SendWorld(this, world, messageText);
+                    }
+                    break;
+
+
+
+                case RawMessageType.Confirmation:
+                    {
+                        if (Info.IsFrozen)
+                        {
+                            MessageNow("&WYou cannot use any commands while frozen.");
+                            return;
+                        }
+                        if (ConfirmCallback != null)
+                        {
+                            if (DateTime.UtcNow.Subtract(ConfirmRequestTime) < ConfirmationTimeout)
+                            {
+                                SendToSpectators("/ok");
+                                ConfirmCallback(this, ConfirmArgument, fromConsole);
+                                ConfirmCallback = null;
+                                ConfirmArgument = null;
+                            }
+                            else
+                            {
+                                MessageNow("Confirmation timed out. Enter the command again.");
+                            }
+                        }
+                        else
+                        {
+                            MessageNow("There is no command to confirm.");
                         }
                     } break;
 
 
                 case RawMessageType.PartialMessage:
-                    partialMessage = rawMessage.Substring( 0, rawMessage.Length - 1 );
-                    MessageNow( "Partial: &F{0}", partialMessage );
+                    partialMessage = rawMessage.Substring(0, rawMessage.Length - 1);
+                    MessageNow("Partial: &F{0}", partialMessage);
                     break;
 
                 case RawMessageType.Invalid:
-                    MessageNow( "Could not parse message." );
+                    MessageNow("Could not parse message.");
                     break;
             }
         }
 
+        #region selection
 
-        /// <summary> Sends a message to all players who are spectating this player, e.g. to forward typed-in commands and PMs.
-        /// "System color" code (&amp;S) will be prepended to the message.
-        /// If the message does not fit on one line, prefix ">" is prepended to each wrapped line. </summary>
-        /// <param name="message"> A composite format string for the message. Same semantics as String.Format(). </param>
-        /// <param name="formatArgs"> An object array that contains zero or more objects to format.  </param>
-        /// <exception cref="ArgumentNullException"> message or formatArgs is null. </exception>
-        /// <exception cref="FormatException"> Message format is invalid. </exception>
-        public void SendToSpectators( [NotNull] string message, [NotNull] params object[] formatArgs ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( formatArgs == null ) throw new ArgumentNullException( "formatArgs" );
-            Player[] spectators = Server.Players.Where( p => p.spectatedPlayer == this ).ToArray();
-            if( spectators.Length > 0 ) {
-                spectators.Message( "[Spectate]: &F" + message, formatArgs );
+        public int markSet = 0;
+
+        //create and set vector array to a size of 2
+        public List<Vector3I> selectedMarks = new List<Vector3I>();
+        public DateTime selectionTime;//add a timer for when selections expire
+
+        public string highlightName = "";
+        public string cmd = "";
+        public int percentOpacity = 0;
+        public System.Drawing.Color color = new System.Drawing.Color();
+
+        /// <summary>
+        /// Used to return two points select by the player, only supports selection cuboid(aka highlight), but was created to support other commands if needed
+        /// </summary>
+        public void SelectMarks()
+        {
+
+            if (markSet == 0)//first corner
+            {
+                Message(cmd + ": Use /mark or place/break a block at the location of the first corner of your selection.");
+                selectionTime = DateTime.Now;
+                markSet++;
+                return;
+            }
+            if (markSet == 1)//second corner
+            {
+                Message(cmd + ": Use /mark or place/break a block at the location of the second corner of your selection.");
+                selectionTime = DateTime.Now;
+                markSet++;
+                return;
+            }
+            else//finish
+            {
+                Message("Selection finished.");
+                if (cmd.ToLower() == "highlight")
+                {
+                    int ID = LegendCraft.getNewHighlightID();
+                    this.World.Players.Send(PacketWriter.MakeSelectionCuboid((byte)ID, ID.ToString(), selectedMarks[0], selectedMarks[1], color, percentOpacity));
+                    Server.Highlights.Add(highlightName, new Tuple<int, Vector3I, Vector3I, System.Drawing.Color, int>(ID, selectedMarks[0], selectedMarks[1], color, percentOpacity));
+                    this.World.Highlights.Add(highlightName, new Tuple<int, Vector3I, Vector3I, System.Drawing.Color, int>(ID, selectedMarks[0], selectedMarks[1], color, percentOpacity));
+                }
+                selectedMarks.Clear();
+                markSet = 0;
+            }
+        }
+
+        #endregion
+
+        public void SendToSpectators([NotNull] string message, [NotNull] params object[] args)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            if (args == null) throw new ArgumentNullException("args");
+            Player[] spectators = Server.Players.Where(p => p.spectatedPlayer == this).ToArray();
+            if (spectators.Length > 0)
+            {
+                spectators.Message("[Spectate]: &F" + message, args);
             }
         }
 
 
-        /// <summary> Sends a message as a WoM alert.
-        /// Players who use World of Minecraft client will see this message on the left side of the screen.
-        /// Other players will receive it as a normal message. "System color" code (&amp;S) will be prepended to the message. </summary>
-        /// <param name="message"> A composite format string for the message. Same semantics as String.Format(). </param>
-        /// <param name="formatArgs"> An object array that contains zero or more objects to format. </param>
-        /// <exception cref="ArgumentNullException"> message or formatArgs is null. </exception>
-        /// <exception cref="FormatException"> Message format is invalid. </exception>
-        [StringFormatMethod( "message" )]
-        public void MessageWoMAlert( [NotNull] string message, [NotNull] params object[] formatArgs ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( formatArgs == null ) throw new ArgumentNullException( "formatArgs" );
-            if( formatArgs.Length > 0 ) {
-                message = String.Format( message, formatArgs );
+        const string WoMAlertPrefix = "^detail.user.alert=";
+        public void MessageAlt([NotNull] string message)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            if (this == Console)
+            {
+                Logger.LogToConsole(message);
             }
-            if( this == Console ) {
-                Logger.LogToConsole( message );
-            } else if( IsUsingWoM ) {
-                foreach( Packet p in LineWrapper.WrapPrefixed( WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message ) ) {
-                    Send( p );
+            else if (IsUsingWoM)
+            {
+                foreach (Packet p in LineWrapper.WrapPrefixed(WoMAlertPrefix, WoMAlertPrefix + Color.Sys + message))
+                {
+                    Send(p);
                 }
-            } else {
-                foreach( Packet p in LineWrapper.Wrap( Color.Sys + message ) ) {
-                    Send( p );
+            }
+            else
+            {
+                foreach (Packet p in LineWrapper.Wrap(Color.Sys + message))
+                {
+                    Send(p);
                 }
             }
         }
 
-
-        /// <summary> Sends a text message to this player. "System color" code (&amp;S) will be prepended to the message. 
-        /// If the message does not fit on one line, prefix ">" is prepended to each wrapped line. </summary>
-        /// <param name="message"> A composite format string for the message. Same semantics as String.Format(). </param>
-        /// <param name="formatArgs"> An object array that contains zero or more objects to format. </param>
-        /// <exception cref="ArgumentNullException"> message or formatArgs is null. </exception>
-        /// <exception cref="FormatException"> Message format is invalid. </exception>
-        [StringFormatMethod( "message" )]
-        public void Message( [NotNull] string message, [NotNull] params object[] formatArgs ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( formatArgs == null ) throw new ArgumentNullException( "formatArgs" );
-            if( formatArgs.Length > 0 ) {
-                message = String.Format( message, formatArgs );
-            }
-            if( IsSuper ) {
-                Logger.LogToConsole( message );
-            } else {
-                foreach( Packet p in LineWrapper.Wrap( Color.Sys + message ) ) {
-                    Send( p );
-                }
-            }
+        [StringFormatMethod("message")]
+        public void MessageAlt([NotNull] string message, [NotNull] params object[] args)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            if (args == null) throw new ArgumentNullException("args");
+            MessageAlt(String.Format(message, args));
         }
 
 
-        /// <summary> Sends a text message to this player, prefixing each line. </summary>
-        /// <param name="prefix"> Prefix to prepend to prepend to each line after the 1st,
-        /// if any line-wrapping occurs. Does NOT get prepended to first line. </param>
-        /// <param name="message"> A composite format string for the message. Same semantics as String.Format(). </param>
-        /// <param name="formatArgs"> An object array that contains zero or more objects to format. </param>
-        /// <exception cref="ArgumentNullException"> prefix, message, or formatArgs is null. </exception>
-        /// <exception cref="FormatException"> Message format is invalid. </exception>
-        [StringFormatMethod( "message" )]
-        public void MessagePrefixed( [NotNull] string prefix, [NotNull] string message, [NotNull] params object[] formatArgs ) {
-            if( prefix == null ) throw new ArgumentNullException( "prefix" );
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( formatArgs == null ) throw new ArgumentNullException( "formatArgs" );
-            if( formatArgs.Length > 0 ) {
-                message = String.Format( message, formatArgs );
-            }
-            if( this == Console ) {
-                Logger.LogToConsole( message );
-            } else {
-                foreach( Packet p in LineWrapper.WrapPrefixed( prefix, message ) ) {
-                    Send( p );
-                }
-            }
-        }
+        public void Message([NotNull] string message)
+        {
+            if (message == null) throw new ArgumentNullException("message");
 
+            //if is console
+            if (IsSuper)
+            {
+                Logger.LogToConsole(message);
 
-        [StringFormatMethod( "message" )]
-        internal void MessageNow( [NotNull] string message, [NotNull] params object[] args ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( args == null ) throw new ArgumentNullException( "args" );
-            if( IsDeaf ) return;
-            if( args.Length > 0 ) {
-                message = String.Format( message, args );
-            }
-            if( this == Console ) {
-                Logger.LogToConsole( message );
-            } else {
-                if( Thread.CurrentThread != ioThread ) {
-                    throw new InvalidOperationException( "SendNow may only be called from player's own thread." );
+                if (sendToWebPanel)
+                {
+                    WebPanelData += message;
                 }
-                foreach( Packet p in LineWrapper.Wrap( Color.Sys + message ) ) {
-                    SendNow( p );
-                }
-            }
-        }
 
-
-        [StringFormatMethod( "message" )]
-        internal void MessageNowPrefixed( [NotNull] string prefix, [NotNull] string message, [NotNull] params object[] args ) {
-            if( prefix == null ) throw new ArgumentNullException( "prefix" );
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( args == null ) throw new ArgumentNullException( "args" );
-            if( IsDeaf ) return;
-            if( args.Length > 0 ) {
-                message = String.Format( message, args );
             }
-            if( this == Console ) {
-                Logger.LogToConsole( message );
-            } else {
-                if( Thread.CurrentThread != ioThread ) {
-                    throw new InvalidOperationException( "SendNow may only be called from player's own thread." );
-                }
-                foreach( Packet p in LineWrapper.WrapPrefixed( prefix, message ) ) {
-                    Send( p );
+            else
+            {
+                foreach (Packet p in LineWrapper.Wrap(Color.Sys + message))
+                {
+                    Send(p);
                 }
             }
         }
 
 
-        /// <summary> Checks whether this player can hear messages from given sender. 
-        /// Deaf and ignoring players will not hear the messages. </summary>
-        /// <returns> True if this player will see messages from sender; otherwise false. </returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        public bool CanHear( [NotNull] Player sender ) {
-            if( sender == null ) throw new ArgumentNullException( "sender" );
-            return !IsDeaf && !IsIgnoring( sender.Info );
+        [StringFormatMethod("message")]
+        public void Message([NotNull] string message, [NotNull] object arg)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            if (arg == null) throw new ArgumentNullException("arg");
+            Message(String.Format(message, arg));
         }
+
+        [StringFormatMethod("message")]
+        public void Message([NotNull] string message, [NotNull] params object[] args)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            if (args == null) throw new ArgumentNullException("args");
+            Message(String.Format(message, args));
+        }
+
+
+        [StringFormatMethod("message")]
+        public void MessagePrefixed([NotNull] string prefix, [NotNull] string message, [NotNull] params object[] args)
+        {
+            if (prefix == null) throw new ArgumentNullException("prefix");
+            if (message == null) throw new ArgumentNullException("message");
+            if (args == null) throw new ArgumentNullException("args");
+            if (args.Length > 0)
+            {
+                message = String.Format(message, args);
+            }
+            if (this == Console)
+            {
+                Logger.LogToConsole(message);
+            }
+            else
+            {
+                foreach (Packet p in LineWrapper.WrapPrefixed(prefix, message))
+                {
+                    Send(p);
+                }
+            }
+        }
+
+
+        [StringFormatMethod("message")]
+        internal void MessageNow([NotNull] string message, [NotNull] params object[] args)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            if (args == null) throw new ArgumentNullException("args");
+            if (IsDeaf) return;
+            if (args.Length > 0)
+            {
+                message = String.Format(message, args);
+            }
+            if (this == Console)
+            {
+                Logger.LogToConsole(message);
+            }
+            else
+            {
+                if (Thread.CurrentThread != ioThread)
+                {
+                    throw new InvalidOperationException("SendNow may only be called from player's own thread.");
+                }
+                foreach (Packet p in LineWrapper.Wrap(Color.Sys + message))
+                {
+                    SendNow(p);
+                }
+            }
+        }
+
+
+        [StringFormatMethod("message")]
+        internal void MessageNowPrefixed([NotNull] string prefix, [NotNull] string message, [NotNull] params object[] args)
+        {
+            if (prefix == null) throw new ArgumentNullException("prefix");
+            if (message == null) throw new ArgumentNullException("message");
+            if (args == null) throw new ArgumentNullException("args");
+            if (IsDeaf) return;
+            if (args.Length > 0)
+            {
+                message = String.Format(message, args);
+            }
+            if (this == Console)
+            {
+                Logger.LogToConsole(message);
+            }
+            else
+            {
+                if (Thread.CurrentThread != ioThread)
+                {
+                    throw new InvalidOperationException("SendNow may only be called from player's own thread.");
+                }
+                foreach (Packet p in LineWrapper.WrapPrefixed(prefix, message))
+                {
+                    Send(p);
+                }
+            }
+        }
+
 
         #region Macros
 
-        /// <summary> Prints "No players found matching ___" message. </summary>
-        /// <param name="playerName"> Given name, for which no players were found. </param>
-        /// <exception cref="ArgumentNullException"> playerName is null. </exception>
-        public void MessageNoPlayer( [NotNull] string playerName ) {
-            if( playerName == null ) throw new ArgumentNullException( "playerName" );
-            Message( "No players found matching \"{0}\"", playerName );
+        public void MessageNoPlayer([NotNull] string playerName)
+        {
+            if (playerName == null) throw new ArgumentNullException("playerName");
+            Message("No players found matching \"{0}\"", playerName);
         }
 
 
-        /// <summary> Prints "No worlds found matching ___" message. </summary>
-        /// <param name="worldName"> Given name, for which no worlds were found. </param>
-        /// <exception cref="ArgumentNullException"> worldName is null. </exception>
-        public void MessageNoWorld( [NotNull] string worldName ) {
-            if( worldName == null ) throw new ArgumentNullException( "worldName" );
-            Message( "No worlds found matching \"{0}\". See &H/Worlds", worldName );
+        public void MessageNoWorld([NotNull] string worldName)
+        {
+            if (worldName == null) throw new ArgumentNullException("worldName");
+            Message("No worlds found matching \"{0}\". See &H/Worlds", worldName);
         }
 
 
-        const int MatchesToPrint = 30;
+        public void MessageManyMatches([NotNull] string itemType, [NotNull] IEnumerable<IClassy> names)
+        {
+            if (itemType == null) throw new ArgumentNullException("itemType");
+            if (names == null) throw new ArgumentNullException("names");
 
-        /// <summary> Prints a comma-separated list of matches (up to 30): "More than one ___ matched: ___, ___, ..." </summary>
-        /// <param name="itemType"> Type of item in the list. Should be singular (e.g. "player" or "world"). </param>
-        /// <param name="items"> List of zero or more matches. ClassyName properties are used in the list. </param>
-        /// <exception cref="ArgumentNullException"> itemType or items is null. </exception>
-        public void MessageManyMatches( [NotNull] string itemType, [NotNull] IEnumerable<IClassy> items ) {
-            if( itemType == null ) throw new ArgumentNullException( "itemType" );
-            if( items == null ) throw new ArgumentNullException( "items" );
+            string nameList = names.JoinToString(", ", p => p.ClassyName);
+            Message("More than one {0} matched: {1}",
+                     itemType, nameList);
+        }
 
-            IClassy[] itemsEnumerated = items.ToArray();
-            string nameList = itemsEnumerated.Take( MatchesToPrint ).JoinToString( ", ", p => p.ClassyName );
-            int count = itemsEnumerated.Length;
-            if( count > MatchesToPrint ) {
-                Message( "More than {0} {1} matched: {2}",
-                         count, itemType, nameList );
-            } else {
-                Message( "More than one {0} matched: {1}",
-                         itemType, nameList );
+        public void MessageManyInfoMatches([NotNull] string itemType, [NotNull] PlayerInfo[] names)
+        {
+            if (itemType == null) throw new ArgumentNullException("itemType");
+            if (names == null) throw new ArgumentNullException("names");
+
+            string nameList = names.JoinToString(", ", p => p.Name);
+            Message("More than one {0} matched: {1}",
+                     itemType, nameList);
+        }
+
+        public void MessageManyDisplayedNamesMatches([NotNull] string itemType, [NotNull] PlayerInfo[] names)
+        {
+            if (itemType == null) throw new ArgumentNullException("itemType");
+            if (names == null) throw new ArgumentNullException("names");
+
+            string nameList = names.JoinToString(", ", p => p.Name + "&S(" + p.DisplayedName + "&S)");
+            Message("More than one {0} matched: {1}",
+                     itemType, nameList);
+        }
+
+
+        public void MessageNoAccess([NotNull] params Permission[] permissions)
+        {
+            if (permissions == null) throw new ArgumentNullException("permissions");
+            Rank reqRank = RankManager.GetMinRankWithAllPermissions(permissions);
+            if (reqRank == null)
+            {
+                Message("None of the ranks have permissions for this command.");
+            }
+            else
+            {
+                Message("This command requires {0}+&S rank.",
+                         reqRank.ClassyName);
             }
         }
 
 
-        /// <summary> Prints "This command requires ___+ rank" message. </summary>
-        /// <param name="permissions"> List of permissions required for the command. </param>
-        /// <exception cref="ArgumentNullException"> permissions is null. </exception>
-        /// <exception cref="ArgumentException"> permissions array is empty. </exception>
-        public void MessageNoAccess( [NotNull] params Permission[] permissions ) {
-            if( permissions == null ) throw new ArgumentNullException( "permissions" );
-            if( permissions.Length == 0 ) throw new ArgumentException( "At least one permission required.", "permissions" );
-            Rank reqRank = RankManager.GetMinRankWithAllPermissions( permissions );
-            if( reqRank == null ) {
-                Message( "None of the ranks have permissions for this command." );
-            } else {
-                Message( "This command requires {0}+&S rank.",
-                         reqRank.ClassyName );
-            }
-        }
-
-
-        /// <summary> Prints "This command requires ___+ rank" message. </summary>
-        /// <param name="cmd"> Command to check. </param>
-        /// <exception cref="ArgumentNullException"> cmd is null. </exception>
-        public void MessageNoAccess( [NotNull] CommandDescriptor cmd ) {
-            if( cmd == null ) throw new ArgumentNullException( "cmd" );
+        public void MessageNoAccess([NotNull] CommandDescriptor cmd)
+        {
+            if (cmd == null) throw new ArgumentNullException("cmd");
             Rank reqRank = cmd.MinRank;
-            if( reqRank == null ) {
-                Message( "This command is disabled on the server." );
-            } else {
-                Message( "This command requires {0}+&S rank.",
-                         reqRank.ClassyName );
+            if (reqRank == null)
+            {
+                Message("This command is disabled on the server.");
+            }
+            else
+            {
+                Message("This command requires {0}+&S rank.",
+                         reqRank.ClassyName);
             }
         }
 
 
-        /// <summary> Prints "Unrecognized rank ___" message. </summary>
-        /// <param name="rankName"> Given name, for which no rank was found. </param>
-        public void MessageNoRank( [NotNull] string rankName ) {
-            if( rankName == null ) throw new ArgumentNullException( "rankName" );
-            Message( "Unrecognized rank \"{0}\". See &H/Ranks", rankName );
+        public void MessageNoRank([NotNull] string rankName)
+        {
+            if (rankName == null) throw new ArgumentNullException("rankName");
+            Message("Unrecognized rank \"{0}\". See &H/Ranks", rankName);
         }
 
 
-        /// <summary> Prints "You cannot access files outside the map folder." message. </summary>
-        public void MessageUnsafePath() {
-            Message( "&WYou cannot access files outside the map folder." );
+        public void MessageUnsafePath()
+        {
+            Message("&WYou cannot access files outside the map folder.");
         }
 
 
-        /// <summary> Prints "No zones found matching ___" message. </summary>
-        /// <param name="zoneName"> Given name, for which no zones was found. </param>
-        public void MessageNoZone( [NotNull] string zoneName ) {
-            if( zoneName == null ) throw new ArgumentNullException( "zoneName" );
-            Message( "No zones found matching \"{0}\". See &H/Zones", zoneName );
+        public void MessageNoZone([NotNull] string zoneName)
+        {
+            if (zoneName == null) throw new ArgumentNullException("zoneName");
+            Message("No zones found matching \"{0}\". See &H/Zones", zoneName);
         }
 
 
-        /// <summary> Prints "Unacceptable world name" message, and requirements for world names. </summary>
-        /// <param name="worldName"> Given world name, deemed to be invalid. </param>
-        public void MessageInvalidWorldName( [NotNull] string worldName ) {
-            if( worldName == null ) throw new ArgumentNullException( "worldName" );
-            Message( "Unacceptable world name: \"{0}\"", worldName );
-            Message( "World names must be 1-16 characters long, and only contain letters, numbers, and underscores." );
+        public void MessageInvalidWorldName([NotNull] string worldName)
+        {
+            Message("Unacceptable world name: \"{0}\"", worldName);
+            Message("World names must be 1-16 characters long, and only contain letters, numbers, and underscores.");
         }
 
 
-        /// <summary> Prints "___ is not a valid player name" message. </summary>
-        /// <param name="playerName"> Given player name, deemed to be invalid. </param>
-        public void MessageInvalidPlayerName( [NotNull] string playerName ) {
-            if( playerName == null ) throw new ArgumentNullException( "playerName" );
-            Message( "\"{0}\" is not a valid player name.", playerName );
+        public void MessageInvalidPlayerName([NotNull] string playerName)
+        {
+            Message("\"{0}\" is not a valid player name.", playerName);
         }
 
 
-        /// <summary> Prints "You are muted for ___ longer" message. </summary>
-        public void MessageMuted() {
-            Message( "You are muted for {0} longer.",
-                     Info.TimeMutedLeft.ToMiniString() );
+        public void MessageMuted()
+        {
+            Message("You are muted for {0} longer.",
+                     Info.TimeMutedLeft.ToMiniString());
         }
 
 
-        /// <summary> Prints "Specify a time range up to ___" message </summary>
-        public void MessageMaxTimeSpan() {
-            Message( "Specify a time range up to {0}", DateTimeUtil.MaxTimeSpan.ToMiniString() );
+        public void MessageMaxTimeSpan()
+        {
+            Message("Specify a time range up to {0:0}d.", DateTimeUtil.MaxTimeSpan.TotalDays);
         }
 
         #endregion
@@ -722,10 +1177,12 @@ namespace fCraft {
 
 
         /// <summary> Checks whether this player is currently ignoring a given PlayerInfo.</summary>
-        public bool IsIgnoring( [NotNull] PlayerInfo other ) {
-            if( other == null ) throw new ArgumentNullException( "other" );
-            lock( ignoreLock ) {
-                return ignoreList.Contains( other );
+        public bool IsIgnoring([NotNull] PlayerInfo other)
+        {
+            if (other == null) throw new ArgumentNullException("other");
+            lock (ignoreLock)
+            {
+                return ignoreList.Contains(other);
             }
         }
 
@@ -735,13 +1192,18 @@ namespace fCraft {
         /// <param name="other"> Player to ignore. </param>
         /// <returns> True if the player is now ignored,
         /// false is the player has already been ignored previously. </returns>
-        public bool Ignore( [NotNull] PlayerInfo other ) {
-            if( other == null ) throw new ArgumentNullException( "other" );
-            lock( ignoreLock ) {
-                if( !ignoreList.Contains( other ) ) {
-                    ignoreList.Add( other );
+        public bool Ignore([NotNull] PlayerInfo other)
+        {
+            if (other == null) throw new ArgumentNullException("other");
+            lock (ignoreLock)
+            {
+                if (!ignoreList.Contains(other))
+                {
+                    ignoreList.Add(other);
                     return true;
-                } else {
+                }
+                else
+                {
                     return false;
                 }
             }
@@ -752,19 +1214,24 @@ namespace fCraft {
         /// <param name="other"> PlayerInfo to unignore. </param>
         /// <returns> True if the player is no longer ignored,
         /// false if the player was already not ignored. </returns>
-        public bool Unignore( [NotNull] PlayerInfo other ) {
-            if( other == null ) throw new ArgumentNullException( "other" );
-            lock( ignoreLock ) {
-                return ignoreList.Remove( other );
+        public bool Unignore([NotNull] PlayerInfo other)
+        {
+            if (other == null) throw new ArgumentNullException("other");
+            lock (ignoreLock)
+            {
+                return ignoreList.Remove(other);
             }
         }
 
 
         /// <summary> Returns a list of all currently-ignored players. </summary>
         [NotNull]
-        public PlayerInfo[] IgnoreList {
-            get {
-                lock( ignoreLock ) {
+        public PlayerInfo[] IgnoreList
+        {
+            get
+            {
+                lock (ignoreLock)
+                {
                     return ignoreList.ToArray();
                 }
             }
@@ -775,73 +1242,47 @@ namespace fCraft {
 
         #region Confirmation
 
-        /// <summary> Callback to be called when player types in "/ok" to confirm an action.
-        /// Use Player.Confirm(...) methods to set this. </summary>
         [CanBeNull]
         public ConfirmationCallback ConfirmCallback { get; private set; }
 
-
-        /// <summary> Custom parameter to be passed to Player.ConfirmCallback. </summary>
         [CanBeNull]
-        public object ConfirmParameter { get; private set; }
+        public object ConfirmArgument { get; private set; }
 
+        static void ConfirmCommandCallback([NotNull] Player player, object tag, bool fromConsole)
+        {
+            
+            if (player == null) throw new ArgumentNullException("player");
+            Command cmd = (Command)tag;
+            cmd.Rewind();
+            cmd.IsConfirmed = true;
+            CommandManager.ParseCommand(player, cmd, fromConsole);
+        }
 
         /// <summary> Time when the confirmation was requested. UTC. </summary>
         public DateTime ConfirmRequestTime { get; private set; }
-
-
-        static void ConfirmCommandCallback( [NotNull] Player player, object tag, bool fromConsole ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            CommandReader cmd = (CommandReader)tag;
-            cmd.Rewind();
-            cmd.IsConfirmed = true;
-            CommandManager.ParseCommand( player, cmd, fromConsole );
-        }
-
 
         /// <summary> Request player to confirm continuing with the command.
         /// Player is prompted to type "/ok", and when he/she does,
         /// the command is called again with IsConfirmed flag set. </summary>
         /// <param name="cmd"> Command that needs confirmation. </param>
         /// <param name="message"> Message to print before "Type /ok to continue". </param>
-        /// <param name="formatArgs"> Optional String.Format() arguments, for the message. </param>
-        /// <exception cref="ArgumentNullException"> cmd, message, or formatArgs is null. </exception>
-        [StringFormatMethod( "message" )]
-        public void Confirm( [NotNull] CommandReader cmd, [NotNull] string message, [NotNull] params object[] formatArgs ) {
-            Confirm( ConfirmCommandCallback, cmd, message, formatArgs );
+        /// <param name="args"> Optional String.Format() arguments, for the message. </param>
+        [StringFormatMethod("message")]
+        public void Confirm([NotNull] Command cmd, [NotNull] string message, [NotNull] params object[] args)
+        {
+            Confirm(ConfirmCommandCallback, cmd, message, args);
         }
 
-
-        /// <summary> Request player to confirm an action.
-        /// Player is prompted to type "/ok", and when he/she does, custom callback will be called </summary>
-        /// <param name="callback"> Method to call when player confirms. </param>
-        /// <param name="callbackParameter"> Argument to pass to the callback. May be null. </param>
-        /// <param name="message"> Message to print before "Type /ok to continue". </param>
-        /// <param name="formatArgs"> Optional String.Format() arguments, for the message. </param>
-        /// <exception cref="ArgumentNullException"> callback, message, or formatArgs is null. </exception>
-        [StringFormatMethod( "message" )]
-        public void Confirm( [NotNull] ConfirmationCallback callback, [CanBeNull] object callbackParameter,
-                             [NotNull] string message, [NotNull] params object[] formatArgs ) {
-            if( callback == null ) throw new ArgumentNullException( "callback" );
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( formatArgs == null ) throw new ArgumentNullException( "formatArgs" );
+        [StringFormatMethod("message")]
+        public void Confirm([NotNull] ConfirmationCallback callback, [CanBeNull] object arg, [NotNull] string message, [NotNull] params object[] args)
+        {
+            if (callback == null) throw new ArgumentNullException("callback");
+            if (message == null) throw new ArgumentNullException("message");
+            if (args == null) throw new ArgumentNullException("args");
             ConfirmCallback = callback;
-            ConfirmParameter = callbackParameter;
+            ConfirmArgument = arg;
             ConfirmRequestTime = DateTime.UtcNow;
-            Message( "{0} Type &H/ok&S to continue.", String.Format( message, formatArgs ) );
-        }
-
-
-        /// <summary> Cancels any pending confirmation (/ok) prompt. </summary>
-        /// <returns> True if a confirmation prompt was pending; otherwise false. </returns>
-        public bool ConfirmCancel() {
-            if( ConfirmCallback != null ) {
-                ConfirmCallback = null;
-                ConfirmParameter = null;
-                return true;
-            } else {
-                return false;
-            }
+            Message("{0} Type &H/ok&S to continue.", String.Format(message, args));
         }
 
         #endregion
@@ -849,38 +1290,34 @@ namespace fCraft {
 
         #region AntiSpam
 
-        /// <summary> Number of messages in a AntiSpamInterval seconds required to trigger the anti-spam filter </summary>
         public static int AntispamMessageCount = 3;
-
-        /// <summary> Interval in seconds to record number of message for anti-spam filter </summary>
         public static int AntispamInterval = 4;
+        readonly Queue<DateTime> spamChatLog = new Queue<DateTime>(AntispamMessageCount);
 
-        readonly Queue<DateTime> spamChatLog = new Queue<DateTime>( AntispamMessageCount );
-
-
-        internal bool DetectChatSpam() {
-            if( IsSuper || AntispamMessageCount < 1 || AntispamInterval < 1 ) return false;
-            if( spamChatLog.Count >= AntispamMessageCount ) {
+        internal bool DetectChatSpam()
+        {
+            if (IsSuper) return false;
+            if (spamChatLog.Count >= AntispamMessageCount)
+            {
                 DateTime oldestTime = spamChatLog.Dequeue();
-                if( DateTime.UtcNow.Subtract( oldestTime ).TotalSeconds < AntispamInterval ) {
+                if (DateTime.UtcNow.Subtract(oldestTime).TotalSeconds < AntispamInterval)
+                {
                     muteWarnings++;
-                    int maxMuteWarnings = ConfigKey.AntispamMaxWarnings.GetInt();
-                    if( maxMuteWarnings > 0 && muteWarnings > maxMuteWarnings ) {
-                        KickNow( "You were kicked for repeated spamming.", LeaveReason.MessageSpamKick );
-                        Server.Message( "&WPlayer {0}&W was kicked for spamming.", ClassyName );
-                    } else {
-                        TimeSpan autoMuteDuration = TimeSpan.FromSeconds( ConfigKey.AntispamMuteDuration.GetInt() );
-                        if( autoMuteDuration > TimeSpan.Zero ) {
-                            Info.Mute( Console, autoMuteDuration, false, true );
-                            Message( "&WYou have been muted for {0} seconds. Slow down.", autoMuteDuration );
-                        } else {
-                            Message( "&WYou are sending messages too quickly. Slow down." );
-                        }
+                    if (muteWarnings > ConfigKey.AntispamMaxWarnings.GetInt())
+                    {
+                        KickNow("You were kicked for repeated spamming.", LeaveReason.MessageSpamKick);
+                        Server.Message("&W{0}&S was kicked for repeated spamming.", ClassyName);
+                    }
+                    else
+                    {
+                        TimeSpan autoMuteDuration = TimeSpan.FromSeconds(ConfigKey.AntispamMuteDuration.GetInt());
+                        Info.Mute(Console, autoMuteDuration, false, true);
+                        Message("You have been muted for {0} seconds. Slow down.", autoMuteDuration);
                     }
                     return true;
                 }
             }
-            spamChatLog.Enqueue( DateTime.UtcNow );
+            spamChatLog.Enqueue(DateTime.UtcNow);
             return false;
         }
 
@@ -904,124 +1341,290 @@ namespace fCraft {
 
         /// <summary> Handles manually-placed/deleted blocks.
         /// Returns true if player's action should result in a kick. </summary>
-        public bool PlaceBlock( Vector3I coord, ClickAction action, Block type ) {
-            if( World == null ) PlayerOpException.ThrowNoWorld( this );
+        public bool PlaceBlock(Vector3I coord, ClickAction action, Block type)
+        {
+            if (World == null) PlayerOpException.ThrowNoWorld(this);
             Map map = WorldMap;
             LastUsedBlockType = type;
 
-            Vector3I coordBelow = new Vector3I( coord.X, coord.Y, coord.Z - 1 );
+            Vector3I coordBelow = new Vector3I(coord.X, coord.Y, coord.Z - 1);
 
-            // check if player is frozen or too far away to legitimately place a block
-            if( Info.IsFrozen ||
-                Math.Abs( coord.X * 32 - Position.X ) > MaxBlockPlacementRange ||
-                Math.Abs( coord.Y * 32 - Position.Y ) > MaxBlockPlacementRange ||
-                Math.Abs( coord.Z * 32 - Position.Z ) > MaxBlockPlacementRange ) {
-                RevertBlockNow( coord );
+            // check if player is frozen
+            if (Info.IsFrozen)
+            {
+                RevertBlockNow(coord);
                 return false;
             }
 
-            if( IsSpectating ) {
-                RevertBlockNow( coord );
-                Message( "You cannot build or delete while spectating." );
+            //if too far away
+            if ((Math.Abs(coord.X * 32 - Position.X) > MaxBlockPlacementRange ||
+                Math.Abs(coord.Y * 32 - Position.Y) > MaxBlockPlacementRange ||
+                Math.Abs(coord.Z * 32 - Position.Z) > MaxBlockPlacementRange) && !this.hasCustomClickDistance)
+            {
+                RevertBlockNow(coord);
                 return false;
             }
 
-            if( World.IsLocked ) {
-                RevertBlockNow( coord );
-                Message( "This map is currently locked (read-only)." );
+            if (Info.isDoorChecking)
+            {
+                RevertBlockNow(coord);
+            }
+
+            #region CaptureTheFlag
+            if (Info.placingBlueFlag)
+            {
+                Info.placingBlueFlag = false;
+                if (World.Map.GetBlock(coord) != Block.Blue)
+                {
+                    Message("The blue flag must be placed on blue wool! You are trying to place the flag on {0}.", World.Map.GetBlock(coord).ToString());
+                    RevertBlockNow(coord);
+                    return false;
+                }
+
+                World.blueFlag = coord;
+                Message("Blue flag placed!");
+                RevertBlockNow(coord);
+            }
+            if (Info.placingRedFlag)
+            {
+                Info.placingRedFlag = false;
+                if (World.Map.GetBlock(coord) != Block.Red)
+                {
+                    Message("The red flag must be placed on red wool! You are trying to place the flag on {0}.", World.Map.GetBlock(coord).ToString());
+                    RevertBlockNow(coord);
+                    return false;
+                }
+
+                World.redFlag = coord;
+                Message("Red flag placed!");
+                RevertBlockNow(coord);
+            }
+
+            if (Info.isPlayingCTF)
+            {
+                if (Info.CTFRedTeam)
+                {
+                    if (coord == World.blueFlag)
+                    {
+                        if (World.blueFlagTaken)
+                        {
+                            //flag already taken, ignore this block
+                            return false;
+                        }
+
+                        //at this point, the player is on the red team and has stolen the blue team flag
+                        Info.hasBlueFlag = true;
+                        World.blueFlagTaken = true;
+                    }
+
+                    if (coord == World.redFlag)
+                    {
+                        Message("&eYou cannot steal your own flag!");
+                        RevertBlockNow(coord);
+                    }
+                }
+
+                if (Info.CTFBlueTeam)
+                {
+                    if (coord == World.redFlag)
+                    {
+                        if (World.redFlagTaken)
+                        {
+                            //flag already taken, ignore this block
+                            return false;
+                        }
+
+                        //at this point, the player is on the blue team and has stolen the red team flag
+                        Info.hasRedFlag = true;
+                        World.redFlagTaken = true;
+                    }
+
+                    if (coord == World.blueFlag)
+                    {
+                        Message("&eYou cannot steal your own flag!");
+                        RevertBlockNow(coord);
+                    }
+                }
+            }
+
+            #endregion
+
+            //if in a command using markSets
+            if (markSet > 0)
+            {
+                //if it has been over 10 seconds, stop selection process
+                if ((DateTime.Now - selectionTime).TotalSeconds > 10)
+                {
+                    markSet = 0;
+                    selectedMarks.Clear();
+
+                }
+                else
+                {
+                    selectedMarks.Add(coord);
+                    RevertBlockNow(coord);
+
+                    SelectMarks();
+                }
+            }
+
+            if (IsSpectating)
+            {
+                Message("You cannot build or delete while spectating.");
+                RevertBlockNow(coord);
                 return false;
             }
 
-            if( CheckBlockSpam() ) return true;
+            if (World.IsLocked)
+            {
+                RevertBlockNow(coord);
+                Message("This map is currently locked (read-only).");
+                return false;
+            }
+
+            if (CheckBlockSpam()) return true;
 
             BlockChangeContext context = BlockChangeContext.Manual;
-            if( IsPainting && action == ClickAction.Delete ) {
-                context |= BlockChangeContext.Replaced;
+            if (IsPainting && action == ClickAction.Delete)
+            {
+                context = BlockChangeContext.Replaced;
             }
 
-            // binding and painting
-            if( action == ClickAction.Delete && !IsPainting ) {
+            // bindings
+            bool requiresUpdate = (type != bindings[(byte)type] || IsPainting);
+            if (action == ClickAction.Delete && !IsPainting)
+            {
                 type = Block.Air;
             }
-            bool requiresUpdate = ( type != GetBind( type ) || IsPainting );
-            type = GetBind( type );
+            type = bindings[(byte)type];
 
             // selection handling
-            if( SelectionMarksExpected > 0 && !DisableClickToMark ) {
-                RevertBlockNow( coord );
-                SelectionAddMark( coord, true, true );
+            if (SelectionMarksExpected > 0)
+            {
+                RevertBlockNow(coord);
+                SelectionAddMark(coord, true);
                 return false;
             }
 
             CanPlaceResult canPlaceResult;
-            if( type == Block.Slab && coord.Z > 0 && map.GetBlock( coordBelow ) == Block.Slab ) {
+            if (type == Block.Stair && coord.Z > 0 && map.GetBlock(coordBelow) == Block.Stair)
+            {
                 // stair stacking
-                canPlaceResult = CanPlace( map, coordBelow, Block.DoubleSlab, context );
-            } else {
+                canPlaceResult = CanPlace(map, coordBelow, Block.DoubleStair, context);
+            }
+            else if (type == Block.CobbleSlab && coord.Z > 0 && map.GetBlock(coordBelow) == Block.CobbleSlab)
+            {
+                //cobbleslab stacking
+                canPlaceResult = CanPlace(map, coordBelow, Block.Cobblestone, context);
+            }
+            else
+            {
                 // normal placement
-                canPlaceResult = CanPlace( map, coord, type, context );
+                canPlaceResult = CanPlace(map, coord, type, context);
             }
 
             // if all is well, try placing it
-            switch( canPlaceResult ) {
+            switch (canPlaceResult)
+            {
                 case CanPlaceResult.Allowed:
                     BlockUpdate blockUpdate;
-                    if( type == Block.Slab && coord.Z > 0 && map.GetBlock( coordBelow ) == Block.Slab ) {
+                    if (type == Block.Stair && coord.Z > 0 && map.GetBlock(coordBelow) == Block.Stair)
+                    {
                         // handle stair stacking
-                        blockUpdate = new BlockUpdate( this, coordBelow, Block.DoubleSlab );
-                        Info.ProcessBlockPlaced( (byte)Block.DoubleSlab );
-                        map.QueueUpdate( blockUpdate );
-                        RaisePlayerPlacedBlockEvent( this, World.Map, coordBelow, Block.Slab, Block.DoubleSlab, context );
-                        RevertBlockNow( coord );
-                        SendNow( Packet.MakeSetBlock( coordBelow, Block.DoubleSlab ) );
-
-                    } else {
+                        blockUpdate = new BlockUpdate(this, coordBelow, Block.DoubleStair);
+                        Info.ProcessBlockPlaced((byte)Block.DoubleStair);
+                        map.QueueUpdate(blockUpdate);
+                        RaisePlayerPlacedBlockEvent(this, World.Map, coordBelow, Block.Stair, Block.DoubleStair, context);
+                        SendNow(PacketWriter.MakeSetBlock(coordBelow, Block.DoubleStair));
+                        RevertBlockNow(coord);
+                        break;
+                    }
+                    else if (type == Block.CobbleSlab && coord.Z > 0 && map.GetBlock(coordBelow) == Block.CobbleSlab)
+                    {
+                        // cobbleslab stacking
+                        blockUpdate = new BlockUpdate(this, coordBelow, Block.Cobblestone);
+                        Info.ProcessBlockPlaced((byte)Block.Cobblestone);
+                        map.QueueUpdate(blockUpdate);
+                        RaisePlayerPlacedBlockEvent(this, World.Map, coordBelow, Block.CobbleSlab, Block.Cobblestone, context);
+                        SendNow(PacketWriter.MakeSetBlock(coordBelow, Block.Cobblestone));
+                        RevertBlockNow(coord);
+                        break;
+                    }
+                    else
+                    {
                         // handle normal blocks
-                        blockUpdate = new BlockUpdate( this, coord, type );
-                        Info.ProcessBlockPlaced( (byte)type );
-                        Block old = map.GetBlock( coord );
-                        map.QueueUpdate( blockUpdate );
-                        RaisePlayerPlacedBlockEvent( this, World.Map, coord, old, type, context );
-                        if( requiresUpdate || RelayAllUpdates ) {
-                            SendNow( Packet.MakeSetBlock( coord, type ) );
+                        blockUpdate = new BlockUpdate(this, coord, type);
+                        Info.ProcessBlockPlaced((byte)type);
+                        Block old = map.GetBlock(coord);
+                        map.QueueUpdate(blockUpdate);
+                        RaisePlayerPlacedBlockEvent(this, World.Map, coord, old, type, context);
+                        if (requiresUpdate || RelayAllUpdates)
+                        {
+                            SendNow(PacketWriter.MakeSetBlock(coord, type));
                         }
                     }
                     break;
 
                 case CanPlaceResult.BlocktypeDenied:
-                    Message( "&WYou are not permitted to affect this block type." );
-                    RevertBlockNow( coord );
+                    Message("&WYou are not permitted to affect this block type.");
+                    RevertBlockNow(coord);
                     break;
 
                 case CanPlaceResult.RankDenied:
-                    Message( "&WYour rank is not allowed to build." );
-                    RevertBlockNow( coord );
+                    if (World.gunPhysics == true && GunMode == true)
+                    {
+                        RevertBlockNow(coord);
+                        break;
+                    }
+                    else
+                    {
+                        Message("&WYour rank is not allowed to build.");
+                        RevertBlockNow(coord);
+                        break;
+                    }
+
+                case CanPlaceResult.Revert:
+                    RevertBlockNow(coord);
                     break;
 
                 case CanPlaceResult.WorldDenied:
-                    switch( World.BuildSecurity.CheckDetailed( Info ) ) {
+                    switch (World.BuildSecurity.CheckDetailed(Info))
+                    {
                         case SecurityCheckResult.RankTooLow:
-                            Message( "&WYour rank is not allowed to build in this world." );
-                            break;
+                        case SecurityCheckResult.RankTooHigh:
+                            if (World.gunPhysics == true && GunMode == true)
+                            {
+                                RevertBlockNow(coord);
+                                break;
+                            }
+                            else
+                            {
+                                Message("&WYour rank is not allowed to build in this world.");
+                                RevertBlockNow(coord);
+                                break;
+                            }
                         case SecurityCheckResult.BlackListed:
-                            Message( "&WYou are not allowed to build in this world." );
+                            Message("&WYou are not allowed to build in this world.");
                             break;
                     }
-                    RevertBlockNow( coord );
+                    RevertBlockNow(coord);
                     break;
 
                 case CanPlaceResult.ZoneDenied:
-                    Zone deniedZone = WorldMap.Zones.FindDenied( coord, this );
-                    if( deniedZone != null ) {
-                        Message( "&WYou are not allowed to build in zone \"{0}\".", deniedZone.Name );
-                    } else {
-                        Message( "&WYou are not allowed to build here." );
+                    Zone deniedZone = WorldMap.Zones.FindDenied(coord, this);
+                    if (deniedZone != null)
+                    {
+                        Message(deniedZone.Message ?? string.Format("&WYou are not allowed to build in zone \"{0}\".", deniedZone.Name));
                     }
-                    RevertBlockNow( coord );
+                    else
+                    {
+                        Message("&WYou are not allowed to build here.");
+                    }
+                    RevertBlockNow(coord);
                     break;
 
                 case CanPlaceResult.PluginDenied:
-                    RevertBlockNow( coord );
+                    RevertBlockNow(coord);
                     break;
 
                 //case CanPlaceResult.PluginDeniedNoUpdate:
@@ -1031,47 +1634,68 @@ namespace fCraft {
         }
 
 
-        /// <summary> Sends a block change to THIS PLAYER ONLY. Does not affect the map. </summary>
-        /// <param name="coords"> Coordinates of the block. </param>
-        /// <param name="block"> Block type to send. </param>
-        public void SendBlock( Vector3I coords, Block block ) {
-            if( !WorldMap.InBounds( coords ) ) throw new ArgumentOutOfRangeException( "coords" );
-            SendLowPriority( Packet.MakeSetBlock( coords, block ) );
-        }
-
-
-        /// <summary> Gets the block from given location in player's world,
+        /// <summary>  Gets the block from given location in player's world,
         /// and sends it (async) to the player.
         /// Used to undo player's attempted block placement/deletion. </summary>
-        public void RevertBlock( Vector3I coords ) {
-            SendLowPriority( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ) ) );
+        public void RevertBlock(Vector3I coords)
+        {
+            SendLowPriority(PacketWriter.MakeSetBlock(coords, WorldMap.GetBlock(coords)));
         }
 
+        public void Kill(World inWorld, string message)
+        {
+            LastTimeKilled = DateTime.UtcNow;
+            inWorld.Players.Message(message);
+            TeleportTo(inWorld.Map.Spawn);
+        }
 
-        // Gets the block from given location in player's world, and sends it (sync) to the player.
-        // Used to undo player's attempted block placement/deletion.
-        // To avoid threading issues, only use this from this player's IoThread.
-        void RevertBlockNow( Vector3I coords ) {
-            SendNow( Packet.MakeSetBlock( coords, WorldMap.GetBlock( coords ) ) );
+        public void KillCTF(World inWorld, string message)
+        {
+            LastTimeKilled = DateTime.UtcNow;
+            inWorld.Players.Message(message);
+
+            if (Info.CTFRedTeam)
+            {
+                TeleportTo(inWorld.redCTFSpawn.ToPlayerCoords());
+            }
+            else if (Info.CTFBlueTeam)
+            {
+                TeleportTo(inWorld.blueCTFSpawn.ToPlayerCoords());
+            }
+            else
+            {
+                TeleportTo(inWorld.Map.Spawn);
+            }
+        }
+
+        /// <summary>  Gets the block from given location in player's world, and sends it (sync) to the player.
+        /// Used to undo player's attempted block placement/deletion.
+        /// To avoid threading issues, only use this from this player's IoThread. </summary>
+        void RevertBlockNow(Vector3I coords)
+        {
+            SendNow(PacketWriter.MakeSetBlock(coords, usesCPE ? WorldMap.GetBlock(coords) : Map.GetFallbackBlock(WorldMap.GetBlock(coords))));
         }
 
 
         // returns true if the player is spamming and should be kicked.
-        bool CheckBlockSpam() {
-            if( Info.Rank.AntiGriefBlocks == 0 || Info.Rank.AntiGriefSeconds == 0 ) return false;
-            if( spamBlockLog.Count >= Info.Rank.AntiGriefBlocks ) {
+        bool CheckBlockSpam()
+        {
+            if (Info.Rank.AntiGriefBlocks == 0 || Info.Rank.AntiGriefSeconds == 0) return false;
+            if (spamBlockLog.Count >= Info.Rank.AntiGriefBlocks)
+            {
                 DateTime oldestTime = spamBlockLog.Dequeue();
-                double spamTimer = DateTime.UtcNow.Subtract( oldestTime ).TotalSeconds;
-                if( spamTimer < Info.Rank.AntiGriefSeconds ) {
-                    KickNow( "You were kicked by antigrief system. Slow down.", LeaveReason.BlockSpamKick );
-                    Server.Message( "{0}&W was kicked for suspected griefing.", ClassyName );
-                    Logger.Log( LogType.SuspiciousActivity,
+                double spamTimer = DateTime.UtcNow.Subtract(oldestTime).TotalSeconds;
+                if (spamTimer < Info.Rank.AntiGriefSeconds)
+                {
+                    KickNow("You were kicked by antigrief system. Slow down.", LeaveReason.BlockSpamKick);
+                    Server.Message("{0}&W was kicked for suspected griefing.", ClassyName);
+                    Logger.Log(LogType.SuspiciousActivity,
                                 "{0} was kicked for block spam ({1} blocks in {2} seconds)",
-                                Name, Info.Rank.AntiGriefBlocks, spamTimer );
+                                Name, Info.Rank.AntiGriefBlocks, spamTimer);
                     return true;
                 }
             }
-            spamBlockLog.Enqueue( DateTime.UtcNow );
+            spamBlockLog.Enqueue(DateTime.UtcNow);
             return false;
         }
 
@@ -1080,31 +1704,39 @@ namespace fCraft {
 
         #region Binding
 
-        readonly Block[] bindings = new Block[256];
+        readonly Block[] bindings = new Block[66];
 
-        public void Bind( Block type, Block replacement ) {
+        public void Bind(Block type, Block replacement)
+        {
             bindings[(byte)type] = replacement;
         }
 
-        public void ResetBind( Block type ) {
+        public void ResetBind(Block type)
+        {
             bindings[(byte)type] = type;
         }
 
-        public void ResetBind( [NotNull] params Block[] types ) {
-            if( types == null ) throw new ArgumentNullException( "types" );
-            foreach( Block type in types ) {
-                ResetBind( type );
+        public void ResetBind([NotNull] params Block[] types)
+        {
+            if (types == null) throw new ArgumentNullException("types");
+            foreach (Block type in types)
+            {
+                ResetBind(type);
             }
         }
 
-        public Block GetBind( Block type ) {
+        public Block GetBind(Block type)
+        {
             return bindings[(byte)type];
         }
 
-        public void ResetAllBinds() {
-            foreach( Block block in Enum.GetValues( typeof( Block ) ) ) {
-                if( block != Block.None ) {
-                    ResetBind( block );
+        public void ResetAllBinds()
+        {
+            foreach (Block block in Enum.GetValues(typeof(Block)))
+            {
+                if (block != Block.Undefined)
+                {
+                    ResetBind(block);
                 }
             }
         }
@@ -1115,95 +1747,129 @@ namespace fCraft {
         #region Permission Checks
 
         /// <summary> Returns true if player has ALL of the given permissions. </summary>
-        public bool Can( [NotNull] params Permission[] permissions ) {
-            if( permissions == null ) throw new ArgumentNullException( "permissions" );
-            return IsSuper || permissions.All( Info.Rank.Can );
+        public bool Can([NotNull] params Permission[] permissions)
+        {
+            if (permissions == null) throw new ArgumentNullException("permissions");
+            return IsSuper || permissions.All(Info.Rank.Can);
         }
 
 
         /// <summary> Returns true if player has ANY of the given permissions. </summary>
-        public bool CanAny( [NotNull] params Permission[] permissions ) {
-            if( permissions == null ) throw new ArgumentNullException( "permissions" );
-            return IsSuper || permissions.Any( Info.Rank.Can );
+        public bool CanAny([NotNull] params Permission[] permissions)
+        {
+            if (permissions == null) throw new ArgumentNullException("permissions");
+            return IsSuper || permissions.Any(Info.Rank.Can);
         }
 
 
         /// <summary> Returns true if player has the given permission. </summary>
-        public bool Can( Permission permission ) {
-            return IsSuper || Info.Rank.Can( permission );
+        public bool Can(Permission permission)
+        {
+            return IsSuper || Info.Rank.Can(permission);
         }
 
 
         /// <summary> Returns true if player has the given permission,
         /// and is allowed to affect players of the given rank. </summary>
-        public bool Can( Permission permission, [NotNull] Rank other ) {
-            if( other == null ) throw new ArgumentNullException( "other" );
-            return IsSuper || Info.Rank.Can( permission, other );
+        public bool Can(Permission permission, [NotNull] Rank other)
+        {
+            if (other == null) throw new ArgumentNullException("other");
+            return IsSuper || Info.Rank.Can(permission, other);
         }
 
 
         /// <summary> Returns true if player is allowed to run
         /// draw commands that affect a given number of blocks. </summary>
-        public bool CanDraw( int volume ) {
-            if( volume < 0 ) throw new ArgumentOutOfRangeException( "volume" );
+        public bool CanDraw(int volume)
+        {
+            if (volume < 0) throw new ArgumentOutOfRangeException("volume");
             return IsSuper || (Info.Rank.DrawLimit == 0) || (volume <= Info.Rank.DrawLimit);
         }
 
 
         /// <summary> Returns true if player is allowed to join a given world. </summary>
-        public bool CanJoin( [NotNull] World worldToJoin ) {
-            if( worldToJoin == null ) throw new ArgumentNullException( "worldToJoin" );
-            return IsSuper || worldToJoin.AccessSecurity.Check( Info );
+        public bool CanJoin([NotNull] World worldToJoin)
+        {
+            if (worldToJoin == null) throw new ArgumentNullException("worldToJoin");
+            return IsSuper || worldToJoin.AccessSecurity.Check(Info);
         }
 
 
         /// <summary> Checks whether player is allowed to place a block on the current world at given coordinates.
         /// Raises the PlayerPlacingBlock event. </summary>
-        public CanPlaceResult CanPlace( [NotNull] Map map, Vector3I coords, Block newBlock, BlockChangeContext context ) {
-            if( map == null ) throw new ArgumentNullException( "map" );
+        public CanPlaceResult CanPlace([NotNull] Map map, Vector3I coords, Block newBlock, BlockChangeContext context)
+        {
+            if (map == null) throw new ArgumentNullException("map");
             CanPlaceResult result;
 
             // check whether coordinate is in bounds
-            Block oldBlock = map.GetBlock( coords );
-            if( oldBlock == Block.None ) {
+            Block oldBlock = map.GetBlock(coords);
+            if (oldBlock == Block.Undefined)
+            {
                 result = CanPlaceResult.OutOfBounds;
+                goto eventCheck;
+            }
+            
+            //check classicube blocks and convert if necessary
+            if (!usesCPE && newBlock > Block.Obsidian) 
+            {
+                newBlock = Map.GetFallbackBlock(newBlock);
+                result = CanPlaceResult.Allowed;
                 goto eventCheck;
             }
 
             // check special blocktypes
-            if( (newBlock == Block.Admincrete && !Can( Permission.PlaceAdmincrete )) ||
-                (newBlock == Block.Water || newBlock == Block.StillWater) && !Can( Permission.PlaceWater ) ||
-                (newBlock == Block.Lava || newBlock == Block.StillLava) && !Can( Permission.PlaceLava ) ) {
+            if (newBlock == Block.Admincrete && !Can(Permission.PlaceAdmincrete))
+            {
+                result = CanPlaceResult.BlocktypeDenied;
+                goto eventCheck;
+            }
+            else if ((newBlock == Block.Water || newBlock == Block.StillWater) && !Can(Permission.PlaceWater))
+            {
+                result = CanPlaceResult.BlocktypeDenied;
+                goto eventCheck;
+            }
+            else if ((newBlock == Block.Lava || newBlock == Block.StillLava) && !Can(Permission.PlaceLava))
+            {
                 result = CanPlaceResult.BlocktypeDenied;
                 goto eventCheck;
             }
 
             // check admincrete-related permissions
-            if( oldBlock == Block.Admincrete && !Can( Permission.DeleteAdmincrete ) ) {
+            if (oldBlock == Block.Admincrete && !Can(Permission.DeleteAdmincrete))
+            {
                 result = CanPlaceResult.BlocktypeDenied;
                 goto eventCheck;
             }
 
             // check zones & world permissions
-            PermissionOverride zoneCheckResult = map.Zones.Check( coords, this );
-            if( zoneCheckResult == PermissionOverride.Allow ) {
+            PermissionOverride zoneCheckResult = map.Zones.Check(coords, this);
+            if (zoneCheckResult == PermissionOverride.Allow)
+            {
                 result = CanPlaceResult.Allowed;
                 goto eventCheck;
-            } else if( zoneCheckResult == PermissionOverride.Deny ) {
+            }
+            else if (zoneCheckResult == PermissionOverride.Deny)
+            {
                 result = CanPlaceResult.ZoneDenied;
                 goto eventCheck;
             }
 
             // Check world permissions
             World mapWorld = map.World;
-            if( mapWorld != null ) {
-                switch( mapWorld.BuildSecurity.CheckDetailed( Info ) ) {
+            if (mapWorld != null)
+            {
+                switch (mapWorld.BuildSecurity.CheckDetailed(Info))
+                {
                     case SecurityCheckResult.Allowed:
                         // Check world's rank permissions
-                        if( (Can( Permission.Build ) || newBlock == Block.Air) &&
-                            (Can( Permission.Delete ) || oldBlock == Block.Air) ) {
+                        if ((Can(Permission.Build) || newBlock == Block.Air) &&
+                            (Can(Permission.Delete) || oldBlock == Block.Air))
+                        {
                             result = CanPlaceResult.Allowed;
-                        } else {
+                        }
+                        else
+                        {
                             result = CanPlaceResult.RankDenied;
                         }
                         break;
@@ -1216,56 +1882,55 @@ namespace fCraft {
                         result = CanPlaceResult.WorldDenied;
                         break;
                 }
-            } else {
+            }
+            else
+            {
                 result = CanPlaceResult.Allowed;
             }
 
         eventCheck:
             var handler = PlacingBlock;
-            if( handler == null ) return result;
+            if (handler == null) return result;
 
-            var e = new PlayerPlacingBlockEventArgs( this, map, coords, oldBlock, newBlock, context, result );
-            handler( null, e );
+            var e = new PlayerPlacingBlockEventArgs(this, map, coords, oldBlock, newBlock, context, result);
+            handler(null, e);
             return e.Result;
         }
 
 
         /// <summary> Whether this player can currently see another player as being online.
+        /// Visibility is determined by whether the other player is hiding or spectating.
         /// Players can always see themselves. Super players (e.g. Console) can see all.
         /// Hidden players can only be seen by those of sufficient rank. </summary>
-        public bool CanSee( [NotNull] Player other ) {
-            if( other == null ) throw new ArgumentNullException( "other" );
+        public bool CanSee([NotNull] Player other)
+        {
+            if (other == null) throw new ArgumentNullException("other");
             return other == this ||
                    IsSuper ||
                    !other.Info.IsHidden ||
-                   Info.Rank.CanSee( other.Info.Rank );
+                   Info.Rank.CanSee(other.Info.Rank);
         }
 
 
         /// <summary> Whether this player can currently see another player moving.
         /// Behaves very similarly to CanSee method, except when spectating:
-        /// Spectators and spectatee cannot see each other.
-        /// Spectators can only be seen by those who'd be able to see them hidden. </summary>
-        public bool CanSeeMoving( [NotNull] Player otherPlayer ) {
-            if( otherPlayer == null ) throw new ArgumentNullException( "otherPlayer" );
-            // Check if player can see otherPlayer while they hide/spectate, and whether otherPlayer is spectating player
-            bool canSeeOther = (otherPlayer.spectatedPlayer == null && !otherPlayer.Info.IsHidden) ||
-                               (otherPlayer.spectatedPlayer != this && Info.Rank.CanSee( otherPlayer.Info.Rank ));
-
-            // Check if player is spectating otherPlayer, or if they're spectating the same target
-            bool hideOther = (spectatedPlayer == otherPlayer) ||
-                             (spectatedPlayer != null && spectatedPlayer == otherPlayer.spectatedPlayer);
-
-            return otherPlayer == this || // players can always "see" self
-                   IsSuper ||             // super-players have ALL permissions
-                   canSeeOther && !hideOther;
+        /// Players can never see someone who's spectating them. If other player is spectating
+        /// someone else, they are treated as hidden and can only be seen by those of sufficient rank. </summary>
+        public bool CanSeeMoving([NotNull] Player other)
+        {
+            if (other == null) throw new ArgumentNullException("other");
+            return other == this ||
+                   IsSuper ||
+                   other.spectatedPlayer == null && !other.Info.IsHidden ||
+                   (other.spectatedPlayer != this && Info.Rank.CanSee(other.Info.Rank));
         }
 
 
         /// <summary> Whether this player should see a given world on the /Worlds list by default. </summary>
-        public bool CanSee( [NotNull] World world ) {
-            if( world == null ) throw new ArgumentNullException( "world" );
-            return CanJoin( world ) && !world.IsHidden;
+        public bool CanSee([NotNull] World world)
+        {
+            if (world == null) throw new ArgumentNullException("world");
+            return CanJoin(world) && !world.IsHidden;
         }
 
         #endregion
@@ -1276,66 +1941,70 @@ namespace fCraft {
         readonly LinkedList<UndoState> undoStack = new LinkedList<UndoState>();
         readonly LinkedList<UndoState> redoStack = new LinkedList<UndoState>();
 
-
-        [CanBeNull]
-        internal UndoState RedoPop() {
-            if( redoStack.Count > 0 ) {
+        internal UndoState RedoPop()
+        {
+            if (redoStack.Count > 0)
+            {
                 var lastNode = redoStack.Last;
                 redoStack.RemoveLast();
                 return lastNode.Value;
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
 
-
-        [NotNull]
-        internal UndoState RedoBegin( [CanBeNull] DrawOperation op ) {
+        internal UndoState RedoBegin(DrawOperation op)
+        {
             LastDrawOp = op;
-            UndoState newState = new UndoState( op );
-            undoStack.AddLast( newState );
+            UndoState newState = new UndoState(op);
+            undoStack.AddLast(newState);
             return newState;
         }
 
-
-        [NotNull]
-        internal UndoState UndoBegin( [CanBeNull] DrawOperation op ) {
+        internal UndoState UndoBegin(DrawOperation op)
+        {
             LastDrawOp = op;
-            UndoState newState = new UndoState( op );
-            redoStack.AddLast( newState );
+            UndoState newState = new UndoState(op);
+            redoStack.AddLast(newState);
             return newState;
         }
 
-
-        [CanBeNull]
-        public UndoState UndoPop() {
-            if( undoStack.Count > 0 ) {
+        public UndoState UndoPop()
+        {
+            if (undoStack.Count > 0)
+            {
                 var lastNode = undoStack.Last;
                 undoStack.RemoveLast();
                 return lastNode.Value;
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
 
-
-        [NotNull]
-        public UndoState DrawBegin( [CanBeNull] DrawOperation op ) {
+        public UndoState DrawBegin(DrawOperation op)
+        {
             LastDrawOp = op;
-            UndoState newState = new UndoState( op );
-            undoStack.AddLast( newState );
-            if( undoStack.Count > ConfigKey.MaxUndoStates.GetInt() ) {
+            UndoState newState = new UndoState(op);
+            undoStack.AddLast(newState);
+            if (undoStack.Count > ConfigKey.MaxUndoStates.GetInt())
+            {
                 undoStack.RemoveFirst();
             }
             redoStack.Clear();
             return newState;
         }
 
-        public void UndoClear() {
+        public void UndoClear()
+        {
             undoStack.Clear();
         }
 
-        public void RedoClear() {
+        public void RedoClear()
+        {
             redoStack.Clear();
         }
 
@@ -1350,16 +2019,16 @@ namespace fCraft {
         [CanBeNull]
         public DrawOperation LastDrawOp { get; set; }
 
-        /// <summary> Whether clicks should be registered towards selection marks. </summary>
-        public bool DisableClickToMark { get; set; }
 
         /// <summary> Whether player is currently making a selection. </summary>
-        public bool IsMakingSelection {
+        public bool IsMakingSelection
+        {
             get { return SelectionMarksExpected > 0; }
         }
 
         /// <summary> Number of selection marks so far. </summary>
-        public int SelectionMarkCount {
+        public int SelectionMarkCount
+        {
             get { return selectionMarks.Count; }
         }
 
@@ -1370,7 +2039,7 @@ namespace fCraft {
         public bool IsRepeatingSelection { get; set; }
 
         [CanBeNull]
-        CommandReader selectionRepeatCommand;
+        Command selectionRepeatCommand;
 
         [CanBeNull]
         SelectionCallback selectionCallback;
@@ -1384,65 +2053,78 @@ namespace fCraft {
         Permission[] selectionPermissions;
 
 
-        public void SelectionAddMark( Vector3I pos, bool announce, bool executeCallbackIfNeeded ) {
-            if( !IsMakingSelection ) throw new InvalidOperationException( "No selection in progress." );
-            selectionMarks.Enqueue( pos );
-            if( SelectionMarkCount >= SelectionMarksExpected ) {
-                if( executeCallbackIfNeeded ) {
+        public void SelectionAddMark(Vector3I pos, bool executeCallbackIfNeeded)
+        {
+            if (!IsMakingSelection) throw new InvalidOperationException("No selection in progress.");
+            selectionMarks.Enqueue(pos);
+            if (SelectionMarkCount >= SelectionMarksExpected)
+            {
+                if (executeCallbackIfNeeded)
+                {
                     SelectionExecute();
-                } else if( announce ) {
-                    Message( "Last block marked at {0}. Type &H/Mark&S or click any block to continue.", pos );
                 }
-            } else if( announce ) {
-                Message( "Block #{0} marked at {1}. Place mark #{2}.",
-                         SelectionMarkCount, pos, SelectionMarkCount + 1 );
+                else
+                {
+                    Message("Last block marked at {0}. Type &H/Mark&S or click any block to continue.", pos);
+                }
+            }
+            else
+            {
+                Message("Block #{0} marked at {1}. Place mark #{2}.",
+                         SelectionMarkCount, pos, SelectionMarkCount + 1);
             }
         }
 
 
-        public void SelectionExecute() {
-            if( !IsMakingSelection || selectionCallback == null ) {
-                throw new InvalidOperationException( "No selection in progress." );
+        public void SelectionExecute()
+        {
+            if (!IsMakingSelection || selectionCallback == null)
+            {
+                throw new InvalidOperationException("No selection in progress.");
             }
             SelectionMarksExpected = 0;
             // check if player still has the permissions required to complete the selection.
-            if( selectionPermissions == null || Can( selectionPermissions ) ) {
-                selectionCallback( this, selectionMarks.ToArray(), selectionArgs );
-                if( IsRepeatingSelection && selectionRepeatCommand != null ) {
+            if (selectionPermissions == null || Can(selectionPermissions))
+            {
+                selectionCallback(this, selectionMarks.ToArray(), selectionArgs);
+                if (IsRepeatingSelection && selectionRepeatCommand != null)
+                {
                     selectionRepeatCommand.Rewind();
-                    CommandManager.ParseCommand( this, selectionRepeatCommand, this == Console );
+                    CommandManager.ParseCommand(this, selectionRepeatCommand, this == Console);
                 }
                 selectionMarks.Clear();
-            } else {
+            }
+            else
+            {
                 // More complex permission checks can be done in the callback function itself.
-                Message( "&WYou are no longer allowed to complete this action." );
-                MessageNoAccess( selectionPermissions );
+                Message("&WYou are no longer allowed to complete this action.");
+                MessageNoAccess(selectionPermissions);
             }
         }
 
 
-        public void SelectionStart( int marksExpected,
+        public void SelectionStart(int marksExpected,
                                     [NotNull] SelectionCallback callback,
                                     [CanBeNull] object args,
-                                    [CanBeNull] params Permission[] requiredPermissions ) {
-            if( callback == null ) throw new ArgumentNullException( "callback" );
+                                    [CanBeNull] params Permission[] requiredPermissions)
+        {
+            if (callback == null) throw new ArgumentNullException("callback");
             selectionArgs = args;
             SelectionMarksExpected = marksExpected;
             selectionMarks.Clear();
             selectionCallback = callback;
             selectionPermissions = requiredPermissions;
-            if( DisableClickToMark ) {
-                Message( "&8Reminder: Click-to-mark is disabled." );
-            }
         }
 
 
-        public void SelectionResetMarks() {
+        public void SelectionResetMarks()
+        {
             selectionMarks.Clear();
         }
 
 
-        public void SelectionCancel() {
+        public void SelectionCancel()
+        {
             selectionMarks.Clear();
             SelectionMarksExpected = 0;
             selectionCallback = null;
@@ -1455,88 +2137,47 @@ namespace fCraft {
 
         #region Copy/Paste
 
-        /// <summary> Returns a list of all CopyStates, indexed by slot. </summary>
-        public CopyState[] CopyStates {
-            get { return copyStates; }
+        CopyState[] copyInformation;
+        public CopyState[] CopyInformation
+        {
+            get { return copyInformation; }
         }
-        CopyState[] copyStates;
 
-        /// <summary> Gets or sets the currently selected copy slot number. Should be between 0 and (MaxCopySlots-1).
-        /// Note that fCraft adds 1 to CopySlot number when presenting it to players.
-        /// So 0th slot is shown as "1st" by /CopySlot and related commands; 1st is shown as "2nd", etc. </summary>
-        public int CopySlot {
+        int copySlot;
+        public int CopySlot
+        {
             get { return copySlot; }
-            set {
-                if( value < 0 || value >= MaxCopySlots) {
-                    throw new ArgumentOutOfRangeException( "value" );
+            set
+            {
+                if (value < 0 || value > Info.Rank.CopySlots)
+                {
+                    throw new ArgumentOutOfRangeException("value");
                 }
                 copySlot = value;
             }
         }
-        int copySlot;
 
-
-        /// <summary> Gets or sets the maximum number of copy slots allocated to this player.
-        /// Should be nonnegative. CopyStates are preserved when increasing the maximum.
-        /// When decreasing the value, any CopyStates in slots that fall outside the new maximum are lost. </summary>
-        public int MaxCopySlots {
-            get { return copyStates.Length; }
-            set {
-                if( value < 0 ) throw new ArgumentOutOfRangeException( "value" );
-                Array.Resize( ref copyStates, value );
-                CopySlot = Math.Min( CopySlot, value - 1 );
-            }
+        internal void InitCopySlots()
+        {
+            Array.Resize(ref copyInformation, Info.Rank.CopySlots);
+            CopySlot = Math.Min(CopySlot, Info.Rank.CopySlots - 1);
         }
 
-
-        /// <summary> Gets CopyState for currently-selected slot. May be null. </summary>
-        /// <returns> CopyState or null, depending on whether anything has been copied into the currently-selected slot. </returns>
         [CanBeNull]
-        public CopyState GetCopyState() {
-            return GetCopyState( copySlot );
+        public CopyState GetCopyInformation()
+        {
+            return CopyInformation[copySlot];
         }
 
-
-        /// <summary> Gets CopyState for the given slot. May be null. </summary>
-        /// <param name="slot"> Slot number. Should be between 0 and (MaxCopySlots-1). </param>
-        /// <returns> CopyState or null, depending on whether anything has been copied into the given slot. </returns>
-        /// <exception cref="ArgumentOutOfRangeException"> slot is not between 0 and (MaxCopySlots-1). </exception>
-        [CanBeNull]
-        public CopyState GetCopyState( int slot ) {
-            if( slot < 0 || slot >= MaxCopySlots ) {
-                throw new ArgumentOutOfRangeException( "slot" );
-            }
-            return copyStates[slot];
-        }
-
-
-        /// <summary> Stores given CopyState at the currently-selected slot. </summary>
-        /// <param name="state"> New content for the current slot. May be a CopyState object, or null. </param>
-        /// <returns> Previous contents of the current slot. May be null. </returns>
-        [CanBeNull]
-        public CopyState SetCopyState( [CanBeNull] CopyState state ) {
-            return SetCopyState( state, copySlot );
-        }
-
-
-        /// <summary> Stores given CopyState at the given slot. </summary>
-        /// <param name="state"> New content for the given slot. May be a CopyState object, or null. </param>
-        /// <param name="slot"> Slot number. Should be between 0 and (MaxCopySlots-1). </param>
-        /// <returns> Previous contents of the current slot. May be null. </returns>
-        /// <exception cref="ArgumentOutOfRangeException"> slot is not between 0 and (MaxCopySlots-1). </exception>
-        [CanBeNull]
-        public CopyState SetCopyState( [CanBeNull] CopyState state, int slot ) {
-            if( slot < 0 || slot >= MaxCopySlots ) {
-                throw new ArgumentOutOfRangeException( "slot" );
-            }
-            if( state != null ) state.Slot = slot;
-            CopyState old = copyStates[slot];
-            copyStates[slot] = state;
-            return old;
+        public void SetCopyInformation([CanBeNull] CopyState info)
+        {
+            if (info != null) info.Slot = copySlot;
+            CopyInformation[copySlot] = info;
         }
 
         #endregion
-
+        [CanBeNull]
+        Player possessionPlayer;
 
         #region Spectating
 
@@ -1545,58 +2186,86 @@ namespace fCraft {
 
         /// <summary> Player currently being spectated. Use Spectate/StopSpectate methods to set. </summary>
         [CanBeNull]
-        public Player SpectatedPlayer {
+        public Player SpectatedPlayer
+        {
             get { return spectatedPlayer; }
         }
 
-        /// <summary> While spectating, currently-spectated player.
-        /// When not spectating, most-recently-spectated player. </summary>
         [CanBeNull]
         public PlayerInfo LastSpectatedPlayer { get; private set; }
 
         readonly object spectateLock = new object();
 
-        /// <summary> Whether this player is currently spectating someone. </summary>
-        public bool IsSpectating {
+        public bool IsSpectating
+        {
             get { return (spectatedPlayer != null); }
         }
 
 
-        /// <summary> Starts spectating the given player. </summary>
-        /// <param name="target"> Player to spectate. </param>
-        /// <returns> True if this player is now spectating the target.
-        /// False if this player has already been spectating the target. </returns>
-        /// <exception cref="ArgumentNullException"> target is null. </exception>
-        /// <exception cref="PlayerOpException"> This player does not have sufficient permissions, or is trying to spectate self. </exception>
-        public bool Spectate( [NotNull] Player target ) {
-            if( target == null ) throw new ArgumentNullException( "target" );
-            lock( spectateLock ) {
-                if( spectatedPlayer == target ) return false;
-
-                if( target == this ) {
-                    PlayerOpException.ThrowCannotTargetSelf( this, Info, "spectate" );
+        public bool Spectate([NotNull] Player target)
+        {
+            if (target == null) throw new ArgumentNullException("target");
+            lock (spectateLock)
+            {
+                if (target == this)
+                {
+                    PlayerOpException.ThrowCannotTargetSelf(this, Info, "spectate");
                 }
 
-                if( !Can( Permission.Spectate, target.Info.Rank ) ) {
-                    PlayerOpException.ThrowPermissionLimit( this, target.Info, "spectate", Permission.Spectate );
+                if (!Can(Permission.Spectate, target.Info.Rank))
+                {
+                    PlayerOpException.ThrowPermissionLimit(this, target.Info, "spectate", Permission.Spectate);
                 }
+
+                if (spectatedPlayer == target) return false;
 
                 spectatedPlayer = target;
                 LastSpectatedPlayer = target.Info;
-                Message( "Now spectating {0}&S. Type &H/unspec&S to stop.", target.ClassyName );
+                Message("Now spectating {0}&S. Type &H/unspec&S to stop.", target.ClassyName);
                 return true;
             }
         }
 
-
-        /// <summary> Stops spectating. </summary>
-        /// <returns> True if this player was spectating someone (and now stopped).
-        /// False if this player was not spectating anyone. </returns>
-        public bool StopSpectating() {
-            lock( spectateLock ) {
-                if( spectatedPlayer == null ) return false;
-                Message( "Stopped spectating {0}", spectatedPlayer.ClassyName );
+        public bool StopSpectating()
+        {
+            lock (spectateLock)
+            {
+                if (spectatedPlayer == null) return false;
+                Message("Stopped spectating {0}", spectatedPlayer.ClassyName);
                 spectatedPlayer = null;
+                return true;
+            }
+        }
+
+        public bool Possess([NotNull] Player target)
+        {
+            if (target == null) throw new ArgumentNullException("target");
+            lock (spectateLock)
+            {
+                if (target == this)
+                {
+                    PlayerOpException.ThrowCannotTargetSelf(this, Info, "possess");
+                }
+
+                if (!Can(Permission.Possess, target.Info.Rank))
+                {
+                    PlayerOpException.ThrowPermissionLimit(this, target.Info, "possess", Permission.Possess);
+                }
+
+                if (target.possessionPlayer == this) return false;
+
+                target.possessionPlayer = this;
+                Message("Now Possessing {0}&S. Type &H/unpossess&S to stop.", target.ClassyName);
+                return true;
+            }
+        }
+        public bool StopPossessing([NotNull]Player target)
+        {
+            lock (spectateLock)
+            {
+                if (target.possessionPlayer == null) return false;
+                Message("Stopped possessing {0}", target.ClassyName);
+                target.possessionPlayer = null;
                 return true;
             }
         }
@@ -1606,110 +2275,57 @@ namespace fCraft {
 
         #region Static Utilities
 
-        static readonly Uri PaidCheckUri = new Uri( "http://minecraft.net/haspaid.jsp?user=" );
-        static readonly TimeSpan PaidCheckTimeout = TimeSpan.FromSeconds( 6 );
 
 
-        /// <summary> Checks whether a given player has a paid minecraft.net account. </summary>
-        /// <returns> True if the account is paid. False if it is not paid, or if information is unavailable. </returns>
-        public static AccountType CheckPaidStatus( [NotNull] string name ) {
-            if( name == null ) throw new ArgumentNullException( "name" );
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create( PaidCheckUri + Uri.EscapeDataString( name ) );
-            request.ServicePoint.BindIPEndPointDelegate = Server.BindIPEndPointCallback;
-            request.Timeout = (int)PaidCheckTimeout.TotalMilliseconds;
-            request.ReadWriteTimeout = (int)PaidCheckTimeout.TotalMilliseconds;
-            request.CachePolicy = Server.CachePolicy;
-
-            try {
-                using( WebResponse response = request.GetResponse() ) {
-                    // ReSharper disable AssignNullToNotNullAttribute
-                    using( StreamReader responseReader = new StreamReader( response.GetResponseStream() ) ) {
-                        // ReSharper restore AssignNullToNotNullAttribute
-                        string paidStatusString = responseReader.ReadToEnd();
-                        bool isPaid;
-                        if( Boolean.TryParse( paidStatusString, out isPaid ) ) {
-                            if( isPaid ) {
-                                return AccountType.Paid;
-                            } else {
-                                return AccountType.Free;
-                            }
-                        } else {
-                            return AccountType.Unknown;
-                        }
-                    }
-                }
-            } catch( WebException ex ) {
-                Logger.Log( LogType.Warning,
-                            "Could not check paid status of player {0}: {1}",
-                            name, ex.Message );
-                return AccountType.Unknown;
-            }
-        }
-
-
-        static readonly Regex
-            EmailRegex = new Regex( @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$", RegexOptions.Compiled ),
-            AccountRegex = new Regex( @"^[a-zA-Z0-9._]{2,16}$", RegexOptions.Compiled ),
-            PlayerNameRegex = new Regex( @"^([a-zA-Z0-9._]{2,16}|[a-zA-Z0-9._]{1,15}@\d*)$", RegexOptions.Compiled );
-
-
-        /// <summary> Checks if given string could be an email address.
-        /// Matches 99.9% of emails. We don't care about the last 0.1% (and neither does Mojang).
-        /// Regex courtesy of http://www.regular-expressions.info/email.html </summary>
-        public static bool IsValidEmail( [NotNull] string email ) {
-            if( email == null ) throw new ArgumentNullException( "email" );
-            return EmailRegex.IsMatch( email );
-        }
-
-
-        /// <summary> Ensures that a player name has the correct length and character set for a Minecraft account.
-        /// Does not permit email addresses. </summary>
-        public static bool IsValidAccountName( [NotNull] string name ) {
-            if( name == null ) throw new ArgumentNullException( "name" );
-            return AccountRegex.IsMatch( name );
+        /// <summary> Ensures that a player name has the correct length and character set. </summary>
+        public static bool IsValidName([NotNull] string name)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+            if (name.Length < 2 || name.Length > 36) return false;
+            return ContainsValidCharacters(name);
         }
 
         /// <summary> Ensures that a player name has the correct length and character set. </summary>
-        public static bool IsValidPlayerName( [NotNull] string name ) {
-            if( name == null ) throw new ArgumentNullException( "name" );
-            return PlayerNameRegex.IsMatch( name );
-        }
-        
-        /// <summary> Checks if all characters in a string are admissible in a player name.
-        /// Allows '@' (for Mojang accounts) and '.' (for those really old rare accounts). </summary>
-        public static bool ContainsValidCharacters( [NotNull] string name ) {
-            if( name == null ) throw new ArgumentNullException( "name" );
-            for( int i = 0; i < name.Length; i++ ) {
+        public static bool ContainsValidCharacters([NotNull] string name)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+            // ReSharper disable LoopCanBeConvertedToQuery
+            for (int i = 0; i < name.Length; i++)
+            {
                 char ch = name[i];
-                if( (ch < '0' && ch != '.') || (ch > '9' && ch < '@') || (ch > 'Z' && ch < '_') || (ch > '_' && ch < 'a') || ch > 'z' ) {
+                if ((ch < '0' && ch != '.') || (ch > '9' && ch < 'A') || (ch > 'Z' && ch < '_') || (ch > '_' && ch < 'a') || ch > 'z')
+                {
                     return false;
                 }
             }
+            // ReSharper restore LoopCanBeConvertedToQuery
             return true;
         }
 
         #endregion
 
 
-        /// <summary> Teleports player to a given coordinate within this map. </summary>
-        public void TeleportTo( Position pos ) {
+        public void TeleportTo(Position pos)
+        {
             StopSpectating();
-            Send( Packet.MakeSelfTeleport( pos ) );
+            Send(PacketWriter.MakeSelfTeleport(pos));
             Position = pos;
         }
 
 
         /// <summary> Time since the player was last active (moved, talked, or clicked). </summary>
-        public TimeSpan IdleTime {
-            get {
-                return DateTime.UtcNow.Subtract( LastActiveTime );
+        public TimeSpan IdleTime
+        {
+            get
+            {
+                return DateTime.UtcNow.Subtract(LastActiveTime);
             }
         }
 
 
         /// <summary> Resets the IdleTimer to 0. </summary>
-        public void ResetIdleTimer() {
+        public void ResetIdleTimer()
+        {
             LastActiveTime = DateTime.UtcNow;
         }
 
@@ -1723,74 +2339,87 @@ namespace fCraft {
         /// <param name="announce"> Whether the kick should be announced publicly on the server and IRC. </param>
         /// <param name="raiseEvents"> Whether Player.BeingKicked and Player.Kicked events should be raised. </param>
         /// <param name="recordToPlayerDB"> Whether the kick should be counted towards player's record.</param>
-        public void Kick( [NotNull] Player player, [CanBeNull] string reason, LeaveReason context,
-                          bool announce, bool raiseEvents, bool recordToPlayerDB ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( !Enum.IsDefined( typeof( LeaveReason ), context ) ) {
-                throw new ArgumentOutOfRangeException( "context" );
+        public void Kick([NotNull] Player player, [CanBeNull] string reason, LeaveReason context,
+                         bool announce, bool raiseEvents, bool recordToPlayerDB)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (!Enum.IsDefined(typeof(LeaveReason), context))
+            {
+                throw new ArgumentOutOfRangeException("context");
             }
-
-            if( reason != null ) reason = reason.Trim( ' ' );
-            if( reason != null && reason.Length == 0 ) reason = null;
+            if (reason != null && reason.Trim().Length == 0) reason = null;
 
             // Check if player can ban/unban in general
-            if( !player.Can( Permission.Kick ) ) {
-                PlayerOpException.ThrowPermissionMissing( player, Info, "kick", Permission.Kick );
+            if (!player.Can(Permission.Kick))
+            {
+                PlayerOpException.ThrowPermissionMissing(player, Info, "kick", Permission.Kick);
             }
 
             // Check if player is trying to ban/unban self
-            if( player == this ) {
-                PlayerOpException.ThrowCannotTargetSelf( player, Info, "kick" );
+            if (player == this)
+            {
+                PlayerOpException.ThrowCannotTargetSelf(player, Info, "kick");
             }
 
             // Check if player has sufficiently high permission limit
-            if( !player.Can( Permission.Kick, Info.Rank ) ) {
-                PlayerOpException.ThrowPermissionLimit( player, Info, "kick", Permission.Kick );
+            if (!player.Can(Permission.Kick, Info.Rank))
+            {
+                PlayerOpException.ThrowPermissionLimit(player, Info, "kick", Permission.Kick);
             }
 
             // check if kick reason is missing but required
-            PlayerOpException.CheckKickReason( reason, player, Info );
+            PlayerOpException.CheckKickReason(reason, player, Info);
 
             // raise Player.BeingKicked event
-            if( raiseEvents ) {
-                var e = new PlayerBeingKickedEventArgs( this, player, reason, announce, recordToPlayerDB, context );
-                RaisePlayerBeingKickedEvent( e );
-                if( e.Cancel ) PlayerOpException.ThrowCancelled( player, Info );
+            if (raiseEvents)
+            {
+                var e = new PlayerBeingKickedEventArgs(this, player, reason, announce, recordToPlayerDB, context);
+                RaisePlayerBeingKickedEvent(e);
+                if (e.Cancel) PlayerOpException.ThrowCancelled(player, Info);
                 recordToPlayerDB = e.RecordToPlayerDB;
             }
 
             // actually kick
             string kickReason;
-            if( reason != null ) {
-                kickReason = String.Format( "Kicked by {0}: {1}", player.Name, reason );
-            } else {
-                kickReason = String.Format( "Kicked by {0}", player.Name );
+            if (reason != null)
+            {
+                kickReason = String.Format("Kicked by {0}: {1}", player.Name, reason);
             }
-            Kick( kickReason, context );
+            else
+            {
+                kickReason = String.Format("Kicked by {0}", player.Name);
+            }
+            Kick(kickReason, context);
 
             // log and record kick to PlayerDB
-            Logger.Log( LogType.UserActivity,
+            Logger.Log(LogType.UserActivity,
                         "{0} kicked {1}. Reason: {2}",
-                        player.Name, Name, reason ?? "" );
-            if( recordToPlayerDB ) {
-                Info.ProcessKick( player, reason );
+                        player.Name, Name, reason ?? "");
+            if (recordToPlayerDB)
+            {
+                Info.ProcessKick(player, reason);
             }
 
             // announce kick
-            if( announce ) {
-                if( reason != null && ConfigKey.AnnounceKickAndBanReasons.Enabled() ) {
-                    Server.Message( "{0}&W was kicked by {1}&W: {2}",
-                                    ClassyName, player.ClassyName, reason );
-                } else {
-                    Server.Message( "{0}&W was kicked by {1}",
-                                    ClassyName, player.ClassyName );
+            if (announce)
+            {
+                if (reason != null && ConfigKey.AnnounceKickAndBanReasons.Enabled())
+                {
+                    Server.Message("{0}&W was kicked by {1}&W: {2}",
+                                    ClassyName, player.ClassyName, reason);
+                }
+                else
+                {
+                    Server.Message("{0}&W was kicked by {1}",
+                                    ClassyName, player.ClassyName);
                 }
             }
 
             // raise Player.Kicked event
-            if( raiseEvents ) {
-                var e = new PlayerKickedEventArgs( this, player, reason, announce, recordToPlayerDB, context );
-                RaisePlayerKickedEvent( e );
+            if (raiseEvents)
+            {
+                var e = new PlayerKickedEventArgs(this, player, reason, announce, recordToPlayerDB, context);
+                RaisePlayerKickedEvent(e);
             }
         }
 
@@ -1805,23 +2434,32 @@ namespace fCraft {
 
 
         /// <summary> Name formatted for the debugger. </summary>
-        public override string ToString() {
-            if( Info != null ) {
-                return String.Format( "Player({0})", Info.Name );
-            } else {
-                return String.Format( "Player({0})", IP );
+        public override string ToString()
+        {
+            if (Info != null)
+            {
+                return String.Format("Player({0})", Info.Name);
+            }
+            else
+            {
+                return String.Format("Player({0})", IP);
             }
         }
     }
 
 
-    sealed class PlayerListSorter : IComparer<Player> {
+    sealed class PlayerListSorter : IComparer<Player>
+    {
         public static readonly PlayerListSorter Instance = new PlayerListSorter();
 
-        public int Compare( Player x, Player y ) {
-            if( x.Info.Rank == y.Info.Rank ) {
-                return StringComparer.OrdinalIgnoreCase.Compare( x.Name, y.Name );
-            } else {
+        public int Compare(Player x, Player y)
+        {
+            if (x.Info.Rank == y.Info.Rank)
+            {
+                return StringComparer.OrdinalIgnoreCase.Compare(x.Name, y.Name);
+            }
+            else
+            {
                 return x.Info.Rank.Index - y.Info.Rank.Index;
             }
         }

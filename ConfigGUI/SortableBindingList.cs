@@ -1,5 +1,4 @@
-﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
@@ -150,7 +149,7 @@ namespace fCraft.ConfigGUI {
                     result = 0;
                 }
                     /* Values don't implement IComparer and are not equivalent, so compare as string values */
-                else result = String.Compare(xValue.ToString(), yValue.ToString(), StringComparison.Ordinal);
+                else result = xValue.ToString().CompareTo( yValue.ToString() );
 
                 /* Return result */
                 return result;
@@ -186,7 +185,7 @@ namespace fCraft.ConfigGUI {
 
         readonly MethodInfo method;
         public int Compare( string propertyName, object a, object b ) {
-            object[] methodArgs = { propertyName, a, b };
+            object[] methodArgs = new[] { propertyName, a, b };
             return (int)method.Invoke( null, methodArgs );
         }
     }

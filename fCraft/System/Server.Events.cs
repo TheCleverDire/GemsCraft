@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Net;
 using System.Collections.Generic;
@@ -56,7 +56,7 @@ namespace fCraft {
 
         #region Session-related
 
-        /// <summary> Occurs any time the server receives an incoming connection (cancelable). </summary>
+        /// <summary> Occurs any time the server receives an incoming connection (cancellable). </summary>
         public static event EventHandler<SessionConnectingEventArgs> SessionConnecting;
 
 
@@ -112,21 +112,20 @@ namespace fCraft.Events {
 
 
     public sealed class SearchingForPlayerEventArgs : EventArgs, IPlayerEvent {
-        internal SearchingForPlayerEventArgs( [CanBeNull] Player player, [NotNull] string searchTerm,
-                                              List<Player> matches, SearchOptions options ) {
+        internal SearchingForPlayerEventArgs( [CanBeNull] Player player, [NotNull] string searchTerm, List<Player> matches ) {
             if( searchTerm == null ) throw new ArgumentNullException( "searchTerm" );
             Player = player;
             SearchTerm = searchTerm;
             Matches = matches;
-            Options = options;
         }
 
         [CanBeNull]
         public Player Player { get; private set; }
-
         public string SearchTerm { get; private set; }
-        public SearchOptions Options { get; private set; }
-
         public List<Player> Matches { get; set; }
+
+        public bool CheckVisibility {
+            get { return Player != null; }
+        }
     }
 }

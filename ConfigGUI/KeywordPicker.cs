@@ -1,12 +1,11 @@
-﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace fCraft.ConfigGUI {
     public sealed partial class KeywordPicker : Form {
         public string Result;
 
         readonly ToolTip tips;
-        static readonly KeywordInfo[] Keywords = {
+        static readonly KeywordInfo[] Keywords = new[]{
             new KeywordInfo("{SERVER_NAME}", "Server name", "Name of your server, as specified in config." ),
             new KeywordInfo("{RANK}", "Player's rank", "Player's rank, including prefix and colors (if applicable)." ),
             new KeywordInfo("{PLAYER_NAME}", "Player's name", "Name of the player, including prefix and colors (if applicable)." ),
@@ -15,8 +14,7 @@ namespace fCraft.ConfigGUI {
             new KeywordInfo("{PLAYERS}", "Number of players online", "Note that hidden players will not be included in this number." ),
             new KeywordInfo("{WORLDS}", "Number of worlds", "Number of worlds accessible by the player. Does not count hidden worlds." ),
             new KeywordInfo("{MOTD}", "MOTD", "Message-of-the-day (server subtitle), as specified in config." ),
-            new KeywordInfo("{VERSION}", "fCraft version", "Version of fCraft that this server is running." ),
-            new KeywordInfo("{PLAYER_LIST}", "Player list", "List of names of all online players that this player can see, including prefixes and colors (if applicable)." )
+            new KeywordInfo("{VERSION}", "fCraft version", "Version of fCraft that this server is running." )
         };
 
         const int ButtonWidth = 150,

@@ -1,16 +1,15 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Resources;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "fCraftGUI" )]
-[assembly: AssemblyDescription( "Shared graphics-related functionality for fCraft" )]
+[assembly: AssemblyTitle("LegendCraftGUI")]
+[assembly: AssemblyDescription("Shared graphics-related functionality for LegendCraft")]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany( "fCraft.net" )]
-[assembly: AssemblyProduct( "fCraftGUI" )]
-[assembly: AssemblyCopyright( "fCraft is Copyright © Matvei Stefarov 2009-2014 (matvei.org)" )]
+[assembly: AssemblyCompany("LeChosenOne")]
+[assembly: AssemblyProduct("LegendCraftGUI")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -32,6 +31,5 @@ using System.Resources;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.6.4.4")]
-[assembly: AssemblyFileVersion("0.6.4.4")]
-[assembly: NeutralResourcesLanguageAttribute( "en-US" )]
+[assembly: AssemblyVersion( "0.6.1.7" )]
+[assembly: AssemblyFileVersion( "0.6.1.7" )]

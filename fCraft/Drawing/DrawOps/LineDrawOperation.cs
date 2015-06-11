@@ -1,17 +1,12 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that creates a simple line, 1 block thick. </summary>
     public sealed class LineDrawOperation : DrawOperation {
 
         public override string Name {
             get { return "Line"; }
-        }
-
-        public override int ExpectedMarks {
-            get { return 2; }
         }
 
         public LineDrawOperation( Player player )

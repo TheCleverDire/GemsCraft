@@ -1,30 +1,16 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
-using System.Runtime.InteropServices;
 
 namespace fCraft {
-    /// <summary> Struct representing a position AND orientation in 3D space.
-    /// Used to represent players' positions in Minecraft world.
-    /// Stores X/Y/Z as signed shorts, and R/L as unsigned bytes (8 bytes total).
+
+    /// <summary> Struct representing a position AND orientation. Takes up 8 bytes of memory.
     /// Use Vector3I if you just need X/Y/Z coordinates without orientation.
     /// Note that, as a struct, Positions are COPIED when assigned or passed as an argument. </summary>
-    [StructLayout( LayoutKind.Sequential, Pack = 1 )]
     public struct Position : IEquatable<Position> {
-        /// <summary> Position at (0,0,0) with R=0 and L=0. </summary>
-        public static readonly Position Zero = new Position( 0, 0, 0 );
+        public readonly static Position Zero = new Position( 0, 0, 0 );
 
-        public readonly short X, Y, Z;
-        public readonly byte R, L;
-
-
-        public Position( Position other, byte r, byte l ) {
-            X = other.X;
-            Y = other.Y;
-            Z = other.Z;
-            R = r;
-            L = l;
-        }
-
+        public short X, Y, Z;
+        public byte R, L;
 
         public Position( short x, short y, short z, byte r, byte l ) {
             X = x;
@@ -34,7 +20,6 @@ namespace fCraft {
             L = l;
         }
 
-
         public Position( int x, int y, int z ) {
             X = (short)x;
             Y = (short)y;
@@ -42,7 +27,6 @@ namespace fCraft {
             R = 0;
             L = 0;
         }
-
 
         internal bool FitsIntoMoveRotatePacket {
             get {
@@ -54,19 +38,26 @@ namespace fCraft {
 
 
         public bool IsZero {
-            get { return X == 0 && Y == 0 && Z == 0 && R == 0 && L == 0; }
+            get {
+                return X == 0 && Y == 0 && Z == 0 && R == 0 && L == 0;
+            }
         }
 
 
         // adjust for bugs in position-reporting in Minecraft client
         public Position GetFixed() {
-            return new Position( X, Y, (short)(Z - 22), R, L );
+            return new Position {
+                X = (X),
+                Y = (Y),
+                Z = (short)(Z - 22),
+                R = R,
+                L = L
+            };
         }
 
 
         public int DistanceSquaredTo( Position other ) {
-            return ( X - other.X ) * ( X - other.X ) + ( Y - other.Y ) * ( Y - other.Y ) +
-                   ( Z - other.Z ) * ( Z - other.Z );
+            return (X - other.X) * (X - other.X) + (Y - other.Y) * (Y - other.Y) + (Z - other.Z) * (Z - other.Z);
         }
 
 
@@ -76,24 +67,20 @@ namespace fCraft {
             return a.Equals( b );
         }
 
-
         public static bool operator !=( Position a, Position b ) {
             return !a.Equals( b );
         }
 
-
         public bool Equals( Position other ) {
-            return ( X == other.X ) && ( Y == other.Y ) && ( Z == other.Z ) && ( R == other.R ) && ( L == other.L );
+            return (X == other.X) && (Y == other.Y) && (Z == other.Z) && (R == other.R) && (L == other.L);
         }
-
 
         public override bool Equals( object obj ) {
-            return ( obj is Position ) && Equals( (Position)obj );
+            return (obj is Position) && Equals( (Position)obj );
         }
 
-
         public override int GetHashCode() {
-            return ( X + Y * short.MaxValue ) ^ ( R + L * short.MaxValue ) + Z;
+            return (X + Y * short.MaxValue) ^ (R + L * short.MaxValue) + Z;
         }
 
         #endregion
@@ -103,19 +90,16 @@ namespace fCraft {
             return String.Format( "Position({0},{1},{2} @{3},{4})", X, Y, Z, R, L );
         }
 
-
         public static explicit operator Vector3I( Position a ) {
             return new Vector3I( a.X, a.Y, a.Z );
         }
-
 
         public Vector3I ToVector3I() {
             return new Vector3I( X, Y, Z );
         }
 
-
         public Vector3I ToBlockCoords() {
-            return new Vector3I( ( X - 16 ) / 32, ( Y - 16 ) / 32, ( Z - 16 ) / 32 );
+            return new Vector3I( (X - 16) / 32, (Y - 16) / 32, (Z - 16) / 32 );
         }
     }
 }

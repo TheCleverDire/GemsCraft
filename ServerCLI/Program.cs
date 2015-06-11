@@ -1,5 +1,5 @@
 ﻿/*
- *  Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+ *  Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -20,35 +20,31 @@
  *  THE SOFTWARE.
  *
  */
+
+//Modified LegendCraft Team
+
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Net;
+using System.IO.Compression;
 using System.Text;
 using System.Threading;
+using System.Net;
+using System.ComponentModel;
+using System.Reflection;
+using System.Linq;
 using fCraft.Events;
 
 namespace fCraft.ServerCLI {
-    static class Program {
-        static bool useColor,
-                    exitOnShutdown = true;
 
+    static class Program {
+        static bool useColor = true;
 
         static void Main( string[] args ) {
-            // Check fCraft.dll version
-            if( typeof( Server ).Assembly.GetName().Version != typeof( Program ).Assembly.GetName().Version ) {
-                Console.Error.WriteLine( "fCraft.dll version does not match ServerCLI.exe version." );
-                Environment.ExitCode = (int)ShutdownReason.FailedToInitialize;
-                return;
-            }
-
-            Console.Title = "fCraft " + Updater.CurrentRelease.VersionString + " - starting...";
-
             Logger.Logged += OnLogged;
             Heartbeat.UriChanged += OnHeartbeatUriChanged;
-            Server.ShutdownEnded += OnShutdownEnded;
+
+            Console.Title = "LegendCraft " + fCraft.Updater.LatestStable + " - starting...";
 
 #if !DEBUG
             try {
@@ -58,53 +54,34 @@ namespace fCraft.ServerCLI {
 
                 Server.InitServer();
 
-                CheckForUpdates();
-                Console.Title = "fCraft " + Updater.CurrentRelease.VersionString + " - " +
-                                ConfigKey.ServerName.GetString();
+                if (ConfigKey.CheckForUpdates.GetString() == "True")
+                {
+                    CheckForUpdates();
+                }
+                Console.Title = "LegendCraft " + Updater.LatestStable + " - " + ConfigKey.ServerName.GetString();
 
                 if( !ConfigKey.ProcessPriority.IsBlank() ) {
                     try {
-                        Process.GetCurrentProcess().PriorityClass =
-                            ConfigKey.ProcessPriority.GetEnum<ProcessPriorityClass>();
+                        Process.GetCurrentProcess().PriorityClass = ConfigKey.ProcessPriority.GetEnum<ProcessPriorityClass>();
                     } catch( Exception ) {
                         Logger.Log( LogType.Warning, "Program.Main: Could not set process priority, using defaults." );
                     }
                 }
 
-                // dont hook up Ctrl+C handler until the server's about to start
-                Console.CancelKeyPress += OnCancelKeyPress;
-
                 if( Server.StartServer() ) {
-                    Console.WriteLine( "** Running fCraft version {0}. **", Updater.CurrentRelease.VersionString );
+                    Console.WriteLine( "** Running LegendCraft version {0} **", Updater.LatestStable );
                     Console.WriteLine( "** Server is now ready. Type /Shutdown to exit safely. **" );
 
                     while( !Server.IsShuttingDown ) {
-                        string cmd;
-                        try {
-                            cmd = Console.ReadLine();
-                        } catch( ArgumentOutOfRangeException ) {
-                            // workaround for TermInfoDriver bug under Mono
-                            continue;
-                        }
-                        if( cmd == null ) {
-                            Console.WriteLine(
-                                "*** Received EOF from console. You will not be able to type anything in console any longer. ***" );
-                            break;
-                        }
+                        string cmd = Console.ReadLine();
                         if( cmd.Equals( "/Clear", StringComparison.OrdinalIgnoreCase ) ) {
                             Console.Clear();
                         } else {
-#if !DEBUG
                             try {
-                                Player.Console.ParseMessage( cmd, true );
+                                Player.Console.ParseMessage( cmd, true, false);
                             } catch( Exception ex ) {
-                                Logger.LogAndReportCrash( "Error while executing a command from console",
-                                                          "ServerCLI",
-                                                          ex, false );
+                                Logger.LogAndReportCrash( "Error while executing a command from console", "ServerCLI", ex, false );
                             }
-#else
-                            Player.Console.ParseMessage( cmd, true );
-#endif
                         }
                     }
 
@@ -122,45 +99,13 @@ namespace fCraft.ServerCLI {
         }
 
 
-        static void OnShutdownEnded( object sender, ShutdownEventArgs e ) {
-            if( exitOnShutdown ) {
-                Environment.Exit( Environment.ExitCode );
-            }
-        }
-
-
-        static void OnCancelKeyPress( object sender, ConsoleCancelEventArgs e ) {
-            switch( e.SpecialKey ) {
-                case ConsoleSpecialKey.ControlBreak:
-                    Console.WriteLine( "*** Shutting down (Ctrl-Break) ***" );
-                    Thread t = new Thread( OnControlShutdown );
-                    t.Start();
-                    t.Join();
-                    break;
-                case ConsoleSpecialKey.ControlC:
-                    e.Cancel = true;
-                    Console.WriteLine( "*** Shutting down (Ctrl-C) ***" );
-                    new Thread( OnControlShutdown ).Start();
-                    break;
-            }
-        }
-
-
-        static void OnControlShutdown() {
-            Server.Shutdown( new ShutdownParams( ShutdownReason.ProcessClosing, TimeSpan.Zero, false ), true );
-            Environment.Exit( (int)ShutdownReason.ProcessClosing );
-        }
-
-
         static void ReportFailure( ShutdownReason reason ) {
-            Console.Title = String.Format( "fCraft {0} {1}", Updater.CurrentRelease.VersionString, reason );
+            Console.Title = String.Format( "LegendCraft {0} {1}", Updater.LatestStable, reason );
             if( useColor ) Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.WriteLine( "** {0} **", reason );
             if( useColor ) Console.ResetColor();
-
-            exitOnShutdown = Server.HasArg( ArgKey.ExitOnCrash );
-            Server.Shutdown( new ShutdownParams( reason, TimeSpan.Zero, false ), false );
-            if( !exitOnShutdown ) {
+            Server.Shutdown( new ShutdownParams( reason, TimeSpan.Zero, false, false ), true );
+            if( !Server.HasArg( ArgKey.ExitOnCrash ) ) {
                 Console.ReadLine();
             }
         }
@@ -171,7 +116,7 @@ namespace fCraft.ServerCLI {
             if( !e.WriteToConsole ) return;
             switch( e.MessageType ) {
                 case LogType.Error:
-                    if( useColor ) Console.ForegroundColor = ConsoleColor.Red;
+                    if(useColor)Console.ForegroundColor = ConsoleColor.Red;
                     Console.Error.WriteLine( e.Message );
                     if( useColor ) Console.ResetColor();
                     return;
@@ -212,17 +157,15 @@ namespace fCraft.ServerCLI {
 
         #region Updates
 
+
         static readonly AutoResetEvent UpdateDownloadWaiter = new AutoResetEvent( false );
-        static bool updateFailed;
 
-        static readonly object ProgressReportLock = new object();
-
-
+        static readonly object progressReportLock = new object();
         static void OnUpdateDownloadProgress( object sender, DownloadProgressChangedEventArgs e ) {
-            lock( ProgressReportLock ) {
+            lock( progressReportLock ) {
                 Console.CursorLeft = 0;
                 int maxProgress = Console.WindowWidth - 9;
-                int progress = (int)Math.Round( ( e.ProgressPercentage / 100f ) * ( maxProgress - 1 ) );
+                int progress = (int)Math.Round((e.ProgressPercentage / 100f) * (maxProgress - 1));
                 Console.Write( "{0,3}% |", e.ProgressPercentage );
                 Console.Write( new String( '=', progress ) );
                 Console.Write( '>' );
@@ -232,60 +175,80 @@ namespace fCraft.ServerCLI {
         }
 
 
-        static void OnUpdateDownloadCompleted( object sender, AsyncCompletedEventArgs e ) {
-            Console.WriteLine();
-            if( e.Error != null ) {
-                updateFailed = true;
-                if( useColor ) Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine( "Downloading the updater failed: {0}", e.Error );
-                if( useColor ) Console.ResetColor();
-            } else {
-                Console.WriteLine( "Update download finished." );
-            }
-            UpdateDownloadWaiter.Set();
-        }
 
+        static void CheckForUpdates()
+        {
+            Console.WriteLine("Checking for LegendCraft updates...");
+            try
+            {
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://raw.githubusercontent.com/LeChosenOne/LegendCraft/master/README.md");
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-        static void CheckForUpdates() {
-            UpdaterMode updaterMode = ConfigKey.UpdaterMode.GetEnum<UpdaterMode>();
-            if( updaterMode == UpdaterMode.Disabled ) return;
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    using (Stream stream = response.GetResponseStream())
+                    {
+                        if (stream != null)
+                        {
+                            StreamReader streamReader = new StreamReader(stream);
+                            string version = streamReader.ReadLine();
 
-            UpdaterResult update = Updater.CheckForUpdates();
-            if( !update.UpdateAvailable ) return;
+                            //update is available, prompt for a download
+                            if (version != null && version != fCraft.Updater.LatestStable)
+                            {
 
-            Console.WriteLine( "** A new version of fCraft is available: {0}, released {1:0} day(s) ago. **",
-                               update.LatestRelease.VersionString,
-                               update.LatestRelease.Age.TotalDays );
-            if( updaterMode != UpdaterMode.Notify ) {
-                WebClient client = new WebClient();
-                client.DownloadProgressChanged += OnUpdateDownloadProgress;
-                client.DownloadFileCompleted += OnUpdateDownloadCompleted;
-                client.DownloadFileAsync( update.DownloadUri, Paths.UpdateInstallerFileName );
-                UpdateDownloadWaiter.WaitOne();
-                if( updateFailed ) return;
+                                Console.WriteLine("Server.Run: Your LegendCraft version is out of date. A LegendCraft Update is available!");
+                                Console.WriteLine("Download the latest LegendCraft version and restart the server? (Y/N)");
+                                string answer = Console.ReadLine();
+                                if (answer.ToLower() == "y" || answer.ToLower() == "yes" || answer.ToLower() == "yup" || answer.ToLower() == "yeah")//preparedness at its finest
+                                {
+                                    using (var client = new WebClient())
+                                    {
+                                        try
+                                        {
+                                            //download new zip in current directory
+                                            Process.Start("http://www.legend-craft.tk/download/latest");
+                                            Console.WriteLine("Downloading the latest LegendCraft Version. Please replace all the files (not folders) in your current folder with the new ones after shutting down.");
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Console.WriteLine("Update error: " + ex);
+                                        }
 
-                if( updaterMode == UpdaterMode.Prompt ) {
-                    Console.WriteLine( "Restart the server and update now? y/n" );
-                    var key = Console.ReadKey();
-                    if( key.KeyChar == 'y' ) {
-                        RestartForUpdate();
-                    } else {
-                        Console.WriteLine( "You can update manually by shutting down the server and running " +
-                                           Paths.UpdateInstallerFileName );
+                                    }
+
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Update ignored. To ignore future LegendCraft update requests, uncheck the box in configGUI.");
+                                }
+
+                            }
+                            else
+                            {
+                                Console.WriteLine("Your LegendCraft version is up to date!");
+                            }
+                        }
                     }
-                } else {
-                    RestartForUpdate();
                 }
+            }
+
+            catch (WebException error)
+            {
+                Console.WriteLine("There was an internet connection error. Server was unable to check for updates. Error: \n\r" + error);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("There was an error in trying to check for updates:\n\r " + e);
             }
         }
 
 
         static void RestartForUpdate() {
-            if( Server.HasArg( ArgKey.NoUpdater ) ) return;
             string restartArgs = String.Format( "{0} --restart=\"{1}\"",
                                                 Server.GetArgString(),
                                                 MonoCompat.PrependMono( "ServerCLI.exe" ) );
-            MonoCompat.StartDotNetProcess( Paths.UpdateInstallerFileName, restartArgs, true );
+            MonoCompat.StartDotNetProcess( Paths.UpdaterFileName, restartArgs, true );
         }
 
         #endregion

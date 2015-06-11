@@ -1,4 +1,4 @@
-// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,22 +8,16 @@ using System.Net;
 using System.Text;
 using JetBrains.Annotations;
 
+// ReSharper disable UnusedMember.Global
 namespace fCraft.MapConversion {
     /// <summary> Standard NBT data types. </summary>
     public enum NBTType : byte {
-        /// <summary> End of tag </summary>
         End,
-        /// <summary> 8 bit integer </summary>
         Byte,
-        /// <summary> 16 bit integer </summary>
         Short,
-        /// <summary> 32 bit integer </summary>
         Int,
-        /// <summary> 64 bit integer </summary>
         Long,
-        /// <summary> 32 bit floating point number (IEEE 754) </summary>
         Float,
-        /// <summary> 64 bit floating point number (IEEE 754) </summary>
         Double,
         Bytes,
         String,
@@ -33,11 +27,12 @@ namespace fCraft.MapConversion {
 
 
     public class NBTag : IEnumerable<NBTag> {
+        // ReSharper disable MemberCanBeProtected.Global
         public NBTType Type { get; protected set; }
         public string Name { get; set; }
         public object Payload { get; set; }
-        [CanBeNull]
         public NBTag Parent { get; set; }
+        // ReSharper restore MemberCanBeProtected.Global
 
 
         #region Constructors
@@ -49,12 +44,14 @@ namespace fCraft.MapConversion {
             Parent = parent;
         }
 
+        // ReSharper disable MemberCanBeProtected.Global
         public NBTag( NBTType type, string name, object payload, NBTag parent ) {
             Type = type;
             Name = name;
             Payload = payload;
             Parent = parent;
         }
+        // ReSharper restore MemberCanBeProtected.Global
 
         #endregion
 
@@ -63,11 +60,11 @@ namespace fCraft.MapConversion {
 
         [CanBeNull]
         public NBTag Append( NBTag tag ) {
-            if( !( this is NBTCompound ) ) {
+            if( !(this is NBTCompound) ) {
                 return null;
             }
             tag.Parent = this;
-            ( this )[tag.Name] = tag;
+            (this)[tag.Name] = tag;
             return tag;
         }
 
@@ -119,7 +116,7 @@ namespace fCraft.MapConversion {
         public bool Contains( [NotNull] string name ) {
             if( name == null ) throw new ArgumentNullException( "name" );
             if( this is NBTCompound ) {
-                return ( (NBTCompound)this ).Tags.ContainsKey( name );
+                return ((NBTCompound)this).Tags.ContainsKey( name );
             } else {
                 return false;
             }
@@ -128,8 +125,8 @@ namespace fCraft.MapConversion {
         public NBTag Remove( [NotNull] string name ) {
             if( name == null ) throw new ArgumentNullException( "name" );
             if( this is NBTCompound ) {
-                NBTag tag = ( this )[name];
-                ( (NBTCompound)this ).Tags.Remove( name );
+                NBTag tag = (this)[name];
+                ((NBTCompound)this).Tags.Remove( name );
                 return tag;
             } else {
                 throw new NotSupportedException( "Can only Remove() from compound tags." );
@@ -137,7 +134,7 @@ namespace fCraft.MapConversion {
         }
 
         public NBTag Remove() {
-            if( Parent is NBTCompound ) {
+            if( Parent != null && Parent is NBTCompound ) {
                 Parent.Remove( Name );
                 return this;
             } else {
@@ -215,13 +212,14 @@ namespace fCraft.MapConversion {
                     return list;
 
                 case NBTType.Compound:
+                    NBTag childTag;
                     NBTCompound compound = new NBTCompound {
                         Type = NBTType.Compound,
                         Name = name,
                         Parent = parent
                     };
                     while( true ) {
-                        NBTag childTag = ReadTag( reader, (NBTType)reader.ReadByte(), null, compound );
+                        childTag = ReadTag( reader, (NBTType)reader.ReadByte(), null, compound );
                         if( childTag.Type == NBTType.End ) break;
                         if( childTag.Name == null )
                             continue;
@@ -339,7 +337,7 @@ namespace fCraft.MapConversion {
                     return;
 
                 case NBTType.Bytes:
-                    writer.Write( IPAddress.HostToNetworkOrder( ( (byte[])Payload ).Length ) );
+                    writer.Write( IPAddress.HostToNetworkOrder( ((byte[])Payload).Length ) );
                     writer.Write( (byte[])Payload );
                     return;
 
@@ -416,14 +414,14 @@ namespace fCraft.MapConversion {
         public NBTag this[int index] {
             get {
                 if( this is NBTList ) {
-                    return ( (NBTList)this ).Tags[index];
+                    return ((NBTList)this).Tags[index];
                 } else {
                     throw new NotSupportedException();
                 }
             }
             set {
                 if( this is NBTList ) {
-                    ( (NBTList)this ).Tags[index] = value;
+                    ((NBTList)this).Tags[index] = value;
                 } else {
                     throw new NotSupportedException();
                 }
@@ -433,14 +431,14 @@ namespace fCraft.MapConversion {
         public NBTag this[string key] {
             get {
                 if( this is NBTCompound ) {
-                    return ( (NBTCompound)this ).Tags[key];
+                    return ((NBTCompound)this).Tags[key];
                 } else {
                     throw new NotSupportedException();
                 }
             }
             set {
                 if( this is NBTCompound ) {
-                    ( (NBTCompound)this ).Tags[key] = value;
+                    ((NBTCompound)this).Tags[key] = value;
                 } else {
                     throw new NotSupportedException();
                 }
@@ -466,10 +464,10 @@ namespace fCraft.MapConversion {
 
             public NBTEnumerator( NBTag tag ) {
                 if( tag is NBTCompound ) {
-                    tags = new NBTag[( (NBTCompound)tag ).Tags.Count];
-                    ( (NBTCompound)tag ).Tags.Values.CopyTo( tags, 0 );
+                    tags = new NBTag[((NBTCompound)tag).Tags.Count];
+                    ((NBTCompound)tag).Tags.Values.CopyTo( tags, 0 );
                 } else if( tag is NBTList ) {
-                    tags = ( (NBTList)tag ).Tags;
+                    tags = ((NBTList)tag).Tags;
                 } else {
                     tags = new NBTag[0];
                 }
@@ -513,7 +511,7 @@ namespace fCraft.MapConversion {
             ListType = type;
             Tags = new NBTag[count];
         }
-        public NBTList( string name, NBTType type, ICollection payloads ) {
+        public NBTList( string name, NBTType type, List<object> payloads ) {
             Name = name;
             Type = NBTType.List;
             ListType = type;

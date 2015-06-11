@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -68,7 +68,7 @@ namespace fCraft.ConfigGUI {
             }
         }
 
-        static readonly Regex SplitByColorRegex = new Regex( "(&[0-9a-zA-Z])" );
+        static readonly Regex SplitByColorRegex = new Regex( "(&[0-9a-zA-Z])", RegexOptions.Compiled );
         TextSegment[] segments;
 
         public void SetText( string[] lines ) {
@@ -83,12 +83,12 @@ namespace fCraft.ConfigGUI {
                         int x = 5;
                         string[] plainTextSegments = SplitByColorRegex.Split( lines[i] );
 
-                        int color = MainForm.ParseToIndex( Color.White );
+                        int color = Color.ParseToIndex( Color.White );
 
                         for( int j = 0; j < plainTextSegments.Length; j++ ) {
                             if( plainTextSegments[j].Length == 0 ) continue;
                             if( plainTextSegments[j][0] == '&' ) {
-                                color = MainForm.ParseToIndex( plainTextSegments[j] );
+                                color = Color.ParseToIndex( plainTextSegments[j] );
                             } else {
                                 newSegments.Add( new TextSegment {
                                     Color = ColorPairs[color],

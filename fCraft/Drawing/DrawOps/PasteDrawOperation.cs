@@ -1,19 +1,13 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that handles aligned (two-mark) pasting for
-    /// /PasteX and /PasteNotX commands. Also used internally by /Paste and /PasteNot. </summary>
     public class PasteDrawOperation : DrawOpWithBrush {
         public override string Name {
             get {
                 return Not ? "PasteNotX" : "PasteX";
             }
-        }
-
-        public override int ExpectedMarks {
-            get { return 2; }
         }
 
         public override string Description {
@@ -28,7 +22,9 @@ namespace fCraft.Drawing {
             }
         }
 
+        // ReSharper disable MemberCanBeProtected.Global
         public bool Not { get; private set; }
+        // ReSharper restore MemberCanBeProtected.Global
         public Block[] Blocks { get; private set; }
         public Vector3I Start { get; private set; }
 
@@ -46,7 +42,7 @@ namespace fCraft.Drawing {
             if( marks.Length < 2 ) throw new ArgumentException( "At least two marks needed.", "marks" );
 
             // Make sure that we have something to paste
-            CopyInfo = Player.GetCopyState();
+            CopyInfo = Player.GetCopyInformation();
             if( CopyInfo == null ) {
                 Player.Message( "Nothing to paste! Copy something first." );
                 return false;
@@ -55,15 +51,15 @@ namespace fCraft.Drawing {
             // Calculate the buffer orientation
             Vector3I delta = marks[1] - marks[0];
             Vector3I orientation = new Vector3I {
-                X = ( delta.X == 0 ? CopyInfo.Orientation.X : Math.Sign( delta.X ) ),
-                Y = ( delta.Y == 0 ? CopyInfo.Orientation.Y : Math.Sign( delta.Y ) ),
-                Z = ( delta.Z == 0 ? CopyInfo.Orientation.Z : Math.Sign( delta.Z ) )
+                X = (delta.X == 0 ? CopyInfo.Orientation.X : Math.Sign( delta.X )),
+                Y = (delta.Y == 0 ? CopyInfo.Orientation.Y : Math.Sign( delta.Y )),
+                Z = (delta.Z == 0 ? CopyInfo.Orientation.Z : Math.Sign( delta.Z ))
             };
 
             // Calculate the start/end coordinates for pasting
-            marks[1] = marks[0] + new Vector3I( orientation.X * ( CopyInfo.Bounds.Width - 1 ),
-                                                orientation.Y * ( CopyInfo.Bounds.Length - 1 ),
-                                                orientation.Z * ( CopyInfo.Bounds.Height - 1 ) );
+            marks[1] = marks[0] + new Vector3I( orientation.X * (CopyInfo.Dimensions.X - 1),
+                                                orientation.Y * (CopyInfo.Dimensions.Y - 1),
+                                                orientation.Z * (CopyInfo.Dimensions.Z - 1) );
             Bounds = new BoundingBox( marks[0], marks[1] );
             Marks = marks;
 
@@ -119,15 +115,15 @@ namespace fCraft.Drawing {
         }
 
 
-        public override bool ReadParams( CommandReader cmd ) {
-            if( Player.GetCopyState() == null ) {
+        public override bool ReadParams( Command cmd ) {
+            if( Player.GetCopyInformation() == null ) {
                 Player.Message( "Nothing to paste! Copy something first." );
                 return false;
             }
             List<Block> blocks = new List<Block>();
             while( cmd.HasNext ) {
-                Block block;
-                if( !cmd.NextBlock( Player, false, out block ) ) return false;
+                Block block = cmd.NextBlock( Player );
+                if( block == Block.Undefined ) return false;
                 blocks.Add( block );
             }
             if( blocks.Count > 0 ) {
@@ -142,19 +138,21 @@ namespace fCraft.Drawing {
 
 
         protected override Block NextBlock() {
-            Block block = CopyInfo.Blocks[Coords.X - Start.X, Coords.Y - Start.Y, Coords.Z - Start.Z];
+            // ReSharper disable LoopCanBeConvertedToQuery
+            Block block = CopyInfo.Buffer[Coords.X - Start.X, Coords.Y - Start.Y, Coords.Z - Start.Z];
             if( Blocks == null ) return block;
             if( Not ) {
                 for( int i = 0; i < Blocks.Length; i++ ) {
-                    if( block == Blocks[i] ) return Block.None;
+                    if( block == Blocks[i] ) return Block.Undefined;
                 }
                 return block;
             } else {
                 for( int i = 0; i < Blocks.Length; i++ ) {
                     if( block == Blocks[i] ) return block;
                 }
-                return Block.None;
+                return Block.Undefined;
             }
+            // ReSharper restore LoopCanBeConvertedToQuery
         }
     }
 }

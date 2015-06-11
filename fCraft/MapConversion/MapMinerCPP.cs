@@ -1,4 +1,4 @@
-// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 // Initial support contributed by Tyler Kennedy <tk@tkte.ch>
 using System;
 using System.IO;
@@ -7,47 +7,36 @@ using System.Net;
 using JetBrains.Annotations;
 
 namespace fCraft.MapConversion {
-    /// <summary> MinerCPP/LuaCraft map conversion implementation, for converting MinerCPP/LuaCraft map format into fCraft's default map format. </summary>
-    public sealed class MapMinerCPP : IMapImporter, IMapExporter {
+    public sealed class MapMinerCPP : IMapConverter {
 
         public string ServerName {
             get { return "MinerCPP/LuaCraft"; }
         }
 
-        public bool SupportsImport {
-            get { return true; }
-        }
-
-        public bool SupportsExport {
-            get { return true; }
-        }
-
-        public string FileExtension {
-            get { return "dat"; }
-        }
 
         public MapStorageType StorageType {
             get { return MapStorageType.SingleFile; }
         }
+
 
         public MapFormat Format {
             get { return MapFormat.MinerCPP; }
         }
 
 
-        public bool ClaimsName( string fileName ) {
+        public bool ClaimsName( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             return fileName.EndsWith( ".dat", StringComparison.OrdinalIgnoreCase );
         }
 
 
-        public bool Claims( string fileName ) {
+        public bool Claims( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             try {
                 using( FileStream mapStream = File.OpenRead( fileName ) ) {
                     using( GZipStream gs = new GZipStream( mapStream, CompressionMode.Decompress ) ) {
                         BinaryReader bs = new BinaryReader( gs );
-                        return ( bs.ReadByte() == 0xbe && bs.ReadByte() == 0xee && bs.ReadByte() == 0xef );
+                        return (bs.ReadByte() == 0xbe && bs.ReadByte() == 0xee && bs.ReadByte() == 0xef);
                     }
                 }
             } catch( Exception ) {
@@ -56,7 +45,7 @@ namespace fCraft.MapConversion {
         }
 
 
-        public Map LoadHeader( string fileName ) {
+        public Map LoadHeader( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             using( FileStream mapStream = File.OpenRead( fileName ) ) {
                 // Setup a GZipStream to decompress and read the map file
@@ -73,11 +62,11 @@ namespace fCraft.MapConversion {
 
             // Read in the magic number
             if( bs.ReadByte() != 0xbe || bs.ReadByte() != 0xee || bs.ReadByte() != 0xef ) {
-                throw new MapFormatException( "MapMinerCPP: Map header is incorrect." );
+                throw new MapFormatException( "MinerCPP map header is incorrect." );
             }
 
-            // Read in the map dimensions
-            // Saved in big endian for who-knows-what reason.
+            // Read in the map dimesions
+            // Saved in big endian for who-know-what reason.
             // XYZ(?)
             int width = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
             int height = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
@@ -88,12 +77,14 @@ namespace fCraft.MapConversion {
             // ReSharper restore UseObjectOrCollectionInitializer
 
             // Read in the spawn location
-            short x = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
-            short z = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
-            short y = IPAddress.NetworkToHostOrder( bs.ReadInt16() );
-            map.Spawn = new Position( x, y, z,
-                                      bs.ReadByte(),
-                                      bs.ReadByte() );
+            // XYZ(?)
+            map.Spawn = new Position {
+                X = IPAddress.NetworkToHostOrder( bs.ReadInt16() ),
+                Z = IPAddress.NetworkToHostOrder( bs.ReadInt16() ),
+                Y = IPAddress.NetworkToHostOrder( bs.ReadInt16() ),
+                R = bs.ReadByte(),
+                L = bs.ReadByte()
+            };
 
             // Skip over the block count, totally useless
             bs.ReadInt32();
@@ -102,13 +93,17 @@ namespace fCraft.MapConversion {
         }
 
 
-        public Map Load( string fileName ) {
+        public Map Load( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             using( FileStream mapStream = File.OpenRead( fileName ) ) {
                 // Setup a GZipStream to decompress and read the map file
                 using( GZipStream gs = new GZipStream( mapStream, CompressionMode.Decompress, true ) ) {
 
                     Map map = LoadHeaderInternal( gs );
+
+                    if( !map.ValidateHeader() ) {
+                        throw new MapFormatException( "One or more of the map dimensions are invalid." );
+                    }
 
                     // Read in the map data
                     map.Blocks = new byte[map.Volume];
@@ -120,7 +115,7 @@ namespace fCraft.MapConversion {
         }
 
 
-        public void Save( Map mapToSave, string fileName ) {
+        public bool Save( [NotNull] Map mapToSave, [NotNull] string fileName ) {
             if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             using( FileStream mapStream = File.Create( fileName ) ) {
@@ -150,6 +145,7 @@ namespace fCraft.MapConversion {
 
                     // Write out the map data
                     bs.Write( mapToSave.Blocks );
+                    return true;
                 }
             }
         }

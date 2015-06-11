@@ -1,22 +1,22 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
+using JetBrains.Annotations;
 
 namespace fCraft.Drawing {
-    /// <summary> Brush that creates a diagonal rainbow pattern, using
-    /// Red, Orange, Yellow, Green, Aqua, Blue, and Violet blocks. </summary>
     public sealed class RainbowBrush : IBrushFactory, IBrush, IBrushInstance {
         public static readonly RainbowBrush Instance = new RainbowBrush();
 
         RainbowBrush() { }
 
+        public bool HasAlternateBlock {
+            get { return false; }
+        }
+
         public string Name {
             get { return "Rainbow"; }
         }
 
-        public int AlternateBlocks {
-            get { return 1; }
-        }
-
+        [CanBeNull]
         public string[] Aliases {
             get { return null; }
         }
@@ -36,16 +36,16 @@ namespace fCraft.Drawing {
         }
 
 
-        public IBrush MakeBrush( Player player, CommandReader cmd ) {
+        public IBrush MakeBrush( Player player, Command cmd ) {
             return this;
         }
 
 
-        public IBrushInstance MakeInstance( Player player, CommandReader cmd, DrawOperation state ) {
+        public IBrushInstance MakeInstance( Player player, Command cmd, DrawOperation state ) {
             return this;
         }
 
-        static readonly Block[] Rainbow = {
+        static readonly Block[] Rainbow = new[]{
             Block.Red,
             Block.Orange,
             Block.Yellow,
@@ -63,14 +63,14 @@ namespace fCraft.Drawing {
             get { return Instance; }
         }
 
-        public bool Begin( Player player, DrawOperation state ) {
+        public bool Begin( [NotNull] Player player, [NotNull] DrawOperation state ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( state == null ) throw new ArgumentNullException( "state" );
             return true;
         }
 
 
-        public Block NextBlock( DrawOperation state ) {
+        public Block NextBlock( [NotNull] DrawOperation state ) {
             if( state == null ) throw new ArgumentNullException( "state" );
             return Rainbow[(state.Coords.X + state.Coords.Y + state.Coords.Z) % 7];
         }

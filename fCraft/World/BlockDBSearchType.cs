@@ -1,9 +1,13 @@
-// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2013 Matvei Stefarov <me@matvei.org>
 
-namespace fCraft {
+namespace fCraft
+{
+
     /// <summary> Describes what kind of results should BlockDB.Lookup return. </summary>
-    public enum BlockDBSearchType {
-        /// <summary> All BlockDB Entries (even those that have been overridden) are returned,
+    public enum BlockDBSearchType
+    {
+
+        /// <summary> All BlockDB Entries (even those that have been overriden) are returned,
         /// possibly multiple entries per coordinate. </summary>
         ReturnAll,
 

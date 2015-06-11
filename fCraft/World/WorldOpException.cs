@@ -1,15 +1,11 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 
 namespace fCraft {
-    /// <summary> Exception that is thrown when an invalid operation is attempted on a world. </summary>
     public sealed class WorldOpException : Exception {
-        /// <summary> Error code associated with the error. </summary>
+
         public WorldOpExceptionCode ErrorCode { get; private set; }
 
-        /// <summary> Creates a new instance of fCraft.WorldOpException, with the specified world and error code. </summary>
-        /// <param name="worldName"> World where exception took place. May be null if no relevant world exists. </param>
-        /// <param name="errorCode"> Error that took place. </param>
         public WorldOpException( string worldName, WorldOpExceptionCode errorCode )
             : base( GetMessage( worldName, errorCode ) ) {
             ErrorCode = errorCode;
@@ -30,7 +26,7 @@ namespace fCraft {
             ErrorCode = errorCode;
         }
 
-        internal static string GetMessage( string worldName, WorldOpExceptionCode code ) {
+        public static string GetMessage( string worldName, WorldOpExceptionCode code ) {
             if( worldName != null ) {
                 switch( code ) {
                     case WorldOpExceptionCode.CannotDoThatToMainWorld:
@@ -69,13 +65,13 @@ namespace fCraft {
                         return "You are not allowed to do this operation to world \"" + worldName + "\".";
 
                     case WorldOpExceptionCode.Unexpected:
-                        return "Unexpected problem occurred with world \"" + worldName + "\".";
+                        return "Unexpected problem occured with world \"" + worldName + "\".";
 
                     case WorldOpExceptionCode.WorldNotFound:
                         return "No world found with the name \"" + worldName + "\".";
 
                     default:
-                        return "Unexpected error occurred while working on world \"" + worldName + "\"";
+                        return "Unexpected error occured while working on world \"" + worldName + "\"";
                 }
             } else {
                 switch( code ) {
@@ -114,11 +110,14 @@ namespace fCraft {
                     case WorldOpExceptionCode.SecurityError:
                         return "You are not allowed to do this operation.";
 
+                    case WorldOpExceptionCode.Unexpected:
+                        return "Unexpected problem occured.";
+
                     case WorldOpExceptionCode.WorldNotFound:
                         return "Specified world was not found.";
 
                     default:
-                        return "Unexpected error occurred.";
+                        return "Unexpected error occured.";
                 }
             }
         }
@@ -127,7 +126,6 @@ namespace fCraft {
 
     /// <summary> List of common world operation issues. Used by WorldOpException. </summary>
     public enum WorldOpExceptionCode {
-        /// <summary> Something new, exciting and dangerous happened! We don't know what it was though. </summary>
         Unexpected,
 
         /// <summary> No changes were needed or made (e.g. renaming a world to the same name). </summary>

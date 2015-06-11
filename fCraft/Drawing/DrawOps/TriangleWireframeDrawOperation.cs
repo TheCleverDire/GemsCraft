@@ -1,9 +1,8 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that creates an outline of a triangle, using three given coordinates as vertices. </summary>
     public sealed class TriangleWireframeDrawOperation : DrawOperation {
 
         public override int ExpectedMarks {

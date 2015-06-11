@@ -1,11 +1,9 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that performs a 2D flood fill. 
-    /// Uses player's position to determine plane of filling. </summary>
-    public sealed class Fill2DDrawOperation : DrawOperation {
+    public sealed class Fill2DDrawOperation : DrawOpWithBrush {
         int maxFillExtent;
 
         public override string Name {
@@ -18,30 +16,54 @@ namespace fCraft.Drawing {
 
         public override string Description {
             get {
-                if( SourceBlock == Block.None ) {
-                    return String.Format( "{0}({1})",
-                                          Name,
-                                          Brush.InstanceDescription );
+                if( SourceBlock == Block.Undefined ) {
+                    if( ReplacementBlock == Block.Undefined ) {
+                        return Name;
+                    } else {
+                        return String.Format( "{0}({1})",
+                                              Name, ReplacementBlock );
+                    }
                 } else {
-                    return String.Format( "{0}({1} @{2} -> {3})",
-                                          Name, SourceBlock, Axis, Brush.InstanceDescription );
+                    return String.Format( "{0}({1} -> {2} @{3})",
+                                          Name, SourceBlock, ReplacementBlock, Axis );
                 }
             }
         }
 
         public Block SourceBlock { get; private set; }
+        public Block ReplacementBlock { get; private set; }
         public Axis Axis { get; private set; }
         public Vector3I Origin { get; private set; }
 
         public Fill2DDrawOperation( Player player )
             : base( player ) {
-            SourceBlock = Block.None;
+            SourceBlock = Block.Undefined;
+            ReplacementBlock = Block.Undefined;
+        }
+
+
+        public override bool ReadParams( Command cmd ) {
+            if( cmd.HasNext ) {
+                ReplacementBlock = cmd.NextBlock( Player );
+                if( ReplacementBlock == Block.Undefined ) return false;
+            }
+            Brush = this;
+            return true;
         }
 
 
         public override bool Prepare( Vector3I[] marks ) {
             if( marks == null ) throw new ArgumentNullException( "marks" );
             if( marks.Length < 1 ) throw new ArgumentException( "At least one mark needed.", "marks" );
+
+            if( ReplacementBlock == Block.Undefined ) {
+                if( Player.LastUsedBlockType == Block.Undefined ) {
+                    Player.Message( "Cannot deduce desired replacement block. Click a block or type out the block name." );
+                    return false;
+                } else {
+                    ReplacementBlock = Player.GetBind( Player.LastUsedBlockType );
+                }
+            }
 
             Marks = marks;
             Origin = marks[0];
@@ -70,58 +92,33 @@ namespace fCraft.Drawing {
                     coordEnumerator = BlockEnumeratorZ().GetEnumerator();
                     break;
             }
-
-            Bounds = new BoundingBox( Origin - maxDelta, Origin + maxDelta );
+            if( SourceBlock == ReplacementBlock ) {
+                Bounds = new BoundingBox( Origin, Origin );
+            } else {
+                Bounds = new BoundingBox( Origin - maxDelta, Origin + maxDelta );
+            }
 
             // Clip bounds to the map, used to limit fill extent
             Bounds = Bounds.GetIntersection( Map.Bounds );
 
             // Set everything up for filling
+            Brush = this;
             Coords = Origin;
 
             StartTime = DateTime.UtcNow;
             Context = BlockChangeContext.Drawn | BlockChangeContext.Filled;
             BlocksTotalEstimate = Bounds.Volume;
 
-            if( Brush == null ) throw new NullReferenceException( Name + ": Brush not set" );
-            return Brush.Begin( Player, this );
-        }
-
-
-        // fields to accommodate non-standard brushes (which require caching)
-        bool nonStandardBrush;
-        HashSet<Vector3I> allCoords;
-
-        public override bool Begin() {
-            if( !RaiseBeginningEvent( this ) ) return false;
-            UndoState = Player.DrawBegin( this );
-            StartTime = DateTime.UtcNow;
-
-            if( !(Brush is NormalBrush) ) {
-                // for nonstandard brushes, cache all coordinates up front
-                nonStandardBrush = true;
-
-                // Generate a list if all coordinates
-                allCoords = new HashSet<Vector3I>();
-                while( coordEnumerator.MoveNext() ) {
-                    allCoords.Add( coordEnumerator.Current );
-                }
-                coordEnumerator.Dispose();
-
-                // Replace our F2D enumerator with a HashSet enumerator
-                coordEnumerator = allCoords.GetEnumerator();
-            }
-
-            HasBegun = true;
-            Map.QueueDrawOp( this );
-            RaiseBeganEvent( this );
             return true;
         }
 
 
         IEnumerator<Vector3I> coordEnumerator;
-
         public override int DrawBatch( int maxBlocksToDraw ) {
+            if( SourceBlock == ReplacementBlock ) {
+                IsDone = true;
+                return 0;
+            }
             int blocksDone = 0;
             while( coordEnumerator.MoveNext() ) {
                 Coords = coordEnumerator.Current;
@@ -137,20 +134,18 @@ namespace fCraft.Drawing {
 
 
         bool CanPlace( Vector3I coords ) {
-            if( nonStandardBrush && allCoords.Contains( coords ) ) {
-                return false;
-            }
             return (Map.GetBlock( coords ) == SourceBlock) &&
-                   (Player.CanPlace( Map, coords, Brush.NextBlock( this ), Context ) == CanPlaceResult.Allowed);
+                   Player.CanPlace( Map, coords, ReplacementBlock, Context ) == CanPlaceResult.Allowed;
         }
 
 
         IEnumerable<Vector3I> BlockEnumeratorX() {
             Stack<Vector3I> stack = new Stack<Vector3I>();
             stack.Push( Origin );
+            Vector3I coords;
 
             while( stack.Count > 0 ) {
-                Vector3I coords = stack.Pop();
+                coords = stack.Pop();
                 while( coords.Y >= Bounds.YMin && CanPlace( coords ) ) coords.Y--;
                 coords.Y++;
                 bool spanLeft = false;
@@ -186,9 +181,10 @@ namespace fCraft.Drawing {
         IEnumerable<Vector3I> BlockEnumeratorY() {
             Stack<Vector3I> stack = new Stack<Vector3I>();
             stack.Push( Origin );
+            Vector3I coords;
 
             while( stack.Count > 0 ) {
-                Vector3I coords = stack.Pop();
+                coords = stack.Pop();
                 while( coords.Z >= Bounds.ZMin && CanPlace( coords ) ) coords.Z--;
                 coords.Z++;
                 bool spanLeft = false;
@@ -224,9 +220,10 @@ namespace fCraft.Drawing {
         IEnumerable<Vector3I> BlockEnumeratorZ() {
             Stack<Vector3I> stack = new Stack<Vector3I>();
             stack.Push( Origin );
+            Vector3I coords;
 
             while( stack.Count > 0 ) {
-                Vector3I coords = stack.Pop();
+                coords = stack.Pop();
                 while( coords.Y >= Bounds.YMin && CanPlace( coords ) ) coords.Y--;
                 coords.Y++;
                 bool spanLeft = false;
@@ -256,6 +253,11 @@ namespace fCraft.Drawing {
                     coords.Y++;
                 }
             }
+        }
+
+
+        protected override Block NextBlock() {
+            return ReplacementBlock;
         }
     }
 }

@@ -10,12 +10,19 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>fCraft</RootNamespace>
     <AssemblyName>fCraft</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <StartupObject>
     </StartupObject>
     <ApplicationIcon>
     </ApplicationIcon>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -28,14 +35,8 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
-    <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>..\bin\Debug\</OutputPath>
@@ -44,27 +45,30 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>..\bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <OutputPath>..\bin\release\</OutputPath>
+    <DefineConstants>RELEASE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
-    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_Events|AnyCPU' ">
-    <OutputPath>..\bin\Debug\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DefineConstants>TRACE;DEBUG;DEBUG_EVENTS</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
-    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_IRC|AnyCPU' ">
     <OutputPath>..\bin\Debug\</OutputPath>
@@ -73,7 +77,8 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_Scheduler|AnyCPU' ">
     <OutputPath>..\bin\Debug\</OutputPath>
@@ -82,55 +87,161 @@
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug_Networking|AnyCPU' ">
-    <OutputPath>..\bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;DEBUG_NETWORKING</DefineConstants>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'DEBUG_BLOCKDB|AnyCPU'">
+    <OutputPath>bin\DEBUG_BLOCKDB\</OutputPath>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <DocumentationFile>..\bin\Debug\fCraft.XML</DocumentationFile>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AStarPathFinder, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\AStarPathFinder.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text, Version=3.6.8.20237, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\release\ServiceStack.Text.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Runtime.Serialization">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.ServiceModel.Web">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Drawing\DrawOperation.cs" />
     <Compile Include="AutoRank\AutoRankManager.cs" />
+    <Compile Include="AutoRank\Condition.cs" />
+    <Compile Include="AutoRank\fCraftAutoManager.cs" />
+    <Compile Include="AutoRank\fCraftConditions.cs" />
+    <Compile Include="AutoRank\fCraftCriterion.cs" />
+    <Compile Include="Commands\Command Handlers\BroModeHandler.cs" />
+    <Compile Include="Commands\Command Handlers\FlyHandler.cs" />
+    <Compile Include="Commands\Command Handlers\GunHandler.cs" />
+    <Compile Include="Commands\Command Handlers\LifeHandler.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\EqualityDrawOperation.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\Expression.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\FuncDrawOperation.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\FuncDrawOperationPSF.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\InequalityDrawOperation.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\ManifoldDrawOperation.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\PrepareParametrizedManifold.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\Scaler.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\SimpleParser.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\StartSpringDraw.cs" />
+    <Compile Include="Commands\Command Handlers\Math Handlers\PrepareSpring.cs" />
+    <Compile Include="Commands\Command Handlers\RealmHandler.cs" />
+    <Compile Include="Commands\Command Handlers\VoteHandler.cs" />
+    <Compile Include="Commands\DevCommands.cs" />
+    <Compile Include="Commands\FunCommands.cs" />
+    <Compile Include="Commands\MathCommands.cs" />
+    <Compile Include="Drawing\Brushes\DiagonalBrush.cs" />
+    <Compile Include="Drawing\DrawOperation.cs" />
     <Compile Include="Commands\ModerationCommands.cs" />
     <Compile Include="Commands\MaintenanceCommands.cs" />
     <Compile Include="Commands\ZoneCommands.cs" />
-    <Compile Include="Drawing\DrawOps\Fill3DDrawOperation.cs" />
+    <Compile Include="Drawing\DrawOps\BlockDBDrawOperation.cs" />
+    <Compile Include="Drawing\DrawOps\CylinderDrawOperation.cs" />
+    <Compile Include="Drawing\DrawOps\Maze.cs" />
+    <Compile Include="Drawing\DrawOps\MazeCuboidDrawOperation.cs" />
+    <Compile Include="Drawing\DrawOps\RandomMazeDrawOperation.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Drawing\DrawOps\WallsOp.cs" />
+    <Compile Include="Drawing\nbt\Class1.cs" />
+    <Compile Include="Drawing\nbt\Exceptions\NbtQueryException.cs" />
+    <Compile Include="Drawing\nbt\Queries\TagQuery.cs" />
+    <Compile Include="Drawing\nbt\Queries\TagQueryToken.cs" />
+    <Compile Include="Drawing\nbt\Tags\INbtTagList.cs" />
+    <Compile Include="Drawing\nbt\Tags\INbtTagValue.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtByte.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtByteArray.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtCompound.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtDouble.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtFloat.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtInt.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtList.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtLong.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtShort.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtString.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtTag.cs" />
+    <Compile Include="Drawing\nbt\Tags\NbtTagType.cs" />
+    <Compile Include="Games\CTF.cs" />
+    <Compile Include="Games\FFA.cs" />
+    <Compile Include="Games\Football.cs" />
+    <Compile Include="Games\GameMode.cs" />
+    <Compile Include="Games\MineChallenge.cs" />
+    <Compile Include="Games\MineField.cs" />
+    <Compile Include="Games\Spell.cs" />
+    <Compile Include="Games\Infection.cs" />
+    <Compile Include="Games\TeamDeathMatch.cs" />
     <Compile Include="MapConversion\MapFCMv3.cs" />
-    <Compile Include="MapGeneration\EmptyMapGen.cs" />
-    <Compile Include="MapGeneration\FloatingIslandMapGen.cs" />
-    <Compile Include="MapGeneration\FlatMapGen.cs" />
-    <Compile Include="MapGeneration\RealisticMapGenTerrainType.cs" />
-    <Compile Include="MapGeneration\MapGenTheme.cs" />
-    <Compile Include="MapGeneration\MapGenUtil.cs" />
-    <Compile Include="MapGeneration\PerlinNoise.cs" />
-    <Compile Include="MapGeneration\RealisticMapGen.cs" />
-    <Compile Include="MapGeneration\RealisticMapGenBlockTheme.cs" />
-    <Compile Include="MapGeneration\VanillaMapGen.cs" />
-    <Compile Include="Player\SearchOptions.cs" />
-    <Compile Include="Player\SecurityController.cs" />
-    <Compile Include="Utils\BitMap3D.cs" />
+    <Compile Include="Network\CPE.cs" />
+    <Compile Include="Network\GlobalChat.cs" />
+    <Compile Include="Network\PacketReader.cs" />
+    <Compile Include="Physics\ExplodingPhysics.cs" />
+    <Compile Include="Physics\Life\Life2d.cs" />
+    <Compile Include="Physics\Life\Life2DZone.cs" />
+    <Compile Include="Physics\Life\LifeSerialization.cs" />
+    <Compile Include="Network\Heartbeat.cs" />
+    <Compile Include="Network\IPBanInfo.cs" />
+    <Compile Include="Network\IPBanList.cs" />
+    <Compile Include="Network\IRC.cs" />
+    <Compile Include="Network\IRCCommands.cs" />
+    <Compile Include="Network\IRCMessage.cs" />
+    <Compile Include="Network\LineWrapper.cs" />
+    <Compile Include="Network\OpCode.cs" />
+    <Compile Include="Network\Packet.cs" />
+    <Compile Include="Network\PacketWriter.cs" />
+    <Compile Include="Network\Player.Networking.cs" />
+    <Compile Include="Physics\ParticleSystem.cs" />
+    <Compile Include="Physics\Physics.cs" />
+    <Compile Include="Physics\PhysicsHeap.cs" />
+    <Compile Include="Physics\PhysicsScheduler.cs" />
+    <Compile Include="Physics\PlantPhysics.cs" />
+    <Compile Include="Physics\SandPhysics.cs" />
+    <Compile Include="Physics\TreeGeneration.cs" />
+    <Compile Include="Physics\WaterPhysics.cs" />
+    <Compile Include="Player\Bot.cs" />
+    <Compile Include="Player\Chat.cs" />
+    <Compile Include="Player\ChatTimer.cs" />
+    <Compile Include="Player\LegendCraft.cs" />
+    <Compile Include="Player\Permission.cs" />
+    <Compile Include="Player\Player.cs" />
+    <Compile Include="Player\Player.Events.cs" />
+    <Compile Include="Player\PlayerConstants.cs" />
+    <Compile Include="Player\PlayerDB.cs" />
+    <Compile Include="Player\PlayerEnumerable.cs" />
+    <Compile Include="Player\PlayerInfo.Actions.cs" />
+    <Compile Include="Player\PlayerInfo.cs" />
+    <Compile Include="Player\PlayerInfo.Events.cs" />
+    <Compile Include="Player\PlayerOpException.cs" />
+    <Compile Include="Player\Position.cs" />
+    <Compile Include="Player\Rank.cs" />
+    <Compile Include="Player\RankManager.cs" />
+    <Compile Include="Plugins\PluginConfig.cs" />
+    <Compile Include="Plugins\PluginConfigSerializer.cs" />
+    <Compile Include="Plugins\SecurityController.cs" />
+    <Compile Include="Plugins\Plugin.cs" />
+    <Compile Include="Plugins\PluginManager.cs" />
+    <Compile Include="Plugins\Plugins\TrollPlugin.cs" />
+    <Compile Include="Portals\Portal.cs" />
+    <Compile Include="Portals\PortalDB.cs" />
+    <Compile Include="Portals\PortalException.cs" />
+    <Compile Include="Portals\PortalHandler.cs" />
+    <Compile Include="Portals\PortalRange.cs" />
+    <Compile Include="Utils\HeartbeatSaverUtil.cs" />
     <Compile Include="Utils\Paths.cs" />
     <Compile Include="System\Scheduler.cs" />
+    <Compile Include="Games\PlayerProximityTracker.cs" />
+    <Compile Include="Utils\RWLSExtension.cs" />
     <Compile Include="Utils\Vector3F.cs" />
     <Compile Include="Commands\CommandDescriptor.cs" />
     <Compile Include="Commands\WorldCommands.cs" />
@@ -146,55 +257,35 @@
     <Compile Include="MapConversion\MapFormat.cs" />
     <Compile Include="MapConversion\MapMCSharp.cs" />
     <Compile Include="MapConversion\MapMinerCPP.cs" />
-    <Compile Include="MapConversion\MapIndev.cs" />
+    <Compile Include="MapConversion\MapNBT.cs" />
     <Compile Include="MapConversion\MapUtility.cs" />
     <Compile Include="MapConversion\NBTag.cs" />
-    <Compile Include="Network\IRC.cs" />
-    <Compile Include="Network\IPBanList.cs" />
-    <Compile Include="Network\IRCCommands.cs" />
-    <Compile Include="Network\IRCMessage.cs" />
-    <Compile Include="Player\PlayerConstants.cs" />
     <Compile Include="Utils\BoundingBox.cs" />
-    <Compile Include="Utils\ConcurrentQueue.cs" />
     <Compile Include="System\ConfigKey.cs" />
     <Compile Include="Utils\Noise.cs" />
     <Compile Include="Utils\Updater.cs" />
-    <Compile Include="Player\RankManager.cs" />
-    <Compile Include="Player\Permission.cs" />
     <Compile Include="Utils\Color.cs" />
-    <Compile Include="Network\Heartbeat.cs" />
     <Compile Include="System\Server.cs" />
     <Compile Include="System\Config.cs" />
     <Compile Include="System\Logger.cs" />
-    <Compile Include="Network\PacketWriter.cs" />
-    <Compile Include="Network\Packet.cs" />
-    <Compile Include="Network\Player.Networking.cs" />
-    <Compile Include="Commands\CommandReader.cs" />
-    <Compile Include="Player\Rank.cs" />
-    <Compile Include="Player\Player.cs" />
-    <Compile Include="Player\PlayerDB.cs" />
-    <Compile Include="Player\PlayerInfo.cs" />
+    <Compile Include="Commands\Command.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="app.config" />
     <Compile Include="Utils\Trie.cs" />
-    <Compile Include="Player\Position.cs" />
     <Compile Include="World\Block.cs" />
+    <Compile Include="World\BlockDBSearchType.cs" />
     <Compile Include="World\BlockUpdate.cs" />
-    <Compile Include="MapGeneration\Forester.cs" />
-    <Compile Include="MapGeneration\MapGenerator.cs" />
-    <Compile Include="MapGeneration\MapGeneratorParameters.cs" />
-    <Compile Include="MapGeneration\MapGeneratorState.cs" />
+    <Compile Include="World\Forester.cs" />
     <Compile Include="World\Map.cs" />
-    <Compile Include="MapGeneration\RealisticMapGenState.cs">
+    <Compile Include="World\MapGenerator.cs">
     </Compile>
-    <Compile Include="MapGeneration\RealisticMapGenParameters.cs" />
+    <Compile Include="World\MapGeneratorArgs.cs" />
     <Compile Include="World\World.cs" />
     <Compile Include="World\Zone.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
       <Visible>False</Visible>
-      <ProductName>.NET Framework Client Profile</ProductName>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
@@ -224,11 +315,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AutoRank\Conditions.cs" />
-    <Compile Include="AutoRank\Criterion.cs" />
     <Compile Include="Commands\ChatCommands.cs" />
     <Compile Include="Drawing\Brushes\ReplaceBrushBrush.cs" />
-    <Compile Include="Drawing\DrawOps\BlockDBDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\TriangleDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\TriangleWireframeDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\Fill2DDrawOperation.cs" />
@@ -238,11 +326,8 @@
     <Compile Include="Drawing\DrawOps\PasteDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\CutDrawOperation.cs" />
     <Compile Include="Drawing\UndoState.cs" />
-    <Compile Include="MapConversion\MyneMetaFile.cs" />
-    <Compile Include="MapConversion\MapRaw.cs" />
-    <Compile Include="Network\IPBanInfo.cs" />
-    <Compile Include="Network\PacketReader.cs" />
-    <Compile Include="Player\ChatTimer.cs" />
+    <Compile Include="MapConversion\INIFile.cs" />
+    <Compile Include="Drawing\Brushes\AbstractPerlinNoiseBrush.cs" />
     <Compile Include="Drawing\Brushes\CheckeredBrush.cs" />
     <Compile Include="Drawing\Brushes\ReplaceNotBrush.cs" />
     <Compile Include="Drawing\Brushes\ReplaceBrush.cs" />
@@ -256,6 +341,7 @@
     <Compile Include="Drawing\DrawOps\EllipsoidDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\CuboidHollowDrawOperation.cs" />
     <Compile Include="Drawing\DrawOps\CuboidWireframeDrawOperation.cs" />
+    <Compile Include="Drawing\Brushes\MarbledBrush.cs" />
     <Compile Include="Drawing\Brushes\RainbowBrush.cs" />
     <Compile Include="Drawing\Brushes\RandomBrush.cs" />
     <Compile Include="Drawing\DrawOps\CuboidDrawOperation.cs" />
@@ -263,28 +349,13 @@
     <Compile Include="Drawing\IBrush.cs" />
     <Compile Include="Drawing\Brushes\NormalBrush.cs" />
     <Compile Include="Drawing\Axis.cs" />
-    <Compile Include="Player\Chat.cs" />
     <Compile Include="Commands\CommandCategory.cs" />
     <Compile Include="MapConversion\MapFormatException.cs" />
     <Compile Include="MapConversion\MapOpticraft.cs" />
-    <Compile Include="Network\LineWrapper.cs" />
-    <Compile Include="Network\OpCode.cs" />
-    <Compile Include="Player\PlayerInfo.Actions.cs" />
-    <Compile Include="Player\Player.Events.cs" />
-    <Compile Include="Player\PlayerEnumerable.cs" />
-    <Compile Include="Player\PlayerOpException.cs" />
+    <Compile Include="MapConversion\MapFCMv4.cs" />
     <Compile Include="System\ArgKey.cs" />
     <Compile Include="System\ConfigKey.Metadata.cs" />
     <Compile Include="System\ConfigSection.cs" />
-    <Compile Include="System\ShutdownParams.cs" />
-    <Compile Include="System\ShutdownReason.cs" />
-    <Compile Include="Utils\BufferUtil.cs" />
-    <Compile Include="Utils\DateTimeUtil.cs" />
-    <Compile Include="Utils\EnumerableUtil.cs" />
-    <Compile Include="Utils\EnumUtil.cs" />
-    <Compile Include="Utils\IPAddressUtil.cs" />
-    <Compile Include="Utils\Mono.Options.cs" />
-    <Compile Include="Utils\RWLSExtension.cs" />
     <Compile Include="Utils\Vector3I.cs" />
     <Compile Include="World\BlockChangeContext.cs" />
     <Compile Include="World\BlockDB.cs" />
@@ -292,23 +363,20 @@
     <Compile Include="System\SchedulerTask.cs" />
     <Compile Include="Utils\IClassy.cs" />
     <Compile Include="System\Server.Events.cs" />
-    <Compile Include="Utils\FormatUtil.cs" />
+    <Compile Include="Utils\ExtensionMethods.cs" />
     <Compile Include="Utils\LogRecorder.cs" />
     <Compile Include="Utils\PerlinNoise3D.cs" />
     <Compile Include="Utils\ZipStorer.cs" />
     <Compile Include="World\BlockDBEntry.cs" />
     <Compile Include="Utils\MetadataCollection.cs" />
-    <Compile Include="World\BlockDBSearchType.cs" />
     <Compile Include="World\WorldManager.cs" />
     <Compile Include="World\WorldOpException.cs" />
     <Compile Include="Utils\MonoCompat.cs" />
     <Compile Include="Utils\YesNoAuto.cs" />
     <Compile Include="World\ZoneCollection.cs" />
-    <Compile Include="Player\PlayerInfo.Events.cs" />
     <Compile Include="World\World.Events.cs" />
     <Compile Include="Utils\JetBrains.Annotations.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

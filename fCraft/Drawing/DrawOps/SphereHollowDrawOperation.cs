@@ -1,10 +1,7 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that creates a hollow sphere,
-    /// or a sphere filled differently on inside and outside.
-    /// The "shell" of the sphere is always 1 block wide. </summary>
     public sealed class SphereHollowDrawOperation : EllipsoidHollowDrawOperation {
         public override string Name {
             get { return "SphereH"; }

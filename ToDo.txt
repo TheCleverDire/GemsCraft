@@ -1,0 +1,4 @@
+-Use LegendCraft last release into the next GemsCraft-
+-Use old updater system from GemsCraft Alpha-
+-Start Implementation of old GemsCraft Alpha commands-
+-Consider new ideas for Beta 1.0 release-

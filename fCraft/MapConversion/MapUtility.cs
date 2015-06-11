@@ -1,130 +1,88 @@
-// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using JetBrains.Annotations;
 
 namespace fCraft.MapConversion {
-    /// <summary> Utilities used to handle different map formats, including loading, parsing, and saving. </summary>
+
     public static class MapUtility {
-        static readonly Dictionary<MapFormat, IMapImporter> Importers = new Dictionary<MapFormat, IMapImporter>();
-        static readonly Dictionary<MapFormat, IMapExporter> Exporters = new Dictionary<MapFormat, IMapExporter>();
 
-
-        /// <summary> Registers a new map importer or exporter.
-        /// Only one importer/exporter may be registered for each supported format.
-        /// If an importer/exporter for the given format has already been registered, it will be replaced. </summary>
-        /// <param name="converter"> New converter to add. </param>
-        /// <exception cref="ArgumentException"> Given IMapConverter is nether an IMapImporter, nor an IMapExporter. </exception>
-        public static void RegisterConverter( IMapConverter converter ) {
-            IMapImporter asImporter = converter as IMapImporter;
-            IMapExporter asExporter = converter as IMapExporter;
-            if( asImporter != null ) Importers.Add( asImporter.Format, asImporter );
-            if( asExporter != null ) Exporters.Add( asExporter.Format, asExporter );
-            if( asImporter == null && asExporter == null ) {
-                throw new ArgumentException( "Given converter is neither an IMapImporter nor an IMapExporter." );
-            }
-        }
+        static readonly Dictionary<MapFormat, IMapConverter> AvailableConverters = new Dictionary<MapFormat, IMapConverter>();
 
 
         static MapUtility() {
-            RegisterConverter( new MapFCMv3() );
-            RegisterConverter( new MapFCMv2() );
-            RegisterConverter( new MapDat() );
-            RegisterConverter( new MapMCSharp() );
-            RegisterConverter( new MapD3() );
-            RegisterConverter( new MapJTE() );
-            RegisterConverter( new MapMinerCPP() );
-            RegisterConverter( new MapMyne() );
-            RegisterConverter( new MapIndev() );
-            RegisterConverter( new MapOpticraft() );
-            RegisterConverter( new MapRaw() );
+            AvailableConverters.Add( MapFormat.FCMv4, new MapFCMv4() );
+            AvailableConverters.Add( MapFormat.FCMv3, new MapFCMv3().AddExtension(new ZoneConverterExtension()).AddExtension(new LifeSerialization()) );
+            AvailableConverters.Add( MapFormat.FCMv2, new MapFCMv2() );
+            AvailableConverters.Add( MapFormat.Creative, new MapDat() );
+            AvailableConverters.Add( MapFormat.MCSharp, new MapMCSharp() );
+            AvailableConverters.Add( MapFormat.D3, new MapD3() );
+            AvailableConverters.Add( MapFormat.JTE, new MapJTE() );
+            AvailableConverters.Add( MapFormat.MinerCPP, new MapMinerCPP() );
+            AvailableConverters.Add( MapFormat.Myne, new MapMyne() );
+            AvailableConverters.Add( MapFormat.NBT, new MapNBT() );
+            AvailableConverters.Add( MapFormat.Opticraft, new MapOpticraft() );
         }
 
 
-        /// <summary> Identifies the map format from the specified file name. </summary>
-        /// <param name="path"> Path to the file or directory to be identified. </param>
-        /// <param name="tryFallbackConverters"> Whether or this method should try ALL converters,
-        /// including ones that do not typically handle files with the given file extension. </param>
-        /// <returns> Map format of the specified file. MapFormat.Unknown, if the format could not be identified. </returns>
-        /// <exception cref="ArgumentNullException"> fileName is null. </exception>
-        /// <exception cref="FileNotFoundException"> The file specified in path was not found. </exception>
-        public static MapFormat Identify( [NotNull] string path, bool tryFallbackConverters ) {
-            if( path == null ) throw new ArgumentNullException( "path" );
+        // ReSharper disable EmptyGeneralCatchClause
+        public static MapFormat Identify( [NotNull] string fileName, bool tryFallbackConverters ) {
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
             MapStorageType targetType = MapStorageType.SingleFile;
-            if( !File.Exists( path ) ) {
-                if( Directory.Exists( path ) ) {
+            if( !File.Exists( fileName ) ) {
+                if( Directory.Exists( fileName ) ) {
                     targetType = MapStorageType.Directory;
                 } else {
-                    throw new FileNotFoundException( "Given file/directory could no be found." );
+                    throw new FileNotFoundException();
                 }
             }
 
-            List<IMapImporter> fallbackConverters = new List<IMapImporter>();
-            foreach( IMapImporter converter in Importers.Values ) {
+            List<IMapConverter> fallbackConverters = new List<IMapConverter>();
+            foreach( IMapConverter converter in AvailableConverters.Values ) {
                 try {
-                    if( converter.StorageType == targetType && converter.ClaimsName( path ) ) {
-                        if( converter.Claims( path ) ) {
+                    if( converter.StorageType == targetType && converter.ClaimsName( fileName ) ) {
+                        if( converter.Claims( fileName ) ) {
                             return converter.Format;
                         }
                     } else {
                         fallbackConverters.Add( converter );
                     }
-                    // ReSharper disable EmptyGeneralCatchClause
-                } catch {}
-                // ReSharper restore EmptyGeneralCatchClause
+                } catch { }
             }
 
             if( tryFallbackConverters ) {
-                foreach( IMapImporter converter in fallbackConverters ) {
+                foreach( IMapConverter converter in fallbackConverters ) {
                     try {
-                        if( converter.Claims( path ) ) {
+                        if( converter.Claims( fileName ) ) {
                             return converter.Format;
                         }
-                        // ReSharper disable EmptyGeneralCatchClause
-                    } catch {}
-                    // ReSharper restore EmptyGeneralCatchClause
+                    } catch { }
                 }
             }
 
             return MapFormat.Unknown;
         }
+        // ReSharper restore EmptyGeneralCatchClause
 
 
-        /// <summary> Attempts to load the map excluding the block data from it's header using the specified file name. </summary>
-        /// <param name="fileName"> The name of the file. </param>
-        /// <param name="tryFallbackConverters"> Whether or this method should try ALL converters,
-        /// including ones that do not typically handle files with the given file extension. </param>
-        /// <param name="map"> Where the loaded map should be stored. </param>
-        /// <returns> Whether or not the map excluding block data was loaded successfully. </returns>
-        /// <exception cref="ArgumentNullException"> fileName is null. </exception>
-        public static bool TryLoadHeader( [NotNull] string fileName, bool tryFallbackConverters, out Map map ) {
+        public static bool TryLoadHeader( [NotNull] string fileName, out Map map ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             try {
-                map = LoadHeader( fileName, tryFallbackConverters );
+                map = LoadHeader( fileName );
                 return true;
             } catch( Exception ex ) {
                 Logger.Log( LogType.Error,
                             "MapUtility.TryLoadHeader: {0}: {1}",
-                            ex.GetType().Name,
-                            ex.Message );
+                            ex.GetType().Name, ex.Message );
                 map = null;
                 return false;
             }
         }
 
 
-        /// <summary> Loads the map excluding block data from it's header using the specified file name. </summary>
-        /// <param name="fileName"> The name of the file. </param>
-        /// <param name="tryFallbackConverters"> Whether or this method should try ALL converters,
-        /// including ones that do not typically handle files with the given file extension. </param>
-        /// <returns> The loaded map excluding block data. </returns>
-        /// <exception cref="ArgumentNullException"> fileName is null. </exception>
-        /// <exception cref="FileNotFoundException"> File/directory with the given name is missing. </exception>
-        /// <exception cref="NoMapConverterFoundException"> No converter can be found to load the map. </exception>
-        [NotNull]
-        public static Map LoadHeader( [NotNull] string fileName, bool tryFallbackConverters ) {
+        public static Map LoadHeader( [NotNull] string fileName ) {
+            // ReSharper disable EmptyGeneralCatchClause
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
 
             MapStorageType targetType = MapStorageType.SingleFile;
@@ -136,77 +94,56 @@ namespace fCraft.MapConversion {
                 }
             }
 
-            List<IMapImporter> fallbackConverters = new List<IMapImporter>();
+            List<IMapConverter> fallbackConverters = new List<IMapConverter>();
 
             // first try all converters for the file extension
-            foreach( IMapImporter converter in Importers.Values ) {
+            foreach( IMapConverter converter in AvailableConverters.Values ) {
                 bool claims = false;
                 try {
                     claims = (converter.StorageType == targetType) &&
                              converter.ClaimsName( fileName ) &&
                              converter.Claims( fileName );
-                    // ReSharper disable EmptyGeneralCatchClause
-                } catch {}
-                // ReSharper restore EmptyGeneralCatchClause
+                } catch{ }
                 if( claims ) {
                     try {
                         Map map = converter.LoadHeader( fileName );
                         map.HasChangedSinceSave = false;
                         return map;
-                    } catch( NotImplementedException ) {}
+                    } catch( NotImplementedException ) { }
                 } else {
                     fallbackConverters.Add( converter );
                 }
             }
 
-            if( tryFallbackConverters ) {
-                foreach( IMapImporter converter in fallbackConverters ) {
-                    try {
-                        Map map = converter.LoadHeader( fileName );
-                        map.HasChangedSinceSave = false;
-                        return map;
-                        // ReSharper disable EmptyGeneralCatchClause
-                    } catch {}
-                    // ReSharper restore EmptyGeneralCatchClause
-                }
+            foreach( IMapConverter converter in fallbackConverters ) {
+                try {
+                    Map map = converter.LoadHeader( fileName );
+                    map.HasChangedSinceSave = false;
+                    return map;
+                } catch { }
             }
 
-            throw new NoMapConverterFoundException( "Could not find any converter to load the given file." );
+            throw new MapFormatException( "Unknown map format." );
+            // ReSharper restore EmptyGeneralCatchClause
         }
 
 
-        /// <summary> Attempts to load the map including the block data from it's header using the specified file name. </summary>
-        /// <param name="fileName"> The name of the file. </param>
-        /// <param name="tryFallbackConverters"> Whether or this method should try ALL converters,
-        /// including ones that do not typically handle files with the given file extension. </param>
-        /// <param name="map"> Where the loaded map should be stored. </param>
-        /// <returns> Whether or not the map was loaded successfully. </returns>
-        /// <exception cref="ArgumentNullException"> fileName is null. </exception>
-        public static bool TryLoad( [NotNull] string fileName, bool tryFallbackConverters, out Map map ) {
+        public static bool TryLoad( [NotNull] string fileName, out Map map ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             try {
-                map = Load( fileName, tryFallbackConverters );
+                map = Load( fileName );
                 return true;
             } catch( Exception ex ) {
                 Logger.Log( LogType.Error,
-                            "MapUtility.TryLoad: {0}",
-                            ex );
+                            "MapUtility.TryLoad: {0}", ex );
                 map = null;
                 return false;
             }
         }
 
 
-        /// <summary> Loads the map from it's header using the specified file name. </summary>
-        /// <param name="fileName"> The name of the file. </param>
-        /// <param name="tryFallbackConverters"> Whether or this method should try ALL converters,
-        /// including ones that do not typically handle files with the given file extension. </param>
-        /// <returns> The loaded map excluding block data. </returns>
-        /// <exception cref="ArgumentNullException"> fileName is null. </exception>
-        /// <exception cref="FileNotFoundException"> File/directory with the given name is missing. </exception>
-        /// <exception cref="NoMapConverterFoundException"> No converter can be found to load the given map file. </exception>
-        [NotNull]
-        public static Map Load( [NotNull] string fileName, bool tryFallbackConverters ) {
+        // ReSharper disable EmptyGeneralCatchClause
+        public static Map Load( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             MapStorageType targetType = MapStorageType.SingleFile;
             if( !File.Exists( fileName ) ) {
@@ -217,18 +154,16 @@ namespace fCraft.MapConversion {
                 }
             }
 
-            List<IMapImporter> fallbackConverters = new List<IMapImporter>();
+            List<IMapConverter> fallbackConverters = new List<IMapConverter>();
 
             // first try all converters for the file extension
-            foreach( IMapImporter converter in Importers.Values ) {
+            foreach( IMapConverter converter in AvailableConverters.Values ) {
                 bool claims = false;
                 try {
                     claims = (converter.StorageType == targetType) &&
                              converter.ClaimsName( fileName ) &&
                              converter.Claims( fileName );
-                    // ReSharper disable EmptyGeneralCatchClause
-                } catch {}
-                // ReSharper restore EmptyGeneralCatchClause
+                } catch { }
                 if( claims ) {
                     Map map = converter.Load( fileName );
                     map.HasChangedSinceSave = false;
@@ -238,115 +173,49 @@ namespace fCraft.MapConversion {
                 }
             }
 
-            if( tryFallbackConverters ) {
-                foreach( IMapImporter converter in fallbackConverters ) {
-                    try {
-                        Map map = converter.Load( fileName );
-                        map.HasChangedSinceSave = false;
-                        return map;
-                        // ReSharper disable EmptyGeneralCatchClause
-                    } catch {}
-                    // ReSharper restore EmptyGeneralCatchClause
-                }
+            foreach( IMapConverter converter in fallbackConverters ) {
+                try {
+                    Map map = converter.Load( fileName );
+                    map.HasChangedSinceSave = false;
+                    return map;
+                } catch { }
             }
 
-            throw new NoMapConverterFoundException( "Could not find any converter to load the given file." );
+            throw new MapFormatException( "Unknown map format." );
         }
+        // ReSharper restore EmptyGeneralCatchClause
 
 
-        /// <summary> Attempts to save the map, under the specified file name using the specified format. </summary>
-        /// <param name="mapToSave"> Map file to be saved. </param>
-        /// <param name="fileName">The name of the file to save to. </param>
-        /// <param name="mapFormat"> The format to use when saving the map. </param>
-        /// <returns> Whether or not the map save completed successfully. </returns>
-        /// <exception cref="ArgumentNullException"> mapToSave or fileName are null. </exception>
-        /// <exception cref="ArgumentException"> mapFormat is set to MapFormat.Unknown. </exception>
-        /// <exception cref="NoMapConverterFoundException"> No exporter could be found for the given format. </exception>
-        public static bool TrySave( [NotNull] Map mapToSave, [NotNull] string fileName, MapFormat mapFormat ) {
+        public static bool TrySave( [NotNull] Map mapToSave, [NotNull] string fileName, MapFormat format ) {
             if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            if( mapFormat == MapFormat.Unknown )
-                throw new ArgumentException( "Format may not be \"Unknown\"", "mapFormat" );
+            if( format == MapFormat.Unknown ) throw new ArgumentException( "Format may not be \"Unknown\"", "format" );
 
-            if( Exporters.ContainsKey( mapFormat ) ) {
-                IMapExporter converter = Exporters[mapFormat];
-                if( converter.SupportsExport ) {
-                    try {
-                        converter.Save( mapToSave, fileName );
-                        return true;
-                    } catch( Exception ex ) {
-                        Logger.LogAndReportCrash( "Map failed to save", "MapConversion", ex, false );
-                        return false;
-                    }
+            if( AvailableConverters.ContainsKey( format ) ) {
+                IMapConverter converter = AvailableConverters[format];
+                try {
+                    return converter.Save( mapToSave, fileName );
+                } catch( Exception ex ) {
+                    Logger.LogAndReportCrash( "Map failed to save", "MapConversion", ex, false );
+                    return false;
                 }
             }
 
-            throw new NoMapConverterFoundException( "No exporter could be found for the given format." );
+            throw new MapFormatException( "Unknown map format for saving." );
         }
 
 
-        /// <summary> Save the map, under the specified file name using the specified format. </summary>
-        /// <param name="mapToSave"> Map file to be saved. </param>
-        /// <param name="fileName">The name of the file to save to. </param>
-        /// <param name="mapFormat"> The format to use when saving the map. </param>
-        /// <exception cref="ArgumentNullException"> mapToSave or fileName are null. </exception>
-        /// <exception cref="ArgumentException"> mapFormat is set to MapFormat.Unknown. </exception>
-        /// <exception cref="NoMapConverterFoundException"> No exporter could be found for the given format. </exception>
-        /// <exception cref="Exception"> Other kinds of exceptions may be thrown by the map exporter. </exception>
-        public static void Save( [NotNull] Map mapToSave, [NotNull] string fileName, MapFormat mapFormat ) {
-            if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
-            if( fileName == null ) throw new ArgumentNullException( "fileName" );
-            if( mapFormat == MapFormat.Unknown )
-                throw new ArgumentException( "Format may not be \"Unknown\"", "mapFormat" );
-
-            if( Exporters.ContainsKey( mapFormat ) ) {
-                IMapExporter converter = Exporters[mapFormat];
-                if( converter.SupportsExport ) {
-                    converter.Save( mapToSave, fileName );
-                }
+        internal static void ReadAll( [NotNull] Stream source, [NotNull] byte[] destination ) {
+            if( source == null ) throw new ArgumentNullException( "source" );
+            if( destination == null ) throw new ArgumentNullException( "destination" );
+            int bytesRead = 0;
+            int bytesLeft = destination.Length;
+            while( bytesLeft > 0 ) {
+                int readPass = source.Read( destination, bytesRead, bytesLeft );
+                if( readPass == 0 ) throw new EndOfStreamException();
+                bytesRead += readPass;
+                bytesLeft -= readPass;
             }
-
-            throw new NoMapConverterFoundException( "No exporter could be found for the given format." );
-        }
-
-
-        /// <summary> Looks up an appropriate importer for the given MapFormat. </summary>
-        /// <param name="format"> Map format for which an importer should be looked up. </param>
-        /// <returns> IMapImporter object if an importer was found for the given format; otherwise null. </returns>
-        [CanBeNull]
-        public static IMapImporter GetImporter( MapFormat format ) {
-            IMapImporter result;
-            if( Importers.TryGetValue( format, out result ) ) {
-                return result;
-            } else {
-                return null;
-            }
-        }
-
-
-        /// <summary> Looks up an appropriate exporter for the given MapFormat. </summary>
-        /// <param name="format"> Map format for which an exporter should be looked up. </param>
-        /// <returns> IMapExporter object if an exporter was found for the given format; otherwise null. </returns>
-        [CanBeNull]
-        public static IMapExporter GetExporter( MapFormat format ) {
-            IMapExporter result;
-            if( Exporters.TryGetValue( format, out result ) ) {
-                return result;
-            } else {
-                return null;
-            }
-        }
-
-
-        /// <summary> Returns an array of all available map importers. </summary>
-        public static IMapImporter[] GetImporters() {
-            return Importers.Values.ToArray();
-        }
-
-
-        /// <summary> Returns an array of all available map exporters. </summary>
-        public static IMapExporter[] GetExporters() {
-            return Exporters.Values.ToArray();
         }
     }
 }

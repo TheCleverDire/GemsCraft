@@ -1,17 +1,10 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Net;
 using JetBrains.Annotations;
 
 namespace fCraft {
-    /// <summary> Exception that is thrown when a player's action or command could not be completed. </summary>
     public sealed class PlayerOpException : Exception {
-        /// <summary> Initializes a new instance of fCraft.PlayerOpException, using the specified information. </summary>
-        /// <param name="player"> The player executing the command. </param>
-        /// <param name="target"> The target of the command, null if no target. </param>
-        /// <param name="errorCode"> Specific error code. </param>
-        /// <param name="message"> Message to display. </param>
-        /// <param name="messageColored"> Message to display with color codes applied. </param>
         public PlayerOpException( [NotNull] Player player, PlayerInfo target,
                                   PlayerOpExceptionCode errorCode,
                                   [NotNull] string message, [NotNull] string messageColored )
@@ -25,19 +18,9 @@ namespace fCraft {
             MessageColored = messageColored;
         }
 
-        /// <summary> Player who caused the error. </summary>
-        [NotNull]
         public Player Player { get; private set; }
-
-        /// <summary> Target of the command that caused the error. </summary>
-        [CanBeNull]
         public PlayerInfo Target { get; private set; }
-
-        /// <summary> Error code associated with the error. </summary>
         public PlayerOpExceptionCode ErrorCode { get; private set; }
-
-        /// <summary> Message to display to player, via Minecraft chat. Optionally enhanced with colorcodes. </summary>
-        [NotNull]
         public string MessageColored { get; private set; }
 
 
@@ -84,7 +67,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation("=> halt")]
+        [TerminatesProgram]
         internal static void ThrowCannotTargetSelf( [NotNull] Player player, [CanBeNull] PlayerInfo target, [NotNull] string action ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( action == null ) throw new ArgumentNullException( "action" );
@@ -94,7 +77,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowPermissionMissing( [NotNull] Player player, [CanBeNull] PlayerInfo target,
                                               [NotNull] string action, [NotNull] params Permission[] permissions ) {
             if( player == null ) throw new ArgumentNullException( "player" );
@@ -116,7 +99,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowPermissionLimitIP( [NotNull] Player player, [NotNull] PlayerInfo infoWhomPlayerCantBan, [NotNull] IPAddress targetAddress ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( infoWhomPlayerCantBan == null ) throw new ArgumentNullException( "infoWhomPlayerCantBan" );
@@ -142,7 +125,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowPermissionLimit( [NotNull] Player player, [NotNull] PlayerInfo targetInfo, [NotNull] string action, Permission permission ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( targetInfo == null ) throw new ArgumentNullException( "targetInfo" );
@@ -158,7 +141,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowPlayerAndIPNotBanned( [NotNull] Player player, [NotNull] PlayerInfo targetInfo, [NotNull] IPAddress address ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( targetInfo == null ) throw new ArgumentNullException( "targetInfo" );
@@ -179,7 +162,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowNoOneToBan( [NotNull] Player player, [CanBeNull] PlayerInfo targetInfo, [NotNull] IPAddress address ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( address == null ) throw new ArgumentNullException( "address" );
@@ -209,7 +192,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowNoOneToUnban( [NotNull] Player player, [CanBeNull] PlayerInfo targetInfo, [NotNull] IPAddress address ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( address == null ) throw new ArgumentNullException( "address" );
@@ -225,7 +208,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowPlayerAlreadyBanned( [NotNull] Player player, [NotNull] PlayerInfo target, [NotNull] string action ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( target == null ) throw new ArgumentNullException( "target" );
@@ -236,7 +219,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowPlayerNotBanned( [NotNull] Player player, [NotNull] PlayerInfo target, [NotNull] string action ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( target == null ) throw new ArgumentNullException( "target" );
@@ -247,7 +230,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowCancelled( [NotNull] Player player, [NotNull] PlayerInfo target ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( target == null ) throw new ArgumentNullException( "target" );
@@ -257,7 +240,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowNoWorld( [NotNull] Player player ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             const string msg = "Player must be in a world to do this.";
@@ -266,7 +249,7 @@ namespace fCraft {
         }
 
 
-        [ContractAnnotation( "=> halt" )]
+        [TerminatesProgram]
         internal static void ThrowInvalidIP( [NotNull] Player player, [CanBeNull] PlayerInfo target, [NotNull] IPAddress ip ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( ip == null ) throw new ArgumentNullException( "ip" );
@@ -283,7 +266,6 @@ namespace fCraft {
     }
 
 
-    /// <summary> Possible player operation exception codes. </summary>
     public enum PlayerOpExceptionCode {
         /// <summary> Other/unknown/unexpected error. </summary>
         Other,

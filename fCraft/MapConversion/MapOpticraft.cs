@@ -1,5 +1,4 @@
-﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
-// Contributed by Jared Klopper. Opticraft is copyright (c) 2011, Jared Klopper
+﻿// Contributed by Jared Klopper. Opticraft is copyright (c) 2011-2012, Jared Klopper
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -9,7 +8,7 @@ using JetBrains.Annotations;
 
 namespace fCraft.MapConversion {
     [DataContract]
-    internal sealed class OpticraftMetaData {
+    public sealed class OpticraftMetaData {
         [DataMember]
         public int X { get; set; }
         [DataMember]
@@ -37,14 +36,14 @@ namespace fCraft.MapConversion {
     }
 
 
-    internal sealed class OpticraftDataStore {
+    public sealed class OpticraftDataStore {
         [DataMember]
         public OpticraftZone[] Zones;
 
     }
 
 
-    internal sealed class OpticraftZone {
+    public sealed class OpticraftZone {
         [DataMember]
         public string Name { get; set; }
         [DataMember]
@@ -69,42 +68,30 @@ namespace fCraft.MapConversion {
         public string[] Excluded;
     }
 
-    /// <summary> Opticraft map conversion implementation, for converting Opticraft map format into fCraft's default map format. </summary>
-    public sealed class MapOpticraft : IMapImporter, IMapExporter {
-        const short MapVersion = 2;
 
+    public sealed class MapOpticraft : IMapConverter {
         public string ServerName {
             get { return "Opticraft"; }
         }
 
-        public bool SupportsImport {
-            get { return true; }
-        }
+        const short MapVersion = 2;
 
-        public bool SupportsExport {
-            get { return true; }
-        }
-
-        public string FileExtension {
-            get { return "save"; }
+        public MapFormat Format {
+            get { return MapFormat.Opticraft; }
         }
 
         public MapStorageType StorageType {
             get { return MapStorageType.SingleFile; }
         }
 
-        public MapFormat Format {
-            get { return MapFormat.Opticraft; }
-        }
 
-
-        public bool ClaimsName( string fileName ) {
+        public bool ClaimsName( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             return fileName.EndsWith( ".save", StringComparison.Ordinal );
         }
 
 
-        public bool Claims( string fileName ) {
+        public bool Claims( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             try {
                 using( FileStream mapStream = File.OpenRead( fileName ) ) {
@@ -117,7 +104,7 @@ namespace fCraft.MapConversion {
         }
 
 
-        public Map LoadHeader( string fileName ) {
+        public Map LoadHeader( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             using( FileStream mapStream = File.OpenRead( fileName ) ) {
                 return LoadMapMetadata( mapStream );
@@ -137,21 +124,21 @@ namespace fCraft.MapConversion {
             MemoryStream memStream = new MemoryStream( rawMetaData );
 
             OpticraftMetaData metaData = (OpticraftMetaData)serializer.ReadObject( memStream );
-
             // ReSharper disable UseObjectOrCollectionInitializer
             Map mapFile = new Map( null, metaData.X, metaData.Y, metaData.Z, false );
             // ReSharper restore UseObjectOrCollectionInitializer
-            mapFile.Spawn = new Position(
-                (short)(metaData.SpawnX),
-                (short)(metaData.SpawnY),
-                (short)(metaData.SpawnZ),
-                metaData.SpawnOrientation,
-                metaData.SpawnPitch );
+            mapFile.Spawn = new Position {
+                X = (short)(metaData.SpawnX),
+                Y = (short)(metaData.SpawnY),
+                Z = (short)(metaData.SpawnZ),
+                R = metaData.SpawnOrientation,
+                L = metaData.SpawnPitch
+            };
             return mapFile;
         }
 
 
-        public Map Load( string fileName ) {
+        public Map Load( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             using( FileStream mapStream = File.OpenRead( fileName ) ) {
                 BinaryReader reader = new BinaryReader( mapStream );
@@ -187,17 +174,14 @@ namespace fCraft.MapConversion {
                 return;
             }
 
-            PlayerInfo conversionPlayer = new PlayerInfo( "OpticraftConversion",
-                                                          RankManager.HighestRank,
-                                                          true,
-                                                          RankChangeType.AutoPromoted );
+            // TODO: investigate side effects
+            PlayerInfo conversionPlayer = new PlayerInfo( "OpticraftConversion", RankManager.HighestRank, true, RankChangeType.AutoPromoted );
             foreach( OpticraftZone optiZone in dataStore.Zones ) {
                 // Make zone
                 Zone fZone = new Zone {
                     Name = optiZone.Name,
                 };
-                BoundingBox bBox = new BoundingBox( optiZone.X1, optiZone.Y1, optiZone.Z1,
-                                                    optiZone.X2, optiZone.X2, optiZone.Z2 );
+                BoundingBox bBox = new BoundingBox( optiZone.X1, optiZone.Y1, optiZone.Z1, optiZone.X2, optiZone.X2, optiZone.Z2 );
                 fZone.Create( bBox, conversionPlayer );
 
                 // Min rank
@@ -208,7 +192,7 @@ namespace fCraft.MapConversion {
 
                 foreach( string playerName in optiZone.Builders ) {
                     // These are all lower case names
-                    if( !Player.IsValidPlayerName( playerName ) ) {
+                    if( !Player.IsValidName( playerName ) ) {
                         continue;
                     }
                     PlayerInfo pInfo = PlayerDB.FindPlayerInfoExact( playerName );
@@ -221,7 +205,7 @@ namespace fCraft.MapConversion {
                 if( optiZone.Excluded != null ) {
                     foreach( string playerName in optiZone.Excluded ) {
                         // These are all lower case names
-                        if( !Player.IsValidPlayerName( playerName ) ) {
+                        if( !Player.IsValidName( playerName ) ) {
                             continue;
                         }
                         PlayerInfo pInfo = PlayerDB.FindPlayerInfoExact( playerName );
@@ -235,7 +219,7 @@ namespace fCraft.MapConversion {
         }
 
 
-        public void Save( Map mapToSave, string fileName ) {
+        public bool Save( [NotNull] Map mapToSave, [NotNull] string fileName ) {
             if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             using( FileStream mapStream = File.OpenWrite( fileName ) ) {
@@ -246,7 +230,7 @@ namespace fCraft.MapConversion {
                 MemoryStream serializationStream = new MemoryStream();
                 DataContractJsonSerializer serializer = new DataContractJsonSerializer( typeof( OpticraftMetaData ) );
                 // Create and serialize core meta data
-                OpticraftMetaData oMetadata = new OpticraftMetaData {
+                OpticraftMetaData oMetadate = new OpticraftMetaData {
                     X = mapToSave.Width,
                     Y = mapToSave.Length,
                     Z = mapToSave.Height,
@@ -259,16 +243,16 @@ namespace fCraft.MapConversion {
                 };
                 // World related values.
                 if( mapToSave.World != null ) {
-                    oMetadata.Hidden = mapToSave.World.IsHidden;
-                    oMetadata.MinimumJoinRank = mapToSave.World.AccessSecurity.MinRank.Name;
-                    oMetadata.MinimumBuildRank = mapToSave.World.BuildSecurity.MinRank.Name;
+                    oMetadate.Hidden = mapToSave.World.IsHidden;
+                    oMetadate.MinimumJoinRank = mapToSave.World.AccessSecurity.MinRank.Name;
+                    oMetadate.MinimumBuildRank = mapToSave.World.BuildSecurity.MinRank.Name;
                 } else {
-                    oMetadata.Hidden = false;
-                    oMetadata.MinimumJoinRank = oMetadata.MinimumBuildRank = "guest";
+                    oMetadate.Hidden = false;
+                    oMetadate.MinimumJoinRank = oMetadate.MinimumBuildRank = "guest";
                 }
 
-                oMetadata.CreationDate = 0; // This is ctime for when the world was created. Unsure on how to extract it. Opticraft makes no use of it as of yet
-                serializer.WriteObject( serializationStream, oMetadata );
+                oMetadate.CreationDate = 0; // This is ctime for when the world was created. Unsure on how to extract it. Opticraft makes no use of it as of yet
+                serializer.WriteObject( serializationStream, oMetadate );
                 byte[] jsonMetaData = serializationStream.ToArray();
                 writer.Write( jsonMetaData.Length );
                 writer.Write( jsonMetaData );
@@ -328,6 +312,7 @@ namespace fCraft.MapConversion {
                 writer.Write( compressedBlocks );
 
             }
+            return true;
         }
     }
 }

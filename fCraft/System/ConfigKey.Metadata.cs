@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
 namespace fCraft {
+
     /// <summary> Describes attributes and metadata of a configuration key. </summary>
     [AttributeUsage( AttributeTargets.Field )]
     public class ConfigKeyAttribute : DescriptionAttribute {
@@ -23,7 +24,9 @@ namespace fCraft {
         public Type ValueType { get; protected set; }
         public object DefaultValue { get; protected set; }
         public ConfigSection Section { get; private set; }
+        // ReSharper disable MemberCanBeProtected.Global
         public bool NotBlank { get; set; }
+        // ReSharper restore MemberCanBeProtected.Global
         public ConfigKey Key { get; internal set; }
 
 
@@ -52,38 +55,17 @@ namespace fCraft {
     }
 
 
-    sealed class StringKeyAttribute : ConfigKeyAttribute {
+    internal sealed class StringKeyAttribute : ConfigKeyAttribute {
         public const int NoLengthRestriction = -1;
-
-
         public StringKeyAttribute( ConfigSection section, object defaultValue, string description )
             : base( section, typeof( string ), defaultValue, description ) {
             MinLength = NoLengthRestriction;
             MaxLength = NoLengthRestriction;
+            Regex = null;
         }
-
-
         public int MinLength { get; set; }
         public int MaxLength { get; set; }
-        Regex regex;
-
-        public string RegexString {
-            get {
-                if( regex != null ) {
-                    return regex.ToString();
-                } else {
-                    return null;
-                }
-            }
-            set {
-                if( value == null ) {
-                    regex = null;
-                } else {
-                    regex = new Regex( value );
-                }
-            }
-        }
-
+        public Regex Regex { get; set; }
         public bool RestrictedChars { get; set; }
 
 
@@ -100,9 +82,9 @@ namespace fCraft {
             if( RestrictedChars && Chat.ContainsInvalidChars( value ) ) {
                 throw new FormatException( String.Format( "Value contains restricted characters." ) );
             }
-            if( regex != null && !regex.IsMatch( value ) ) {
+            if( Regex != null && !Regex.IsMatch( value ) ) {
                 throw new FormatException( String.Format( "Value does not match the expected format: /{0}/.",
-                                                          RegexString ) );
+                                                          Regex ) );
             }
         }
     }
@@ -258,7 +240,7 @@ namespace fCraft {
         public override void Validate( string value ) {
             base.Validate( value );
             bool test;
-            if( value.Length != 0 && !Boolean.TryParse( value, out test ) ) {
+            if( !Boolean.TryParse( value, out test ) ) {
                 throw new FormatException( "Value cannot be parsed as a boolean." );
             }
         }
@@ -312,7 +294,7 @@ namespace fCraft {
             if( NotNone && test.Equals( IPAddress.None ) ) {
                 throw new FormatException( String.Format( "Value cannot be {0}", IPAddress.None ) );
             }
-            if( NotLAN && test.IsLocal() ) {
+            if( NotLAN && test.IsLAN() ) {
                 throw new FormatException( "Value cannot be a LAN address." );
             }
             if( NotLoopback && IPAddress.IsLoopback( test ) ) {
@@ -381,9 +363,7 @@ namespace fCraft {
             base.Validate( value );
             if( !NotBlank && String.IsNullOrEmpty( value ) ) return;
             try {
-                // ReSharper disable ReturnValueOfPureMethodIsNotUsed
                 Enum.Parse( ValueType, value, true );
-                // ReSharper restore ReturnValueOfPureMethodIsNotUsed
             } catch( ArgumentException ) {
                 string message = String.Format( "Could not parse value as {0}. Valid values are: {1}",
                                                 ValueType.Name,

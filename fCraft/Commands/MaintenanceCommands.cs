@@ -1,6 +1,7 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -25,10 +26,14 @@ namespace fCraft {
             CommandManager.RegisterCommand( CdPruneDB );
 
             CommandManager.RegisterCommand( CdImport );
-            //CommandManager.RegisterCommand( CdImportRankList );
-            //CommandManager.RegisterCommand( CdExport );
 
             CommandManager.RegisterCommand( CdInfoSwap );
+
+            CommandManager.RegisterCommand(CdFixRealms);
+
+            CommandManager.RegisterCommand(CdNick);
+            CommandManager.RegisterCommand(CdName);
+            CommandManager.RegisterCommand(CdEdit);
 
 #if DEBUG
             CommandManager.RegisterCommand( new CommandDescriptor {
@@ -36,7 +41,7 @@ namespace fCraft {
                 IsHidden = true,
                 Category = CommandCategory.Maintenance | CommandCategory.Debug,
                 Help = "Bandwidth Use Mode statistics.",
-                Handler = delegate( Player player, CommandReader cmd ) {
+                Handler = delegate( Player player, Command cmd ) {
                     string newModeName = cmd.Next();
                     if( newModeName == null ) {
                         player.Message( "{0}: S: {1}  R: {2}  S/s: {3:0.0}  R/s: {4:0.0}",
@@ -58,10 +63,11 @@ namespace fCraft {
                 IsHidden = true,
                 Category = CommandCategory.Maintenance | CommandCategory.Debug,
                 Help = "BlockDB Debug",
-                Handler = delegate( Player player, CommandReader cmd ) {
+                Handler = delegate( Player player, Command cmd ) {
                     if( player.World == null ) PlayerOpException.ThrowNoWorld( player );
                     BlockDB db = player.World.BlockDB;
-                    using( db.GetReadLock() ) {
+                    lock (player.World.SyncRoot)
+                    {
                         player.Message( "BlockDB: CAP={0} SZ={1} FI={2}",
                                         db.CacheCapacity, db.CacheSize, db.LastFlushedIndex );
                     }
@@ -69,7 +75,393 @@ namespace fCraft {
             } );
 #endif
         }
+        #region LegendCraft
+        /* Copyright (c) <2013-2014> <LeChosenOne, DingusBungus>
+   Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.*/
+        
+        static readonly CommandDescriptor CdEdit = new CommandDescriptor
+        {
+            Name = "Edit",
+            Aliases = new[] { "configure", "set" },
+            Category = CommandCategory.Chat ,
+            Permissions = new[] {Permission.ReloadConfig},
+            IsConsoleSafe = true,
+            Usage = "/Edit [Add|Clear|Help] [Swears|Rules|Greeting|Announcements] [Message]",
+            Help = "Allows a player to add items to the swearwords, rules, and announcements or create a new greeting. You can also clear one of the options.",
+            NotRepeatable = true,
+            Handler = EditHandler,
+        };
+
+        static void EditHandler(Player player, Command cmd)
+        {
+            string option;
+            string target;
+
+            try
+            {
+                option = cmd.Next().ToLower();
+            }
+            catch (NullReferenceException)
+            {
+                CdEdit.PrintUsage(player);
+                return;
+            }
+            
+            if (option == "help")
+            {
+                player.Message("Options are Add and Clear.\r\n " +
+                    "'/Edit Clear Swears' will completely erase all the swears so you can start from scratch.\n " +
+                    "'/Edit Add Swears Monkey' will add the word 'Monkey' to the current list of swears.");
+                return;
+            }
+                       
+            else if(option == "clear")
+            {
+                target = cmd.Next();
+                if(string.IsNullOrEmpty(target))
+                {
+                    CdEdit.PrintUsage(player);
+                    return;
+                }
+               
+                //clear the files
+                switch (target.ToLower())
+                {
+                    case "swears":
+                        if (File.Exists(Paths.SwearWordsFileName))
+                        {
+                            File.Delete(Paths.SwearWordsFileName);
+                        }
+                        File.Create(Paths.SwearWordsFileName).Dispose();
+                        player.Message("&eThe swear words for the server has been wiped.");
+                        break;
+                    case "rules":
+                        if (File.Exists(Paths.RulesFileName))
+                        {
+                            File.Delete(Paths.RulesFileName);
+                        }
+                        File.Create(Paths.RulesFileName).Dispose();
+                        player.Message("&eThe rules for the server has been wiped.");
+                        break;
+                    case "greeting":  
+                        if (File.Exists(Paths.GreetingFileName))
+                        {
+                            File.Delete(Paths.GreetingFileName);
+                        }
+                        File.Create(Paths.GreetingFileName).Dispose();
+                        player.Message("&eThe greeting for the server has been wiped.");
+                        break;
+                    case "announcements":
+                        if (File.Exists(Paths.AnnouncementsFileName))
+                        {
+                            File.Delete(Paths.AnnouncementsFileName);
+                        }
+                        File.Create(Paths.AnnouncementsFileName).Dispose();
+                        player.Message("&eThe announcements for the server has been wiped.");
+                        break;
+                    default:
+                        player.Message("&ePlease choose either 'greeting', 'rules', 'announcements' or 'swears' as an option to clear.");
+                        break;
+                }
+                return;
+            }
+
+            else if (option == "add")
+            {
+                target = cmd.Next();
+                if (String.IsNullOrEmpty(target))
+                {
+                    CdEdit.PrintUsage(player);
+                    return;
+                }
+                
+                //append the files
+                string newItem = cmd.NextAll();
+                if (String.IsNullOrEmpty(newItem))
+                {
+                    CdEdit.PrintUsage(player);
+                    return;
+                }
+                switch (target.ToLower())
+                {
+                    case "swear":
+                    case "swearwords":
+                    case "swearword":
+                    case "swears":
+                        if (!File.Exists(Paths.SwearWordsFileName))
+                        {
+                            File.Create(Paths.SwearWordsFileName).Dispose();
+                        }
+                        using (StreamWriter sw = File.AppendText(Paths.SwearWordsFileName))
+                        {
+                            player.Message("&eAdded &c'{0}'&e to the list of swear words.", newItem);
+                            sw.WriteLine(newItem);
+                            sw.Close();
+                        }
+                        player.ParseMessage("/reload swears", true, false);
+                        break;
+                    case "rule":
+                    case "rules":
+                        if (!File.Exists(Paths.RulesFileName))
+                        {
+                            File.Create(Paths.RulesFileName).Dispose();
+                        }
+                        using (StreamWriter sw = File.AppendText(Paths.RulesFileName))
+                        {
+                            player.Message("&eAdded &c'{0}'&e to the /rules.", newItem);
+                            sw.WriteLine(newItem);
+                            sw.Close();
+                        }
+                        break;
+                    case "announcement":
+                    case "announcements":
+                        if (!File.Exists(Paths.AnnouncementsFileName))
+                        {
+                            File.Create(Paths.AnnouncementsFileName).Dispose();
+                        }
+                        using (StreamWriter sw = File.AppendText(Paths.AnnouncementsFileName))
+                        {
+                            player.Message("&eAdded &c'{0}'&e to the announcements.", newItem);
+                            sw.WriteLine(newItem);
+                            sw.Close();
+                        }
+                        break;
+                    case "greeting":
+                        if (!File.Exists(Paths.GreetingFileName))
+                        {
+                            File.Create(Paths.GreetingFileName).Dispose();
+                        }
+                        //File.Create(Paths.GreetingFileName).Close();
+                        using (StreamWriter sw = File.AppendText(Paths.GreetingFileName))
+                        {
+                            player.Message("&eChanged greeting to {0}.", newItem);
+                            sw.WriteLine(newItem);
+                            sw.Close();
+                        }
+                        break;
+                    default:
+                        player.Message("&ePlease choose either 'greeting', 'announcements', 'rules', or 'swears' as an option to add to.");
+                        break;
+                }
+            }
+            else
+            {
+                CdEdit.PrintUsage(player);
+                return;
+            }
+        }
+
+        static readonly CommandDescriptor CdName = new CommandDescriptor
+        {
+            Name = "Name",
+            Category = CommandCategory.Chat | CommandCategory.Fun,
+            Permissions = new[] {Permission.Name},
+            IsConsoleSafe = false,
+            Usage = "/Name (NewName|Revert|Blank)",
+            Help = "Allows you to edit your name. Doing /Name revert makes your nick your last used nickname. Do just /Name to reset your nick.",
+            NotRepeatable = true,
+            Handler = NameHandler,
+        };
+
+        static void NameHandler(Player p, Command cmd)
+        {
+                string displayedname = cmd.NextAll();
+                string nameBuffer = p.Info.DisplayedName;
+
+                if (string.IsNullOrEmpty(displayedname) || displayedname.Length < 1)
+                {
+                    p.Info.oldDisplayedName = p.Info.DisplayedName;
+                    p.Info.DisplayedName = p.Name;
+                    p.Message("Your name has been reset.");
+                    p.Info.isJelly = false;
+                    p.Info.isMad = false;
+                    return;
+                }
+                else
+                {
+                    if (displayedname.ToLower() == "revert")      //swaps the new and old names by using a buffer name for swapping.
+                    {
+                        if (p.Info.oldDisplayedName == null)
+                        {
+                            p.Message("You do not have an old Nick-Name to revert to.");
+                            return;
+                        }
+                        p.Info.DisplayedName = p.Info.oldDisplayedName;
+                        p.Info.oldDisplayedName = nameBuffer;
+                        p.Message("Your name has been reverted.");
+                        return;
+                    }
+                    if (displayedname.ToLower() == "blank")      //swaps the new and old names by using a buffer name for swapping.
+                    {
+                        p.Info.oldDisplayedName = nameBuffer;
+                        p.Info.DisplayedName = p.Info.oldDisplayedName;
+                        p.Info.DisplayedName = "";
+                        p.Message("Name: DisplayedName was set to blank", p.Info.DisplayedName);
+                        return;
+                    }
+                    else
+                    {
+                        p.Info.oldDisplayedName = p.Info.DisplayedName;
+                        p.Info.DisplayedName = displayedname;
+                        if (p.Info.oldDisplayedName == null)
+                        {
+                            p.Message("Name: DisplayedName was set to \"{0}&S\"", p.Info.DisplayedName);
+                            p.Info.isMad = false;
+                            p.Info.isJelly = false;
+                            return;
+                        }
+                        else
+                        {
+                            p.Message("Name: DisplayedName changed from \"{0}&S\" to \"{1}&S\"", p.Info.oldDisplayedName, p.Info.DisplayedName);
+                            return;
+                        }
+                    }
+                }
+        }
+    #endregion 
+        
+        #region 800Craft
+
+        //Copyright (C) <2012>  <Jon Baker, Glenn Mariën and Lao Tszy>
+
+        //This program is free software: you can redistribute it and/or modify
+        //it under the terms of the GNU General Public License as published by
+        //the Free Software Foundation, either version 3 of the License, or
+        //(at your option) any later version.
+
+        //This program is distributed in the hope that it will be useful,
+        //but WITHOUT ANY WARRANTY; without even the implied warranty of
+        //MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        //GNU General Public License for more details.
+
+        //You should have received a copy of the GNU General Public License
+        //along with this program.  If not, see <http://www.gnu.org/licenses/>.
+        static readonly CommandDescriptor CdFixRealms = new CommandDescriptor
+        {
+            Name = "Fixrealms",
+            Category = CommandCategory.Maintenance,
+            IsConsoleSafe = false,
+            IsHidden = true,
+            Permissions = new[] { Permission.ManageWorlds },
+            Help = "&SConverts personal worlds into realms.",
+            Handler = FixRealms
+        };
+
+        static void FixRealms(Player player, Command cmd)
+        {
+            var Players = PlayerDB.PlayerInfoList;
+            int Count = 0;
+            foreach (World w in WorldManager.Worlds)
+            {
+                foreach (PlayerInfo p in Players)
+                {
+                    if (p.Name == w.Name)
+                    {
+                        w.IsHidden = false;
+                        w.IsRealm = true;
+                        Count++;
+                    }
+                }
+            }
+            player.Message("Converted {0} worlds to Realms", Count.ToString());
+        }
+
+        static readonly CommandDescriptor CdNick = new CommandDescriptor
+        {
+            Name = "Nick",
+            Category = CommandCategory.Maintenance,
+            IsConsoleSafe = true,
+            Permissions = new[] { Permission.EditPlayerDB },
+            Usage = "/Nick PlayerName DisplayedName",
+            Help = "&SA shortcut for /Setinfo DisplayedName, it changes a player's displayedName",
+            Handler = NickHandler
+        };
+
+        static void NickHandler(Player player, Command cmd)
+        {
+            string name = cmd.Next();
+            string displayedName = cmd.NextAll();
+
+            if (string.IsNullOrEmpty(name) || name.Length < 1)
+            {
+                CdNick.PrintUsage(player);
+                return;
+            }
+            PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches(player, name);
+            if (target == null){ return; }
+
+            string nameBuffer = null;
+            if (target.DisplayedName == null)
+            {
+                nameBuffer = target.Name;
+            }
+            else
+            {
+                nameBuffer = target.DisplayedName;
+            }
+
+            if (displayedName.ToLower() == "revert")      //swaps the new and old names by using a buffer name for swapping.
+            {
+                if (target.oldDisplayedName == null)
+                {
+                    player.Message("{0} does not have an old Nick-Name to revert to.", target.Name);
+                    return;
+                }
+                target.DisplayedName = target.oldDisplayedName;
+                target.oldDisplayedName = nameBuffer;
+                player.Message("{0}'s name has been reverted.", target.Name);
+                return;
+            }
+            else
+            {
+                if (target.DisplayedName != null)
+                {
+                    target.oldDisplayedName = target.DisplayedName;
+                } 
+                if (string.IsNullOrEmpty(displayedName) || displayedName.Length < 1)
+                {
+                    target.DisplayedName = null;
+                    player.Message("Nick: DisplayedName for {0} was reset (was \"{1}&S\")",
+                                    target.Name,
+                                    target.oldDisplayedName);
+                    return;
+                }
+                else if (target.oldDisplayedName == null || target.oldDisplayedName == target.Name)
+                {
+                    target.DisplayedName = displayedName;
+                    player.Message("Nick: DisplayedName for {0} set to \"{1}&S\"",
+                                    target.Name,
+                                    target.DisplayedName);
+                    return;
+                }
+                else
+                {
+                    target.DisplayedName = displayedName;
+                    player.Message("Nick: DisplayedName for {0} changed from \"{1}&S\" to \"{2}&S\"",
+                                    target.Name,
+                                    target.oldDisplayedName,
+                                    target.DisplayedName);
+                    return;
+                }          
+            }
+        }
+        #endregion
 
         #region DumpStats
 
@@ -79,93 +471,82 @@ namespace fCraft {
             IsConsoleSafe = true,
             IsHidden = true,
             Permissions = new[] { Permission.EditPlayerDB },
-            Help = "Writes out a number of statistics about the server. " +
-                   "Only recently-active non-banned players are counted. " +
-                   "If InactivityTime is not given, players from last 31 days are counted.",
-            Usage = "/DumpStats FileName [InactivityTime]",
+            Help = "&SWrites out a number of statistics about the server. " +
+                   "Only non-banned players active in the last 30 days are counted.",
+            Usage = "/DumpStats FileName",
             Handler = DumpStatsHandler
         };
 
         const int TopPlayersToList = 5;
 
-        static void DumpStatsHandler( Player player, CommandReader cmd ) {
+        static void DumpStatsHandler( Player player, Command cmd ) {
             string fileName = cmd.Next();
-            string time = cmd.Next();
             if( fileName == null ) {
                 CdDumpStats.PrintUsage( player );
                 return;
             }
 
-            try {
-                if( !Paths.Contains( Paths.WorkingPath, fileName ) ) {
-                    player.MessageUnsafePath();
-                    return;
-                }
-            } catch( ArgumentException e ) {
-                player.Message( "DumpStats: {0}", e.Message );
+            if( !Paths.Contains( Paths.WorkingPath, fileName ) ) {
+                player.MessageUnsafePath();
                 return;
             }
 
+            // ReSharper disable AssignNullToNotNullAttribute
             if( Paths.IsProtectedFileName( Path.GetFileName( fileName ) ) ) {
-                player.Message( "DumpStats: You may not use this file." );
+                // ReSharper restore AssignNullToNotNullAttribute
+                player.Message( "You may not use this file." );
                 return;
             }
 
             string extension = Path.GetExtension( fileName );
-            if( !extension.Equals( ".txt", StringComparison.OrdinalIgnoreCase ) ) {
-                player.Message( "DumpStats: File name must end with .txt" );
+            if( extension == null || !extension.Equals( ".txt", StringComparison.OrdinalIgnoreCase ) ) {
+                player.Message( "Stats filename must end with .txt" );
                 return;
             }
 
             if( File.Exists( fileName ) && !cmd.IsConfirmed ) {
-                Logger.Log( LogType.UserActivity,
-                            "DumpStats: Asked {0} for confirmation to overwrite \"{1}\"",
-                            player.Name, fileName );
                 player.Confirm( cmd, "File \"{0}\" already exists. Overwrite?", Path.GetFileName( fileName ) );
                 return;
             }
 
-            TimeSpan inactivityTime = TimeSpan.FromDays( 31 );
-            if( time != null ) {
-                if( !time.TryParseMiniTimeSpan( out inactivityTime ) ) {
-                    CdDumpStats.PrintUsage( player );
-                    return;
-                }
-            }
-
             if( !Paths.TestFile( "DumpStats file", fileName, false, FileAccess.Write ) ) {
-                player.Message( "DumpStats: Cannot create specified file. See log for details." );
+                player.Message( "Cannot create specified file. See log for details." );
                 return;
             }
 
+            PlayerInfo[] infos;
             using( FileStream fs = File.Create( fileName ) ) {
                 using( StreamWriter writer = new StreamWriter( fs ) ) {
-                    PlayerInfo[] infos = PlayerDB.PlayerInfoList;
+                    infos = PlayerDB.PlayerInfoList;
                     if( infos.Length == 0 ) {
                         writer.WriteLine( "(TOTAL) (0 players)" );
                         writer.WriteLine();
                     } else {
-                        DumpPlayerGroupStats( writer, infos, "(TOTAL)", inactivityTime );
+                        DumpPlayerGroupStats( writer, infos, "(TOTAL)" );
                     }
 
                     List<PlayerInfo> rankPlayers = new List<PlayerInfo>();
                     foreach( Rank rank in RankManager.Ranks ) {
-                        rankPlayers.AddRange( infos.Where( t => t.Rank == rank ) );
+                        // ReSharper disable LoopCanBeConvertedToQuery
+                        for( int i = 0; i < infos.Length; i++ ) {
+                            // ReSharper restore LoopCanBeConvertedToQuery
+                            if( infos[i].Rank == rank ) rankPlayers.Add( infos[i] );
+                        }
                         if( rankPlayers.Count == 0 ) {
                             writer.WriteLine( "{0}: 0 players, 0 banned, 0 inactive", rank.Name );
                             writer.WriteLine();
                         } else {
-                            DumpPlayerGroupStats( writer, rankPlayers, rank.Name, inactivityTime );
+                            DumpPlayerGroupStats( writer, rankPlayers, rank.Name );
                         }
                         rankPlayers.Clear();
                     }
                 }
             }
 
-            player.Message( "DumpStats: Saved to \"{0}\"", fileName );
+            player.Message( "Stats saved to \"{0}\"", fileName );
         }
 
-        static void DumpPlayerGroupStats( TextWriter writer, IList<PlayerInfo> infos, string groupName, TimeSpan inactivityTime ) {
+        static void DumpPlayerGroupStats( TextWriter writer, IList<PlayerInfo> infos, string groupName ) {
             RankStats stat = new RankStats();
             foreach( Rank rank2 in RankManager.Ranks ) {
                 stat.PreviousRank.Add( rank2, 0 );
@@ -173,8 +554,8 @@ namespace fCraft {
 
             int totalCount = infos.Count;
             int bannedCount = infos.Count( info => info.IsBanned );
-            int inactiveCount = infos.Count( info => info.TimeSinceLastSeen >= inactivityTime );
-            infos = infos.Where( info => (info.TimeSinceLastSeen < inactivityTime && !info.IsBanned) ).ToList();
+            int inactiveCount = infos.Count( info => info.TimeSinceLastSeen.TotalDays >= 30 );
+            infos = infos.Where( info => (info.TimeSinceLastSeen.TotalDays < 30 && !info.IsBanned) ).ToList();
 
             if( infos.Count == 0 ) {
                 writer.WriteLine( "{0}: {1} players, {2} banned, {3} inactive",
@@ -555,15 +936,13 @@ namespace fCraft {
             Category = CommandCategory.Maintenance | CommandCategory.Moderation,
             IsHidden = true,
             IsConsoleSafe = true,
-            Permissions = new[] {Permission.EditPlayerDB, Permission.Promote, Permission.Demote},
-            Help = "Demotes/promotes all existing players of a certain rank. " +
-                   "Rank reason will be \"~MassRank\". You will be asked to confirm before proceeding. " +
-                   "Be careful with this command, as it can not be undone.",
+            Permissions = new[] { Permission.EditPlayerDB, Permission.Promote, Permission.Demote },
+            Help = "",
             Usage = "/MassRank FromRank ToRank Reason",
             Handler = MassRankHandler
         };
 
-        static void MassRankHandler( Player player, CommandReader cmd ) {
+        static void MassRankHandler( Player player, Command cmd ) {
             string fromRankName = cmd.Next();
             string toRankName = cmd.Next();
             string reason = cmd.NextAll();
@@ -593,9 +972,6 @@ namespace fCraft {
             string verb = (fromRank > toRank ? "demot" : "promot");
 
             if( !cmd.IsConfirmed ) {
-                Logger.Log( LogType.UserActivity,
-                            "MassRank: Asked {0} to confirm {1}ion of {2} players.",
-                            player.Name, verb, playerCount );
                 player.Confirm( cmd, "{0}e {1} players?", verb.UppercaseFirst(), playerCount );
                 return;
             }
@@ -605,127 +981,6 @@ namespace fCraft {
 
             int affected = PlayerDB.MassRankChange( player, fromRank, toRank, reason );
             player.Message( "MassRank: done, {0} records affected.", affected );
-        }
-
-
-        static readonly CommandDescriptor CdImportRankList = new CommandDescriptor {
-            Name = "ImportRankList",
-            Category = CommandCategory.Maintenance,
-            IsHidden = true,
-            IsConsoleSafe = true,
-            Permissions = new[] {Permission.Import},
-            Help = "", // TODO
-            Usage = "/ImportRankList FileName ToRank Reason",
-            Handler = ImportRankListHandler
-        };
-
-        // TODO: document the fact that this only promotes (unlike "/Import Ranks")
-        static void ImportRankListHandler( Player player, CommandReader cmd ) {
-            string fileName = cmd.Next();
-            string rankName = cmd.Next();
-            string reason = cmd.NextAll();
-
-            if( fileName == null || rankName == null ) {
-                CdImportRankList.PrintUsage( player );
-                return;
-            }
-
-            // parse rank name
-            Rank rank = RankManager.FindRank( rankName );
-            if( rank == null ) {
-                player.MessageNoRank( rankName );
-                return;
-            }
-            
-            // Make sure that the target file is legit
-            if( !Paths.Contains( Paths.WorkingPath, fileName ) ) {
-                Logger.Log( LogType.SuspiciousActivity,
-                            "ImportRankList: Player {0} tried to import from \"{1}\"",
-                            player.Name,
-                            fileName );
-                player.MessageUnsafePath();
-                return;
-            }
-
-            // Make sure file exists
-            if( !File.Exists( fileName ) ) {
-                player.Message( "Rank list file not found: " + fileName );
-                return;
-            }
-
-            // Read list of names from file.
-            // Using List list to preserve capitalization and a HashSet to avoid duplicates.
-            List<string> nameList = new List<string>();
-            using( StreamReader reader = new StreamReader( fileName ) ) {
-                HashSet<string> lowerNameSet = new HashSet<string>();
-                while( true ) {
-                    string nextName = reader.ReadLine();
-                    if( nextName == null ) break;
-                    if( !Player.IsValidPlayerName( nextName ) ) {
-                        player.Message( "ImportRankList: Invalid player name skipped: {0}", nextName );
-                        continue;
-                    }
-                    string nameToLower = nextName.ToLowerInvariant();
-                    if( lowerNameSet.Contains( nameToLower ) ) {
-                        player.Message( "ImportRankList: Skipping a duplicate name: {0}", nextName );
-                        continue;
-                    }
-                    nameList.Add( nextName );
-                    lowerNameSet.Add( nameToLower );
-                }
-            }
-
-            // Ask player to confirm before continuing
-            if( !cmd.IsConfirmed ) {
-                Logger.Log( LogType.UserActivity,
-                            "Import: Asked {0} to confirm importing {1} ranks from {2}",
-                            player.Name,
-                            nameList.Count,
-                            fileName );
-                player.Confirm( cmd,
-                                "ImportRankList: Are you sure you want to rank {0} players to {1}&S?",
-                                nameList.Count,
-                                rank.ClassyName );
-                return;
-            }
-
-            // Carry out the promotions
-            int newPlayers = 0,
-                promotedPlayers = 0,
-                skippedPlayers = 0;
-            foreach( string name in nameList ) {
-                PlayerInfo info = PlayerDB.FindPlayerInfoExact( name );
-                if( info == null ) {
-                    // Create and promote a new record
-                    newPlayers++;
-                    PlayerInfo newInfo = PlayerDB.CreateNewPlayerInfo( name, RankChangeType.Promoted );
-                    newInfo.ChangeRank( player, rank, reason, true, true, false );
-                    Logger.Log( LogType.UserActivity, "ImportRankList: Created a new player record for {0}", name );
-
-                } else {
-                    // Check if an existing record needs updating
-                    if( info.Rank < rank && // don't demote anyone
-                        !info.IsBanned && // don't promote banned players
-                        info.RankChangeType != RankChangeType.Demoted && // don't re-promote demoted players
-                        info.RankChangeType != RankChangeType.AutoDemoted ) {
-                        // Promote!
-                        info.ChangeRank( player, rank, reason, true, true, false );
-                        promotedPlayers++;
-
-                    } else {
-                        skippedPlayers++;
-                    }
-                }
-            }
-            string successMsg = String.Format(
-                "ImportRankList: Created {0} new records, promoted {1} players, " +
-                "skipped {2} records from file \"{3}\"",
-                newPlayers,
-                promotedPlayers,
-                skippedPlayers,
-                Path.GetFileName( fileName ) );
-            Logger.Log( LogType.UserActivity, successMsg );
-            player.Message( successMsg );
         }
 
         #endregion
@@ -738,55 +993,44 @@ namespace fCraft {
             Category = CommandCategory.Maintenance | CommandCategory.Moderation,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.EditPlayerDB },
-            Help = "Allows direct editing of players' database records. List of editable properties: " +
-                   "Bandwidth, BanReason, DisplayedName, KickReason, Name (capitalization only), " +
-                   "PreviousRank, RankChangeType, RankReason, TimesKicked, TotalTime, UnbanReason. " +
-                   "For detailed help see &H/Help SetInfo <Property>",
+            Help = "&SAllows direct editing of players' database records. List of editable properties: " +
+                   "BanReason, DisplayedName, KickReason, PreviousRank, RankChangeType, " +
+                   "RankReason, TimesKicked, TotalTime, UnbanReason. For detailed help see &H/Help SetInfo <Property>",
             HelpSections = new Dictionary<string, string>{
-                { "bandwidth",      "&H/SetInfo <PlayerName> Bandwidth <Mode>\n&S" +
-                                    "Sets custom bandwidth use mode for given player. " +
-                                    "<Type> can be: Default, VeryLow, Low, Normal, High, VeryHigh. Shortcut: BW" },
                 { "banreason",      "&H/SetInfo <PlayerName> BanReason <Reason>\n&S" +
-                                    "Changes ban reason for the given player. Original ban reason is preserved in the logs. " +
-                                    "Shortcut: BR" },
+                                    "Changes ban reason for the given player. Original ban reason is preserved in the logs." },
                 { "displayedname",  "&H/SetInfo <RealPlayerName> DisplayedName <DisplayedName>\n&S" +
                                     "Sets or resets the way player's name is displayed in chat. "+
                                     "Any printable symbols or color codes may be used in the displayed name. "+
                                     "Note that player's real name is still used in logs and on the in-game player list. "+
-                                    "To remove a custom name, type \"&H/SetInfo <RealName> DisplayedName&S\" (omit the name). " +
-                                    "Shortcut: DN" },
+                                    "To remove a custom name, type \"&H/SetInfo <RealName> DisplayedName&S\" (omit the name)." },
                 { "kickreason",     "&H/SetInfo <PlayerName> KickReason <Reason>\n&S" +
                                     "Changes reason of most-recent kick for the given player. " +
-                                    "Original kick reason is preserved in the logs. Shortcut: KR" },
-                { "name",           "&H/SetInfo <PlayerName> Name <Name>\n&S" +
-                                    "Changes capitalization of player's name. " +
-                                    "No spelling changes are allowed (use DisplayedName for those, if you must). " +
-                                    "Shortcut: N" },
+                                    "Original kick reason is preserved in the logs." },
                 { "previousrank",   "&H/SetInfo <PlayerName> PreviousRank <RankName>\n&S" +
                                     "Changes previous rank held by the player. " +
                                     "To reset previous rank to \"none\" (will show as \"default\" in &H/Info&S), " +
-                                    "type \"&H/SetInfo <Name> PreviousRank&S\" (omit the rank name). Shortcut: PR" },
+                                    "type \"&H/SetInfo <Name> PreviousRank&S\" (omit the rank name)." },
                 { "rankchangetype", "&H/SetInfo <PlayerName> RankChangeType <Type>\n&S" +
-                                    "Sets the type of rank change. <Type> can be: Promoted, Demoted, AutoPromoted, AutoDemoted. " +
-                                    "Shortcut: RCT" },
+                                    "Sets the type of rank change. <Type> can be: Promoted, Demoted, AutoPromoted, AutoDemoted." },
                 { "rankreason",     "&H/SetInfo <PlayerName> RankReason <Reason>\n&S" +
                                     "Changes promotion/demotion reason for the given player. "+
-                                    "Original promotion/demotion reason is preserved in the logs. Shortcut: RR" },
+                                    "Original promotion/demotion reason is preserved in the logs." },
                 { "timeskicked",    "&H/SetInfo <PlayerName> TimesKicked <#>\n&S" +
                                     "Changes the number of times that a player has been kicked. "+
-                                    "Acceptable value range: 0-9999. Shortcut: TK" },
+                                    "Acceptible value range: 0-9999" },
                 { "totaltime",      "&H/SetInfo <PlayerName> TotalTime <Time>\n&S" +
                                     "Changes the amount of game time that the player has on record. " +
-                                    "Accepts values in the common compact time-span format. Shortcut: TT" },
+                                    "Accepts values in the common compact time-span format." },
                 { "unbanreason",    "&H/SetInfo <PlayerName> UnbanReason <Reason>\n&S" +
                                     "Changes unban reason for the given player. " +
-                                    "Original unban reason is preserved in the logs. Shortcut: UR" }
+                                    "Original unban reason is preserved in the logs." }
             },
             Usage = "/SetInfo <PlayerName> <Property> <Value>",
             Handler = SetInfoHandler
         };
 
-        static void SetInfoHandler( Player player, CommandReader cmd ) {
+        static void SetInfoHandler( Player player, Command cmd ) {
             string targetName = cmd.Next();
             string propertyName = cmd.Next();
             string valName = cmd.NextAll();
@@ -796,12 +1040,11 @@ namespace fCraft {
                 return;
             }
 
-            PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches( player, targetName, SearchOptions.IncludeSelf );
+            PlayerInfo info = PlayerDB.FindPlayerInfoOrPrintMatches( player, targetName );
             if( info == null ) return;
 
             switch( propertyName.ToLower() ) {
                 case "timeskicked":
-                case "tk":
                     int oldTimesKicked = info.TimesKicked;
                     if( ValidateInt( valName, 0, 9999 ) ) {
                         info.TimesKicked = Int32.Parse( valName );
@@ -811,12 +1054,11 @@ namespace fCraft {
                                         info.TimesKicked );
                         break;
                     } else {
-                        player.Message( "SetInfo: TimesKicked value out of range (acceptable: 0-9999)" );
+                        player.Message( "SetInfo: TimesKicked value acceptible (Acceptible value range: 0-9999)" );
                         return;
                     }
 
                 case "previousrank":
-                case "pr":
                     Rank newPreviousRank;
                     if( valName.Length > 0 ) {
                         newPreviousRank = RankManager.FindRank( valName );
@@ -830,14 +1072,15 @@ namespace fCraft {
 
                     Rank oldPreviousRank = info.PreviousRank;
 
-                    if( newPreviousRank == null && oldPreviousRank == null ) {
-                        player.Message( "SetInfo: PreviousRank for {0}&S is not set.",
-                                        info.ClassyName );
-                        return;
-                    } else if( newPreviousRank == oldPreviousRank ) {
-                        player.Message( "SetInfo: PreviousRank for {0}&S is already set to {1}",
-                                        info.ClassyName,
-                                        newPreviousRank.ClassyName );
+                    if( newPreviousRank == oldPreviousRank ) {
+                        if( newPreviousRank == null ) {
+                            player.Message( "SetInfo: PreviousRank for {0}&S is not set.",
+                                            info.ClassyName );
+                        } else {
+                            player.Message( "SetInfo: PreviousRank for {0}&S is already set to {1}",
+                                            info.ClassyName,
+                                            newPreviousRank.ClassyName );
+                        }
                         return;
                     }
                     info.PreviousRank = newPreviousRank;
@@ -859,10 +1102,9 @@ namespace fCraft {
                     break;
 
                 case "totaltime":
-                case "tt":
                     TimeSpan newTotalTime;
                     TimeSpan oldTotalTime = info.TotalTime;
-                    if( valName.TryParseMiniTimeSpan( out newTotalTime ) ) {
+                    if( valName.TryParseMiniTimespan( out newTotalTime ) ) {
                         if( newTotalTime > DateTimeUtil.MaxTimeSpan ) {
                             player.MessageMaxTimeSpan();
                             return;
@@ -881,15 +1123,14 @@ namespace fCraft {
                     }
 
                 case "rankchangetype":
-                case "rct":
                     RankChangeType oldType = info.RankChangeType;
-                    RankChangeType newType;
-                    if(!EnumUtil.TryParse(valName, out newType, true)){
+                    try {
+                        info.RankChangeType = (RankChangeType)Enum.Parse( typeof( RankChangeType ), valName, true );
+                    } catch( ArgumentException ) {
                         player.Message( "SetInfo: Could not parse RankChangeType. Allowed values: {0}",
                                         String.Join( ", ", Enum.GetNames( typeof( RankChangeType ) ) ) );
                         return;
                     }
-                    info.RankChangeType = newType;
                     player.Message( "SetInfo: RankChangeType for {0}&S changed from {1} to {2}",
                                     info.ClassyName,
                                     oldType,
@@ -897,7 +1138,6 @@ namespace fCraft {
                     break;
 
                 case "banreason":
-                case "br":
                     if( valName.Length == 0 ) valName = null;
                     if( SetPlayerInfoField( player, "BanReason", info, info.BanReason, valName ) ) {
                         info.BanReason = valName;
@@ -906,23 +1146,7 @@ namespace fCraft {
                         return;
                     }
 
-                case "bandwidth":
-                case "bw":
-                    BandwidthUseMode oldMode = info.BandwidthUseMode;
-                    BandwidthUseMode newMode;
-                    if( !EnumUtil.TryParse( valName, out newMode, true ) ) {
-                        player.Message( "SetInfo: Could not parse BandwidthUseMode. Allowed values: {0}",
-                                        String.Join( ", ", Enum.GetNames( typeof( BandwidthUseMode ) ) ) );
-                        return;
-                    }
-                    info.BandwidthUseMode = newMode;
-                    player.Message( "SetInfo: BandwidthUseMode for {0}&S changed from {1} to {2}",
-                                    info.ClassyName,
-                                    oldMode, newMode );
-                    break;
-
                 case "unbanreason":
-                case "ur":
                     if( valName.Length == 0 ) valName = null;
                     if( SetPlayerInfoField( player, "UnbanReason", info, info.UnbanReason, valName ) ) {
                         info.UnbanReason = valName;
@@ -932,7 +1156,6 @@ namespace fCraft {
                     }
 
                 case "rankreason":
-                case "rr":
                     if( valName.Length == 0 ) valName = null;
                     if( SetPlayerInfoField( player, "RankReason", info, info.RankChangeReason, valName ) ) {
                         info.RankChangeReason = valName;
@@ -942,7 +1165,6 @@ namespace fCraft {
                     }
 
                 case "kickreason":
-                case "kr":
                     if( valName.Length == 0 ) valName = null;
                     if( SetPlayerInfoField( player, "KickReason", info, info.LastKickReason, valName ) ) {
                         info.LastKickReason = valName;
@@ -952,15 +1174,9 @@ namespace fCraft {
                     }
 
                 case "displayedname":
-                case "dn":
+                    Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
                     string oldDisplayedName = info.DisplayedName;
                     if( valName.Length == 0 ) valName = null;
-
-                    if( valName != null && ( valName.Contains( '\n' ) || valName.Contains( "&n" ) || valName.Contains( "&N" ) ) ) {
-                        player.Message( "SetInfo: DisplayedName may not contain line breaks." );
-                        return;
-                    }
-
                     if( valName == info.DisplayedName ) {
                         if( valName == null ) {
                             player.Message( "SetInfo: DisplayedName for {0} is not set.",
@@ -982,23 +1198,13 @@ namespace fCraft {
                         player.Message( "SetInfo: DisplayedName for {0} was reset (was \"{1}&S\")",
                                         info.Name,
                                         oldDisplayedName );
+                        target.Info.isMad = false;
+                        target.Info.isJelly = false;
                     } else {
                         player.Message( "SetInfo: DisplayedName for {0} changed from \"{1}&S\" to \"{2}&S\"",
                                         info.Name,
                                         oldDisplayedName,
                                         valName );
-                    }
-                    break;
-
-                case "name":
-                case "n":
-                    if( valName.Equals( info.Name, StringComparison.OrdinalIgnoreCase ) ) {
-                        info.Name = valName;
-                    } else {
-                        player.Message( "SetInfo: Only capitalization changes are allowed in the name. " +
-                                        "Type out the whole name ({0}) please.",
-                                        info.Name );
-                        return;
                     }
                     break;
 
@@ -1011,7 +1217,7 @@ namespace fCraft {
             info.LastModified = DateTime.UtcNow;
         }
 
-        static bool SetPlayerInfoField( [NotNull] Player player, [NotNull] string fieldName, [NotNull] PlayerInfo info,
+        static bool SetPlayerInfoField( [NotNull] Player player, [NotNull] string fieldName, [NotNull] IClassy info,
                                         [CanBeNull] string oldValue, [CanBeNull] string newValue ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( fieldName == null ) throw new ArgumentNullException( "fieldName" );
@@ -1057,11 +1263,11 @@ namespace fCraft {
 
         static readonly CommandDescriptor CdReload = new CommandDescriptor {
             Name = "Reload",
-            Aliases = new[] { "configreload", "reloadconfig", "autorankreload", "reloadautorank" },
+            Aliases = new[] { "configreload", "reloadconfig"},
             Category = CommandCategory.Maintenance,
             Permissions = new[] { Permission.ReloadConfig },
             IsConsoleSafe = true,
-            Usage = "/Reload config/autorank/salt",
+            Usage = "/Reload config/salt/swears",
             Help = "Reloads a given configuration file or setting. "+
                    "Config note: changes to ranks and IRC settings still require a full restart. "+
                    "Salt note: Until server synchronizes with Minecraft.net, " +
@@ -1069,7 +1275,7 @@ namespace fCraft {
             Handler = ReloadHandler
         };
 
-        static void ReloadHandler( Player player, CommandReader cmd ) {
+        static void ReloadHandler( Player player, Command cmd ) {
             string whatToReload = cmd.Next();
             if( whatToReload == null ) {
                 CdReload.PrintUsage( player );
@@ -1083,22 +1289,18 @@ namespace fCraft {
 
                 switch( whatToReload ) {
                     case "config":
-                        try {
-                            Config.Load( true, true );
-                            success = true;
-                        } catch( Exception ex ) {
-                            Logger.LogAndReportCrash( "Config failed to reload", "ConfigGUI", ex, false );
-                            success = false;
-                        }
+                        success = Config.Load( true, true );
                         break;
 
-                    case "autorank":
-                        success = AutoRankManager.Init();
-                        AutoRankManager.DoAutoRankAll( player, PlayerDB.PlayerInfoList, "(AutoRanked)", false );
+                    case "swears":
+                        Chat.badWordMatchers = null;
+                        Chat.Swears.Clear();
+                        success = true;
                         break;
 
                     case "salt":
                         Heartbeat.Salt = Server.GetRandomString( 32 );
+                        Heartbeat.Salt2 = Server.GetRandomString(32);
                         player.Message( "&WNote: Until server synchronizes with Minecraft.net, " +
                                         "connecting players may have trouble verifying names." );
                         success = true;
@@ -1118,7 +1320,7 @@ namespace fCraft {
                 if( success ) {
                     player.Message( "Reload: reloaded {0}.", whatToReload );
                 } else {
-                    player.Message( "&WReload: Error(s) occurred while reloading {0}.", whatToReload );
+                    player.Message( "&WReload: Error(s) occured while reloading {0}.", whatToReload );
                 }
             }
         }
@@ -1133,7 +1335,7 @@ namespace fCraft {
             Category = CommandCategory.Maintenance,
             Permissions = new[] { Permission.ShutdownServer },
             IsConsoleSafe = true,
-            Help = "Shuts down the server remotely after a given delay. " +
+            Help = "&SShuts down the server remotely after a given delay. " +
                    "A shutdown reason or message can be specified to be shown to players. " +
                    "Type &H/Shutdown abort&S to cancel.",
             Usage = "/Shutdown Delay [Reason]&S or &H/Shutdown abort",
@@ -1142,7 +1344,7 @@ namespace fCraft {
 
         static readonly TimeSpan DefaultShutdownTime = TimeSpan.FromSeconds( 5 );
 
-        static void ShutdownHandler( Player player, CommandReader cmd ) {
+        static void ShutdownHandler( Player player, Command cmd ) {
             string delayString = cmd.Next();
             TimeSpan delayTime = DefaultShutdownTime;
             string reason = "";
@@ -1157,7 +1359,7 @@ namespace fCraft {
                         player.MessageNow( "Cannot abort shutdown - too late." );
                     }
                     return;
-                } else if( !delayString.TryParseMiniTimeSpan( out delayTime ) ) {
+                } else if( !delayString.TryParseMiniTimespan( out delayTime ) ) {
                     CdShutdown.PrintUsage( player );
                     return;
                 }
@@ -1180,14 +1382,14 @@ namespace fCraft {
                 Logger.Log( LogType.UserActivity,
                             "{0} scheduled a shutdown ({1} delay).",
                             player.Name, delayTime.ToCompactString() );
-                ShutdownParams sp = new ShutdownParams( ShutdownReason.ShutdownCommand, delayTime, false );
+                ShutdownParams sp = new ShutdownParams( ShutdownReason.ShuttingDown, delayTime, true, false );
                 Server.Shutdown( sp, false );
             } else {
                 Server.Message( "&SShutdown reason: {0}", reason );
                 Logger.Log( LogType.UserActivity,
                             "{0} scheduled a shutdown ({1} delay). Reason: {2}",
                             player.Name, delayTime.ToCompactString(), reason );
-                ShutdownParams sp = new ShutdownParams( ShutdownReason.ShutdownCommand, delayTime, false, reason, player );
+                ShutdownParams sp = new ShutdownParams( ShutdownReason.ShuttingDown, delayTime, true, false, reason, player );
                 Server.Shutdown( sp, false );
             }
         }
@@ -1199,14 +1401,14 @@ namespace fCraft {
             Category = CommandCategory.Maintenance,
             Permissions = new[] { Permission.ShutdownServer },
             IsConsoleSafe = true,
-            Help = "Restarts the server remotely after a given delay. " +
+            Help = "&SRestarts the server remotely after a given delay. " +
                    "A restart reason or message can be specified to be shown to players. " +
                    "Type &H/Restart abort&S to cancel.",
             Usage = "/Restart Delay [Reason]&S or &H/Restart abort",
             Handler = RestartHandler
         };
 
-        static void RestartHandler( Player player, CommandReader cmd ) {
+        static void RestartHandler( Player player, Command cmd ) {
             string delayString = cmd.Next();
             TimeSpan delayTime = DefaultShutdownTime;
             string reason = "";
@@ -1216,12 +1418,13 @@ namespace fCraft {
                     if( Server.CancelShutdown() ) {
                         Logger.Log( LogType.UserActivity,
                                     "Restart aborted by {0}.", player.Name );
+                        Server.IsRestarting = false;
                         Server.Message( "&WRestart aborted by {0}", player.ClassyName );
                     } else {
                         player.MessageNow( "Cannot abort restart - too late." );
                     }
                     return;
-                } else if( !delayString.TryParseMiniTimeSpan( out delayTime ) ) {
+                } else if( !delayString.TryParseMiniTimespan( out delayTime ) ) {
                     CdShutdown.PrintUsage( player );
                     return;
                 }
@@ -1237,21 +1440,21 @@ namespace fCraft {
                                 TimeSpan.FromMilliseconds( Int32.MaxValue - 1 ).ToMiniString() );
                 return;
             }
-
+            Server.IsRestarting = true;
             Server.Message( "&WServer restarting in {0}", delayTime.ToMiniString() );
 
             if( String.IsNullOrEmpty( reason ) ) {
                 Logger.Log( LogType.UserActivity,
                             "{0} scheduled a restart ({1} delay).",
                             player.Name, delayTime.ToCompactString() );
-                ShutdownParams sp = new ShutdownParams( ShutdownReason.RestartCommand, delayTime, true );
+                ShutdownParams sp = new ShutdownParams( ShutdownReason.Restarting, delayTime, true, true );
                 Server.Shutdown( sp, false );
             } else {
                 Server.Message( "&WRestart reason: {0}", reason );
                 Logger.Log( LogType.UserActivity,
                             "{0} scheduled a restart ({1} delay). Reason: {2}",
                             player.Name, delayTime.ToCompactString(), reason );
-                ShutdownParams sp = new ShutdownParams( ShutdownReason.RestartCommand, delayTime, true, reason, player );
+                ShutdownParams sp = new ShutdownParams( ShutdownReason.Restarting, delayTime, true, true, reason, player );
                 Server.Shutdown( sp, false );
             }
         }
@@ -1267,27 +1470,22 @@ namespace fCraft {
             IsConsoleSafe = true,
             IsHidden = true,
             Permissions = new[] { Permission.EditPlayerDB },
-            Help = "Removes inactive players from the player database. Use with caution.",
+            Help = "&SRemoves inactive players from the player database. Use with caution.",
             Handler = PruneDBHandler
         };
 
-        static void PruneDBHandler( Player player, CommandReader cmd ) {
+        static void PruneDBHandler( Player player, Command cmd ) {
             if( !cmd.IsConfirmed ) {
                 player.MessageNow( "PruneDB: Finding inactive players..." );
                 int inactivePlayers = PlayerDB.CountInactivePlayers();
                 if( inactivePlayers == 0 ) {
                     player.Message( "PruneDB: No inactive players found." );
                 } else {
-                    Logger.Log( LogType.UserActivity,
-                                "PruneDB: Asked {0} to confirm erasing {1} records.",
-                                player.Name, inactivePlayers );
                     player.Confirm( cmd, "PruneDB: Erase {0} records of inactive players?",
                                     inactivePlayers );
                 }
             } else {
-                var task = Scheduler.NewBackgroundTask( PruneDBTask, player );
-                task.IsCritical = true;
-                task.RunOnce();
+                Scheduler.NewBackgroundTask( PruneDBTask, player ).RunOnce();
             }
         }
 
@@ -1301,21 +1499,21 @@ namespace fCraft {
         #endregion
 
 
-        #region Import / Export
+        #region Importing
 
         static readonly CommandDescriptor CdImport = new CommandDescriptor {
             Name = "Import",
-            Aliases = new[] { "ImportBans", "ImportRanks" },
+            Aliases = new[] { "importbans", "importranks" },
             Category = CommandCategory.Maintenance,
             IsConsoleSafe = true,
             Permissions = new[] { Permission.Import },
-            Usage = "/Import Bans Software File&S or &H/Import Ranks Software File Rank",
+            Usage = "/Import bans Software File&S or &H/Import ranks Software File Rank",
             Help = "Imports data from formats used by other servers. " +
                    "Currently only MCSharp/MCZall/MCLawl/MCForge files are supported.",
             Handler = ImportHandler
         };
 
-        static void ImportHandler( Player player, CommandReader cmd ) {
+        static void ImportHandler( Player player, Command cmd ) {
             string action = cmd.Next();
             if( action == null ) {
                 CdImport.PrintUsage( player );
@@ -1346,197 +1544,74 @@ namespace fCraft {
         }
 
 
-        static void ImportBans( Player player, CommandReader cmd ) {
+        static void ImportBans( Player player, Command cmd ) {
             string serverName = cmd.Next();
-            string fileName = cmd.Next();
+            string file = cmd.Next();
 
             // Make sure all parameters are specified
-            if( serverName == null || fileName == null ) {
+            if( serverName == null || file == null ) {
                 CdImport.PrintUsage( player );
                 return;
             }
 
             // Check if file exists
-            if( !File.Exists( fileName ) ) {
-                player.Message( "File not found: {0}", fileName );
+            if( !File.Exists( file ) ) {
+                player.Message( "File not found: {0}", file );
                 return;
             }
 
-            int playersBanned = 0,
-                linesSkipped = 0,
-                playersAlreadyBanned = 0;
+            string[] names;
+
             switch( serverName.ToLower() ) {
                 case "mcsharp":
                 case "mczall":
                 case "mclawl":
                 case "mcforge":
-                    string[] names;
                     try {
-                        names = File.ReadAllLines( fileName );
+                        names = File.ReadAllLines( file );
                     } catch( Exception ex ) {
-                        player.Message( "Import: Could not open \"{0}\" to import bans.",
-                                        fileName );
                         Logger.Log( LogType.Error,
-                                    "ImportBans: Could not open \"{0}\": {1}",
-                                    fileName, ex );
+                                    "Could not open \"{0}\" to import bans: {1}",
+                                    file, ex );
                         return;
                     }
-                    if( !cmd.IsConfirmed ) {
-                        Logger.Log( LogType.UserActivity,
-                                    "Import: Asked {0} to confirm importing {1} bans from \"{2}\"",
-                                    player.Name, names.Length, fileName );
-                        player.Confirm( cmd, "Import: Import {0} bans?", names.Length );
-                        return;
-                    }
-
-                    const string reason = "(imported from MCSharp)";
-                    foreach( string name in names ) {
-                        try {
-                            IPAddress ip;
-                            if( IPAddressUtil.IsIP( name ) && IPAddress.TryParse( name, out ip ) ) {
-                                ip.BanIP( player, reason, true, true );
-                            } else if( Player.IsValidPlayerName( name ) ) {
-                                PlayerInfo info = PlayerDB.FindPlayerInfoExact( name ) ??
-                                                  PlayerDB.CreateNewPlayerInfo( name, RankChangeType.Default );
-                                info.Ban( player, reason, true, true );
-                                playersBanned++;
-
-                            } else {
-                                linesSkipped++;
-                            }
-                        } catch( PlayerOpException ex ) {
-                            if( ex.ErrorCode == PlayerOpExceptionCode.NoActionNeeded ) {
-                                playersAlreadyBanned++;
-                                continue;
-                            }
-                            Logger.Log( LogType.Warning, "ImportBans: " + ex.Message );
-                            player.Message( ex.MessageColored );
-                        }
-                    }
-                    PlayerDB.Save();
-                    IPBanList.Save();
                     break;
-
-                case "commandbook":
-                    if( !fileName.EndsWith( ".csv", StringComparison.OrdinalIgnoreCase ) ) {
-                        player.Message( "Import: Please provide bans.csv file for CommandBook" );
-                        return;
-                    }
-
-                    string[] lines;
-                    try {
-                        lines = File.ReadAllLines( fileName );
-                    } catch( Exception ex ) {
-                        player.Message( "Import: Could not open \"{0}\" to import bans.",
-                                        fileName );
-                        Logger.Log( LogType.Error,
-                                    "ImportBans: Could not open \"{0}\": {1}",
-                                    fileName, ex );
-                        return;
-                    }
-                    if( !cmd.IsConfirmed ) {
-                        Logger.Log( LogType.UserActivity,
-                                    "Import: Asked {0} to confirm importing {1} bans from \"{2}\"",
-                                    player.Name, lines.Length, fileName );
-                        player.Confirm( cmd, "Import: Import {0} bans?", lines.Length );
-                        return;
-                    }
-                    for( int i = 0; i < lines.Length; i++ ) {
-                        string[] record = ParseCsvRow( lines[i] );
-                        if( record.Length != 5 ) {
-                            linesSkipped++;
-                            continue;
-                        }
-                        string playerName = record[0];
-                        string banReason = String.Format( "{0} (imported from CommandBook on {1})",
-                                                          record[2],
-                                                          DateTime.UtcNow.ToCompactString() ).Trim();
-
-                        PlayerInfo info = PlayerDB.FindPlayerInfoExact( playerName ) ??
-                                          PlayerDB.CreateNewPlayerInfo( playerName, RankChangeType.Default );
-
-                        try {
-                            info.Ban( player, banReason, true, true );
-                            playersBanned++;
-                        } catch( PlayerOpException ex ) {
-                            if( ex.ErrorCode == PlayerOpExceptionCode.NoActionNeeded ) {
-                                playersAlreadyBanned++;
-                                continue;
-                            }
-                            Logger.Log( LogType.Warning, "ImportBans: " + ex.Message );
-                            player.Message( ex.MessageColored );
-                            continue;
-                        }
-
-                        long timestamp;
-                        if( record[3].Length > 1 && Int64.TryParse( record[3], out timestamp ) ) {
-                            DateTime originalBanDate = DateTimeUtil.UnixEpoch.AddMilliseconds( timestamp );
-                            info.BanDate = originalBanDate;
-                        }
-                    }
-                    PlayerDB.Save();
-                    IPBanList.Save();
-
-                    break;
-
                 default:
-                    player.Message( "fCraft does not support importing from \"{0}\". " +
-                                    "Only MCSharp and CommandBook ban lists are supported.",
-                                    serverName );
+                    player.Message( "800Craft does not support importing from {0}", serverName );
                     return;
             }
-            player.Message( "Import: Banned {0} players, found {1} already-banned players, skipped {2} lines.",
-                            playersBanned, playersAlreadyBanned, linesSkipped );
-        }
 
+            if( !cmd.IsConfirmed ) {
+                player.Confirm( cmd, "Import {0} bans.", names.Length );
+                return;
+            }
 
-        // by Chris Wilson
-        static string[] ParseCsvRow( string r ) {
-            List<string> resp = new List<string>();
-            bool cont = false;
-            string cs = "";
-            string[] c = r.Split( new[] { ',' }, StringSplitOptions.None );
-            foreach( string y in c ) {
-                string x = y;
-                if( cont ) {
-                    // End of field
-                    if( x.EndsWith( "\"" ) ) {
-                        cs += "," + x.Substring( 0, x.Length - 1 );
-                        resp.Add( cs );
-                        cs = "";
-                        cont = false;
-                        continue;
+            string reason = "(import from " + serverName + ")";
+            foreach( string name in names ) {
+                try {
+                    IPAddress ip;
+                    if( Server.IsIP( name ) && IPAddress.TryParse( name, out ip ) ) {
+                        ip.BanIP( player, reason, true, true );
+                    } else if( Player.IsValidName( name ) ) {
+                        PlayerInfo info = PlayerDB.FindPlayerInfoExact( name ) ??
+                                          PlayerDB.AddFakeEntry( name, RankChangeType.Default );
+                        info.Ban( player, reason, true, true );
 
                     } else {
-                        // Field still not ended
-                        cs += "," + x;
-                        continue;
+                        player.Message( "Could not parse \"{0}\" as either name or IP. Skipping.", name );
                     }
+                } catch( PlayerOpException ex ) {
+                    Logger.Log( LogType.Warning, "ImportBans: " + ex.Message );
+                    player.Message( ex.MessageColored );
                 }
-                // Fully encapsulated with no comma within
-                if( x.StartsWith( "\"" ) && x.EndsWith( "\"" ) ) {
-                    if( (x.EndsWith( "\"\"" ) && !x.EndsWith( "\"\"\"" )) && x != "\"\"" ) {
-                        cont = true;
-                        cs = x;
-                        continue;
-                    }
-                    resp.Add( x.Substring( 1, x.Length - 2 ) );
-                    continue;
-                }
-                // Start of encapsulation but comma has split it into at least next field
-                if( x.StartsWith( "\"" ) && !x.EndsWith( "\"" ) ) {
-                    cont = true;
-                    cs += x.Substring( 1 );
-                    continue;
-                }
-                // Non encapsulated complete field
-                resp.Add( x );
             }
-            return resp.ToArray();
+
+            PlayerDB.Save();
+            IPBanList.Save();
         }
 
 
-        static void ImportRanks( Player player, CommandReader cmd ) {
+        static void ImportRanks( Player player, Command cmd ) {
             string serverName = cmd.Next();
             string fileName = cmd.Next();
             string rankName = cmd.Next();
@@ -1563,7 +1638,7 @@ namespace fCraft {
 
             string[] names;
 
-            switch( serverName.ToLowerInvariant() ) {
+            switch( serverName.ToLower() ) {
                 case "mcsharp":
                 case "mczall":
                 case "mclawl":
@@ -1578,14 +1653,11 @@ namespace fCraft {
                     }
                     break;
                 default:
-                    player.Message( "fCraft does not support importing from {0}", serverName );
+                    player.Message( "800Craft does not support importing from {0}", serverName );
                     return;
             }
 
             if( !cmd.IsConfirmed ) {
-                Logger.Log( LogType.UserActivity,
-                            "Import: Asked {0} to confirm importing {1} ranks from {2}",
-                            player.Name, names.Length, fileName );
                 player.Confirm( cmd, "Import {0} player ranks?", names.Length );
                 return;
             }
@@ -1594,7 +1666,7 @@ namespace fCraft {
             foreach( string name in names ) {
                 try {
                     PlayerInfo info = PlayerDB.FindPlayerInfoExact( name ) ??
-                                      PlayerDB.CreateNewPlayerInfo( name, RankChangeType.Promoted );
+                                      PlayerDB.AddFakeEntry( name, RankChangeType.Promoted );
                     try {
                         info.ChangeRank( player, targetRank, reason, !silent, true, false );
                     } catch( PlayerOpException ex ) {
@@ -1609,93 +1681,6 @@ namespace fCraft {
             PlayerDB.Save();
         }
 
-
-        static readonly CommandDescriptor CdExport = new CommandDescriptor {
-            Name = "Export",
-            Category = CommandCategory.Maintenance,
-            IsHidden = true,
-            IsConsoleSafe = true,
-            Permissions = new[] { Permission.Import },
-            Usage = "/Export Bans FileName&S or &H/Export Ranks FileName RankName",
-            Handler = ExportHandler
-        };
-
-        static void ExportHandler( [NotNull] Player player, [NotNull] CommandReader cmd ) {
-            string actionType = cmd.Next();
-            string fileName = cmd.Next();
-            if( actionType == null || fileName == null ) {
-                CdExport.PrintUsage( player );
-                return;
-            }
-
-            // Make sure the given filename is valid
-            if( !Paths.IsValidPath( fileName ) ) {
-                player.Message( "Export: Unacceptable filename given: \"{0}\"", fileName );
-                return;
-            }
-
-            // Make sure that the target file is legit
-            if( !Paths.Contains( Paths.WorkingPath, fileName ) ) {
-                Logger.Log( LogType.SuspiciousActivity,
-                            "Export: Player {0} tried to export to \"{1}\"",
-                            player.Name,
-                            fileName );
-                player.MessageUnsafePath();
-                return;
-            }
-
-            IEnumerable<PlayerInfo> playerList;
-            if( "Ranks".Equals( actionType, StringComparison.OrdinalIgnoreCase ) ) {
-                // Read and check the rank name
-                string rankName = cmd.Next();
-                if( rankName == null ) {
-                    CdExport.PrintUsage( player );
-                    return;
-                }
-                Rank rank = RankManager.FindRank( rankName );
-                if( rank == null ) {
-                    player.MessageNoRank( rankName );
-                    return;
-                }
-
-                // Get a list of players of given rank
-                playerList = PlayerDB.PlayerInfoList.Where( p => p.Rank == rank );
-
-            } else if( "Bans".Equals( actionType, StringComparison.OrdinalIgnoreCase ) ) {
-                // Get a list of banned players
-                playerList = PlayerDB.PlayerInfoList
-                                            .Where( p => p.BanStatus == BanStatus.Banned );
-
-            } else {
-                player.Message( "Export: Action must be \"ranks\" or \"bans\"." );
-                CdExport.PrintUsage( player );
-                return;
-            }
-
-            // If file already exists, require confirmation
-            if( !cmd.IsConfirmed && File.Exists( fileName ) ) {
-                Logger.Log( LogType.UserActivity,
-                            "Export: Asked {0} to confirm overwriting \"{1}\"",
-                            player.Name,
-                            fileName );
-                player.Confirm( cmd, "Export: File \"{0}\" already exists. Overwrite?", fileName );
-                return;
-            }
-
-            // Save the list to file. If file is not writable, explodes!
-            int playerCount = 0;
-            using( StreamWriter writer = new StreamWriter( fileName ) ) {
-                foreach( PlayerInfo info in playerList ) {
-                    writer.WriteLine( info.Name );
-                    playerCount++;
-                }
-            }
-
-            // report success
-            player.Message( "Export: Written {0} names to \"{1}\"",
-                            playerCount, Path.GetFileName( fileName ) );
-        }
-
         #endregion
 
 
@@ -1706,11 +1691,11 @@ namespace fCraft {
             IsHidden = true,
             Permissions = new[] { Permission.EditPlayerDB },
             Usage = "/InfoSwap Player1 Player2",
-            Help = "Swaps stats of two players in the database. Both players should be offline.",
-            Handler = InfoSwapHandler
+            Help = "&SSwaps records between two players. EXPERIMENTAL, use at your own risk.",
+            Handler = DoPlayerDB
         };
 
-        static void InfoSwapHandler( Player player, CommandReader cmd ) {
+        static void DoPlayerDB( Player player, Command cmd ) {
             string p1Name = cmd.Next();
             string p2Name = cmd.Next();
             if( p1Name == null || p2Name == null ) {
@@ -1718,9 +1703,9 @@ namespace fCraft {
                 return;
             }
 
-            PlayerInfo p1 = PlayerDB.FindPlayerInfoOrPrintMatches( player, p1Name, SearchOptions.IncludeSelf );
+            PlayerInfo p1 = PlayerDB.FindPlayerInfoOrPrintMatches( player, p1Name );
             if( p1 == null ) return;
-            PlayerInfo p2 = PlayerDB.FindPlayerInfoOrPrintMatches( player, p2Name, SearchOptions.IncludeSelf );
+            PlayerInfo p2 = PlayerDB.FindPlayerInfoOrPrintMatches( player, p2Name );
             if( p2 == null ) return;
 
             if( p1 == p2 ) {
@@ -1734,16 +1719,10 @@ namespace fCraft {
             }
 
             if( !cmd.IsConfirmed ) {
-                Logger.Log( LogType.UserActivity,
-                            "InfoSwap: Asked {0} to confirm swapping stats of players {1} and {2}",
-                            player.Name, p1.Name, p2.Name );
-                player.Confirm( cmd, "InfoSwap: Swap stats of players {0}&S and {1}&S?",
-                                     p1.ClassyName, p2.ClassyName );
+                player.Confirm( cmd, "InfoSwap: Swap stats of players {0}&S and {1}&S?", p1.ClassyName, p2.ClassyName );
+                return;
             } else {
                 PlayerDB.SwapPlayerInfo( p1, p2 );
-                Logger.Log( LogType.UserActivity,
-                            "Player {0} swapped stats of players {1} and {2}",
-                            player.Name, p1.Name, p2.Name );
                 player.Message( "InfoSwap: Stats of {0}&S and {1}&S have been swapped.",
                                 p1.ClassyName, p2.ClassyName );
             }

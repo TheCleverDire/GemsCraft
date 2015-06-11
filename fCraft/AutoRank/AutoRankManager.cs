@@ -1,221 +1,230 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
+using System.Text;
+using System.Xml;
 using System.Xml.Linq;
-using JetBrains.Annotations;
+using System.IO;
+using fCraft;
 
-namespace fCraft.AutoRank {
-    static class AutoRankManager {
-        internal static readonly TimeSpan TickInterval = TimeSpan.FromSeconds( 60 );
+namespace fCraft.AutoRank
+{
+    public static class AutoRankManager
+    {
+        public static List<Condition> conditionList = new List<Condition>();
 
-        static readonly List<Criterion> Criteria = new List<Criterion>();
+        public static void Load()
+        {
+            try
+            {
+                if (!File.Exists(Paths.AutoRankFileName))
+                {
+                    //autorank was never set up
+                    return;
+                }
 
-        // Whether any criteria are defined.
-        static bool HasCriteria {
-            get { return Criteria.Count > 0; }
-        }
+                XDocument doc = XDocument.Load(Paths.AutoRankFileName);
+                XElement docConfig = doc.Root;
 
-
-        //  Adds a new criterion to the list. Throws an ArgumentException on duplicates.
-        static void Add( [NotNull] Criterion criterion ) {
-            if( criterion == null ) throw new ArgumentNullException( "criterion" );
-            if( Criteria.Contains( criterion ) )
-                throw new ArgumentException( "This criterion has already been added." );
-            Criteria.Add( criterion );
-        }
-
-
-        /// <summary> Checks whether a given player is due for a promotion or demotion. </summary>
-        /// <param name="info"> PlayerInfo to check. </param>
-        /// <returns> Null if no rank change is needed, or a rank to promote/demote to. </returns>
-        [CanBeNull]
-        public static Rank Check( [NotNull] PlayerInfo info ) {
-            if( info == null ) throw new ArgumentNullException( "info" );
-            for( int i = 0; i < Criteria.Count; i++ ) {
-                if( Criteria[i].FromRank == info.Rank &&
-                    !info.IsBanned &&
-                    Criteria[i].Condition.Eval( info ) ) {
-
-                    return Criteria[i].ToRank;
+                //load each rank change
+                foreach (XElement mainElement in docConfig.Elements())
+                {
+                    string startingRank = mainElement.Name.ToString().Split('-')[0];
+                    string endingRank = mainElement.Name.ToString().Split('-')[1];
+                    foreach (XAttribute condition in mainElement.Attributes())
+                    {
+                        string cond = condition.Name.ToString();
+                        string op = GetOperator(condition.Value);
+                        string value = GetValue(condition.Value);
+                        Condition generatedCondition = new Condition(startingRank, endingRank, cond, op, value);
+                        conditionList.Add(generatedCondition);
+                    }
+                    //load each condition in each rank change
+                    foreach (XAttribute conditional in mainElement.Attributes())
+                    {
+                        //load the operator and the value
+                    }
                 }
             }
-            return null;
+            catch (Exception ex)
+            {
+                if (ex is IndexOutOfRangeException)
+                {
+                    //chill, autorank is just empty and stuff
+                }
+                else
+                {
+                    Logger.LogToConsole(ex.Message + " " + ex.Data);
+                }
+            }
         }
 
-
-        internal static void TaskCallback( SchedulerTask schedulerTask ) {
-            if( !ConfigKey.AutoRankEnabled.Enabled() ) return;
-            PlayerInfo[] onlinePlayers = Server.Players.Select( p => p.Info ).ToArray();
-            DoAutoRankAll( Player.AutoRank, onlinePlayers, "(AutoRanked)", true );
+        public static string GetOperator(string str)
+        {
+            string returnString;
+            if (str.Contains("=/="))
+            {
+                returnString = str.Substring(0, 3);
+                return returnString;
+            }
+            if (str.Contains(">=") || str.Contains("<="))
+            {
+                returnString = str.Substring(0, 2);
+                return returnString;
+            }
+            else
+            {
+                returnString = str.Substring(0, 1);
+                return returnString;
+            }
         }
 
+        public static string GetValue(string str)
+        {
+            string returnString;
+            if (str.Contains("=/="))
+            {
+                returnString = str.Substring(3);
+                return returnString;
+            }
+            if (str.Contains(">=") || str.Contains("<="))
+            {
+                returnString = str.Substring(2);
+                return returnString;
+            }
+            else
+            {
+                returnString = str.Substring(1);
+                return returnString;
+            }
+        }
 
-        public static bool Init() {
-            Criteria.Clear();
+        /// <summary>
+        /// Check if a player is eligible for an autorank promotion/demotion
+        /// </summary>
+        public static void Check(Player player)
+        {
+            //loop through every condition in the conditions list
+            foreach (Condition condTest in conditionList)
+            {
+                //make sure the player's rank matches up with any of the starting ranks for each conditions
+                if (player.Info.Rank.Name == condTest.startingRank)
+                {
+                    bool rankUp = true;
 
-            if( File.Exists( Paths.AutoRankFileName ) ) {
-                try {
-                    XDocument doc = XDocument.Load( Paths.AutoRankFileName );
-                    if( doc.Root == null ) return false;
-                    foreach( XElement el in doc.Root.Elements( "Criterion" ) ) {
-                        try {
-                            Add( new Criterion( el ) );
-                        } catch( Exception ex ) {
-                            Logger.Log( LogType.Error,
-                                        "AutoRank.Init: Could not parse an AutoRank criterion: {0}",
-                                        ex );
+                    //loop through each AND item in the condition, if one AND item is not met, player will not rank up
+                    foreach (var item in condTest.conditions)
+                    {
+                        //type of condition
+                        switch (item.Key)
+                        {
+                            case "Since_First_Login":
+                                if(!item.Value.Item1.Operator(player.Info.TimeSinceFirstLogin.Days, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Since_Last_Login":
+                                if (!item.Value.Item1.Operator(player.Info.TimeSinceLastLogin.Days, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Last_Seen":
+                                if (!item.Value.Item1.Operator(player.Info.TimeSinceLastLogin.Days, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Total_Time":
+                                if (!item.Value.Item1.Operator((long)player.Info.TotalTime.TotalHours, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Blocks_Built":
+                                if (!item.Value.Item1.Operator(player.Info.BlocksBuilt, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Blocks_Deleted":
+                                if (!item.Value.Item1.Operator(player.Info.BlocksDeleted, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Blocks_Changed":
+                                if (!item.Value.Item1.Operator(player.Info.BlocksBuilt + player.Info.BlocksDeleted + player.Info.BlocksDrawn, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Blocks_Drawn":
+                                if (!item.Value.Item1.Operator(player.Info.BlocksDrawn, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Visits":
+                                if (!item.Value.Item1.Operator(player.Info.TimesVisited, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Messages":
+                                if (!item.Value.Item1.Operator(player.Info.MessagesWritten, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Times_Kicked":
+                                if (!item.Value.Item1.Operator(player.Info.TimesKicked, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Since_Rank_Change":
+                                if (!item.Value.Item1.Operator(player.Info.TimeSinceRankChange.Days, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            case "Since_Last_Kick":
+                                if (!item.Value.Item1.Operator(player.Info.TimeSinceLastKick.Days, item.Value.Item2))
+                                {
+                                    rankUp = false;
+                                }
+                                break;
+                            default:
+                                //shouldn't happen
+                                break;
                         }
+
                     }
-                    if( Criteria.Count == 0 ) {
-                        Logger.Log( LogType.Warning, "AutoRank.Init: No criteria loaded." );
+                    if (rankUp)
+                    {
+                        player.Info.ChangeRank(Player.Console, Rank.Parse(condTest.endingRank), "AutoRank System", true, true, true);
                     }
-                    return true;
-                } catch( Exception ex ) {
-                    Logger.Log( LogType.Error,
-                                "AutoRank.Init: Could not parse the AutoRank file: {0}",
-                                ex );
-                    return false;
                 }
-            } else {
-                Logger.Log( LogType.Warning, "AutoRank.Init: {0} not found. No criteria loaded.", Paths.AutoRankFileName );
-                return false;
             }
         }
 
-
-        internal static void DoAutoRankAll( [NotNull] Player player, [NotNull] PlayerInfo[] list, string message, bool auto ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( list == null ) throw new ArgumentNullException( "list" );
-
-            if( !HasCriteria ) {
-                if( !auto ) {
-                    player.Message( "AutoRankAll: No criteria found." );
-                }
-                return;
-            }
-
-            if( !auto ) {
-                player.Message( "AutoRankAll: Evaluating {0} players...", list.Length );
-            }
-
-            Stopwatch sw = Stopwatch.StartNew();
-            int promoted = 0,
-                demoted = 0;
-            for( int i = 0; i < list.Length; i++ ) {
-                Rank newRank = Check( list[i] );
-                if( newRank != null ) {
-                    if( newRank > list[i].Rank ) {
-                        promoted++;
-                    } else if( newRank < list[i].Rank ) {
-                        demoted++;
-                    }
-                    try {
-                        list[i].ChangeRank( player, newRank, message, true, true, true );
-                    } catch( PlayerOpException ex ) {
-                        if( auto ) {
-                            Logger.Log( LogType.Error, "AutoRank: Could not change player's rank: {0}", ex.Message );
-                        } else {
-                            player.Message( ex.MessageColored );
-                        }
-                    }
-                }
-            }
-            sw.Stop();
-            String resultMsg = String.Format( "AutoRankAll: Worked for {0}ms, {1} players promoted, {2} demoted.",
-                                              sw.ElapsedMilliseconds,
-                                              promoted,
-                                              demoted );
-            if( auto ) {
-                if( promoted > 0 || demoted > 0 ) {
-                    Logger.Log( LogType.SystemActivity, resultMsg );
-                }
-            } else {
-                player.Message( resultMsg );
+        /// <summary>
+        /// Parse a string into a bool like a boss
+        /// </summary>
+        public static bool Operator(this string str, long x, long y)
+        {
+            switch (str)
+            {
+                case ">": return x > y;
+                case "<": return x < y;
+                case "=": return x == y;
+                case ">=": return x >= y;
+                case "<=": return x <= y;
+                case "=/=": return x != y;
+                default: throw new Exception("Error: Unable to parse AutoRank logic. Make sure that Autorank.xml is not damaged or corrupted!: " + str);
             }
         }
     }
-
-
-    #region Enums
-
-    /// <summary>  Operators used to compare PlayerInfo fields. </summary>
-    enum ComparisonOp {
-
-        /// <summary> EQuals to </summary>
-        Eq,
-
-        /// <summary> Not EQual to </summary>
-        Neq,
-
-        /// <summary> Greater Than </summary>
-        Gt,
-
-        /// <summary> Greater Than or Equal </summary>
-        Gte,
-
-        /// <summary> Less Than </summary>
-        Lt,
-
-        /// <summary> Less Than or Equal </summary>
-        Lte
-    }
-
-
-    /// <summary> Enumeration of quantifiable PlayerInfo fields (or field combinations) that may be used with AutoRank conditions. </summary>
-    enum ConditionField {
-        /// <summary> Time since first login (first time the player connected), in seconds.
-        /// For players who have been entered into PlayerDB but have never logged in, this is a huge value. </summary>
-        TimeSinceFirstLogin,
-
-        /// <summary> Time since most recent login, in seconds.
-        /// For players who have been entered into PlayerDB but have never logged in, this is a huge value.</summary>
-        TimeSinceLastLogin,
-
-        /// <summary> Time since player was last seen (0 if the player is online, otherwise time since last logout, in seconds).
-        /// For players who have been entered into PlayerDB but have never logged in, this is a huge value.</summary>
-        LastSeen,
-
-        /// <summary> Total time spent on the server (including current session) in seconds.
-        /// For players who have been entered into PlayerDB but have never logged in, this is 0.</summary>
-        TotalTime,
-
-        /// <summary> Number of blocks that were built manually (by clicking).
-        /// Does not include drawn or pasted blocks. </summary>
-        BlocksBuilt,
-
-        /// <summary> Number of blocks deleted manually (by clicking).
-        /// Does not include drawn or cut blocks. </summary>
-        BlocksDeleted,
-
-        /// <summary> Number of blocks changed (built + deleted) manually (by clicking).
-        /// Does not include drawn or cut/paste blocks. </summary>
-        BlocksChanged,
-
-        /// <summary> Number of blocks affected by drawing commands, replacement, and cut/paste. </summary>
-        BlocksDrawn,
-
-        /// <summary> Number of separate visits/sessions on this server. </summary>
-        TimesVisited,
-
-        /// <summary> Number of messages written in chat.
-        /// Includes normal chat, PMs, rank chat, /Staff, /Say, and /Me messages. </summary>
-        MessagesWritten,
-
-        /// <summary> Number of times kicked by other players or by console.
-        /// Does not include any kind of automated kicks (AFK kicks, anti-grief or anti-spam, server shutdown, etc). </summary>
-        TimesKicked,
-
-        /// <summary> Time since last promotion or demotion, in seconds.
-        /// For new players (who still have the default rank) this is a huge value. </summary>
-        TimeSinceRankChange,
-
-        /// <summary> Time since the player has been kicked by other players or by console.
-        /// Does not reset from any kind of automated kicks (AFK kicks, anti-grief or anti-spam, server shutdown, etc). </summary>
-        TimeSinceLastKick
-    }
-
-    #endregion
 }

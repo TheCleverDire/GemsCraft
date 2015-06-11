@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.IO;
 using System.Linq;
@@ -44,7 +44,7 @@ namespace fCraft.ConfigGUI {
         private void bInsertColor_Click( object sender, EventArgs e ) {
             if( colorPicker == null ) colorPicker = new ColorPicker("Insert color",0);
             if( colorPicker.ShowDialog() == DialogResult.OK){
-                string colorToInsert = MainForm.Parse( colorPicker.ColorIndex );
+                string colorToInsert = Color.Parse( colorPicker.ColorIndex );
                 int selectionStart = tText.SelectionStart;
                 tText.Paste( colorToInsert );
                 tText.Select( selectionStart, 2 );

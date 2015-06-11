@@ -1,14 +1,9 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that creates a simple cuboid. </summary>
     public sealed class CuboidDrawOperation : DrawOperation {
         public override string Name {
             get { return "Cuboid"; }
-        }
-
-        public override int ExpectedMarks {
-            get { return 2; }
         }
 
         public CuboidDrawOperation( Player player )

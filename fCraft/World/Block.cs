@@ -1,10 +1,9 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 
-#pragma warning disable 1591
 namespace fCraft {
     /// <summary> Enumeration of all standard Minecraft Classic block types. </summary>
     public enum Block : byte {
-        None = 255,
+        Undefined = 255, // for error checking
 
         Air = 0,
         Stone = 1,
@@ -12,7 +11,7 @@ namespace fCraft {
         Dirt = 3,
         Cobblestone = 4,
         Wood = 5,
-        Sapling = 6,
+        Plant = 6,
         Admincrete = 7,
         Water = 8,
         StillWater = 9,
@@ -52,13 +51,30 @@ namespace fCraft {
 
         Gold = 41,
         Iron = 42,
-        DoubleSlab = 43,
-        Slab = 44,
-        Bricks = 45,
+        DoubleStair = 43,
+        Stair = 44,
+        Brick = 45,
         TNT = 46,
         Books = 47,
-        MossyCobble = 48,
-        Obsidian = 49
+        MossyRocks = 48,
+        Obsidian = 49,
+
+        //ClassiCube Blocks
+        CobbleSlab = 50,
+        Rope = 51,
+        Sandstone = 52,
+        Snow = 53,
+        Fire = 54,
+        LightPink = 55,
+        DarkGreen = 56,
+        Brown = 57,
+        DarkBlue = 58,
+        Turquoise = 59,
+        Ice = 60,
+        Tile = 61,
+        Magma = 62,
+        Pillar = 63,
+        Crate = 64,
+        StoneBrick = 65
     }
 }
-#pragma warning restore 1591

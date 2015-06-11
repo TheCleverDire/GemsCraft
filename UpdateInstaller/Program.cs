@@ -1,5 +1,5 @@
 ﻿/*
- *  Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+ *  Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ using fCraft.UpdateInstaller.Properties;
 namespace fCraft.UpdateInstaller {
     static class Program {
         const string ConfigFileNameDefault = "config.xml",
-                     BackupFileNameFormat = "fCraftData_{0:yyyyMMdd'_'HH'-'mm'-'ss}_BeforeUpdate.zip";
+                     BackupFileNameFormat = "LegendCraftData_{0:yyyyMMdd'_'HH'-'mm'-'ss}_BeforeUpdate.zip";
 
         public const string DataBackupDirectory = "databackups";
 
@@ -124,7 +124,7 @@ namespace fCraft.UpdateInstaller {
             using( MemoryStream ms = new MemoryStream( Resources.Payload ) ) {
                 using( ZipStorer zs = ZipStorer.Open( ms, FileAccess.Read ) ) {
 
-                    var allFiles = zs.ReadCentralDir().Select( entry => entry.FileNameInZip ).Union( LegacyFiles );
+                    var allFiles = zs.ReadCentralDir().Select( entry => entry.FilenameInZip ).Union( LegacyFiles );
 
                     // ensure that fcraft files are writable
                     bool allPassed;
@@ -162,9 +162,9 @@ namespace fCraft.UpdateInstaller {
 
                     // extract files
                     foreach( var entry in zs.ReadCentralDir() ) {
-                        Console.WriteLine( "Extracting {0}", entry.FileNameInZip );
+                        Console.WriteLine( "Extracting {0}", entry.FilenameInZip );
                         try {
-                            using( FileStream fs = File.Create( entry.FileNameInZip ) ) {
+                            using( FileStream fs = File.Create( entry.FilenameInZip ) ) {
                                 zs.ExtractFile( entry, fs );
                             }
                         } catch( Exception ex ) {
@@ -190,9 +190,27 @@ namespace fCraft.UpdateInstaller {
 
             // Restart fCraft (if requested)
             if( restartTarget != null ) {
+                if( restartTarget == "fCraftConsole.exe" ) {
+                    restartTarget = "ServerCLI.exe";
+                } else if( restartTarget == "fCraftUI.exe" ) {
+                    restartTarget = "ServerGUI.exe";
+                }
+
+                if( !File.Exists( restartTarget ) ) {
+                    Console.Error.WriteLine( "Restart target not found, quitting: {0}", restartTarget );
+                    return (int)ReturnCodes.RestartTargetNotFound;
+                }
                 string argString = String.Join( " ", argsList.ToArray() );
                 Console.WriteLine( "Starting: {0} {1}", restartTarget, argString );
-                Process.Start( restartTarget, argString );
+                switch( Environment.OSVersion.Platform ) {
+                    case PlatformID.MacOSX:
+                    case PlatformID.Unix:
+                        Process.Start( "mono", "\"" + restartTarget + "\" " + argString + " &" );
+                        break;
+                    default:
+                        Process.Start( restartTarget, argString );
+                        break;
+                }
             }
 
             return (int)ReturnCodes.Ok;
@@ -229,6 +247,7 @@ namespace fCraft.UpdateInstaller {
     enum ReturnCodes {
         Ok = 0,
         FailedToRunPreUpdateCommand = 1,
-        FailedToRunPostUpdateCommand = 2
+        FailedToRunPostUpdateCommand = 2,
+        RestartTargetNotFound = 3
     }
 }

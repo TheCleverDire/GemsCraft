@@ -1,19 +1,20 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 
 namespace fCraft {
-    /// <summary> Represents a method that acts as a handler for a command. </summary>
+
+    /// <summary> Delegate for command handlers/callbacks. </summary>
     /// <param name="source"> Player who called the command. </param>
     /// <param name="cmd"> Command arguments. </param>
-    public delegate void CommandHandler( Player source, CommandReader cmd );
+    public delegate void CommandHandler( Player source, Command cmd );
 
 
     /// <summary> Describes a chat command. Defines properties, permission requirements, and usage information.
     /// Specifies a handler method. </summary>
-    public class CommandDescriptor : IClassy {
+    public sealed class CommandDescriptor : IClassy {
 
         /// <summary> List of aliases. May be null or empty. Default: null </summary>
         [CanBeNull]
@@ -29,7 +30,7 @@ namespace fCraft {
         public CommandHandler Handler { get; set; }
 
         /// <summary> Full text of the help message. Default: null </summary>
-        public virtual string Help { get; set; }
+        public string Help { get; set; }
 
         /// <summary> Whether the command is hidden from command list (/cmds). Default: false </summary>
         public bool IsHidden { get; set; }
@@ -37,7 +38,7 @@ namespace fCraft {
         /// <summary> Whether the command is not part of fCraft core (set automatically). </summary>
         public bool IsCustom { get; internal set; }
 
-        /// <summary> Whether the command shouldn't be repeated by the "/" shortcut. Default: false </summary>
+        /// <summary> Whether the command should be repeated by the "/" shortcut. Default: false </summary>
         public bool NotRepeatable { get; set; }
 
         /// <summary> Whether the command should be usable by frozen players. Default: false </summary>
@@ -60,14 +61,14 @@ namespace fCraft {
         public string Usage { get; set; }
 
         /// <summary> Help sub-sections. </summary>
-        public virtual Dictionary<string, string> HelpSections { get; set; }
+        public Dictionary<string, string> HelpSections { get; set; }
 
         /// <summary> Whether this command involves a selection that can be repeated with /static. Default: false </summary>
         public bool RepeatableSelection { get; set; }
 
 
         /// <summary> Checks whether this command may be called by players of a given rank. </summary>
-        public virtual bool CanBeCalledBy( [NotNull] Rank rank ) {
+        public bool CanBeCalledBy( [NotNull] Rank rank ) {
             if( rank == null ) throw new ArgumentNullException( "rank" );
             return Permissions == null ||
                    Permissions.All( rank.Can ) ||
@@ -75,13 +76,9 @@ namespace fCraft {
         }
 
 
-        /// <summary> Gets the lowest rank that has any/all permissions to call this command.
-        /// Returns null if none of the ranks have necessary permissions. </summary>
         public Rank MinRank {
             get {
-                if( Permissions == null ) {
-                    return RankManager.LowestRank;
-                } else if( AnyPermission ) {
+                if( AnyPermission ) {
                     return RankManager.GetMinRankWithAnyPermission( Permissions );
                 } else {
                     return RankManager.GetMinRankWithAllPermissions( Permissions );
@@ -92,14 +89,14 @@ namespace fCraft {
 
         /// <summary> Checks whether players of the given rank should see this command in /cmds list.
         /// Takes permissions and the hidden flag into account. </summary>
-        public virtual bool IsVisibleTo( [NotNull] Rank rank ) {
+        public bool IsVisibleTo( [NotNull] Rank rank ) {
             if( rank == null ) throw new ArgumentNullException( "rank" );
             return !IsHidden && CanBeCalledBy( rank );
         }
 
 
         /// <summary> Prints command usage syntax to the given player. </summary>
-        public virtual void PrintUsage( [NotNull] Player player ) {
+        public void PrintUsage( [NotNull] Player player ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( Usage != null ) {
                 player.Message( "Usage: &H{0}", Usage );
@@ -113,9 +110,9 @@ namespace fCraft {
         /// <param name="player"> Player who called the command. </param>
         /// <param name="cmd"> Command arguments. </param>
         /// <param name="raiseEvent"> Whether CommandCalling and CommandCalled events should be raised. </param>
-        /// <returns> True if the command was called successfully.
+        /// <returns> True if the command was called succesfully.
         /// False if the call was cancelled by the CommandCalling event. </returns>
-        public bool Call( [NotNull] Player player, [NotNull] CommandReader cmd, bool raiseEvent ) {
+        public bool Call( [NotNull] Player player, [NotNull] Command cmd, bool raiseEvent ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( cmd == null ) throw new ArgumentNullException( "cmd" );
             if( raiseEvent && CommandManager.RaiseCommandCallingEvent( cmd, this, player ) ) return false;
@@ -129,10 +126,7 @@ namespace fCraft {
             return String.Format( "CommandDescriptor({0})", Name );
         }
 
-
-        /// <summary> Returns a formatted name of the command,
-        /// colored and possibly prefixed according to MinRank required to call this command. </summary>
-        public virtual string ClassyName {
+        public string ClassyName {
             get {
                 if( ConfigKey.RankColorsInChat.Enabled() ) {
                     Rank minRank;

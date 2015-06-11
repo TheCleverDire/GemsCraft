@@ -8,15 +8,31 @@
     <ProjectGuid>{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>fCraft.GUI</RootNamespace>
+    <RootNamespace>fCraftGUI</RootNamespace>
     <AssemblyName>fCraftGUI</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <UpgradeBackupLocation />
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -37,12 +53,18 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>LegendCraftLogoIcon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="fCraft, Version=0.6.1.7, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\bin\release\fCraft.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq">
@@ -57,46 +79,21 @@
     <Compile Include="AboutWindow.Designer.cs">
       <DependentUpon>AboutWindow.cs</DependentUpon>
     </Compile>
-    <Compile Include="DefaultMapGenGui.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DefaultMapGenGui.Designer.cs">
-      <DependentUpon>DefaultMapGenGui.cs</DependentUpon>
-    </Compile>
-    <Compile Include="FlatMapGenGui.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="FlatMapGenGui.Designer.cs">
-      <DependentUpon>FlatMapGenGui.cs</DependentUpon>
-    </Compile>
-    <Compile Include="IMapGeneratorGuiProvider.cs" />
-    <Compile Include="MapGeneratorGui.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
     <Compile Include="IsoCat.cs" />
-    <Compile Include="IsoCatMode.cs" />
-    <Compile Include="IsoCatResult.cs" />
-    <Compile Include="MapGenGuiUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="RealisticMapGenGui.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="RealisticMapGenGui.Designer.cs">
-      <DependentUpon>RealisticMapGenGui.cs</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\fCraft\fCraft.csproj">
-      <Project>{7FBE7809-6F77-415C-ABEB-A3F627E817B0}</Project>
-      <Name>fCraft</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <Content Include="ConfigGUI.ico" />
+    <Content Include="grayAbstract.jpg" />
+    <Content Include="grayArt.PNG" />
+    <Content Include="LegendCraftLogoIcon.ico" />
+    <Content Include="LegendCraftLogoText.ico" />
+    <None Include="Resources\Background.bmp" />
     <Content Include="Tileset.png" />
     <Content Include="TilesetShadowed.png" />
   </ItemGroup>
@@ -105,19 +102,22 @@
       <DependentUpon>AboutWindow.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="DefaultMapGenGui.resx">
-      <DependentUpon>DefaultMapGenGui.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="FlatMapGenGui.resx">
-      <DependentUpon>FlatMapGenGui.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="RealisticMapGenGui.resx">
-      <DependentUpon>RealisticMapGenGui.cs</DependentUpon>
-    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

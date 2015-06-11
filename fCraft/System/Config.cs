@@ -1,24 +1,175 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Xml.Linq;
 using fCraft.Events;
 using JetBrains.Annotations;
 
 namespace fCraft {
+
+    /*
+     * Config format-version changelog:
+     * 100 - r1-r133
+     *
+     * 101 - r134 - Per-class draw limits and antigrief detection
+     *              Removed AntigriefBlockCount and AntigriefBlockInterval keys
+     *
+     * 102 - r171 - Added RequireBanReason, RequireClassChangeReason, AnnounceKickAndBanReasons, AnnounceClassChanges keys
+     *              Removed AnnounceUnverifiedNames key
+     *
+     * 103 - r190 - Added UseSpeedHack permission
+     *              Added PrivateMessageColor and IRCColor keys
+     *
+     * 104 - r198 - Added IRCBotAnnounceServerJoins and IRCBotAnnounceIRCJoins keys
+     *              Removed IRCBotMsg key
+     *
+     * 105 - r205 - Added SubmitCrashReports key
+     *              Removed PolicyColorCodesInChat, PolicyIllegalCharacters, and RunOnStartup
+     *
+     * 106 - r212 - Added IRCDelay key
+     * 
+     * 107 - r214 - Added ShowJoinedWorldMessages and ClassColorsInWorldNames keys
+     *              Removed ChangeName permission
+     *
+     * 108 - r224 - Added IP config key
+     *              Capped MaxPlayers at 128
+     *
+     * 109 - r226 - Added PatrolledClass config key
+     *              Added Patrol permission
+     *
+     * 110 - r227 - Added ShutdownServer and Mute permissions.
+     *              NOTE: This build does not support loading config.xml of this or earlier versions.
+     * 
+     * 111 - r231 - Renamed config keys:
+     *                  DefaultClass             -> DefaultRank
+     *                  ClassColorsInChat        -> RankColorsInChat
+     *                  ClassColorsInWorldNames  -> RankColorsInWorldNames
+     *                  ClassPrefixesInChat      -> RankPrefixesInChat
+     *                  ClassPrefixesInList      -> RankPrefixesInList
+     *                  PatrolledClass           -> PatrolledRank
+     *                  RequireClassChangeReason -> RequireRankChangeReason
+     *                  AnnounceClassChanges     -> AnnounceRankChanges
+     *              Renamed XML elements:
+     *                  Classes     -> Ranks
+     *                  PlayerClass -> Rank
+     *              Removed "rank" from PlayerClass/Rank object
+     *              Made the order of Rank elements determine the relative index
+     *              Config.xml files of earlier versions than 111 can NOT be loaded by this copy of fCraft.
+     *
+     * 112 - r235 - Removed PingInterval config key
+     *              Removed inactive ControlPhysics and AddLandmarks permissions
+     *
+     * 113 - r243 - Removed IRCBotQuitMsg config key
+     * 
+     * 114 - r244 - Added IRCRegisteredNick, IRCNickServ, and IRCNickServMessage keys
+     * 
+     * 115 - r265 - Added IRCThreads keys
+     * 
+     * 116 - r272 - Added AutoRankEnabled keys
+     * 
+     * 117 - r280 - Added MaxUndo keys
+     * 
+     * 118 - r318 - Added MeColor and WarningColor keys
+     * 
+     * 119 - r331 - Added LogPath and MapPath keys
+     * 
+     * 120 - r332 - Added DataPath key
+     * 
+     * 121 - r335 - Renamed SendRedundantBlockUpdates key to RelayAllBlockUpdates
+     * 
+     * 122 - r341 - Added IRCUseColor key
+     * 
+     * 123 - r346 - Added IRCBotAnnounceServerEvents
+     * 
+     * 124 - r354 - Added HeartbeatEnabled
+     * 
+     * 125 - r356 - Removed LogPath and DataPath keys
+     * 
+     * 126 - r366 - Added PreventSecurityCircumvention key
+     * 
+     * 127 - r368 - Removed PreventSecurityCircumvention key
+     *              Added per-rank AllowSecurityCircumvention setting instead
+     *              
+     * 128 - r379 - Added ConsoleName
+     * 
+     * 129 - r405 - Added ShowConnectedMessages
+     * 
+     * 130 - r413 - Added ShowBannedConnectionMessages
+     * 
+     * 131 - r460 - Changed default for IRCNick from "fBot" to "MinecraftBot"
+     *              Relaxed range limits on many integer keys.
+     *              Renamed ProcessPriority value "Low" to "Idle", to match WinAPI 
+     *              
+     * 132 - r477 - Added BackupBeforeUpdate, RunBeforeUpdate, and RunAfterUpdate config keys
+     *              Renamed UpdateMode to UpdaterMode
+     *              
+     * 133 - r517 - Added UseColorCodes permission
+     * 
+     * 134 - r520 - Removed LimitOneConnectionPerIP key
+     *              Added MaxConnectionsPerIP key
+     *              
+     * 135 - r526 - Added RequireKickReason and AnnounceRankChangeReasons keys
+     *              Added ViewPlayerIPs permission
+     *              
+     * 136 - r528 - Added BringAll permission.
+     * 
+     * 137 - r556 - Added BandwidthUseMode key.
+     * 
+     * 138 - r578 - Removed SaveOnShutdown key.
+     *              Tweaked range checks on some keys.
+     *              Grouped key tags into section tags.
+     *              When saving, keys with default values are now commented out.
+     *              CONFIGS SAVED WITH THIS VERSION ARE NOT LOADABLE. It is obsolete.
+     *              
+     * 139 - r579 - Fixed XML structure messed up by 138. Sections are now saved into <Section> elements.
+     * 
+     * 140 - r616 - Added Spectate permission.
+     * 
+     * 141 - r622 - Added RestartInterval key.
+     * 
+     * 142 - r638 - Added BackupDataOnStartup key.
+     * 
+     * 143 - r676 - Added LoadPlugins key (currently unused).
+     * 
+     * 144 - r787 - Added DrawAdvanced permission.
+     * 
+     * 145 - r794 - Added UndoOthersActions permission.
+     * 
+     * 146 - r910 - Renamed BackupInterval to DefaultBackupInterval
+     * 
+     * 147 - r926 - Renamed EnableBlockDB to BlockDBEnabled
+     * 
+     * 148 - r1014 - Added BlockDBAutoEnable and BlockDBAutoEnableRank keys
+     *               Moved BlockDBEnabled to Security ConfigSection
+     *               
+     * 149 - r1061 - Added HeartbeatToWoMDirect, WoMDirectDescription, and WoMEnableEnvExtensions keys
+     * 
+     * 150 - r1066 - Removed WoMDirectDescription key
+     * 
+     * 151 - r1169 - Added MaxUndoStates key
+     *               Added fillLimit rank attribute.
+     *               Changed defaults for some keys:
+     *                  BlockDBEnabled to "true"
+     *                  WomEnableEnvExtensions to "false"
+     *                  IRCBotAnnounceServerEvents to "true"
+     *                  
+     * 152 - r1243 - Changed the way fCraft stores config keys.
+     *               Before: <fCraftConfig><Section name="blah"><KeyName>Value</KeyName></Section></fCraftConfig>
+     *               After: <fCraftConfig><Settings><ConfigKey key="KeyName" value="Value" default="DefaultValue" /></Settings></fCraftConfig>
+     */
+
     /// <summary> Static class that handles loading/saving configuration, contains config defaults,
-    /// and various configuration-related utilities.
-    /// See http://www.fCraft.net/wiki/Config_version_history for format history. </summary>
+    /// and various configuration-related utilities. </summary>
     public static class Config {
         /// <summary>  Supported version of the Minecraft classic protocol. </summary>
         public const int ProtocolVersion = 7;
 
         /// <summary> Latest version of config.xml available at the time of building this copy of fCraft.
         /// Config.xml files saved with this build will have this version number embedded. </summary>
-        public const int CurrentVersion = 169;
+        public const int CurrentVersion = 156;
 
         const int LowestSupportedVersion = 111,
                   FirstVersionWithMaxPlayersKey = 134, // LEGACY
@@ -28,6 +179,7 @@ namespace fCraft {
         const string ConfigXmlRootName = "fCraftConfig";
 
         // Mapping of keys to their values
+        public static bool ProtocolExtension = true;
         static readonly string[] Settings;
         static readonly bool[] SettingsEnabledCache; // cached .Enabled() calls
         static readonly bool[] SettingsUseEnabledCache; // cached .Enabled() calls
@@ -41,6 +193,10 @@ namespace fCraft {
         // List of renamed/remapped keys.
         static readonly Dictionary<string, ConfigKey> LegacyConfigKeys = new Dictionary<string, ConfigKey>(); // LEGACY
 
+        // List of renamed/remapped key values.
+        static readonly Dictionary<ConfigKey, KeyValuePair<string, string>> LegacyConfigValues =
+                    new Dictionary<ConfigKey, KeyValuePair<string, string>>(); // LEGACY
+
 
         static Config() {
             int keyCount = Enum.GetValues( typeof( ConfigKey ) ).Length;
@@ -52,7 +208,9 @@ namespace fCraft {
             // gather metadata for ConfigKeys
             foreach( var keyField in typeof( ConfigKey ).GetFields() ) {
                 foreach( var attribute in (ConfigKeyAttribute[])keyField.GetCustomAttributes( typeof( ConfigKeyAttribute ), false ) ) {
+                    // ReSharper disable AssignNullToNotNullAttribute
                     ConfigKey key = (ConfigKey)keyField.GetValue( null );
+                    // ReSharper restore AssignNullToNotNullAttribute
                     attribute.Key = key;
                     KeyMetadata[(int)key] = attribute;
                 }
@@ -69,10 +227,16 @@ namespace fCraft {
             LoadDefaults();
 
             // These keys were renamed at some point. LEGACY
+            LegacyConfigKeys.Add( "SendRedundantBlockUpdates".ToLower(), ConfigKey.RelayAllBlockUpdates );
+            LegacyConfigKeys.Add( "AutomaticUpdates".ToLower(), ConfigKey.UpdaterMode );
+            LegacyConfigKeys.Add( "IRCBot".ToLower(), ConfigKey.IRCBotEnabled );
+            LegacyConfigKeys.Add( "UpdateMode".ToLower(), ConfigKey.UpdaterMode );
             LegacyConfigKeys.Add( "BackupInterval".ToLower(), ConfigKey.DefaultBackupInterval );
             LegacyConfigKeys.Add( "EnableBlockDB".ToLower(), ConfigKey.BlockDBEnabled );
-            LegacyConfigKeys.Add( "IRCUseColor".ToLower(), ConfigKey.IRCShowColorsFromServer );
-            LegacyConfigKeys.Add( "IRCAllowMinecraftEmotes".ToLower(), ConfigKey.IRCShowEmotesFromIRC );
+
+            // These values have been renamed at some point. LEGACY
+            LegacyConfigValues.Add( ConfigKey.ProcessPriority,
+                                    new KeyValuePair<string, string>( "Low", ProcessPriorityClass.Idle.ToString() ) );
         }
 
 
@@ -140,24 +304,30 @@ namespace fCraft {
         /// <summary> Loads configuration from file. </summary>
         /// <param name="skipRankList"> If true, skips over rank definitions. </param>
         /// <param name="raiseReloadedEvent"> Whether ConfigReloaded event should be raised. </param>
-        public static void Load( bool skipRankList, bool raiseReloadedEvent ) {
+        /// <returns> True if loading succeeded. </returns>
+        public static bool Load( bool skipRankList, bool raiseReloadedEvent ) {
             bool fromFile = false;
 
             // try to load config file (XML)
             XDocument file;
             if( File.Exists( Paths.ConfigFileName ) ) {
-                file = XDocument.Load( Paths.ConfigFileName );
-                if( file.Root == null || file.Root.Name != ConfigXmlRootName ) {
-                    Logger.Log( LogType.Warning,
-                                "Config.Load: Malformed or incompatible config file {0}. Loading defaults.",
-                                Paths.ConfigFileName );
-                    file = new XDocument();
-                    file.Add( new XElement( ConfigXmlRootName ) );
-                } else {
-                    Logger.Log( LogType.Debug,
-                                "Config.Load: Config file {0} loaded successfully.",
-                                Paths.ConfigFileName );
-                    fromFile = true;
+                try {
+                    file = XDocument.Load( Paths.ConfigFileName );
+                    if( file.Root == null || file.Root.Name != ConfigXmlRootName ) {
+                        Logger.Log( LogType.Warning,
+                                    "Config.Load: Malformed or incompatible config file {0}. Loading defaults.",
+                                    Paths.ConfigFileName );
+                        file = new XDocument();
+                        file.Add( new XElement( ConfigXmlRootName ) );
+                    } else {
+                        Logger.Log( LogType.Debug,
+                                    "Config.Load: Config file {0} loaded succesfully.",
+                                    Paths.ConfigFileName );
+                        fromFile = true;
+                    }
+                } catch( Exception ex ) {
+                    Logger.LogAndReportCrash( "Config failed to load", "fCraft", ex, true );
+                    return false;
                 }
             } else {
                 // create a new one (with defaults) if no file exists
@@ -174,16 +344,14 @@ namespace fCraft {
                 if( attr != null && Int32.TryParse( attr.Value, out version ) ) {
                     if( version < LowestSupportedVersion ) {
                         Logger.Log( LogType.Warning,
-                                    "Config.Load: Your copy of config.xml is too old (v{0}) to be loaded properly. " +
+                                    "Config.Load: Your copy of config.xml is too old to be loaded properly. " +
                                     "Some settings will be lost or replaced with defaults. " +
-                                    "Please run ConfigGUI to make sure that everything is in order.",
-                                    version );
+                                    "Please run ConfigGUI to make sure that everything is in order." );
                     } else if( version != CurrentVersion ) {
                         Logger.Log( LogType.Warning,
-                                    "Config.Load: Your config.xml was made for a different version of fCraft. " +
+                                    "Config.Load: Your config.xml was made for a different version of 800Craft / fCraft. " +
                                     "Some obsolete settings might be ignored, and some recently-added settings will be set to defaults. " +
-                                    "It is recommended that you run ConfigGUI to make sure that everything is in order. (v{0} -> v{1})",
-                                    version, CurrentVersion );
+                                    "It is recommended that you run ConfigGUI to make sure that everything is in order." );
                     }
                 } else {
                     Logger.Log( LogType.Warning,
@@ -207,7 +375,7 @@ namespace fCraft {
                 Logger.Log( LogType.Warning, "Config.Load: using default console options." );
             }
 
-            // read log options for log files
+            // read log options for logfiles
             XElement logFileOptions = config.Element( "LogFileOptions" );
             if( logFileOptions != null ){
                 LoadLogOptions( logFileOptions, Logger.LogFileOptions );
@@ -259,6 +427,8 @@ namespace fCraft {
             }
 
             if( raiseReloadedEvent ) RaiseReloadedEvent();
+
+            return true;
         }
 
 
@@ -267,16 +437,15 @@ namespace fCraft {
 
             string keyName = element.Name.ToString().ToLower();
             ConfigKey key;
-            if( EnumUtil.TryParse( keyName, out key, true ) ) {
+            if(EnumUtil.TryParse(keyName,out key,true)){
                 // known key
                 TrySetValue( key, element.Value );
 
-            } else if( LegacyConfigKeys.ContainsKey( keyName ) ) {
-                // LEGACY - renamed/legacy key
+            } else if( LegacyConfigKeys.ContainsKey( keyName ) ) { // LEGACY
+                // renamed/legacy key
                 TrySetValue( LegacyConfigKeys[keyName], element.Value );
 
-            } else if( keyName == "limitoneconnectionperip" ) {
-                // LEGACY
+            } else if( keyName == "limitoneconnectionperip" ) { // LEGACY
                 Logger.Log( LogType.Warning,
                             "Config: LimitOneConnectionPerIP (bool) was replaced by MaxConnectionsPerIP (int). " +
                             "Adjust your configuration accordingly." );
@@ -297,32 +466,24 @@ namespace fCraft {
         static void ParseKeyElement( [NotNull] XElement element ) {
             if( element == null ) throw new ArgumentNullException( "element" );
 
-            // ReSharper disable PossibleNullReferenceException
-            string keyName = element.Attribute( "key" ).Value.ToLower();
+            string keyName = element.Attribute( "key" ).Value;
             string value = element.Attribute( "value" ).Value;
-            // ReSharper restore PossibleNullReferenceException
-
             ConfigKey key;
             if( EnumUtil.TryParse( keyName, out key, true ) ) {
                 // known key
                 TrySetValue( key, value );
 
-            } else if( LegacyConfigKeys.ContainsKey( keyName ) ) {
-                // LEGACY - renamed/legacy key
+            } else if( LegacyConfigKeys.ContainsKey( keyName ) ) { // LEGACY
+                // renamed/legacy key
                 TrySetValue( LegacyConfigKeys[keyName], value );
-
-            } else if( keyName == "ircstripminecraftcolors" ) { // LEGACY
-                TrySetValue( ConfigKey.IRCShowColorsFromIRC, element.Value );
-                ConfigKey.IRCShowColorsFromIRC.SetValue( !ConfigKey.IRCShowColorsFromIRC.Enabled() );
 
             } else {
                 // unknown key
                 Logger.Log( LogType.Warning,
                             "Config: Unrecognized entry ignored: {0} = {1}",
-                            keyName, value );
+                            element.Name, element.Value );
             }
         }
-
 
         static void LoadLogOptions( [NotNull] XContainer el, [NotNull] IList<bool> list ) {
             if( el == null ) throw new ArgumentNullException( "el" );
@@ -334,11 +495,6 @@ namespace fCraft {
                 } else {
                     list[i] = false;
                 }
-            }
-
-            // for compatibility with fCraft 0.631 and earlier
-            if( el.Element( "IRC" ) != null ) { // LEGACY
-                list[(int)LogType.IRCStatus] = true;
             }
         }
 
@@ -399,14 +555,6 @@ namespace fCraft {
                     Server.BlockUpdateThrottling = key.GetInt();
                     break;
 
-                case ConfigKey.BypassHttpsCertificateValidation:
-                    if( key.Enabled() ) {
-                        ServicePointManager.ServerCertificateValidationCallback = delegate { return true; };
-                    } else {
-                        ServicePointManager.ServerCertificateValidationCallback = null;
-                    }
-                    break;
-
                 case ConfigKey.ConsoleName:
                     if( Player.Console != null ) {
                         Player.Console.Info.Name = key.GetString();
@@ -414,11 +562,8 @@ namespace fCraft {
                     break;
 
                 case ConfigKey.DefaultBackupInterval:
-                    World.DefaultBackupInterval = new TimeSpan( TimeSpan.TicksPerMinute * key.GetInt() );
-                    break;
-
-                case ConfigKey.HeartbeatUrl:
-                    Heartbeat.MinecraftNetUri = new Uri( key.GetString() );
+                    // TODO: update SchedulerTasks
+                    WorldManager.DefaultBackupInterval = new TimeSpan( TimeSpan.TicksPerSecond * key.GetInt() );
                     break;
 
                 case ConfigKey.HelpColor:
@@ -426,11 +571,15 @@ namespace fCraft {
                     break;
 
                 case ConfigKey.IRCDelay:
-                    IRC.SendDelay = TimeSpan.FromMilliseconds( key.GetInt() );
+                    IRC.SendDelay = key.GetInt();
                     break;
 
                 case ConfigKey.IRCMessageColor:
                     Color.IRC = Color.Parse( key.GetString() );
+                    break;
+
+                case ConfigKey.GlobalColor:
+                    Color.Global = Color.Parse(key.GetString());
                     break;
 
                 case ConfigKey.LogMode:
@@ -481,6 +630,10 @@ namespace fCraft {
                     Color.Sys = Color.Parse( key.GetString() );
                     break;
 
+                case ConfigKey.CustomChatColor:
+                    Color.Custom = Color.Parse(key.GetString());
+                    break;
+
                 case ConfigKey.TickInterval:
                     Server.TicksPerSecond = 1000 / (float)key.GetInt();
                     break;
@@ -525,7 +678,7 @@ namespace fCraft {
             XElement consoleOptions = new XElement( "ConsoleOptions" );
             for( int i = 0; i < Logger.ConsoleOptions.Length; i++ ) {
                 if( Logger.ConsoleOptions[i] ) {
-                    consoleOptions.Add( new XElement( ( (LogType)i ).ToString() ) );
+                    consoleOptions.Add( new XElement( ((LogType)i).ToString() ) );
                 }
             }
             config.Add( consoleOptions );
@@ -534,7 +687,7 @@ namespace fCraft {
             XElement logFileOptions = new XElement( "LogFileOptions" );
             for( int i = 0; i < Logger.LogFileOptions.Length; i++ ) {
                 if( Logger.LogFileOptions[i] ) {
-                    logFileOptions.Add( new XElement( ( (LogType)i ).ToString() ) );
+                    logFileOptions.Add( new XElement( ((LogType)i).ToString() ) );
                 }
             }
             config.Add( logFileOptions );
@@ -549,9 +702,7 @@ namespace fCraft {
             if( RankManager.LegacyRankMapping.Count > 0 ) {
                 // save legacy rank mapping
                 XElement legacyRankMappingTag = new XElement( "LegacyRankMapping" );
-                legacyRankMappingTag.Add(
-                    new XComment(
-                        "Legacy rank mapping is used for compatibility if cases when ranks are renamed or deleted." ) );
+                legacyRankMappingTag.Add( new XComment( "Legacy rank mapping is used for compatibility if cases when ranks are renamed or deleted." ) );
                 foreach( KeyValuePair<string, string> pair in RankManager.LegacyRankMapping ) {
                     XElement rankPair = new XElement( "LegacyRankPair" );
                     rankPair.Add( new XAttribute( "from", pair.Key ), new XAttribute( "to", pair.Value ) );
@@ -562,11 +713,16 @@ namespace fCraft {
 
 
             file.Add( config );
-            // write out the changes
-            string tempFileName = Paths.ConfigFileName + ".temp";
-            file.Save( tempFileName );
-            Paths.MoveOrReplaceFile( tempFileName, Paths.ConfigFileName );
-            return true;
+            try {
+                // write out the changes
+                string tempFileName = Paths.ConfigFileName + ".temp";
+                file.Save( tempFileName );
+                Paths.MoveOrReplace( tempFileName, Paths.ConfigFileName );
+                return true;
+            } catch( Exception ex ) {
+                Logger.LogAndReportCrash( "Config failed to save", "fCraft", ex, true );
+                return false;
+            }
         }
 
         #endregion
@@ -607,11 +763,10 @@ namespace fCraft {
         /// Note the parsing is done in a case-insensitive way. </summary>
         /// <typeparam name="TEnum"> Enum to use for parsing.
         /// An ArgumentException will be thrown if this is not an enum. </typeparam>
-        /// <exception cref="ArgumentException"> TEnum is not an System.Enum.
-        /// -or- key value is either an empty string ("") or only contains white space.
-        /// -or- value is a name, but not one of the named constants defined for the enumeration. </exception>
-        public static TEnum GetEnum<TEnum>( this ConfigKey key ) where TEnum : struct {
-            return (TEnum)Enum.Parse( typeof( TEnum ), GetString( key ), true );
+        public static TEnum GetEnum<TEnum>(this ConfigKey key) where TEnum : struct
+        {
+            if (!typeof(TEnum).IsEnum) throw new ArgumentException("Enum type required");
+            return (TEnum)Enum.Parse(typeof(TEnum), GetString(key), true);
         }
 
 
@@ -678,13 +833,12 @@ namespace fCraft {
 
 
         /// <summary> Sets value of a given config key.
-        /// Note that this method may throw exceptions if the given value is not acceptable.
+        /// Note that this method may throw exceptions if the given value is not acceptible.
         /// Use Config.TrySetValue() if you'd like to suppress exceptions in favor of a boolean return value. </summary>
         /// <param name="key"> Config key to set. </param>
         /// <param name="rawValue"> Value to assign to the key. If passed object is not a string, rawValue.ToString() is used. </param>
-        /// <exception cref="ArgumentNullException"> rawValue is null. </exception>
-        /// <exception cref="NullReferenceException"> rawValue.ToString() is null. </exception>
-        /// <exception cref="FormatException"> Given value did not satisfy key's requirements. </exception>
+        /// <exception cref="T:System.ArgumentNullException" />
+        /// <exception cref="T:System.FormatException" />
         /// <returns> True if value is valid and has been assigned.
         /// False if value is valid, but assignment was cancelled by an event handler/plugin. </returns>
         public static bool SetValue( this ConfigKey key, object rawValue ) {
@@ -698,6 +852,15 @@ namespace fCraft {
                 throw new NullReferenceException( key + ": rawValue.ToString() returned null." );
             }
 
+            if( LegacyConfigValues.ContainsKey( key ) ) {
+                foreach( var pair in LegacyConfigValues.Values ) {
+                    if( pair.Key.Equals( value, StringComparison.OrdinalIgnoreCase ) ) {
+                        value = pair.Value;
+                        break;
+                    }
+                }
+            }
+
             // throws various exceptions (most commonly FormatException) if invalid
             KeyMetadata[(int)key].Validate( value );
 
@@ -706,7 +869,7 @@ namespace fCraft {
 
 
         /// <summary> Attempts to set the value of a given config key.
-        /// Check the return value to make sure that the given value was acceptable. </summary>
+        /// Check the return value to make sure that the given value was acceptible. </summary>
         /// <param name="key"> Config key to set. </param>
         /// <param name="rawValue"> Value to assign to the key. If passed object is not a string, rawValue.ToString() is used. </param>
         /// <exception cref="T:System.ArgumentNullException" />
@@ -831,7 +994,6 @@ namespace fCraft {
             owner.Add( new XElement( Permission.Delete.ToString() ) );
             owner.Add( new XElement( Permission.UseSpeedHack.ToString() ) );
             owner.Add( new XElement( Permission.UseColorCodes.ToString() ) );
-            owner.Add( new XElement( Permission.UseEmotes.ToString() ) );
 
             owner.Add( new XElement( Permission.PlaceGrass.ToString() ) );
             owner.Add( new XElement( Permission.PlaceWater.ToString() ) );
@@ -840,7 +1002,6 @@ namespace fCraft {
             owner.Add( new XElement( Permission.DeleteAdmincrete.ToString() ) );
 
             owner.Add( new XElement( Permission.Say.ToString() ) );
-            owner.Add( new XElement( Permission.UseTimers.ToString() ) );
             owner.Add( new XElement( Permission.ReadStaffChat.ToString() ) );
             XElement temp = new XElement( Permission.Kick.ToString() );
             temp.Add( new XAttribute( "max", "owner" ) );
@@ -861,7 +1022,6 @@ namespace fCraft {
 
             owner.Add( new XElement( Permission.ViewOthersInfo.ToString() ) );
             owner.Add( new XElement( Permission.ViewPlayerIPs.ToString() ) );
-            owner.Add( new XElement( Permission.ViewEmails.ToString() ) );
             owner.Add( new XElement( Permission.EditPlayerDB.ToString() ) );
 
             owner.Add( new XElement( Permission.Teleport.ToString() ) );
@@ -877,17 +1037,58 @@ namespace fCraft {
 
             owner.Add( new XElement( Permission.ManageZones.ToString() ) );
             owner.Add( new XElement( Permission.ManageWorlds.ToString() ) );
-            owner.Add( new XElement( Permission.FlushWorlds.ToString() ) );
             owner.Add( new XElement( Permission.ManageBlockDB.ToString() ) );
             owner.Add( new XElement( Permission.Import.ToString() ) );
             owner.Add( new XElement( Permission.Draw.ToString() ) );
             owner.Add( new XElement( Permission.DrawAdvanced.ToString() ) );
             owner.Add( new XElement( Permission.CopyAndPaste.ToString() ) );
             owner.Add( new XElement( Permission.UndoOthersActions.ToString() ) );
-            owner.Add( new XElement( Permission.UndoAll.ToString() ) );
 
             owner.Add( new XElement( Permission.ReloadConfig.ToString() ) );
             owner.Add( new XElement( Permission.ShutdownServer.ToString() ) );
+            owner.Add( new XElement(Permission.Basscannon.ToString() ) );
+            owner.Add( new XElement(Permission.Tree.ToString() ) );
+            owner.Add( new XElement(Permission.UsePortal.ToString() ) );
+            owner.Add( new XElement(Permission.ManagePortal.ToString() ) );
+            owner.Add( new XElement(Permission.HighFive.ToString() ) );
+            owner.Add( new XElement(Permission.ChatWithCaps.ToString() ) );
+
+            owner.Add( new XElement(Permission.Swear.ToString() ) );
+            owner.Add( new XElement(Permission.MakeVotes.ToString() ) );
+            owner.Add( new XElement(Permission.MakeVoteKicks.ToString() ) );
+            owner.Add( new XElement(Permission.BroMode.ToString() ) );
+            owner.Add( new XElement(Permission.Troll.ToString() ) );
+            owner.Add( new XElement(Permission.HideRanks.ToString() ) );
+            owner.Add( new XElement(Permission.ReadAdminChat.ToString() ) );
+
+            owner.Add( new XElement(Permission.ReadCustomChat.ToString() ) );
+            owner.Add( new XElement(Permission.Realm.ToString() ) );
+            owner.Add( new XElement(Permission.Possess.ToString() ) );
+            owner.Add( new XElement(Permission.Gtfo.ToString() ) );
+            owner.Add( new XElement(Permission.RageQuit.ToString() ) );
+            owner.Add( new XElement(Permission.Tower.ToString() ) );
+
+            owner.Add( new XElement(Permission.TempBan.ToString() ) );
+            owner.Add( new XElement(Permission.Warn.ToString() ) );
+            owner.Add( new XElement(Permission.Slap.ToString() ) );
+            owner.Add( new XElement(Permission.Kill.ToString() ) );
+            owner.Add( new XElement(Permission.Physics.ToString() ) );
+
+            owner.Add( new XElement(Permission.Fireworks.ToString() ) );
+            owner.Add( new XElement(Permission.Gun.ToString() ) );
+            owner.Add( new XElement(Permission.Games.ToString() ) );
+            owner.Add( new XElement(Permission.Moderation.ToString() ) );
+            owner.Add( new XElement(Permission.Immortal.ToString() ) );
+            owner.Add(new XElement(Permission.Punch.ToString()));
+            owner.Add(new XElement(Permission.Brofist.ToString()));
+            owner.Add(new XElement(Permission.STFU.ToString()));
+            owner.Add(new XElement(Permission.MuteAll.ToString()));
+            owner.Add(new XElement(Permission.LeBot.ToString()));
+            owner.Add(new XElement(Permission.Economy.ToString()));
+            owner.Add(new XElement(Permission.ManageEconomy.ToString()));
+            owner.Add(new XElement(Permission.MakeVotes.ToString()));
+            owner.Add(new XElement(Permission.TPA.ToString()));
+
             permissions.Add( owner );
             try {
                 RankManager.AddRank( new Rank( owner ) );
@@ -914,7 +1115,6 @@ namespace fCraft {
             op.Add( new XElement( Permission.Delete.ToString() ) );
             op.Add( new XElement( Permission.UseSpeedHack.ToString() ) );
             op.Add( new XElement( Permission.UseColorCodes.ToString() ) );
-            op.Add( new XElement( Permission.UseEmotes.ToString() ) );
 
             op.Add( new XElement( Permission.PlaceGrass.ToString() ) );
             op.Add( new XElement( Permission.PlaceWater.ToString() ) );
@@ -923,7 +1123,6 @@ namespace fCraft {
             op.Add( new XElement( Permission.DeleteAdmincrete.ToString() ) );
 
             op.Add( new XElement( Permission.Say.ToString() ) );
-            op.Add( new XElement( Permission.UseTimers.ToString() ) );
             op.Add( new XElement( Permission.ReadStaffChat.ToString() ) );
             temp = new XElement( Permission.Kick.ToString() );
             temp.Add( new XAttribute( "max", "op" ) );
@@ -953,12 +1152,18 @@ namespace fCraft {
             op.Add( new XElement( Permission.SetSpawn.ToString() ) );
 
             op.Add( new XElement( Permission.ManageZones.ToString() ) );
-            op.Add( new XElement( Permission.FlushWorlds.ToString() ) );
             op.Add( new XElement( Permission.Lock.ToString() ) );
             op.Add( new XElement( Permission.Draw.ToString() ) );
             op.Add( new XElement( Permission.DrawAdvanced.ToString() ) );
             op.Add( new XElement( Permission.CopyAndPaste.ToString() ) );
             op.Add( new XElement( Permission.UndoOthersActions.ToString() ) );
+            op.Add(new XElement(Permission.Punch.ToString()));
+            op.Add(new XElement(Permission.Brofist.ToString()));
+            op.Add(new XElement(Permission.STFU.ToString()));
+            op.Add(new XElement(Permission.LeBot.ToString()));
+            op.Add(new XElement(Permission.Economy.ToString()));
+            op.Add(new XElement(Permission.MakeVotes.ToString()));
+            op.Add(new XElement(Permission.TPA.ToString()));
             permissions.Add( op );
             try {
                 RankManager.AddRank( new Rank( op ) );
@@ -998,6 +1203,10 @@ namespace fCraft {
             builder.Add( new XElement( Permission.Teleport.ToString() ) );
 
             builder.Add( new XElement( Permission.Draw.ToString() ) );
+            builder.Add(new XElement(Permission.Brofist.ToString()));
+            builder.Add(new XElement(Permission.Economy.ToString()));
+            builder.Add(new XElement(Permission.MakeVotes.ToString()));
+            builder.Add(new XElement(Permission.TPA.ToString()));
             permissions.Add( builder );
             try {
                 RankManager.AddRank( new Rank( builder ) );
@@ -1039,7 +1248,7 @@ namespace fCraft {
         public static event EventHandler Reloaded;
 
 
-        /// <summary> Occurs when a config key is about to be changed (cancelable).
+        /// <summary> Occurs when a config key is about to be changed (cancellable).
         /// The new value may be replaced by the callback. </summary>
         public static event EventHandler<ConfigKeyChangingEventArgs> KeyChanging;
 
@@ -1082,8 +1291,8 @@ namespace fCraft {
 
 
 namespace fCraft.Events {
-    /// <summary> Provides data for Config.KeyChanging event. Allows modification of the value. Cancelable. </summary>
-    public sealed class ConfigKeyChangingEventArgs : EventArgs, ICancelableEvent {
+
+    public sealed class ConfigKeyChangingEventArgs : EventArgs, ICancellableEvent {
         public ConfigKey Key { get; private set; }
         public string OldValue { get; private set; }
         public string NewValue { get; set; }
@@ -1098,7 +1307,6 @@ namespace fCraft.Events {
     }
 
 
-    /// <summary> Provides data for Config.keyChanged event. Immutable. </summary>
     public sealed class ConfigKeyChangedEventArgs : EventArgs {
         public ConfigKey Key { get; private set; }
         public string OldValue { get; private set; }
@@ -1110,4 +1318,5 @@ namespace fCraft.Events {
             NewValue = newValue;
         }
     }
+
 }

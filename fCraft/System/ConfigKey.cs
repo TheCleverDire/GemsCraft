@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System.Diagnostics;
 
 namespace fCraft {
@@ -7,11 +7,35 @@ namespace fCraft {
     public enum ConfigKey {
         #region General
 
-        [StringKey( ConfigSection.General, "Custom Minecraft Server (fCraft)",
+        [StringKey( ConfigSection.General, "[LegendCraft] Default",
 @"The name of the server, as shown on the welcome screen and the
 official server list (if server is public).",
             MinLength = 1, MaxLength = 64 )]
         ServerName,
+
+        [StringKey(ConfigSection.General, "EngineerChat",
+@"The name of the custom chat channel",
+            MinLength = 1, MaxLength = 12)]
+        CustomChatName,
+
+        [StringKey(ConfigSection.General, "En",
+@"The name of the custom chat alias",
+            MinLength = 1, MaxLength = 12)]
+        CustomAliasName,
+        
+        [StringKey(ConfigSection.General, "WebsiteURL",
+@"The website used for the server. Used for $website and /BanGrief",
+MinLength = 1, MaxLength = 64)]
+        WebsiteURL,
+
+        [StringKey(ConfigSection.General, "True",
+@"Determines if the server should check for updates", MinLength = 4, MaxLength = 5)]
+        CheckForUpdates,
+
+        [StringKey(ConfigSection.General, "%CBlock",
+@"The word which swears will be replaced with",
+            MinLength = 1, MaxLength = 12)]
+        SwearName,
 
 
         [StringKey( ConfigSection.General, "Welcome to the server!",
@@ -28,6 +52,11 @@ uses more RAM and more bandwidth. If a player's rank is given a
 ""reserved slot"" on the server, they can join even if server is full.",
             MinValue = 1, MaxValue = 1000 )]
         MaxPlayers,
+
+        [IntKey(ConfigSection.General, 8,
+@"Maximum number Caps a player is allowed to chat with.",
+            MinValue = 1, MaxValue = 12)]
+        MaxCaps,
 
 
         [IntKey( ConfigSection.General, 20,
@@ -54,7 +83,7 @@ changes if your computer's IP or server's port change." )]
 
 
         [IntKey( ConfigSection.General, 25565,
-@"Port number on your local machine that fCraft uses to listen for
+@"Port number on your local machine that LegendCraft uses to listen for
 incoming connections. If you are behind a router, you may need
 to set up port forwarding. You may also need to add a firewall
 exception for ServerGUI/ServerCLI/ConfigGUI. Note that your
@@ -62,19 +91,12 @@ server's URL will change if you change the port number.",
             MinValue = 1, MaxValue = 65535 )]
         Port,
 
-
         [IntKey( ConfigSection.General, 100,
 @"Total available upload bandwidth, in kilobytes. This number
 is used to pace drawing commands to prevent server from
 overwhelming the Internet connection with data.",
             MinValue = 1, MaxValue = short.MaxValue )]
         UploadBandwidth,
-
-
-        [StringKey( ConfigSection.General, "https://minecraft.net/heartbeat.jsp",
-@"URL to send heartbeats to. Default is minecraft.net.
-This config key is added in case alternative login/heartbeat services arise.")]
-        HeartbeatUrl,
 
         #endregion
 
@@ -90,13 +112,9 @@ This config key is added in case alternative login/heartbeat services arise.")]
         RankColorsInWorldNames,
 
         [BoolKey( ConfigSection.Chat, false,
-@"Show rank prefixes in chat before player names. This can be
+@"Show 1-character prefixes in chat before player names. This can be
 used to set up IRC-style ""+"" and ""@"" prefixes for ops." )]
         RankPrefixesInChat,
-
-        [BoolKey( ConfigSection.Chat, false,
-@"Whether to prepend rank prefixes to players with a custom DisplayedName set." )]
-        RankPrefixesOnDisplayedNames,
 
         [BoolKey( ConfigSection.Chat, false,
 @"Show prefixes in the player list. As a side-effect, Minecraft client
@@ -114,6 +132,9 @@ will not show custom skins for players with prefixed names." )]
         [ColorKey( ConfigSection.Chat, Color.SysDefault,
 @"Color of normal system messages." )]
         SystemMessageColor,
+        [ColorKey(ConfigSection.Chat, Color.CustomDefault,
+@"Color of custom chat channel.")]
+        CustomChatColor,
 
         [ColorKey( ConfigSection.Chat, Color.HelpDefault,
 @"Color of command usage examples in help." )]
@@ -140,6 +161,10 @@ colorcodes in announcement and rule files." )]
         [ColorKey( ConfigSection.Chat, Color.WarningDefault,
 @"Color of error and warning messages." )]
         WarningColor,
+
+        [ColorKey(ConfigSection.Chat, Color.GlobalDefault,
+@"Color of global messages.")]
+        GlobalColor,
 
         [IntKey( ConfigSection.Chat, 0,
 @"Announcement interval, in minutes. Set to 0 to disable announcements.
@@ -219,17 +244,13 @@ before the player is kicked. Set this to 0 to disable automatic kicks.",
             AlwaysAllowZero = true, MinValue = 0, MaxValue = 64 )]
         AntispamMaxWarnings,
 
+
         [BoolKey( ConfigSection.Security, false,
 @"Only allow players who have a paid Minecraft account (not recommended).
 This will help filter out griefers with throwaway accounts,
 but will also prevent many legitimate players from joining." )]
         PaidPlayersOnly,
 
-        [BoolKey( ConfigSection.Security, true,
-@"Whether to allow email (Mojang account) players, who do not have
-a regular Minecraft player name. These players' names can still be reliably
-verified, but their player name has to be created from their email." )]
-        AllowEmailAccounts,
 
         [BoolKey( ConfigSection.Security, false,
 @"Require players to specify a reason/memo when banning or unbanning someone." )]
@@ -285,41 +306,45 @@ A higher setting (120+ seconds) is recommended for busy servers with many maps."
 @"Whether to create a backup of every map when the server starts." )]
         BackupOnStartup,
 
-        [BoolKey( ConfigSection.SavingAndBackup, true,
-@"Create backups every time a world's map is replaced, by /Gen or /WLoad.
-A timestamp and command's name are included in the filename." )]
-        BackupOnMapChange,
+        [BoolKey( ConfigSection.SavingAndBackup, false,
+@"Create backups any time a player joins a map.
+Both a timestamp and player's name are included in the filename." )]
+        BackupOnJoin,
 
         [BoolKey( ConfigSection.SavingAndBackup, true,
 @"Only create backups if the map was modified since last backup." )]
         BackupOnlyWhenChanged,
 
         [IntKey( ConfigSection.SavingAndBackup, 20,
-@"Default interval (in minutes) for saving periodic map backups for loaded worlds.
+@"Default interval for saving periodic map backups for loaded worlds.
 A world is considered ""loaded"" if there is at least one player on it.
 This setting can be overridden on a per-world basis.
-Set to 0 to disable periodic backups by default.",
+Set to 0 to disable periodic backups.",
             MinValue = 0 )]
         DefaultBackupInterval,
 
         [IntKey( ConfigSection.SavingAndBackup, 0,
-@"Maximum number of backup files that fCraft should keep.
-If exceeded, oldest backups will be deleted first.
-Set to 0 to keep unlimited number of files (default).",
+@"Maximum number of backup files that 800Craft should keep.
+If exceeded, oldest backups will be deleted first.",
             MinValue = 0 )]
         MaxBackups,
 
         [IntKey( ConfigSection.SavingAndBackup, 0,
-@"Maximum combined file size of all backups, in MB.
-If exceeded, oldest backups will be deleted first.
-Set to 0 to keep unlimited number of backups (default).",
+@"Maximum combined filesize of all backups, in MB.
+If exceeded, oldest backups will be deleted first.",
             MinValue = 0 )]
         MaxBackupSize,
 
         [BoolKey( ConfigSection.SavingAndBackup, true,
-@"Create backups of server data (PlayerDB, IPBanList, config.xml, and worlds.xml) on startup.
-Backups are zipped and placed into ""databackups"" directory." )]
+@"Create backups of server data (PlayerDB and IPBanList) on startup." )]
         BackupDataOnStartup,
+        [BoolKey(ConfigSection.SavingAndBackup, true,
+@"Starts the heartbeatsaver on shutdown")]
+        HbSaverKey,
+
+        [BoolKey(ConfigSection.Chat, true,
+@"Enables Global Chat (/Global) for IRC channel #800Craft esper.net")]
+        GCKey,
 
         #endregion
 
@@ -342,20 +367,24 @@ If exceeded, oldest logs will be erased first. Set this to 0 to keep all logs.",
         #region IRC
 
         [BoolKey( ConfigSection.IRC, false,
-@"fCraft includes an IRC (Internet Relay Chat) client for
+@"LegendCraft includes an IRC (Internet Relay Chat) client for
 relaying messages to and from any IRC network.
 Note that encrypted IRC (via SSL) is not supported." )]
         IRCBotEnabled,
 
         [StringKey( ConfigSection.IRC, "MinecraftBot",
-@"IRC bot's nickname. If the nickname is taken, fCraft will append
+@"IRC bot's nickname. If the nickname is taken, 800Craft will append
 an underscore (_) to the name and retry.",
-            MinLength = 1, MaxLength = 30, RegexString=@"\A[a-zA-Z_\-\[\]\\^{}|`][a-zA-Z0-9_\-\[\]\\^{}|`]*\z" )]
+            MinLength = 1, MaxLength = 32 )]
         IRCBotNick,
 
         [StringKey( ConfigSection.IRC, "irc.esper.net",
 @"Host or address of the IRC network." )]
         IRCBotNetwork,
+
+        [StringKey(ConfigSection.IRC, "defaultPass",
+@"Optional, password of the IRC network.")]
+        IRCBotNetworkPass,
 
         [IntKey( ConfigSection.IRC, 6667,
 @"Port number of the IRC network. Most networks use port 6667.",
@@ -408,23 +437,9 @@ or requires identification/authentication." )]
 @"Color of IRC messages and event announcements, as seen on the server/in-game." )]
         IRCMessageColor,
 
-
         [BoolKey( ConfigSection.IRC, true,
-@"Whether colors in server messages should be shown on IRC." )]
-        IRCShowColorsFromServer,
-
-        [BoolKey( ConfigSection.IRC, true,
-@"Whether emotes in servers messages should be shown on IRC." )]
-        IRCShowEmotesFromServer,
-
-        [BoolKey( ConfigSection.IRC, false,
-@"Whether colors in IRC messages (both ^K colorcodes and &-colorcodes) should be shown in-game." )]
-        IRCShowColorsFromIRC,
-
-        [BoolKey( ConfigSection.IRC, false,
-@"Whether Minecraft emote keywords and symbols in IRC messages should be shown in-game." )]
-        IRCShowEmotesFromIRC,
-
+@"Whether the bots should use colors and formatting on IRC." )]
+        IRCUseColor,
 
         [IntKey( ConfigSection.IRC, 750,
 @"Minimum delay (in milliseconds) between IRC messages. Many networks
@@ -438,8 +453,12 @@ Using multiple bots helps bypass message rate limits on some servers.
 Note that some networks frown upon having multiple connections from one IP.
 It is recommended to leave this at 1 unless you are having specific issues
 with IRC bots falling behind on messages.",
-            MinValue = 1, MaxValue = 3 )]
+            MinValue = 1, MaxValue=3 )]
         IRCThreads,
+
+        [StringKey(ConfigSection.IRC, "password",
+@"Optional, used to connect to password-protected channels.")]
+        IRCChannelPassword,
 
         #endregion
 
@@ -448,14 +467,14 @@ with IRC bots falling behind on messages.",
 
         [BoolKey( ConfigSection.Advanced, true,
 @"Crash reports are created when serious unexpected errors occur.
-Being able to receive crash reports helps identify bugs and improve fCraft!
+Being able to receive crash reports helps identify bugs and improve LegendCraft!
 The report consists of the error information, OS and runtime versions,
 a copy of config.xml, and last 25 lines of the log file.
 Reports are confidential and are not displayed publicly." )]
         SubmitCrashReports,
 
         [EnumKey( ConfigSection.Advanced, fCraft.UpdaterMode.Prompt,
-@"fCraft can automatically update to latest stable versions.
+@"800Craft can automatically update to latest stable versions.
 If enabled, the update check is done on-startup." )]
         UpdaterMode,
 
@@ -484,8 +503,8 @@ You may use this option to disable the relative updates." )]
         NoPartialPositionUpdates,
 
         [EnumKey( ConfigSection.Advanced, ProcessPriorityClass.Normal,
-@"It is recommended to leave fCraft at default priority.
-Setting this below ""Normal"" may starve fCraft of resources.
+@"It is recommended to leave 800Craft at default priority.
+Setting this below ""Normal"" may starve 800Craft of resources.
 Setting this above ""Normal"" may slow down other software on your machine." )]
         ProcessPriority,
 
@@ -498,7 +517,7 @@ drawing commands (like cuboid).",
         BlockUpdateThrottling,
 
         [IntKey( ConfigSection.Advanced, 100,
-@"The rate at which fCraft applies block updates, in milliseconds. Lowering this will slightly
+@"The rate at which 800Craft applies block updates, in milliseconds. Lowering this will slightly
 reduce bandwidth and CPU use, but will add latency to block placement.",
             MinValue = 10, MaxValue = 10000 )]
         TickInterval,
@@ -530,8 +549,13 @@ Each state increases the maximum potential memory use per-player.",
             MinLength = 1, MaxLength = 64 )]
         ConsoleName,
 
+        [StringKey(ConfigSection.General, "Classicube.net",
+@"URL to send heartbeats to. Default is classicube.net.
+This config key is added in case alternative login/heartbeat services arise.")]
+        HeartbeatUrl,
+
         [BoolKey( ConfigSection.Advanced, false,
-@"Enable autorank (experimental, unsupported, use at your own risk)" )]
+@"Enable AutoRank to run on the server." )]
         AutoRankEnabled,
 
         [BoolKey( ConfigSection.Advanced, true,
@@ -540,13 +564,17 @@ If disabled, heartbeat data is written to heartbeatdata.txt." )]
         HeartbeatEnabled,
 
         [BoolKey( ConfigSection.Advanced, false,
-@"If enabled, allows changing worlds' environment settings for WoM clients via /Env" )]
+@"If enabled, sends heartbeats to WoM Direct service, http://direct.worldofminecraft.com/" )]
+        HeartbeatToWoMDirect,
+
+        [BoolKey( ConfigSection.Advanced, false,
+@"If enabled, allows changing worlds' environment settings for WoM clients via /Env or /MapEdit" )]
         WoMEnableEnvExtensions,
 
         [IPKey( ConfigSection.Advanced, IPKeyAttribute.BlankValueMeaning.Any,
 @"If the machine has more than one available IP address (for example
 if you have more than one NIC) you can use this setting to make
-fCraft bind to the same IP every time." )]
+LegendCraft bind to the same IP every time." )]
         IP,
 
         [EnumKey( ConfigSection.Advanced, fCraft.BandwidthUseMode.Normal,
@@ -560,13 +588,9 @@ but will reduce bandwidth use." )]
 @"Automatically restarts the server after a given number of seconds." )]
         RestartInterval,
 
-        [BoolKey( ConfigSection.Advanced, false,
-@"Bypasses validation of HTTPS certificates, for heartbeat connections. May be useful under Mono." )]
-        BypassHttpsCertificateValidation,
-
-        [BoolKey(ConfigSection.Advanced,true,
-@"Moves the emote suffix from end-of-line to immediately after its usage.")]
-        MoveEmoteDotToEndOfMessage
+        [StringKey(ConfigSection.Advanced, "True",
+@"If enabled, allows the server to respond to connect to online WebPanel at http://legend-craft.tk")]
+        WebPanelEnabled,
 
         #endregion
     }

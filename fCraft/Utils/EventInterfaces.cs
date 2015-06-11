@@ -1,11 +1,23 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
+// ReSharper disable UnusedMemberInSuper.Global
 using System;
 
 namespace fCraft {
     /// <summary> An EventArgs for an event that can be cancelled. </summary>
-    public interface ICancelableEvent {
-        /// <summary> Set to "true" to cancel the event. </summary>
+    public interface ICancellableEvent {
         bool Cancel { get; set; }
+    }
+
+
+    /// <summary> An EventArgs for an event that directly relates to a particular player. </summary>
+    public interface IPlayerEvent {
+        Player Player { get; }
+    }
+
+
+    /// <summary> An EventArgs for an event that directly relates to a particular world. </summary>
+    public interface IWorldEvent {
+        World World { get; }
     }
 
 

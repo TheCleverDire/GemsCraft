@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle( "fCraft UpdateInstaller" )]
-[assembly: AssemblyDescription( "fCraft self-extracting updater" )]
+[assembly: AssemblyTitle("LegendCraft UpdateInstaller")]
+[assembly: AssemblyDescription("LegendCraft self-extracting updater")]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany( "fCraft.net" )]
-[assembly: AssemblyProduct( "fCraft UpdateInstaller" )]
-[assembly: AssemblyCopyright( "fCraft is Copyright © Matvei Stefarov 2009-2014 (matvei.org)" )]
+[assembly: AssemblyCompany("au70.net")]
+[assembly: AssemblyProduct("LegendCraft UpdateInstaller")]
+[assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -31,5 +31,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.6.4.4")]
-[assembly: AssemblyFileVersion("0.6.4.4")]
+[assembly: AssemblyVersion( "0.6.1.7" )]
+[assembly: AssemblyFileVersion( "0.6.1.7" )]

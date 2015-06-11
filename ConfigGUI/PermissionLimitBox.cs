@@ -1,4 +1,4 @@
-﻿// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Windows.Forms;
 
@@ -56,17 +56,8 @@ namespace fCraft.ConfigGUI {
                 comboBox.SelectedIndex = -1;
                 Visible = false;
             } else {
-                comboBox.SelectedIndex = GetLimitIndex( rank, Permission );
+                comboBox.SelectedIndex = rank.GetLimitIndex( Permission );
                 Visible = rank.Can( Permission );
-            }
-        }
-
-
-        static int GetLimitIndex( Rank rank, Permission permission ) {
-            if( rank.HasLimitSet( permission ) ) {
-                return rank.GetLimit( permission ).Index + 1;
-            } else {
-                return 0;
             }
         }
 

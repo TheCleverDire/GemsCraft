@@ -1,26 +1,24 @@
-﻿using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
-using JetBrains.Annotations;
-
-namespace fCraft.ConfigGUI {
-    partial class MainForm {
+﻿namespace fCraft.ConfigGUI
+{
+    partial class MainForm
+    {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private IContainer components = null;
+        private System.ComponentModel.IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose( bool disposing ) {
-            if( disposing && (components != null) ) {
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
                 components.Dispose();
             }
             bold.Dispose();
-            base.Dispose( disposing );
+            base.Dispose(disposing);
         }
 
         #region Windows Form Designer generated code
@@ -29,35 +27,19 @@ namespace fCraft.ConfigGUI {
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent() {
+        private void InitializeComponent()
+        {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabGeneral = new System.Windows.Forms.TabPage();
-            this.gUpdaterSettings = new System.Windows.Forms.GroupBox();
-            this.bShowAdvancedUpdaterSettings = new System.Windows.Forms.Button();
-            this.cUpdaterMode = new System.Windows.Forms.ComboBox();
-            this.lUpdater = new System.Windows.Forms.Label();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.bChangelog = new System.Windows.Forms.Button();
-            this.bCredits = new System.Windows.Forms.Button();
-            this.bReadme = new System.Windows.Forms.Button();
-            this.gHelpAndSupport = new System.Windows.Forms.GroupBox();
-            this.bOpenWiki = new System.Windows.Forms.Button();
-            this.bReportABug = new System.Windows.Forms.Button();
-            this.gInformation = new System.Windows.Forms.GroupBox();
-            this.bGreeting = new System.Windows.Forms.Button();
-            this.lAnnouncementsUnits = new System.Windows.Forms.Label();
-            this.nAnnouncements = new System.Windows.Forms.NumericUpDown();
-            this.xAnnouncements = new System.Windows.Forms.CheckBox();
-            this.bRules = new System.Windows.Forms.Button();
-            this.bAnnouncements = new System.Windows.Forms.Button();
             this.gBasic = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.HeartBeatUrlComboBox = new System.Windows.Forms.ComboBox();
             this.nMaxPlayersPerWorld = new System.Windows.Forms.NumericUpDown();
             this.lMaxPlayersPerWorld = new System.Windows.Forms.Label();
-            this.bPortCheck = new System.Windows.Forms.Button();
             this.lPort = new System.Windows.Forms.Label();
             this.nPort = new System.Windows.Forms.NumericUpDown();
             this.cDefaultRank = new System.Windows.Forms.ComboBox();
@@ -74,7 +56,30 @@ namespace fCraft.ConfigGUI {
             this.nMaxPlayers = new System.Windows.Forms.NumericUpDown();
             this.lPublic = new System.Windows.Forms.Label();
             this.lMaxPlayers = new System.Windows.Forms.Label();
+            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.bWiki = new System.Windows.Forms.Button();
+            this.bWeb = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.bChangelog = new System.Windows.Forms.Button();
+            this.bCredits = new System.Windows.Forms.Button();
+            this.bReadme = new System.Windows.Forms.Button();
+            this.gInformation = new System.Windows.Forms.GroupBox();
+            this.bGreeting = new System.Windows.Forms.Button();
+            this.lAnnouncementsUnits = new System.Windows.Forms.Label();
+            this.nAnnouncements = new System.Windows.Forms.NumericUpDown();
+            this.xAnnouncements = new System.Windows.Forms.CheckBox();
+            this.bRules = new System.Windows.Forms.Button();
+            this.bAnnouncements = new System.Windows.Forms.Button();
             this.tabChat = new System.Windows.Forms.TabPage();
+            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
+            this.gAppearence = new System.Windows.Forms.GroupBox();
+            this.xShowConnectionMessages = new System.Windows.Forms.CheckBox();
+            this.xShowJoinedWorldMessages = new System.Windows.Forms.CheckBox();
+            this.xRankColorsInWorldNames = new System.Windows.Forms.CheckBox();
+            this.xRankPrefixesInList = new System.Windows.Forms.CheckBox();
+            this.xRankPrefixesInChat = new System.Windows.Forms.CheckBox();
+            this.xRankColorsInChat = new System.Windows.Forms.CheckBox();
             this.gChatColors = new System.Windows.Forms.GroupBox();
             this.lColorMe = new System.Windows.Forms.Label();
             this.bColorMe = new System.Windows.Forms.Button();
@@ -90,14 +95,6 @@ namespace fCraft.ConfigGUI {
             this.lColorAnnouncement = new System.Windows.Forms.Label();
             this.bColorHelp = new System.Windows.Forms.Button();
             this.bColorSay = new System.Windows.Forms.Button();
-            this.gAppearence = new System.Windows.Forms.GroupBox();
-            this.xShowConnectionMessages = new System.Windows.Forms.CheckBox();
-            this.xShowJoinedWorldMessages = new System.Windows.Forms.CheckBox();
-            this.xRankColorsInWorldNames = new System.Windows.Forms.CheckBox();
-            this.xRankPrefixesInList = new System.Windows.Forms.CheckBox();
-            this.xRankPrefixesInChat = new System.Windows.Forms.CheckBox();
-            this.xRankColorsInChat = new System.Windows.Forms.CheckBox();
-            this.chatPreview = new fCraft.ConfigGUI.ChatPreview();
             this.tabWorlds = new System.Windows.Forms.TabPage();
             this.xWoMEnableEnvExtensions = new System.Windows.Forms.CheckBox();
             this.bMapPath = new System.Windows.Forms.Button();
@@ -162,10 +159,8 @@ namespace fCraft.ConfigGUI {
             this.xBlockDBAutoEnable = new System.Windows.Forms.CheckBox();
             this.xBlockDBEnabled = new System.Windows.Forms.CheckBox();
             this.gSecurityMisc = new System.Windows.Forms.GroupBox();
-            this.xAllowEmailAccounts = new System.Windows.Forms.CheckBox();
             this.xAnnounceRankChangeReasons = new System.Windows.Forms.CheckBox();
             this.xRequireKickReason = new System.Windows.Forms.CheckBox();
-            this.xAllowFreePlayers = new System.Windows.Forms.CheckBox();
             this.lPatrolledRankAndBelow = new System.Windows.Forms.Label();
             this.cPatrolledRank = new System.Windows.Forms.ComboBox();
             this.lPatrolledRank = new System.Windows.Forms.Label();
@@ -174,24 +169,27 @@ namespace fCraft.ConfigGUI {
             this.xRequireRankChangeReason = new System.Windows.Forms.CheckBox();
             this.xRequireBanReason = new System.Windows.Forms.CheckBox();
             this.gSpamChat = new System.Windows.Forms.GroupBox();
-            this.xAntispamMuteDuration = new System.Windows.Forms.CheckBox();
-            this.xAntispamMessageCount = new System.Windows.Forms.CheckBox();
             this.lAntispamMaxWarnings = new System.Windows.Forms.Label();
             this.nAntispamMaxWarnings = new System.Windows.Forms.NumericUpDown();
             this.xAntispamKicks = new System.Windows.Forms.CheckBox();
-            this.lAntispamMuteDurationUnits = new System.Windows.Forms.Label();
-            this.lAntispamIntervalUnits = new System.Windows.Forms.Label();
-            this.nAntispamMuteDuration = new System.Windows.Forms.NumericUpDown();
+            this.lSpamMuteSeconds = new System.Windows.Forms.Label();
+            this.lAntispamInterval = new System.Windows.Forms.Label();
+            this.nSpamMute = new System.Windows.Forms.NumericUpDown();
+            this.lSpamMute = new System.Windows.Forms.Label();
             this.nAntispamInterval = new System.Windows.Forms.NumericUpDown();
             this.lAntispamMessageCount = new System.Windows.Forms.Label();
             this.nAntispamMessageCount = new System.Windows.Forms.NumericUpDown();
+            this.lSpamChat = new System.Windows.Forms.Label();
             this.gVerify = new System.Windows.Forms.GroupBox();
             this.nMaxConnectionsPerIP = new System.Windows.Forms.NumericUpDown();
             this.xAllowUnverifiedLAN = new System.Windows.Forms.CheckBox();
             this.xMaxConnectionsPerIP = new System.Windows.Forms.CheckBox();
             this.lVerifyNames = new System.Windows.Forms.Label();
             this.cVerifyNames = new System.Windows.Forms.ComboBox();
-            this.tabSavingAndBackup = new System.Windows.Forms.TabPage();
+            this.gUpdate = new System.Windows.Forms.TabPage();
+            this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.bUpdate = new System.Windows.Forms.Button();
+            this.checkUpdate = new System.Windows.Forms.CheckBox();
             this.gDataBackup = new System.Windows.Forms.GroupBox();
             this.xBackupDataOnStartup = new System.Windows.Forms.CheckBox();
             this.gSaving = new System.Windows.Forms.GroupBox();
@@ -200,17 +198,17 @@ namespace fCraft.ConfigGUI {
             this.xSaveInterval = new System.Windows.Forms.CheckBox();
             this.gBackups = new System.Windows.Forms.GroupBox();
             this.xBackupOnlyWhenChanged = new System.Windows.Forms.CheckBox();
-            this.xBackupOnStartup = new System.Windows.Forms.CheckBox();
             this.lMaxBackupSize = new System.Windows.Forms.Label();
             this.xMaxBackupSize = new System.Windows.Forms.CheckBox();
             this.nMaxBackupSize = new System.Windows.Forms.NumericUpDown();
             this.xMaxBackups = new System.Windows.Forms.CheckBox();
+            this.xBackupOnStartup = new System.Windows.Forms.CheckBox();
             this.lMaxBackups = new System.Windows.Forms.Label();
             this.nMaxBackups = new System.Windows.Forms.NumericUpDown();
             this.nBackupInterval = new System.Windows.Forms.NumericUpDown();
             this.lBackupIntervalUnits = new System.Windows.Forms.Label();
             this.xBackupInterval = new System.Windows.Forms.CheckBox();
-            this.xBackupOnMapChange = new System.Windows.Forms.CheckBox();
+            this.xBackupOnJoin = new System.Windows.Forms.CheckBox();
             this.tabLogging = new System.Windows.Forms.TabPage();
             this.gLogFile = new System.Windows.Forms.GroupBox();
             this.lLogFileOptionsDescription = new System.Windows.Forms.Label();
@@ -226,20 +224,19 @@ namespace fCraft.ConfigGUI {
             this.vConsoleOptions = new System.Windows.Forms.ListView();
             this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tabIRC = new System.Windows.Forms.TabPage();
-            this.gIRCFormatting = new System.Windows.Forms.GroupBox();
-            this.bColorIRC = new System.Windows.Forms.Button();
-            this.lColorIRC = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
-            this.xIRCShowEmotesFromServer = new System.Windows.Forms.CheckBox();
-            this.xIRCShowEmotesFromIRC = new System.Windows.Forms.CheckBox();
-            this.xIRCShowColorsFromIRC = new System.Windows.Forms.CheckBox();
-            this.xIRCShowColorsFromServer = new System.Windows.Forms.CheckBox();
+            this.gIRCAdv = new System.Windows.Forms.GroupBox();
+            this.tServPass = new System.Windows.Forms.TextBox();
+            this.xServPass = new System.Windows.Forms.CheckBox();
+            this.tChanPass = new System.Windows.Forms.TextBox();
+            this.xChanPass = new System.Windows.Forms.CheckBox();
             this.xIRCListShowNonEnglish = new System.Windows.Forms.CheckBox();
             this.gIRCOptions = new System.Windows.Forms.GroupBox();
             this.xIRCBotAnnounceServerEvents = new System.Windows.Forms.CheckBox();
+            this.xIRCUseColor = new System.Windows.Forms.CheckBox();
             this.lIRCNoForwardingMessage = new System.Windows.Forms.Label();
             this.xIRCBotAnnounceIRCJoins = new System.Windows.Forms.CheckBox();
+            this.bColorIRC = new System.Windows.Forms.Button();
+            this.lColorIRC = new System.Windows.Forms.Label();
             this.xIRCBotForwardFromIRC = new System.Windows.Forms.CheckBox();
             this.xIRCBotAnnounceServerJoins = new System.Windows.Forms.CheckBox();
             this.xIRCBotForwardFromServer = new System.Windows.Forms.CheckBox();
@@ -266,9 +263,6 @@ namespace fCraft.ConfigGUI {
             this.xIRCBotEnabled = new System.Windows.Forms.CheckBox();
             this.cIRCList = new System.Windows.Forms.ComboBox();
             this.tabAdvanced = new System.Windows.Forms.TabPage();
-            this.gCrashReport = new System.Windows.Forms.GroupBox();
-            this.lCrashReportDisclaimer = new System.Windows.Forms.Label();
-            this.xSubmitCrashReports = new System.Windows.Forms.CheckBox();
             this.gPerformance = new System.Windows.Forms.GroupBox();
             this.lAdvancedWarning = new System.Windows.Forms.Label();
             this.xLowLatencyMode = new System.Windows.Forms.CheckBox();
@@ -281,7 +275,7 @@ namespace fCraft.ConfigGUI {
             this.lThrottling = new System.Windows.Forms.Label();
             this.lThrottlingUnits = new System.Windows.Forms.Label();
             this.gAdvancedMisc = new System.Windows.Forms.GroupBox();
-            this.xHeartbeatEnabled = new System.Windows.Forms.CheckBox();
+            this.xAutoRank = new System.Windows.Forms.CheckBox();
             this.nMaxUndoStates = new System.Windows.Forms.NumericUpDown();
             this.lMaxUndoStates = new System.Windows.Forms.Label();
             this.lIPWarning = new System.Windows.Forms.Label();
@@ -294,31 +288,51 @@ namespace fCraft.ConfigGUI {
             this.xMaxUndo = new System.Windows.Forms.CheckBox();
             this.xRelayAllBlockUpdates = new System.Windows.Forms.CheckBox();
             this.xNoPartialPositionUpdates = new System.Windows.Forms.CheckBox();
+            this.gCrashReport = new System.Windows.Forms.GroupBox();
+            this.xCrash = new System.Windows.Forms.CheckBox();
+            this.lCrashReportDisclaimer = new System.Windows.Forms.Label();
+            this.Misc = new System.Windows.Forms.TabPage();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
+            this.websiteURL = new System.Windows.Forms.TextBox();
+            this.ReqsEditor = new System.Windows.Forms.Button();
+            this.SwearEditor = new System.Windows.Forms.Button();
+            this.MaxCapsValue = new System.Windows.Forms.NumericUpDown();
+            this.MaxCaps = new System.Windows.Forms.Label();
+            this.SwearBox = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
+            this.CustomColor = new System.Windows.Forms.Button();
+            this.CustomText = new System.Windows.Forms.Label();
+            this.CustomName = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.CustomAliases = new System.Windows.Forms.TextBox();
             this.bOK = new System.Windows.Forms.Button();
             this.bCancel = new System.Windows.Forms.Button();
             this.bResetTab = new System.Windows.Forms.Button();
             this.bResetAll = new System.Windows.Forms.Button();
             this.bApply = new System.Windows.Forms.Button();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
-            this.gHeartbeatUrl = new System.Windows.Forms.GroupBox();
-            this.cHeartbeatUrl = new System.Windows.Forms.ComboBox();
-            this.lHeartbeatUrl = new System.Windows.Forms.Label();
-            this.lHeartbeatUrlWarning = new System.Windows.Forms.Label();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.IColorGlobal = new System.Windows.Forms.Label();
+            this.bColorGlobal = new System.Windows.Forms.Button();
             this.tabs.SuspendLayout();
             this.tabGeneral.SuspendLayout();
-            this.gUpdaterSettings.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.gHelpAndSupport.SuspendLayout();
-            this.gInformation.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).BeginInit();
             this.gBasic.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayersPerWorld)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nPort)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).BeginInit();
+            this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.groupBox2.SuspendLayout();
+            this.gInformation.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).BeginInit();
             this.tabChat.SuspendLayout();
-            this.gChatColors.SuspendLayout();
             this.gAppearence.SuspendLayout();
+            this.gChatColors.SuspendLayout();
             this.tabWorlds.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvWorlds)).BeginInit();
             this.tabRanks.SuspendLayout();
@@ -335,12 +349,13 @@ namespace fCraft.ConfigGUI {
             this.gSecurityMisc.SuspendLayout();
             this.gSpamChat.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nAntispamMaxWarnings)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nAntispamMuteDuration)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nSpamMute)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nAntispamInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nAntispamMessageCount)).BeginInit();
             this.gVerify.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxConnectionsPerIP)).BeginInit();
-            this.tabSavingAndBackup.SuspendLayout();
+            this.gUpdate.SuspendLayout();
+            this.groupBox5.SuspendLayout();
             this.gDataBackup.SuspendLayout();
             this.gSaving.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nSaveInterval)).BeginInit();
@@ -353,20 +368,23 @@ namespace fCraft.ConfigGUI {
             ((System.ComponentModel.ISupportInitialize)(this.nLogLimit)).BeginInit();
             this.gConsole.SuspendLayout();
             this.tabIRC.SuspendLayout();
-            this.gIRCFormatting.SuspendLayout();
+            this.gIRCAdv.SuspendLayout();
             this.gIRCOptions.SuspendLayout();
             this.gIRCNetwork.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nIRCDelay)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nIRCBotPort)).BeginInit();
             this.tabAdvanced.SuspendLayout();
-            this.gCrashReport.SuspendLayout();
             this.gPerformance.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nTickInterval)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nThrottling)).BeginInit();
             this.gAdvancedMisc.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndoStates)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndo)).BeginInit();
-            this.gHeartbeatUrl.SuspendLayout();
+            this.gCrashReport.SuspendLayout();
+            this.Misc.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).BeginInit();
+            this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabs
@@ -379,10 +397,11 @@ namespace fCraft.ConfigGUI {
             this.tabs.Controls.Add(this.tabWorlds);
             this.tabs.Controls.Add(this.tabRanks);
             this.tabs.Controls.Add(this.tabSecurity);
-            this.tabs.Controls.Add(this.tabSavingAndBackup);
+            this.tabs.Controls.Add(this.gUpdate);
             this.tabs.Controls.Add(this.tabLogging);
             this.tabs.Controls.Add(this.tabIRC);
             this.tabs.Controls.Add(this.tabAdvanced);
+            this.tabs.Controls.Add(this.Misc);
             this.tabs.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabs.Location = new System.Drawing.Point(12, 12);
             this.tabs.Name = "tabs";
@@ -392,241 +411,25 @@ namespace fCraft.ConfigGUI {
             // 
             // tabGeneral
             // 
-            this.tabGeneral.Controls.Add(this.gHeartbeatUrl);
-            this.tabGeneral.Controls.Add(this.gUpdaterSettings);
-            this.tabGeneral.Controls.Add(this.groupBox2);
-            this.tabGeneral.Controls.Add(this.gHelpAndSupport);
-            this.tabGeneral.Controls.Add(this.gInformation);
+            this.tabGeneral.BackColor = System.Drawing.Color.IndianRed;
             this.tabGeneral.Controls.Add(this.gBasic);
+            this.tabGeneral.Controls.Add(this.groupBox4);
+            this.tabGeneral.Controls.Add(this.pictureBox1);
+            this.tabGeneral.Controls.Add(this.groupBox2);
+            this.tabGeneral.Controls.Add(this.gInformation);
             this.tabGeneral.Location = new System.Drawing.Point(4, 24);
             this.tabGeneral.Name = "tabGeneral";
             this.tabGeneral.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
             this.tabGeneral.Size = new System.Drawing.Size(652, 482);
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
-            this.tabGeneral.UseVisualStyleBackColor = true;
-            // 
-            // gUpdaterSettings
-            // 
-            this.gUpdaterSettings.Controls.Add(this.bShowAdvancedUpdaterSettings);
-            this.gUpdaterSettings.Controls.Add(this.cUpdaterMode);
-            this.gUpdaterSettings.Controls.Add(this.lUpdater);
-            this.gUpdaterSettings.Location = new System.Drawing.Point(8, 247);
-            this.gUpdaterSettings.Name = "gUpdaterSettings";
-            this.gUpdaterSettings.Size = new System.Drawing.Size(636, 54);
-            this.gUpdaterSettings.TabIndex = 2;
-            this.gUpdaterSettings.TabStop = false;
-            this.gUpdaterSettings.Text = "Updater Settings";
-            // 
-            // bShowAdvancedUpdaterSettings
-            // 
-            this.bShowAdvancedUpdaterSettings.Location = new System.Drawing.Point(318, 22);
-            this.bShowAdvancedUpdaterSettings.Name = "bShowAdvancedUpdaterSettings";
-            this.bShowAdvancedUpdaterSettings.Size = new System.Drawing.Size(75, 23);
-            this.bShowAdvancedUpdaterSettings.TabIndex = 2;
-            this.bShowAdvancedUpdaterSettings.Text = "Advanced";
-            this.bShowAdvancedUpdaterSettings.UseVisualStyleBackColor = true;
-            this.bShowAdvancedUpdaterSettings.Click += new System.EventHandler(this.bShowAdvancedUpdaterSettings_Click);
-            // 
-            // cUpdaterMode
-            // 
-            this.cUpdaterMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cUpdaterMode.FormattingEnabled = true;
-            this.cUpdaterMode.Items.AddRange(new object[] {
-            "Disabled",
-            "Notify about availability",
-            "Prompt to install",
-            "Fully automatic"});
-            this.cUpdaterMode.Location = new System.Drawing.Point(123, 22);
-            this.cUpdaterMode.Name = "cUpdaterMode";
-            this.cUpdaterMode.Size = new System.Drawing.Size(189, 23);
-            this.cUpdaterMode.TabIndex = 1;
-            // 
-            // lUpdater
-            // 
-            this.lUpdater.AutoSize = true;
-            this.lUpdater.Location = new System.Drawing.Point(6, 25);
-            this.lUpdater.Name = "lUpdater";
-            this.lUpdater.Size = new System.Drawing.Size(111, 15);
-            this.lUpdater.TabIndex = 0;
-            this.lUpdater.Text = "fCraft update check";
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox2.Controls.Add(this.bChangelog);
-            this.groupBox2.Controls.Add(this.bCredits);
-            this.groupBox2.Controls.Add(this.bReadme);
-            this.groupBox2.Location = new System.Drawing.Point(329, 412);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(315, 56);
-            this.groupBox2.TabIndex = 4;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "About fCraft";
-            // 
-            // bChangelog
-            // 
-            this.bChangelog.Location = new System.Drawing.Point(107, 20);
-            this.bChangelog.Name = "bChangelog";
-            this.bChangelog.Size = new System.Drawing.Size(95, 23);
-            this.bChangelog.TabIndex = 2;
-            this.bChangelog.Text = "Changelog";
-            this.bChangelog.UseVisualStyleBackColor = true;
-            this.bChangelog.Click += new System.EventHandler(this.bChangelog_Click);
-            // 
-            // bCredits
-            // 
-            this.bCredits.Location = new System.Drawing.Point(208, 20);
-            this.bCredits.Name = "bCredits";
-            this.bCredits.Size = new System.Drawing.Size(95, 23);
-            this.bCredits.TabIndex = 1;
-            this.bCredits.Text = "Credits";
-            this.bCredits.UseVisualStyleBackColor = true;
-            this.bCredits.Click += new System.EventHandler(this.bCredits_Click);
-            // 
-            // bReadme
-            // 
-            this.bReadme.Enabled = false;
-            this.bReadme.Location = new System.Drawing.Point(6, 20);
-            this.bReadme.Name = "bReadme";
-            this.bReadme.Size = new System.Drawing.Size(95, 23);
-            this.bReadme.TabIndex = 0;
-            this.bReadme.Text = "Readme";
-            this.bReadme.UseVisualStyleBackColor = true;
-            this.bReadme.Click += new System.EventHandler(this.bReadme_Click);
-            // 
-            // gHelpAndSupport
-            // 
-            this.gHelpAndSupport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.gHelpAndSupport.Controls.Add(this.bOpenWiki);
-            this.gHelpAndSupport.Controls.Add(this.bReportABug);
-            this.gHelpAndSupport.Location = new System.Drawing.Point(8, 412);
-            this.gHelpAndSupport.Name = "gHelpAndSupport";
-            this.gHelpAndSupport.Size = new System.Drawing.Size(315, 56);
-            this.gHelpAndSupport.TabIndex = 3;
-            this.gHelpAndSupport.TabStop = false;
-            this.gHelpAndSupport.Text = "Help and Support";
-            // 
-            // bOpenWiki
-            // 
-            this.bOpenWiki.Location = new System.Drawing.Point(9, 20);
-            this.bOpenWiki.Name = "bOpenWiki";
-            this.bOpenWiki.Size = new System.Drawing.Size(140, 23);
-            this.bOpenWiki.TabIndex = 0;
-            this.bOpenWiki.Text = "Open fCraft Wiki";
-            this.bOpenWiki.UseVisualStyleBackColor = true;
-            this.bOpenWiki.Click += new System.EventHandler(this.bOpenWiki_Click);
-            // 
-            // bReportABug
-            // 
-            this.bReportABug.Location = new System.Drawing.Point(155, 20);
-            this.bReportABug.Name = "bReportABug";
-            this.bReportABug.Size = new System.Drawing.Size(140, 23);
-            this.bReportABug.TabIndex = 1;
-            this.bReportABug.Text = "Report a Bug";
-            this.bReportABug.UseVisualStyleBackColor = true;
-            this.bReportABug.Click += new System.EventHandler(this.bReportABug_Click);
-            // 
-            // gInformation
-            // 
-            this.gInformation.Controls.Add(this.bGreeting);
-            this.gInformation.Controls.Add(this.lAnnouncementsUnits);
-            this.gInformation.Controls.Add(this.nAnnouncements);
-            this.gInformation.Controls.Add(this.xAnnouncements);
-            this.gInformation.Controls.Add(this.bRules);
-            this.gInformation.Controls.Add(this.bAnnouncements);
-            this.gInformation.Location = new System.Drawing.Point(8, 184);
-            this.gInformation.Name = "gInformation";
-            this.gInformation.Size = new System.Drawing.Size(636, 57);
-            this.gInformation.TabIndex = 1;
-            this.gInformation.TabStop = false;
-            this.gInformation.Text = "Information";
-            // 
-            // bGreeting
-            // 
-            this.bGreeting.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bGreeting.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bGreeting.Location = new System.Drawing.Point(538, 20);
-            this.bGreeting.Name = "bGreeting";
-            this.bGreeting.Size = new System.Drawing.Size(92, 28);
-            this.bGreeting.TabIndex = 5;
-            this.bGreeting.Text = "Edit Greeting";
-            this.bGreeting.UseVisualStyleBackColor = true;
-            this.bGreeting.Click += new System.EventHandler(this.bGreeting_Click);
-            // 
-            // lAnnouncementsUnits
-            // 
-            this.lAnnouncementsUnits.AutoSize = true;
-            this.lAnnouncementsUnits.Location = new System.Drawing.Point(266, 27);
-            this.lAnnouncementsUnits.Name = "lAnnouncementsUnits";
-            this.lAnnouncementsUnits.Size = new System.Drawing.Size(28, 15);
-            this.lAnnouncementsUnits.TabIndex = 2;
-            this.lAnnouncementsUnits.Text = "min";
-            // 
-            // nAnnouncements
-            // 
-            this.nAnnouncements.Enabled = false;
-            this.nAnnouncements.Location = new System.Drawing.Point(210, 25);
-            this.nAnnouncements.Maximum = new decimal(new int[] {
-            60,
-            0,
-            0,
-            0});
-            this.nAnnouncements.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.nAnnouncements.Name = "nAnnouncements";
-            this.nAnnouncements.Size = new System.Drawing.Size(50, 21);
-            this.nAnnouncements.TabIndex = 1;
-            this.nAnnouncements.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            // 
-            // xAnnouncements
-            // 
-            this.xAnnouncements.AutoSize = true;
-            this.xAnnouncements.Location = new System.Drawing.Point(24, 26);
-            this.xAnnouncements.Name = "xAnnouncements";
-            this.xAnnouncements.Size = new System.Drawing.Size(180, 19);
-            this.xAnnouncements.TabIndex = 0;
-            this.xAnnouncements.Text = "Show announcements every";
-            this.xAnnouncements.UseVisualStyleBackColor = true;
-            this.xAnnouncements.CheckedChanged += new System.EventHandler(this.xAnnouncements_CheckedChanged);
-            // 
-            // bRules
-            // 
-            this.bRules.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bRules.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bRules.Location = new System.Drawing.Point(445, 20);
-            this.bRules.Name = "bRules";
-            this.bRules.Size = new System.Drawing.Size(87, 28);
-            this.bRules.TabIndex = 4;
-            this.bRules.Text = "Edit Rules";
-            this.bRules.UseVisualStyleBackColor = true;
-            this.bRules.Click += new System.EventHandler(this.bRules_Click);
-            // 
-            // bAnnouncements
-            // 
-            this.bAnnouncements.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bAnnouncements.Enabled = false;
-            this.bAnnouncements.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.bAnnouncements.Location = new System.Drawing.Point(301, 20);
-            this.bAnnouncements.Name = "bAnnouncements";
-            this.bAnnouncements.Size = new System.Drawing.Size(138, 28);
-            this.bAnnouncements.TabIndex = 3;
-            this.bAnnouncements.Text = "Edit Announcements";
-            this.bAnnouncements.UseVisualStyleBackColor = true;
-            this.bAnnouncements.Click += new System.EventHandler(this.bAnnouncements_Click);
             // 
             // gBasic
             // 
+            this.gBasic.Controls.Add(this.label6);
+            this.gBasic.Controls.Add(this.HeartBeatUrlComboBox);
             this.gBasic.Controls.Add(this.nMaxPlayersPerWorld);
             this.gBasic.Controls.Add(this.lMaxPlayersPerWorld);
-            this.gBasic.Controls.Add(this.bPortCheck);
             this.gBasic.Controls.Add(this.lPort);
             this.gBasic.Controls.Add(this.nPort);
             this.gBasic.Controls.Add(this.cDefaultRank);
@@ -645,10 +448,33 @@ namespace fCraft.ConfigGUI {
             this.gBasic.Controls.Add(this.lMaxPlayers);
             this.gBasic.Location = new System.Drawing.Point(8, 13);
             this.gBasic.Name = "gBasic";
-            this.gBasic.Size = new System.Drawing.Size(636, 165);
+            this.gBasic.Size = new System.Drawing.Size(636, 190);
             this.gBasic.TabIndex = 0;
             this.gBasic.TabStop = false;
             this.gBasic.Text = "Basic Settings";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(10, 160);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(112, 15);
+            this.label6.TabIndex = 20;
+            this.label6.Text = "HeartBeat Location";
+            // 
+            // HeartBeatUrlComboBox
+            // 
+            this.HeartBeatUrlComboBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.HeartBeatUrlComboBox.FormattingEnabled = true;
+            this.HeartBeatUrlComboBox.Items.AddRange(new object[] {
+            "Minecraft.net",
+            "ClassiCube.net"});
+            this.HeartBeatUrlComboBox.Location = new System.Drawing.Point(123, 157);
+            this.HeartBeatUrlComboBox.Name = "HeartBeatUrlComboBox";
+            this.HeartBeatUrlComboBox.Size = new System.Drawing.Size(194, 23);
+            this.HeartBeatUrlComboBox.TabIndex = 19;
+            this.HeartBeatUrlComboBox.SelectedIndexChanged += new System.EventHandler(this.HeartBeatUrlComboBox_SelectedIndexChanged);
             // 
             // nMaxPlayersPerWorld
             // 
@@ -681,16 +507,6 @@ namespace fCraft.ConfigGUI {
             this.lMaxPlayersPerWorld.Size = new System.Drawing.Size(135, 15);
             this.lMaxPlayersPerWorld.TabIndex = 11;
             this.lMaxPlayersPerWorld.Text = "Max players (per world)";
-            // 
-            // bPortCheck
-            // 
-            this.bPortCheck.Location = new System.Drawing.Point(204, 99);
-            this.bPortCheck.Name = "bPortCheck";
-            this.bPortCheck.Size = new System.Drawing.Size(68, 23);
-            this.bPortCheck.TabIndex = 8;
-            this.bPortCheck.Text = "Check";
-            this.bPortCheck.UseVisualStyleBackColor = true;
-            this.bPortCheck.Click += new System.EventHandler(this.bPortCheck_Click);
             // 
             // lPort
             // 
@@ -726,6 +542,7 @@ namespace fCraft.ConfigGUI {
             // cDefaultRank
             // 
             this.cDefaultRank.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cDefaultRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cDefaultRank.FormattingEnabled = true;
             this.cDefaultRank.Location = new System.Drawing.Point(440, 128);
             this.cDefaultRank.Name = "cDefaultRank";
@@ -753,12 +570,16 @@ namespace fCraft.ConfigGUI {
             // 
             // bMeasure
             // 
+            this.bMeasure.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bMeasure.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bMeasure.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bMeasure.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bMeasure.Location = new System.Drawing.Point(559, 99);
             this.bMeasure.Name = "bMeasure";
             this.bMeasure.Size = new System.Drawing.Size(71, 23);
             this.bMeasure.TabIndex = 16;
             this.bMeasure.Text = "Measure";
-            this.bMeasure.UseVisualStyleBackColor = true;
+            this.bMeasure.UseVisualStyleBackColor = false;
             this.bMeasure.Click += new System.EventHandler(this.bMeasure_Click);
             // 
             // tServerName
@@ -839,6 +660,7 @@ namespace fCraft.ConfigGUI {
             // cPublic
             // 
             this.cPublic.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cPublic.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cPublic.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.cPublic.FormattingEnabled = true;
             this.cPublic.Items.AddRange(new object[] {
@@ -891,22 +713,321 @@ namespace fCraft.ConfigGUI {
             this.lMaxPlayers.TabIndex = 4;
             this.lMaxPlayers.Text = "Max players (total)";
             // 
+            // groupBox4
+            // 
+            this.groupBox4.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox4.Controls.Add(this.bWiki);
+            this.groupBox4.Controls.Add(this.bWeb);
+            this.groupBox4.Location = new System.Drawing.Point(468, 306);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(126, 94);
+            this.groupBox4.TabIndex = 5;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Contact Us";
+            // 
+            // bWiki
+            // 
+            this.bWiki.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bWiki.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bWiki.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bWiki.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bWiki.Location = new System.Drawing.Point(7, 60);
+            this.bWiki.Name = "bWiki";
+            this.bWiki.Size = new System.Drawing.Size(111, 23);
+            this.bWiki.TabIndex = 1;
+            this.bWiki.Text = "Wiki";
+            this.bWiki.UseVisualStyleBackColor = false;
+            // 
+            // bWeb
+            // 
+            this.bWeb.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bWeb.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bWeb.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bWeb.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bWeb.Location = new System.Drawing.Point(8, 31);
+            this.bWeb.Name = "bWeb";
+            this.bWeb.Size = new System.Drawing.Size(110, 23);
+            this.bWeb.TabIndex = 1;
+            this.bWeb.Text = "Website";
+            this.bWeb.UseVisualStyleBackColor = false;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(212, 294);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(213, 175);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 5;
+            this.pictureBox1.TabStop = false;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox2.Controls.Add(this.bChangelog);
+            this.groupBox2.Controls.Add(this.bCredits);
+            this.groupBox2.Controls.Add(this.bReadme);
+            this.groupBox2.Location = new System.Drawing.Point(51, 306);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(123, 135);
+            this.groupBox2.TabIndex = 4;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "About";
+            // 
+            // bChangelog
+            // 
+            this.bChangelog.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bChangelog.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bChangelog.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bChangelog.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bChangelog.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bChangelog.Location = new System.Drawing.Point(7, 89);
+            this.bChangelog.Name = "bChangelog";
+            this.bChangelog.Size = new System.Drawing.Size(110, 23);
+            this.bChangelog.TabIndex = 2;
+            this.bChangelog.Text = "Changelog";
+            this.bChangelog.UseVisualStyleBackColor = false;
+            this.bChangelog.Click += new System.EventHandler(this.bChangelog_Click);
+            // 
+            // bCredits
+            // 
+            this.bCredits.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bCredits.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bCredits.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bCredits.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bCredits.Location = new System.Drawing.Point(6, 31);
+            this.bCredits.Name = "bCredits";
+            this.bCredits.Size = new System.Drawing.Size(111, 23);
+            this.bCredits.TabIndex = 1;
+            this.bCredits.Text = "Credits";
+            this.bCredits.UseVisualStyleBackColor = false;
+            this.bCredits.Click += new System.EventHandler(this.bCredits_Click);
+            // 
+            // bReadme
+            // 
+            this.bReadme.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bReadme.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bReadme.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bReadme.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bReadme.Location = new System.Drawing.Point(7, 60);
+            this.bReadme.Name = "bReadme";
+            this.bReadme.Size = new System.Drawing.Size(110, 23);
+            this.bReadme.TabIndex = 1;
+            this.bReadme.Text = "Readme";
+            this.bReadme.UseVisualStyleBackColor = false;
+            this.bReadme.Click += new System.EventHandler(this.bReadme_Click);
+            // 
+            // gInformation
+            // 
+            this.gInformation.Controls.Add(this.bGreeting);
+            this.gInformation.Controls.Add(this.lAnnouncementsUnits);
+            this.gInformation.Controls.Add(this.nAnnouncements);
+            this.gInformation.Controls.Add(this.xAnnouncements);
+            this.gInformation.Controls.Add(this.bRules);
+            this.gInformation.Controls.Add(this.bAnnouncements);
+            this.gInformation.Location = new System.Drawing.Point(8, 219);
+            this.gInformation.Name = "gInformation";
+            this.gInformation.Size = new System.Drawing.Size(636, 57);
+            this.gInformation.TabIndex = 1;
+            this.gInformation.TabStop = false;
+            this.gInformation.Text = "Information";
+            // 
+            // bGreeting
+            // 
+            this.bGreeting.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bGreeting.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bGreeting.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bGreeting.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bGreeting.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bGreeting.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bGreeting.Location = new System.Drawing.Point(538, 20);
+            this.bGreeting.Name = "bGreeting";
+            this.bGreeting.Size = new System.Drawing.Size(92, 28);
+            this.bGreeting.TabIndex = 5;
+            this.bGreeting.Text = "Edit Greeting";
+            this.bGreeting.UseVisualStyleBackColor = false;
+            this.bGreeting.Click += new System.EventHandler(this.bGreeting_Click);
+            // 
+            // lAnnouncementsUnits
+            // 
+            this.lAnnouncementsUnits.AutoSize = true;
+            this.lAnnouncementsUnits.Location = new System.Drawing.Point(266, 27);
+            this.lAnnouncementsUnits.Name = "lAnnouncementsUnits";
+            this.lAnnouncementsUnits.Size = new System.Drawing.Size(28, 15);
+            this.lAnnouncementsUnits.TabIndex = 2;
+            this.lAnnouncementsUnits.Text = "min";
+            // 
+            // nAnnouncements
+            // 
+            this.nAnnouncements.Enabled = false;
+            this.nAnnouncements.Location = new System.Drawing.Point(210, 25);
+            this.nAnnouncements.Maximum = new decimal(new int[] {
+            60,
+            0,
+            0,
+            0});
+            this.nAnnouncements.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nAnnouncements.Name = "nAnnouncements";
+            this.nAnnouncements.Size = new System.Drawing.Size(50, 21);
+            this.nAnnouncements.TabIndex = 1;
+            this.nAnnouncements.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // xAnnouncements
+            // 
+            this.xAnnouncements.AutoSize = true;
+            this.xAnnouncements.BackColor = System.Drawing.Color.Firebrick;
+            this.xAnnouncements.FlatStyle = System.Windows.Forms.FlatStyle.System;
+            this.xAnnouncements.Location = new System.Drawing.Point(24, 26);
+            this.xAnnouncements.Name = "xAnnouncements";
+            this.xAnnouncements.Size = new System.Drawing.Size(186, 20);
+            this.xAnnouncements.TabIndex = 0;
+            this.xAnnouncements.Text = "Show announcements every";
+            this.xAnnouncements.UseVisualStyleBackColor = false;
+            this.xAnnouncements.CheckedChanged += new System.EventHandler(this.xAnnouncements_CheckedChanged);
+            // 
+            // bRules
+            // 
+            this.bRules.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bRules.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bRules.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bRules.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bRules.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bRules.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bRules.Location = new System.Drawing.Point(445, 20);
+            this.bRules.Name = "bRules";
+            this.bRules.Size = new System.Drawing.Size(87, 28);
+            this.bRules.TabIndex = 4;
+            this.bRules.Text = "Edit Rules";
+            this.bRules.UseVisualStyleBackColor = false;
+            this.bRules.Click += new System.EventHandler(this.bRules_Click);
+            // 
+            // bAnnouncements
+            // 
+            this.bAnnouncements.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bAnnouncements.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bAnnouncements.Enabled = false;
+            this.bAnnouncements.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bAnnouncements.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bAnnouncements.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bAnnouncements.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bAnnouncements.Location = new System.Drawing.Point(301, 20);
+            this.bAnnouncements.Name = "bAnnouncements";
+            this.bAnnouncements.Size = new System.Drawing.Size(138, 28);
+            this.bAnnouncements.TabIndex = 3;
+            this.bAnnouncements.Text = "Edit Announcements";
+            this.bAnnouncements.UseVisualStyleBackColor = false;
+            this.bAnnouncements.Click += new System.EventHandler(this.bAnnouncements_Click);
+            // 
             // tabChat
             // 
-            this.tabChat.Controls.Add(this.gChatColors);
-            this.tabChat.Controls.Add(this.gAppearence);
+            this.tabChat.BackColor = System.Drawing.Color.IndianRed;
             this.tabChat.Controls.Add(this.chatPreview);
+            this.tabChat.Controls.Add(this.gAppearence);
+            this.tabChat.Controls.Add(this.gChatColors);
             this.tabChat.Location = new System.Drawing.Point(4, 24);
             this.tabChat.Name = "tabChat";
             this.tabChat.Padding = new System.Windows.Forms.Padding(5, 5, 5, 10);
             this.tabChat.Size = new System.Drawing.Size(652, 482);
             this.tabChat.TabIndex = 10;
             this.tabChat.Text = "Chat";
-            this.tabChat.UseVisualStyleBackColor = true;
+            // 
+            // chatPreview
+            // 
+            this.chatPreview.Location = new System.Drawing.Point(8, 256);
+            this.chatPreview.Name = "chatPreview";
+            this.chatPreview.Size = new System.Drawing.Size(636, 213);
+            this.chatPreview.TabIndex = 2;
+            // 
+            // gAppearence
+            // 
+            this.gAppearence.Controls.Add(this.xShowConnectionMessages);
+            this.gAppearence.Controls.Add(this.xShowJoinedWorldMessages);
+            this.gAppearence.Controls.Add(this.xRankColorsInWorldNames);
+            this.gAppearence.Controls.Add(this.xRankPrefixesInList);
+            this.gAppearence.Controls.Add(this.xRankPrefixesInChat);
+            this.gAppearence.Controls.Add(this.xRankColorsInChat);
+            this.gAppearence.Location = new System.Drawing.Point(7, 153);
+            this.gAppearence.Name = "gAppearence";
+            this.gAppearence.Size = new System.Drawing.Size(637, 97);
+            this.gAppearence.TabIndex = 1;
+            this.gAppearence.TabStop = false;
+            this.gAppearence.Text = "Appearence Tweaks";
+            // 
+            // xShowConnectionMessages
+            // 
+            this.xShowConnectionMessages.AutoSize = true;
+            this.xShowConnectionMessages.Location = new System.Drawing.Point(325, 45);
+            this.xShowConnectionMessages.Name = "xShowConnectionMessages";
+            this.xShowConnectionMessages.Size = new System.Drawing.Size(306, 19);
+            this.xShowConnectionMessages.TabIndex = 4;
+            this.xShowConnectionMessages.Text = "Show a message when players join/leave SERVER.";
+            this.xShowConnectionMessages.UseVisualStyleBackColor = true;
+            // 
+            // xShowJoinedWorldMessages
+            // 
+            this.xShowJoinedWorldMessages.AutoSize = true;
+            this.xShowJoinedWorldMessages.Location = new System.Drawing.Point(325, 20);
+            this.xShowJoinedWorldMessages.Name = "xShowJoinedWorldMessages";
+            this.xShowJoinedWorldMessages.Size = new System.Drawing.Size(261, 19);
+            this.xShowJoinedWorldMessages.TabIndex = 3;
+            this.xShowJoinedWorldMessages.Text = "Show a message when players join worlds.";
+            this.xShowJoinedWorldMessages.UseVisualStyleBackColor = true;
+            // 
+            // xRankColorsInWorldNames
+            // 
+            this.xRankColorsInWorldNames.AutoSize = true;
+            this.xRankColorsInWorldNames.Location = new System.Drawing.Point(325, 70);
+            this.xRankColorsInWorldNames.Name = "xRankColorsInWorldNames";
+            this.xRankColorsInWorldNames.Size = new System.Drawing.Size(243, 19);
+            this.xRankColorsInWorldNames.TabIndex = 5;
+            this.xRankColorsInWorldNames.Text = "Color world names based on build rank.";
+            this.xRankColorsInWorldNames.UseVisualStyleBackColor = true;
+            // 
+            // xRankPrefixesInList
+            // 
+            this.xRankPrefixesInList.AutoSize = true;
+            this.xRankPrefixesInList.Location = new System.Drawing.Point(44, 70);
+            this.xRankPrefixesInList.Name = "xRankPrefixesInList";
+            this.xRankPrefixesInList.Size = new System.Drawing.Size(219, 19);
+            this.xRankPrefixesInList.TabIndex = 2;
+            this.xRankPrefixesInList.Text = "Prefixes in player list (breaks skins).";
+            this.xRankPrefixesInList.UseVisualStyleBackColor = true;
+            // 
+            // xRankPrefixesInChat
+            // 
+            this.xRankPrefixesInChat.AutoSize = true;
+            this.xRankPrefixesInChat.Location = new System.Drawing.Point(25, 45);
+            this.xRankPrefixesInChat.Name = "xRankPrefixesInChat";
+            this.xRankPrefixesInChat.Size = new System.Drawing.Size(133, 19);
+            this.xRankPrefixesInChat.TabIndex = 1;
+            this.xRankPrefixesInChat.Text = "Show rank prefixes.";
+            this.xRankPrefixesInChat.UseVisualStyleBackColor = true;
+            this.xRankPrefixesInChat.CheckedChanged += new System.EventHandler(this.xRankPrefixesInChat_CheckedChanged);
+            // 
+            // xRankColorsInChat
+            // 
+            this.xRankColorsInChat.AutoSize = true;
+            this.xRankColorsInChat.Location = new System.Drawing.Point(25, 20);
+            this.xRankColorsInChat.Name = "xRankColorsInChat";
+            this.xRankColorsInChat.Size = new System.Drawing.Size(123, 19);
+            this.xRankColorsInChat.TabIndex = 0;
+            this.xRankColorsInChat.Text = "Show rank colors.";
+            this.xRankColorsInChat.UseVisualStyleBackColor = true;
             // 
             // gChatColors
             // 
+            this.gChatColors.BackColor = System.Drawing.Color.IndianRed;
             this.gChatColors.Controls.Add(this.lColorMe);
+            this.gChatColors.Controls.Add(this.bColorGlobal);
             this.gChatColors.Controls.Add(this.bColorMe);
             this.gChatColors.Controls.Add(this.lColorWarning);
             this.gChatColors.Controls.Add(this.bColorWarning);
@@ -915,6 +1036,7 @@ namespace fCraft.ConfigGUI {
             this.gChatColors.Controls.Add(this.bColorPM);
             this.gChatColors.Controls.Add(this.lColorHelp);
             this.gChatColors.Controls.Add(this.lColorPM);
+            this.gChatColors.Controls.Add(this.IColorGlobal);
             this.gChatColors.Controls.Add(this.lColorSay);
             this.gChatColors.Controls.Add(this.bColorAnnouncement);
             this.gChatColors.Controls.Add(this.lColorAnnouncement);
@@ -1060,91 +1182,9 @@ namespace fCraft.ConfigGUI {
             this.bColorSay.UseVisualStyleBackColor = false;
             this.bColorSay.Click += new System.EventHandler(this.bColorSay_Click);
             // 
-            // gAppearence
-            // 
-            this.gAppearence.Controls.Add(this.xShowConnectionMessages);
-            this.gAppearence.Controls.Add(this.xShowJoinedWorldMessages);
-            this.gAppearence.Controls.Add(this.xRankColorsInWorldNames);
-            this.gAppearence.Controls.Add(this.xRankPrefixesInList);
-            this.gAppearence.Controls.Add(this.xRankPrefixesInChat);
-            this.gAppearence.Controls.Add(this.xRankColorsInChat);
-            this.gAppearence.Location = new System.Drawing.Point(7, 153);
-            this.gAppearence.Name = "gAppearence";
-            this.gAppearence.Size = new System.Drawing.Size(637, 97);
-            this.gAppearence.TabIndex = 1;
-            this.gAppearence.TabStop = false;
-            this.gAppearence.Text = "Appearence Tweaks";
-            // 
-            // xShowConnectionMessages
-            // 
-            this.xShowConnectionMessages.AutoSize = true;
-            this.xShowConnectionMessages.Location = new System.Drawing.Point(325, 45);
-            this.xShowConnectionMessages.Name = "xShowConnectionMessages";
-            this.xShowConnectionMessages.Size = new System.Drawing.Size(306, 19);
-            this.xShowConnectionMessages.TabIndex = 4;
-            this.xShowConnectionMessages.Text = "Show a message when players join/leave SERVER.";
-            this.xShowConnectionMessages.UseVisualStyleBackColor = true;
-            // 
-            // xShowJoinedWorldMessages
-            // 
-            this.xShowJoinedWorldMessages.AutoSize = true;
-            this.xShowJoinedWorldMessages.Location = new System.Drawing.Point(325, 20);
-            this.xShowJoinedWorldMessages.Name = "xShowJoinedWorldMessages";
-            this.xShowJoinedWorldMessages.Size = new System.Drawing.Size(261, 19);
-            this.xShowJoinedWorldMessages.TabIndex = 3;
-            this.xShowJoinedWorldMessages.Text = "Show a message when players join worlds.";
-            this.xShowJoinedWorldMessages.UseVisualStyleBackColor = true;
-            // 
-            // xRankColorsInWorldNames
-            // 
-            this.xRankColorsInWorldNames.AutoSize = true;
-            this.xRankColorsInWorldNames.Location = new System.Drawing.Point(325, 70);
-            this.xRankColorsInWorldNames.Name = "xRankColorsInWorldNames";
-            this.xRankColorsInWorldNames.Size = new System.Drawing.Size(243, 19);
-            this.xRankColorsInWorldNames.TabIndex = 5;
-            this.xRankColorsInWorldNames.Text = "Color world names based on build rank.";
-            this.xRankColorsInWorldNames.UseVisualStyleBackColor = true;
-            // 
-            // xRankPrefixesInList
-            // 
-            this.xRankPrefixesInList.AutoSize = true;
-            this.xRankPrefixesInList.Location = new System.Drawing.Point(44, 70);
-            this.xRankPrefixesInList.Name = "xRankPrefixesInList";
-            this.xRankPrefixesInList.Size = new System.Drawing.Size(219, 19);
-            this.xRankPrefixesInList.TabIndex = 2;
-            this.xRankPrefixesInList.Text = "Prefixes in player list (breaks skins).";
-            this.xRankPrefixesInList.UseVisualStyleBackColor = true;
-            // 
-            // xRankPrefixesInChat
-            // 
-            this.xRankPrefixesInChat.AutoSize = true;
-            this.xRankPrefixesInChat.Location = new System.Drawing.Point(25, 45);
-            this.xRankPrefixesInChat.Name = "xRankPrefixesInChat";
-            this.xRankPrefixesInChat.Size = new System.Drawing.Size(133, 19);
-            this.xRankPrefixesInChat.TabIndex = 1;
-            this.xRankPrefixesInChat.Text = "Show rank prefixes.";
-            this.xRankPrefixesInChat.UseVisualStyleBackColor = true;
-            this.xRankPrefixesInChat.CheckedChanged += new System.EventHandler(this.xRankPrefixesInChat_CheckedChanged);
-            // 
-            // xRankColorsInChat
-            // 
-            this.xRankColorsInChat.AutoSize = true;
-            this.xRankColorsInChat.Location = new System.Drawing.Point(25, 20);
-            this.xRankColorsInChat.Name = "xRankColorsInChat";
-            this.xRankColorsInChat.Size = new System.Drawing.Size(123, 19);
-            this.xRankColorsInChat.TabIndex = 0;
-            this.xRankColorsInChat.Text = "Show rank colors.";
-            this.xRankColorsInChat.UseVisualStyleBackColor = true;
-            // 
-            // chatPreview
-            // 
-            this.chatPreview.Location = new System.Drawing.Point(7, 256);
-            this.chatPreview.Name = "chatPreview";
-            this.chatPreview.Size = new System.Drawing.Size(637, 241);
-            this.chatPreview.TabIndex = 2;
-            // 
             // tabWorlds
             // 
+            this.tabWorlds.BackColor = System.Drawing.Color.IndianRed;
             this.tabWorlds.Controls.Add(this.xWoMEnableEnvExtensions);
             this.tabWorlds.Controls.Add(this.bMapPath);
             this.tabWorlds.Controls.Add(this.xMapPath);
@@ -1163,7 +1203,6 @@ namespace fCraft.ConfigGUI {
             this.tabWorlds.Size = new System.Drawing.Size(652, 482);
             this.tabWorlds.TabIndex = 9;
             this.tabWorlds.Text = "Worlds";
-            this.tabWorlds.UseVisualStyleBackColor = true;
             // 
             // xWoMEnableEnvExtensions
             // 
@@ -1171,21 +1210,25 @@ namespace fCraft.ConfigGUI {
             this.xWoMEnableEnvExtensions.AutoSize = true;
             this.xWoMEnableEnvExtensions.Location = new System.Drawing.Point(8, 436);
             this.xWoMEnableEnvExtensions.Name = "xWoMEnableEnvExtensions";
-            this.xWoMEnableEnvExtensions.Size = new System.Drawing.Size(267, 19);
+            this.xWoMEnableEnvExtensions.Size = new System.Drawing.Size(251, 19);
             this.xWoMEnableEnvExtensions.TabIndex = 22;
-            this.xWoMEnableEnvExtensions.Text = "Enable WoM environment extensions (/Env).";
+            this.xWoMEnableEnvExtensions.Text = "Enable Env Extensions (/MapEdit or /Env)";
             this.xWoMEnableEnvExtensions.UseVisualStyleBackColor = true;
             // 
             // bMapPath
             // 
             this.bMapPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bMapPath.BackColor = System.Drawing.Color.WhiteSmoke;
             this.bMapPath.Enabled = false;
+            this.bMapPath.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bMapPath.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bMapPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bMapPath.Location = new System.Drawing.Point(587, 409);
             this.bMapPath.Name = "bMapPath";
-            this.bMapPath.Size = new System.Drawing.Size(57, 23);
+            this.bMapPath.Size = new System.Drawing.Size(62, 23);
             this.bMapPath.TabIndex = 10;
             this.bMapPath.Text = "Browse";
-            this.bMapPath.UseVisualStyleBackColor = true;
+            this.bMapPath.UseVisualStyleBackColor = false;
             this.bMapPath.Click += new System.EventHandler(this.bMapPath_Click);
             // 
             // xMapPath
@@ -1225,6 +1268,7 @@ namespace fCraft.ConfigGUI {
             // 
             this.cDefaultBuildRank.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cDefaultBuildRank.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cDefaultBuildRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cDefaultBuildRank.FormattingEnabled = true;
             this.cDefaultBuildRank.Location = new System.Drawing.Point(372, 378);
             this.cDefaultBuildRank.Name = "cDefaultBuildRank";
@@ -1236,6 +1280,7 @@ namespace fCraft.ConfigGUI {
             // 
             this.cMainWorld.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cMainWorld.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cMainWorld.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cMainWorld.Location = new System.Drawing.Point(542, 17);
             this.cMainWorld.Name = "cMainWorld";
             this.cMainWorld.Size = new System.Drawing.Size(102, 23);
@@ -1253,34 +1298,46 @@ namespace fCraft.ConfigGUI {
             // 
             // bWorldEdit
             // 
+            this.bWorldEdit.BackColor = System.Drawing.Color.WhiteSmoke;
             this.bWorldEdit.Enabled = false;
+            this.bWorldEdit.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bWorldEdit.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bWorldEdit.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bWorldEdit.Location = new System.Drawing.Point(114, 13);
             this.bWorldEdit.Name = "bWorldEdit";
             this.bWorldEdit.Size = new System.Drawing.Size(100, 28);
             this.bWorldEdit.TabIndex = 2;
             this.bWorldEdit.Text = "Edit";
-            this.bWorldEdit.UseVisualStyleBackColor = true;
+            this.bWorldEdit.UseVisualStyleBackColor = false;
             this.bWorldEdit.Click += new System.EventHandler(this.bWorldEdit_Click);
             // 
             // bAddWorld
             // 
+            this.bAddWorld.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bAddWorld.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bAddWorld.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bAddWorld.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bAddWorld.Location = new System.Drawing.Point(8, 13);
             this.bAddWorld.Name = "bAddWorld";
             this.bAddWorld.Size = new System.Drawing.Size(100, 28);
             this.bAddWorld.TabIndex = 1;
             this.bAddWorld.Text = "Add World";
-            this.bAddWorld.UseVisualStyleBackColor = true;
+            this.bAddWorld.UseVisualStyleBackColor = false;
             this.bAddWorld.Click += new System.EventHandler(this.bAddWorld_Click);
             // 
             // bWorldDelete
             // 
+            this.bWorldDelete.BackColor = System.Drawing.Color.WhiteSmoke;
             this.bWorldDelete.Enabled = false;
+            this.bWorldDelete.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bWorldDelete.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bWorldDelete.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bWorldDelete.Location = new System.Drawing.Point(220, 13);
             this.bWorldDelete.Name = "bWorldDelete";
             this.bWorldDelete.Size = new System.Drawing.Size(100, 28);
             this.bWorldDelete.TabIndex = 3;
             this.bWorldDelete.Text = "Delete World";
-            this.bWorldDelete.UseVisualStyleBackColor = true;
+            this.bWorldDelete.UseVisualStyleBackColor = false;
             this.bWorldDelete.Click += new System.EventHandler(this.bWorldDel_Click);
             // 
             // dgvWorlds
@@ -1374,6 +1431,7 @@ namespace fCraft.ConfigGUI {
             // 
             // tabRanks
             // 
+            this.tabRanks.BackColor = System.Drawing.Color.IndianRed;
             this.tabRanks.Controls.Add(this.gPermissionLimits);
             this.tabRanks.Controls.Add(this.lRankList);
             this.tabRanks.Controls.Add(this.bLowerRank);
@@ -1390,7 +1448,6 @@ namespace fCraft.ConfigGUI {
             this.tabRanks.Size = new System.Drawing.Size(652, 482);
             this.tabRanks.TabIndex = 2;
             this.tabRanks.Text = "Ranks";
-            this.tabRanks.UseVisualStyleBackColor = true;
             // 
             // gPermissionLimits
             // 
@@ -1429,23 +1486,31 @@ namespace fCraft.ConfigGUI {
             // bLowerRank
             // 
             this.bLowerRank.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bLowerRank.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bLowerRank.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bLowerRank.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
+            this.bLowerRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bLowerRank.Location = new System.Drawing.Point(84, 455);
             this.bLowerRank.Name = "bLowerRank";
             this.bLowerRank.Size = new System.Drawing.Size(70, 23);
             this.bLowerRank.TabIndex = 5;
             this.bLowerRank.Text = "▼ Lower";
-            this.bLowerRank.UseVisualStyleBackColor = true;
+            this.bLowerRank.UseVisualStyleBackColor = false;
             this.bLowerRank.Click += new System.EventHandler(this.bLowerRank_Click);
             // 
             // bRaiseRank
             // 
             this.bRaiseRank.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bRaiseRank.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bRaiseRank.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bRaiseRank.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
+            this.bRaiseRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bRaiseRank.Location = new System.Drawing.Point(8, 455);
             this.bRaiseRank.Name = "bRaiseRank";
             this.bRaiseRank.Size = new System.Drawing.Size(70, 23);
             this.bRaiseRank.TabIndex = 4;
             this.bRaiseRank.Text = "▲ Raise";
-            this.bRaiseRank.UseVisualStyleBackColor = true;
+            this.bRaiseRank.UseVisualStyleBackColor = false;
             this.bRaiseRank.Click += new System.EventHandler(this.bRaiseRank_Click);
             // 
             // gRankOptions
@@ -1758,12 +1823,16 @@ namespace fCraft.ConfigGUI {
             // 
             // bDeleteRank
             // 
+            this.bDeleteRank.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bDeleteRank.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bDeleteRank.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
+            this.bDeleteRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bDeleteRank.Location = new System.Drawing.Point(84, 28);
             this.bDeleteRank.Name = "bDeleteRank";
             this.bDeleteRank.Size = new System.Drawing.Size(70, 23);
             this.bDeleteRank.TabIndex = 3;
             this.bDeleteRank.Text = "Delete";
-            this.bDeleteRank.UseVisualStyleBackColor = true;
+            this.bDeleteRank.UseVisualStyleBackColor = false;
             this.bDeleteRank.Click += new System.EventHandler(this.bDeleteRank_Click);
             // 
             // vPermissions
@@ -1792,12 +1861,16 @@ namespace fCraft.ConfigGUI {
             // 
             // bAddRank
             // 
+            this.bAddRank.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bAddRank.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bAddRank.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
+            this.bAddRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bAddRank.Location = new System.Drawing.Point(8, 28);
             this.bAddRank.Name = "bAddRank";
             this.bAddRank.Size = new System.Drawing.Size(70, 23);
             this.bAddRank.TabIndex = 2;
             this.bAddRank.Text = "Add Rank";
-            this.bAddRank.UseVisualStyleBackColor = true;
+            this.bAddRank.UseVisualStyleBackColor = false;
             this.bAddRank.Click += new System.EventHandler(this.bAddRank_Click);
             // 
             // lPermissions
@@ -1826,6 +1899,7 @@ namespace fCraft.ConfigGUI {
             // 
             // tabSecurity
             // 
+            this.tabSecurity.BackColor = System.Drawing.Color.IndianRed;
             this.tabSecurity.Controls.Add(this.gBlockDB);
             this.tabSecurity.Controls.Add(this.gSecurityMisc);
             this.tabSecurity.Controls.Add(this.gSpamChat);
@@ -1836,7 +1910,6 @@ namespace fCraft.ConfigGUI {
             this.tabSecurity.Size = new System.Drawing.Size(652, 482);
             this.tabSecurity.TabIndex = 7;
             this.tabSecurity.Text = "Security";
-            this.tabSecurity.UseVisualStyleBackColor = true;
             // 
             // gBlockDB
             // 
@@ -1853,8 +1926,9 @@ namespace fCraft.ConfigGUI {
             // cBlockDBAutoEnableRank
             // 
             this.cBlockDBAutoEnableRank.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cBlockDBAutoEnableRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cBlockDBAutoEnableRank.FormattingEnabled = true;
-            this.cBlockDBAutoEnableRank.Location = new System.Drawing.Point(442, 53);
+            this.cBlockDBAutoEnableRank.Location = new System.Drawing.Point(408, 55);
             this.cBlockDBAutoEnableRank.Name = "cBlockDBAutoEnableRank";
             this.cBlockDBAutoEnableRank.Size = new System.Drawing.Size(121, 23);
             this.cBlockDBAutoEnableRank.TabIndex = 2;
@@ -1865,7 +1939,7 @@ namespace fCraft.ConfigGUI {
             // 
             this.xBlockDBAutoEnable.AutoSize = true;
             this.xBlockDBAutoEnable.Enabled = false;
-            this.xBlockDBAutoEnable.Location = new System.Drawing.Point(76, 55);
+            this.xBlockDBAutoEnable.Location = new System.Drawing.Point(42, 55);
             this.xBlockDBAutoEnable.Name = "xBlockDBAutoEnable";
             this.xBlockDBAutoEnable.Size = new System.Drawing.Size(360, 19);
             this.xBlockDBAutoEnable.TabIndex = 1;
@@ -1887,10 +1961,8 @@ namespace fCraft.ConfigGUI {
             // 
             // gSecurityMisc
             // 
-            this.gSecurityMisc.Controls.Add(this.xAllowEmailAccounts);
             this.gSecurityMisc.Controls.Add(this.xAnnounceRankChangeReasons);
             this.gSecurityMisc.Controls.Add(this.xRequireKickReason);
-            this.gSecurityMisc.Controls.Add(this.xAllowFreePlayers);
             this.gSecurityMisc.Controls.Add(this.lPatrolledRankAndBelow);
             this.gSecurityMisc.Controls.Add(this.cPatrolledRank);
             this.gSecurityMisc.Controls.Add(this.lPatrolledRank);
@@ -1905,20 +1977,10 @@ namespace fCraft.ConfigGUI {
             this.gSecurityMisc.TabStop = false;
             this.gSecurityMisc.Text = "Misc";
             // 
-            // xAllowEmailAccounts
-            // 
-            this.xAllowEmailAccounts.AutoSize = true;
-            this.xAllowEmailAccounts.Location = new System.Drawing.Point(76, 45);
-            this.xAllowEmailAccounts.Name = "xAllowEmailAccounts";
-            this.xAllowEmailAccounts.Size = new System.Drawing.Size(201, 19);
-            this.xAllowEmailAccounts.TabIndex = 10;
-            this.xAllowEmailAccounts.Text = "Allow emails / Mojang accounts.";
-            this.xAllowEmailAccounts.UseVisualStyleBackColor = true;
-            // 
             // xAnnounceRankChangeReasons
             // 
             this.xAnnounceRankChangeReasons.AutoSize = true;
-            this.xAnnounceRankChangeReasons.Location = new System.Drawing.Point(368, 133);
+            this.xAnnounceRankChangeReasons.Location = new System.Drawing.Point(304, 109);
             this.xAnnounceRankChangeReasons.Name = "xAnnounceRankChangeReasons";
             this.xAnnounceRankChangeReasons.Size = new System.Drawing.Size(253, 19);
             this.xAnnounceRankChangeReasons.TabIndex = 6;
@@ -1928,28 +1990,17 @@ namespace fCraft.ConfigGUI {
             // xRequireKickReason
             // 
             this.xRequireKickReason.AutoSize = true;
-            this.xRequireKickReason.Location = new System.Drawing.Point(42, 83);
+            this.xRequireKickReason.Location = new System.Drawing.Point(42, 59);
             this.xRequireKickReason.Name = "xRequireKickReason";
             this.xRequireKickReason.Size = new System.Drawing.Size(135, 19);
             this.xRequireKickReason.TabIndex = 1;
             this.xRequireKickReason.Text = "Require kick reason";
             this.xRequireKickReason.UseVisualStyleBackColor = true;
             // 
-            // xAllowFreePlayers
-            // 
-            this.xAllowFreePlayers.AutoSize = true;
-            this.xAllowFreePlayers.Location = new System.Drawing.Point(42, 20);
-            this.xAllowFreePlayers.Name = "xAllowFreePlayers";
-            this.xAllowFreePlayers.Size = new System.Drawing.Size(226, 19);
-            this.xAllowFreePlayers.TabIndex = 0;
-            this.xAllowFreePlayers.Text = "Allow free accounts (recommended).";
-            this.xAllowFreePlayers.UseVisualStyleBackColor = true;
-            this.xAllowFreePlayers.CheckedChanged += new System.EventHandler(this.xAllowFreePlayers_CheckedChanged);
-            // 
             // lPatrolledRankAndBelow
             // 
             this.lPatrolledRankAndBelow.AutoSize = true;
-            this.lPatrolledRankAndBelow.Location = new System.Drawing.Point(548, 23);
+            this.lPatrolledRankAndBelow.Location = new System.Drawing.Point(257, 143);
             this.lPatrolledRankAndBelow.Name = "lPatrolledRankAndBelow";
             this.lPatrolledRankAndBelow.Size = new System.Drawing.Size(72, 15);
             this.lPatrolledRankAndBelow.TabIndex = 9;
@@ -1958,8 +2009,9 @@ namespace fCraft.ConfigGUI {
             // cPatrolledRank
             // 
             this.cPatrolledRank.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cPatrolledRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cPatrolledRank.FormattingEnabled = true;
-            this.cPatrolledRank.Location = new System.Drawing.Point(419, 20);
+            this.cPatrolledRank.Location = new System.Drawing.Point(128, 140);
             this.cPatrolledRank.Name = "cPatrolledRank";
             this.cPatrolledRank.Size = new System.Drawing.Size(123, 23);
             this.cPatrolledRank.TabIndex = 8;
@@ -1968,7 +2020,7 @@ namespace fCraft.ConfigGUI {
             // lPatrolledRank
             // 
             this.lPatrolledRank.AutoSize = true;
-            this.lPatrolledRank.Location = new System.Drawing.Point(330, 23);
+            this.lPatrolledRank.Location = new System.Drawing.Point(39, 143);
             this.lPatrolledRank.Name = "lPatrolledRank";
             this.lPatrolledRank.Size = new System.Drawing.Size(83, 15);
             this.lPatrolledRank.TabIndex = 7;
@@ -1977,7 +2029,7 @@ namespace fCraft.ConfigGUI {
             // xAnnounceRankChanges
             // 
             this.xAnnounceRankChanges.AutoSize = true;
-            this.xAnnounceRankChanges.Location = new System.Drawing.Point(336, 108);
+            this.xAnnounceRankChanges.Location = new System.Drawing.Point(304, 84);
             this.xAnnounceRankChanges.Name = "xAnnounceRankChanges";
             this.xAnnounceRankChanges.Size = new System.Drawing.Size(231, 19);
             this.xAnnounceRankChanges.TabIndex = 5;
@@ -1988,7 +2040,7 @@ namespace fCraft.ConfigGUI {
             // xAnnounceKickAndBanReasons
             // 
             this.xAnnounceKickAndBanReasons.AutoSize = true;
-            this.xAnnounceKickAndBanReasons.Location = new System.Drawing.Point(336, 83);
+            this.xAnnounceKickAndBanReasons.Location = new System.Drawing.Point(304, 59);
             this.xAnnounceKickAndBanReasons.Name = "xAnnounceKickAndBanReasons";
             this.xAnnounceKickAndBanReasons.Size = new System.Drawing.Size(244, 19);
             this.xAnnounceKickAndBanReasons.TabIndex = 4;
@@ -1998,7 +2050,7 @@ namespace fCraft.ConfigGUI {
             // xRequireRankChangeReason
             // 
             this.xRequireRankChangeReason.AutoSize = true;
-            this.xRequireRankChangeReason.Location = new System.Drawing.Point(42, 133);
+            this.xRequireRankChangeReason.Location = new System.Drawing.Point(42, 109);
             this.xRequireRankChangeReason.Name = "xRequireRankChangeReason";
             this.xRequireRankChangeReason.Size = new System.Drawing.Size(236, 19);
             this.xRequireRankChangeReason.TabIndex = 3;
@@ -2008,7 +2060,7 @@ namespace fCraft.ConfigGUI {
             // xRequireBanReason
             // 
             this.xRequireBanReason.AutoSize = true;
-            this.xRequireBanReason.Location = new System.Drawing.Point(42, 108);
+            this.xRequireBanReason.Location = new System.Drawing.Point(42, 84);
             this.xRequireBanReason.Name = "xRequireBanReason";
             this.xRequireBanReason.Size = new System.Drawing.Size(184, 19);
             this.xRequireBanReason.TabIndex = 2;
@@ -2017,17 +2069,17 @@ namespace fCraft.ConfigGUI {
             // 
             // gSpamChat
             // 
-            this.gSpamChat.Controls.Add(this.xAntispamMuteDuration);
-            this.gSpamChat.Controls.Add(this.xAntispamMessageCount);
             this.gSpamChat.Controls.Add(this.lAntispamMaxWarnings);
             this.gSpamChat.Controls.Add(this.nAntispamMaxWarnings);
             this.gSpamChat.Controls.Add(this.xAntispamKicks);
-            this.gSpamChat.Controls.Add(this.lAntispamMuteDurationUnits);
-            this.gSpamChat.Controls.Add(this.lAntispamIntervalUnits);
-            this.gSpamChat.Controls.Add(this.nAntispamMuteDuration);
+            this.gSpamChat.Controls.Add(this.lSpamMuteSeconds);
+            this.gSpamChat.Controls.Add(this.lAntispamInterval);
+            this.gSpamChat.Controls.Add(this.nSpamMute);
+            this.gSpamChat.Controls.Add(this.lSpamMute);
             this.gSpamChat.Controls.Add(this.nAntispamInterval);
             this.gSpamChat.Controls.Add(this.lAntispamMessageCount);
             this.gSpamChat.Controls.Add(this.nAntispamMessageCount);
+            this.gSpamChat.Controls.Add(this.lSpamChat);
             this.gSpamChat.Location = new System.Drawing.Point(8, 194);
             this.gSpamChat.Name = "gSpamChat";
             this.gSpamChat.Size = new System.Drawing.Size(636, 94);
@@ -2035,34 +2087,10 @@ namespace fCraft.ConfigGUI {
             this.gSpamChat.TabStop = false;
             this.gSpamChat.Text = "Chat Spam Prevention";
             // 
-            // xAntispamMuteDuration
-            // 
-            this.xAntispamMuteDuration.AutoSize = true;
-            this.xAntispamMuteDuration.Enabled = false;
-            this.xAntispamMuteDuration.Location = new System.Drawing.Point(42, 60);
-            this.xAntispamMuteDuration.Name = "xAntispamMuteDuration";
-            this.xAntispamMuteDuration.Size = new System.Drawing.Size(127, 19);
-            this.xAntispamMuteDuration.TabIndex = 12;
-            this.xAntispamMuteDuration.Text = "Mute spammer for";
-            this.xAntispamMuteDuration.UseVisualStyleBackColor = true;
-            this.xAntispamMuteDuration.CheckedChanged += new System.EventHandler(this.xAntispamMuteDuration_CheckedChanged);
-            // 
-            // xAntispamMessageCount
-            // 
-            this.xAntispamMessageCount.AutoSize = true;
-            this.xAntispamMessageCount.Location = new System.Drawing.Point(42, 26);
-            this.xAntispamMessageCount.Name = "xAntispamMessageCount";
-            this.xAntispamMessageCount.Size = new System.Drawing.Size(116, 19);
-            this.xAntispamMessageCount.TabIndex = 11;
-            this.xAntispamMessageCount.Text = "Limit chat rate to";
-            this.xAntispamMessageCount.UseVisualStyleBackColor = true;
-            this.xAntispamMessageCount.CheckedChanged += new System.EventHandler(this.xAntispamMessageCount_CheckedChanged);
-            // 
             // lAntispamMaxWarnings
             // 
             this.lAntispamMaxWarnings.AutoSize = true;
-            this.lAntispamMaxWarnings.Enabled = false;
-            this.lAntispamMaxWarnings.Location = new System.Drawing.Point(569, 61);
+            this.lAntispamMaxWarnings.Location = new System.Drawing.Point(454, 62);
             this.lAntispamMaxWarnings.Name = "lAntispamMaxWarnings";
             this.lAntispamMaxWarnings.Size = new System.Drawing.Size(57, 15);
             this.lAntispamMaxWarnings.TabIndex = 10;
@@ -2070,8 +2098,7 @@ namespace fCraft.ConfigGUI {
             // 
             // nAntispamMaxWarnings
             // 
-            this.nAntispamMaxWarnings.Enabled = false;
-            this.nAntispamMaxWarnings.Location = new System.Drawing.Point(501, 59);
+            this.nAntispamMaxWarnings.Location = new System.Drawing.Point(386, 60);
             this.nAntispamMaxWarnings.Name = "nAntispamMaxWarnings";
             this.nAntispamMaxWarnings.Size = new System.Drawing.Size(62, 21);
             this.nAntispamMaxWarnings.TabIndex = 9;
@@ -2079,8 +2106,7 @@ namespace fCraft.ConfigGUI {
             // xAntispamKicks
             // 
             this.xAntispamKicks.AutoSize = true;
-            this.xAntispamKicks.Enabled = false;
-            this.xAntispamKicks.Location = new System.Drawing.Point(419, 60);
+            this.xAntispamKicks.Location = new System.Drawing.Point(304, 61);
             this.xAntispamKicks.Name = "xAntispamKicks";
             this.xAntispamKicks.Size = new System.Drawing.Size(76, 19);
             this.xAntispamKicks.TabIndex = 8;
@@ -2088,45 +2114,50 @@ namespace fCraft.ConfigGUI {
             this.xAntispamKicks.UseVisualStyleBackColor = true;
             this.xAntispamKicks.CheckedChanged += new System.EventHandler(this.xSpamChatKick_CheckedChanged);
             // 
-            // lAntispamMuteDurationUnits
+            // lSpamMuteSeconds
             // 
-            this.lAntispamMuteDurationUnits.AutoSize = true;
-            this.lAntispamMuteDurationUnits.Enabled = false;
-            this.lAntispamMuteDurationUnits.Location = new System.Drawing.Point(243, 61);
-            this.lAntispamMuteDurationUnits.Name = "lAntispamMuteDurationUnits";
-            this.lAntispamMuteDurationUnits.Size = new System.Drawing.Size(53, 15);
-            this.lAntispamMuteDurationUnits.TabIndex = 7;
-            this.lAntispamMuteDurationUnits.Text = "seconds";
+            this.lSpamMuteSeconds.AutoSize = true;
+            this.lSpamMuteSeconds.Location = new System.Drawing.Point(221, 62);
+            this.lSpamMuteSeconds.Name = "lSpamMuteSeconds";
+            this.lSpamMuteSeconds.Size = new System.Drawing.Size(53, 15);
+            this.lSpamMuteSeconds.TabIndex = 7;
+            this.lSpamMuteSeconds.Text = "seconds";
             // 
-            // lAntispamIntervalUnits
+            // lAntispamInterval
             // 
-            this.lAntispamIntervalUnits.AutoSize = true;
-            this.lAntispamIntervalUnits.Enabled = false;
-            this.lAntispamIntervalUnits.Location = new System.Drawing.Point(383, 27);
-            this.lAntispamIntervalUnits.Name = "lAntispamIntervalUnits";
-            this.lAntispamIntervalUnits.Size = new System.Drawing.Size(53, 15);
-            this.lAntispamIntervalUnits.TabIndex = 4;
-            this.lAntispamIntervalUnits.Text = "seconds";
+            this.lAntispamInterval.AutoSize = true;
+            this.lAntispamInterval.Location = new System.Drawing.Point(372, 27);
+            this.lAntispamInterval.Name = "lAntispamInterval";
+            this.lAntispamInterval.Size = new System.Drawing.Size(53, 15);
+            this.lAntispamInterval.TabIndex = 4;
+            this.lAntispamInterval.Text = "seconds";
             // 
-            // nAntispamMuteDuration
+            // nSpamMute
             // 
-            this.nAntispamMuteDuration.Enabled = false;
-            this.nAntispamMuteDuration.Location = new System.Drawing.Point(175, 59);
-            this.nAntispamMuteDuration.Name = "nAntispamMuteDuration";
-            this.nAntispamMuteDuration.Size = new System.Drawing.Size(62, 21);
-            this.nAntispamMuteDuration.TabIndex = 6;
-            this.nAntispamMuteDuration.Value = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.nSpamMute.Location = new System.Drawing.Point(153, 59);
+            this.nSpamMute.Name = "nSpamMute";
+            this.nSpamMute.Size = new System.Drawing.Size(62, 21);
+            this.nSpamMute.TabIndex = 6;
+            // 
+            // lSpamMute
+            // 
+            this.lSpamMute.AutoSize = true;
+            this.lSpamMute.Location = new System.Drawing.Point(39, 62);
+            this.lSpamMute.Name = "lSpamMute";
+            this.lSpamMute.Size = new System.Drawing.Size(108, 15);
+            this.lSpamMute.TabIndex = 5;
+            this.lSpamMute.Text = "Mute spammer for";
             // 
             // nAntispamInterval
             // 
-            this.nAntispamInterval.Enabled = false;
-            this.nAntispamInterval.Location = new System.Drawing.Point(315, 25);
+            this.nAntispamInterval.Location = new System.Drawing.Point(304, 25);
             this.nAntispamInterval.Maximum = new decimal(new int[] {
             50,
+            0,
+            0,
+            0});
+            this.nAntispamInterval.Minimum = new decimal(new int[] {
+            1,
             0,
             0,
             0});
@@ -2142,8 +2173,7 @@ namespace fCraft.ConfigGUI {
             // lAntispamMessageCount
             // 
             this.lAntispamMessageCount.AutoSize = true;
-            this.lAntispamMessageCount.Enabled = false;
-            this.lAntispamMessageCount.Location = new System.Drawing.Point(232, 27);
+            this.lAntispamMessageCount.Location = new System.Drawing.Point(219, 27);
             this.lAntispamMessageCount.Name = "lAntispamMessageCount";
             this.lAntispamMessageCount.Size = new System.Drawing.Size(77, 15);
             this.lAntispamMessageCount.TabIndex = 2;
@@ -2151,10 +2181,14 @@ namespace fCraft.ConfigGUI {
             // 
             // nAntispamMessageCount
             // 
-            this.nAntispamMessageCount.Enabled = false;
-            this.nAntispamMessageCount.Location = new System.Drawing.Point(164, 25);
+            this.nAntispamMessageCount.Location = new System.Drawing.Point(153, 25);
             this.nAntispamMessageCount.Maximum = new decimal(new int[] {
             50,
+            0,
+            0,
+            0});
+            this.nAntispamMessageCount.Minimum = new decimal(new int[] {
+            2,
             0,
             0,
             0});
@@ -2167,8 +2201,18 @@ namespace fCraft.ConfigGUI {
             0,
             0});
             // 
+            // lSpamChat
+            // 
+            this.lSpamChat.AutoSize = true;
+            this.lSpamChat.Location = new System.Drawing.Point(39, 31);
+            this.lSpamChat.Name = "lSpamChat";
+            this.lSpamChat.Size = new System.Drawing.Size(97, 15);
+            this.lSpamChat.TabIndex = 0;
+            this.lSpamChat.Text = "Limit chat rate to";
+            // 
             // gVerify
             // 
+            this.gVerify.BackColor = System.Drawing.Color.IndianRed;
             this.gVerify.Controls.Add(this.nMaxConnectionsPerIP);
             this.gVerify.Controls.Add(this.xAllowUnverifiedLAN);
             this.gVerify.Controls.Add(this.xMaxConnectionsPerIP);
@@ -2232,6 +2276,7 @@ namespace fCraft.ConfigGUI {
             // cVerifyNames
             // 
             this.cVerifyNames.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cVerifyNames.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cVerifyNames.FormattingEnabled = true;
             this.cVerifyNames.Items.AddRange(new object[] {
             "None (Unsafe)",
@@ -2243,18 +2288,54 @@ namespace fCraft.ConfigGUI {
             this.cVerifyNames.TabIndex = 1;
             this.cVerifyNames.SelectedIndexChanged += new System.EventHandler(this.cVerifyNames_SelectedIndexChanged);
             // 
-            // tabSavingAndBackup
+            // gUpdate
             // 
-            this.tabSavingAndBackup.Controls.Add(this.gDataBackup);
-            this.tabSavingAndBackup.Controls.Add(this.gSaving);
-            this.tabSavingAndBackup.Controls.Add(this.gBackups);
-            this.tabSavingAndBackup.Location = new System.Drawing.Point(4, 24);
-            this.tabSavingAndBackup.Name = "tabSavingAndBackup";
-            this.tabSavingAndBackup.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.tabSavingAndBackup.Size = new System.Drawing.Size(652, 482);
-            this.tabSavingAndBackup.TabIndex = 4;
-            this.tabSavingAndBackup.Text = "Saving and Backup";
-            this.tabSavingAndBackup.UseVisualStyleBackColor = true;
+            this.gUpdate.BackColor = System.Drawing.Color.IndianRed;
+            this.gUpdate.Controls.Add(this.groupBox5);
+            this.gUpdate.Controls.Add(this.gDataBackup);
+            this.gUpdate.Controls.Add(this.gSaving);
+            this.gUpdate.Controls.Add(this.gBackups);
+            this.gUpdate.Location = new System.Drawing.Point(4, 24);
+            this.gUpdate.Name = "gUpdate";
+            this.gUpdate.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
+            this.gUpdate.Size = new System.Drawing.Size(652, 482);
+            this.gUpdate.TabIndex = 4;
+            this.gUpdate.Text = "Saving and Backup";
+            // 
+            // groupBox5
+            // 
+            this.groupBox5.Controls.Add(this.bUpdate);
+            this.groupBox5.Controls.Add(this.checkUpdate);
+            this.groupBox5.Location = new System.Drawing.Point(8, 293);
+            this.groupBox5.Name = "groupBox5";
+            this.groupBox5.Size = new System.Drawing.Size(635, 54);
+            this.groupBox5.TabIndex = 3;
+            this.groupBox5.TabStop = false;
+            this.groupBox5.Text = "Update";
+            // 
+            // bUpdate
+            // 
+            this.bUpdate.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bUpdate.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bUpdate.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bUpdate.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bUpdate.Location = new System.Drawing.Point(221, 14);
+            this.bUpdate.Name = "bUpdate";
+            this.bUpdate.Size = new System.Drawing.Size(205, 28);
+            this.bUpdate.TabIndex = 23;
+            this.bUpdate.Text = "Manual Update Check";
+            this.bUpdate.UseVisualStyleBackColor = false;
+            this.bUpdate.Click += new System.EventHandler(this.bUpdate_Click);
+            // 
+            // checkUpdate
+            // 
+            this.checkUpdate.AutoSize = true;
+            this.checkUpdate.Location = new System.Drawing.Point(11, 20);
+            this.checkUpdate.Name = "checkUpdate";
+            this.checkUpdate.Size = new System.Drawing.Size(201, 19);
+            this.checkUpdate.TabIndex = 22;
+            this.checkUpdate.Text = "Automatically Check for Updates";
+            this.checkUpdate.UseVisualStyleBackColor = true;
             // 
             // gDataBackup
             // 
@@ -2269,7 +2350,7 @@ namespace fCraft.ConfigGUI {
             // xBackupDataOnStartup
             // 
             this.xBackupDataOnStartup.AutoSize = true;
-            this.xBackupDataOnStartup.Location = new System.Drawing.Point(11, 20);
+            this.xBackupDataOnStartup.Location = new System.Drawing.Point(16, 20);
             this.xBackupDataOnStartup.Name = "xBackupDataOnStartup";
             this.xBackupDataOnStartup.Size = new System.Drawing.Size(261, 19);
             this.xBackupDataOnStartup.TabIndex = 0;
@@ -2291,11 +2372,6 @@ namespace fCraft.ConfigGUI {
             // nSaveInterval
             // 
             this.nSaveInterval.Location = new System.Drawing.Point(136, 20);
-            this.nSaveInterval.Maximum = new decimal(new int[] {
-            86400,
-            0,
-            0,
-            0});
             this.nSaveInterval.Name = "nSaveInterval";
             this.nSaveInterval.Size = new System.Drawing.Size(48, 21);
             this.nSaveInterval.TabIndex = 1;
@@ -2323,17 +2399,17 @@ namespace fCraft.ConfigGUI {
             // gBackups
             // 
             this.gBackups.Controls.Add(this.xBackupOnlyWhenChanged);
-            this.gBackups.Controls.Add(this.xBackupOnStartup);
             this.gBackups.Controls.Add(this.lMaxBackupSize);
             this.gBackups.Controls.Add(this.xMaxBackupSize);
             this.gBackups.Controls.Add(this.nMaxBackupSize);
             this.gBackups.Controls.Add(this.xMaxBackups);
+            this.gBackups.Controls.Add(this.xBackupOnStartup);
             this.gBackups.Controls.Add(this.lMaxBackups);
             this.gBackups.Controls.Add(this.nMaxBackups);
             this.gBackups.Controls.Add(this.nBackupInterval);
             this.gBackups.Controls.Add(this.lBackupIntervalUnits);
             this.gBackups.Controls.Add(this.xBackupInterval);
-            this.gBackups.Controls.Add(this.xBackupOnMapChange);
+            this.gBackups.Controls.Add(this.xBackupOnJoin);
             this.gBackups.Location = new System.Drawing.Point(8, 71);
             this.gBackups.Name = "gBackups";
             this.gBackups.Size = new System.Drawing.Size(636, 158);
@@ -2344,27 +2420,17 @@ namespace fCraft.ConfigGUI {
             // xBackupOnlyWhenChanged
             // 
             this.xBackupOnlyWhenChanged.AutoSize = true;
-            this.xBackupOnlyWhenChanged.Location = new System.Drawing.Point(334, 20);
+            this.xBackupOnlyWhenChanged.Location = new System.Drawing.Point(369, 46);
             this.xBackupOnlyWhenChanged.Name = "xBackupOnlyWhenChanged";
             this.xBackupOnlyWhenChanged.Size = new System.Drawing.Size(260, 19);
             this.xBackupOnlyWhenChanged.TabIndex = 4;
             this.xBackupOnlyWhenChanged.Text = "Skip timed backups if map hasn\'t changed.";
             this.xBackupOnlyWhenChanged.UseVisualStyleBackColor = true;
             // 
-            // xBackupOnStartup
-            // 
-            this.xBackupOnStartup.AutoSize = true;
-            this.xBackupOnStartup.Location = new System.Drawing.Point(11, 71);
-            this.xBackupOnStartup.Name = "xBackupOnStartup";
-            this.xBackupOnStartup.Size = new System.Drawing.Size(272, 19);
-            this.xBackupOnStartup.TabIndex = 0;
-            this.xBackupOnStartup.Text = "Create backups of ALL maps on each startup.";
-            this.xBackupOnStartup.UseVisualStyleBackColor = true;
-            // 
             // lMaxBackupSize
             // 
             this.lMaxBackupSize.AutoSize = true;
-            this.lMaxBackupSize.Location = new System.Drawing.Point(413, 122);
+            this.lMaxBackupSize.Location = new System.Drawing.Point(418, 124);
             this.lMaxBackupSize.Name = "lMaxBackupSize";
             this.lMaxBackupSize.Size = new System.Drawing.Size(103, 15);
             this.lMaxBackupSize.TabIndex = 11;
@@ -2373,7 +2439,7 @@ namespace fCraft.ConfigGUI {
             // xMaxBackupSize
             // 
             this.xMaxBackupSize.AutoSize = true;
-            this.xMaxBackupSize.Location = new System.Drawing.Point(11, 121);
+            this.xMaxBackupSize.Location = new System.Drawing.Point(16, 123);
             this.xMaxBackupSize.Name = "xMaxBackupSize";
             this.xMaxBackupSize.Size = new System.Drawing.Size(317, 19);
             this.xMaxBackupSize.TabIndex = 9;
@@ -2383,7 +2449,7 @@ namespace fCraft.ConfigGUI {
             // 
             // nMaxBackupSize
             // 
-            this.nMaxBackupSize.Location = new System.Drawing.Point(334, 120);
+            this.nMaxBackupSize.Location = new System.Drawing.Point(339, 122);
             this.nMaxBackupSize.Maximum = new decimal(new int[] {
             1000000,
             0,
@@ -2396,7 +2462,7 @@ namespace fCraft.ConfigGUI {
             // xMaxBackups
             // 
             this.xMaxBackups.AutoSize = true;
-            this.xMaxBackups.Location = new System.Drawing.Point(11, 96);
+            this.xMaxBackups.Location = new System.Drawing.Point(16, 98);
             this.xMaxBackups.Name = "xMaxBackups";
             this.xMaxBackups.Size = new System.Drawing.Size(251, 19);
             this.xMaxBackups.TabIndex = 6;
@@ -2404,10 +2470,21 @@ namespace fCraft.ConfigGUI {
             this.xMaxBackups.UseVisualStyleBackColor = true;
             this.xMaxBackups.CheckedChanged += new System.EventHandler(this.xMaxBackups_CheckedChanged);
             // 
+            // xBackupOnStartup
+            // 
+            this.xBackupOnStartup.AutoSize = true;
+            this.xBackupOnStartup.Enabled = false;
+            this.xBackupOnStartup.Location = new System.Drawing.Point(16, 20);
+            this.xBackupOnStartup.Name = "xBackupOnStartup";
+            this.xBackupOnStartup.Size = new System.Drawing.Size(168, 19);
+            this.xBackupOnStartup.TabIndex = 0;
+            this.xBackupOnStartup.Text = "Create backups on startup";
+            this.xBackupOnStartup.UseVisualStyleBackColor = true;
+            // 
             // lMaxBackups
             // 
             this.lMaxBackups.AutoSize = true;
-            this.lMaxBackups.Location = new System.Drawing.Point(331, 97);
+            this.lMaxBackups.Location = new System.Drawing.Point(336, 99);
             this.lMaxBackups.Name = "lMaxBackups";
             this.lMaxBackups.Size = new System.Drawing.Size(157, 15);
             this.lMaxBackups.TabIndex = 8;
@@ -2415,7 +2492,7 @@ namespace fCraft.ConfigGUI {
             // 
             // nMaxBackups
             // 
-            this.nMaxBackups.Location = new System.Drawing.Point(268, 95);
+            this.nMaxBackups.Location = new System.Drawing.Point(273, 97);
             this.nMaxBackups.Maximum = new decimal(new int[] {
             100000,
             0,
@@ -2427,12 +2504,7 @@ namespace fCraft.ConfigGUI {
             // 
             // nBackupInterval
             // 
-            this.nBackupInterval.Location = new System.Drawing.Point(160, 19);
-            this.nBackupInterval.Maximum = new decimal(new int[] {
-            100000,
-            0,
-            0,
-            0});
+            this.nBackupInterval.Location = new System.Drawing.Point(164, 45);
             this.nBackupInterval.Name = "nBackupInterval";
             this.nBackupInterval.Size = new System.Drawing.Size(48, 21);
             this.nBackupInterval.TabIndex = 2;
@@ -2440,7 +2512,7 @@ namespace fCraft.ConfigGUI {
             // lBackupIntervalUnits
             // 
             this.lBackupIntervalUnits.AutoSize = true;
-            this.lBackupIntervalUnits.Location = new System.Drawing.Point(214, 21);
+            this.lBackupIntervalUnits.Location = new System.Drawing.Point(218, 47);
             this.lBackupIntervalUnits.Name = "lBackupIntervalUnits";
             this.lBackupIntervalUnits.Size = new System.Drawing.Size(51, 15);
             this.lBackupIntervalUnits.TabIndex = 3;
@@ -2449,7 +2521,7 @@ namespace fCraft.ConfigGUI {
             // xBackupInterval
             // 
             this.xBackupInterval.AutoSize = true;
-            this.xBackupInterval.Location = new System.Drawing.Point(12, 20);
+            this.xBackupInterval.Location = new System.Drawing.Point(16, 46);
             this.xBackupInterval.Name = "xBackupInterval";
             this.xBackupInterval.Size = new System.Drawing.Size(142, 19);
             this.xBackupInterval.TabIndex = 1;
@@ -2457,18 +2529,19 @@ namespace fCraft.ConfigGUI {
             this.xBackupInterval.UseVisualStyleBackColor = true;
             this.xBackupInterval.CheckedChanged += new System.EventHandler(this.xBackupAtInterval_CheckedChanged);
             // 
-            // xBackupOnMapChange
+            // xBackupOnJoin
             // 
-            this.xBackupOnMapChange.AutoSize = true;
-            this.xBackupOnMapChange.Location = new System.Drawing.Point(12, 46);
-            this.xBackupOnMapChange.Name = "xBackupOnMapChange";
-            this.xBackupOnMapChange.Size = new System.Drawing.Size(433, 19);
-            this.xBackupOnMapChange.TabIndex = 5;
-            this.xBackupOnMapChange.Text = "Create backup whenever a world\'s map is replaced (using /Gen or /WLoad)";
-            this.xBackupOnMapChange.UseVisualStyleBackColor = true;
+            this.xBackupOnJoin.AutoSize = true;
+            this.xBackupOnJoin.Location = new System.Drawing.Point(16, 72);
+            this.xBackupOnJoin.Name = "xBackupOnJoin";
+            this.xBackupOnJoin.Size = new System.Drawing.Size(279, 19);
+            this.xBackupOnJoin.TabIndex = 5;
+            this.xBackupOnJoin.Text = "Create backup whenever a player joins a world";
+            this.xBackupOnJoin.UseVisualStyleBackColor = true;
             // 
             // tabLogging
             // 
+            this.tabLogging.BackColor = System.Drawing.Color.IndianRed;
             this.tabLogging.Controls.Add(this.gLogFile);
             this.tabLogging.Controls.Add(this.gConsole);
             this.tabLogging.Location = new System.Drawing.Point(4, 24);
@@ -2477,10 +2550,10 @@ namespace fCraft.ConfigGUI {
             this.tabLogging.Size = new System.Drawing.Size(652, 482);
             this.tabLogging.TabIndex = 5;
             this.tabLogging.Text = "Logging";
-            this.tabLogging.UseVisualStyleBackColor = true;
             // 
             // gLogFile
             // 
+            this.gLogFile.BackColor = System.Drawing.Color.IndianRed;
             this.gLogFile.Controls.Add(this.lLogFileOptionsDescription);
             this.gLogFile.Controls.Add(this.xLogLimit);
             this.gLogFile.Controls.Add(this.vLogFileOptions);
@@ -2561,6 +2634,7 @@ namespace fCraft.ConfigGUI {
             // cLogMode
             // 
             this.cLogMode.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cLogMode.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cLogMode.FormattingEnabled = true;
             this.cLogMode.Items.AddRange(new object[] {
             "One long file",
@@ -2622,7 +2696,8 @@ namespace fCraft.ConfigGUI {
             // 
             // tabIRC
             // 
-            this.tabIRC.Controls.Add(this.gIRCFormatting);
+            this.tabIRC.BackColor = System.Drawing.Color.IndianRed;
+            this.tabIRC.Controls.Add(this.gIRCAdv);
             this.tabIRC.Controls.Add(this.xIRCListShowNonEnglish);
             this.tabIRC.Controls.Add(this.gIRCOptions);
             this.tabIRC.Controls.Add(this.gIRCNetwork);
@@ -2635,104 +2710,57 @@ namespace fCraft.ConfigGUI {
             this.tabIRC.Size = new System.Drawing.Size(652, 482);
             this.tabIRC.TabIndex = 8;
             this.tabIRC.Text = "IRC";
-            this.tabIRC.UseVisualStyleBackColor = true;
             // 
-            // gIRCFormatting
+            // gIRCAdv
             // 
-            this.gIRCFormatting.Controls.Add(this.bColorIRC);
-            this.gIRCFormatting.Controls.Add(this.lColorIRC);
-            this.gIRCFormatting.Controls.Add(this.label2);
-            this.gIRCFormatting.Controls.Add(this.label1);
-            this.gIRCFormatting.Controls.Add(this.xIRCShowEmotesFromServer);
-            this.gIRCFormatting.Controls.Add(this.xIRCShowEmotesFromIRC);
-            this.gIRCFormatting.Controls.Add(this.xIRCShowColorsFromIRC);
-            this.gIRCFormatting.Controls.Add(this.xIRCShowColorsFromServer);
-            this.gIRCFormatting.Enabled = false;
-            this.gIRCFormatting.Location = new System.Drawing.Point(8, 206);
-            this.gIRCFormatting.Name = "gIRCFormatting";
-            this.gIRCFormatting.Size = new System.Drawing.Size(635, 104);
-            this.gIRCFormatting.TabIndex = 6;
-            this.gIRCFormatting.TabStop = false;
-            this.gIRCFormatting.Text = "Formatting";
+            this.gIRCAdv.Controls.Add(this.tServPass);
+            this.gIRCAdv.Controls.Add(this.xServPass);
+            this.gIRCAdv.Controls.Add(this.tChanPass);
+            this.gIRCAdv.Controls.Add(this.xChanPass);
+            this.gIRCAdv.Location = new System.Drawing.Point(10, 374);
+            this.gIRCAdv.Name = "gIRCAdv";
+            this.gIRCAdv.Size = new System.Drawing.Size(419, 95);
+            this.gIRCAdv.TabIndex = 6;
+            this.gIRCAdv.TabStop = false;
+            this.gIRCAdv.Text = "Advanced";
             // 
-            // bColorIRC
+            // tServPass
             // 
-            this.bColorIRC.BackColor = System.Drawing.Color.White;
-            this.bColorIRC.Location = new System.Drawing.Point(325, 73);
-            this.bColorIRC.Name = "bColorIRC";
-            this.bColorIRC.Size = new System.Drawing.Size(100, 23);
-            this.bColorIRC.TabIndex = 17;
-            this.bColorIRC.UseVisualStyleBackColor = false;
-            this.bColorIRC.Click += new System.EventHandler(this.bColorIRC_Click);
+            this.tServPass.Enabled = false;
+            this.tServPass.Location = new System.Drawing.Point(219, 48);
+            this.tServPass.Name = "tServPass";
+            this.tServPass.Size = new System.Drawing.Size(154, 21);
+            this.tServPass.TabIndex = 3;
             // 
-            // lColorIRC
+            // xServPass
             // 
-            this.lColorIRC.AutoSize = true;
-            this.lColorIRC.Location = new System.Drawing.Point(208, 77);
-            this.lColorIRC.Name = "lColorIRC";
-            this.lColorIRC.Size = new System.Drawing.Size(111, 15);
-            this.lColorIRC.TabIndex = 16;
-            this.lColorIRC.Text = "IRC message color";
+            this.xServPass.AutoSize = true;
+            this.xServPass.Location = new System.Drawing.Point(219, 23);
+            this.xServPass.Name = "xServPass";
+            this.xServPass.Size = new System.Drawing.Size(143, 19);
+            this.xServPass.TabIndex = 2;
+            this.xServPass.Text = "Use Server Password";
+            this.xServPass.UseVisualStyleBackColor = true;
+            this.xServPass.CheckedChanged += new System.EventHandler(this.xServPass_CheckedChanged);
             // 
-            // label2
+            // tChanPass
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(52, 24);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(267, 15);
-            this.label2.TabIndex = 8;
-            this.label2.Text = "For messages sent from Minecraft to IRC, show:";
-            this.label2.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.tChanPass.Enabled = false;
+            this.tChanPass.Location = new System.Drawing.Point(16, 48);
+            this.tChanPass.Name = "tChanPass";
+            this.tChanPass.Size = new System.Drawing.Size(154, 21);
+            this.tChanPass.TabIndex = 1;
             // 
-            // label1
+            // xChanPass
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(52, 49);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(267, 15);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "For messages sent from IRC to Minecraft, show:";
-            this.label1.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            // 
-            // xIRCShowEmotesFromServer
-            // 
-            this.xIRCShowEmotesFromServer.AutoSize = true;
-            this.xIRCShowEmotesFromServer.Location = new System.Drawing.Point(403, 23);
-            this.xIRCShowEmotesFromServer.Name = "xIRCShowEmotesFromServer";
-            this.xIRCShowEmotesFromServer.Size = new System.Drawing.Size(68, 19);
-            this.xIRCShowEmotesFromServer.TabIndex = 5;
-            this.xIRCShowEmotesFromServer.Text = "Emotes";
-            this.xIRCShowEmotesFromServer.UseVisualStyleBackColor = true;
-            // 
-            // xIRCShowEmotesFromIRC
-            // 
-            this.xIRCShowEmotesFromIRC.AutoSize = true;
-            this.xIRCShowEmotesFromIRC.Location = new System.Drawing.Point(403, 48);
-            this.xIRCShowEmotesFromIRC.Name = "xIRCShowEmotesFromIRC";
-            this.xIRCShowEmotesFromIRC.Size = new System.Drawing.Size(68, 19);
-            this.xIRCShowEmotesFromIRC.TabIndex = 4;
-            this.xIRCShowEmotesFromIRC.Text = "Emotes";
-            this.xIRCShowEmotesFromIRC.UseVisualStyleBackColor = true;
-            // 
-            // xIRCShowColorsFromIRC
-            // 
-            this.xIRCShowColorsFromIRC.AutoSize = true;
-            this.xIRCShowColorsFromIRC.Location = new System.Drawing.Point(325, 48);
-            this.xIRCShowColorsFromIRC.Name = "xIRCShowColorsFromIRC";
-            this.xIRCShowColorsFromIRC.Size = new System.Drawing.Size(61, 19);
-            this.xIRCShowColorsFromIRC.TabIndex = 3;
-            this.xIRCShowColorsFromIRC.Text = "Colors";
-            this.xIRCShowColorsFromIRC.UseVisualStyleBackColor = true;
-            // 
-            // xIRCShowColorsFromServer
-            // 
-            this.xIRCShowColorsFromServer.AutoSize = true;
-            this.xIRCShowColorsFromServer.Location = new System.Drawing.Point(325, 23);
-            this.xIRCShowColorsFromServer.Name = "xIRCShowColorsFromServer";
-            this.xIRCShowColorsFromServer.Size = new System.Drawing.Size(61, 19);
-            this.xIRCShowColorsFromServer.TabIndex = 2;
-            this.xIRCShowColorsFromServer.Text = "Colors";
-            this.xIRCShowColorsFromServer.UseVisualStyleBackColor = true;
+            this.xChanPass.AutoSize = true;
+            this.xChanPass.Location = new System.Drawing.Point(16, 23);
+            this.xChanPass.Name = "xChanPass";
+            this.xChanPass.Size = new System.Drawing.Size(154, 19);
+            this.xChanPass.TabIndex = 0;
+            this.xChanPass.Text = "Use Channel Password";
+            this.xChanPass.UseVisualStyleBackColor = true;
+            this.xChanPass.CheckedChanged += new System.EventHandler(this.xChanPass_CheckedChanged);
             // 
             // xIRCListShowNonEnglish
             // 
@@ -2749,14 +2777,17 @@ namespace fCraft.ConfigGUI {
             // gIRCOptions
             // 
             this.gIRCOptions.Controls.Add(this.xIRCBotAnnounceServerEvents);
+            this.gIRCOptions.Controls.Add(this.xIRCUseColor);
             this.gIRCOptions.Controls.Add(this.lIRCNoForwardingMessage);
             this.gIRCOptions.Controls.Add(this.xIRCBotAnnounceIRCJoins);
+            this.gIRCOptions.Controls.Add(this.bColorIRC);
+            this.gIRCOptions.Controls.Add(this.lColorIRC);
             this.gIRCOptions.Controls.Add(this.xIRCBotForwardFromIRC);
             this.gIRCOptions.Controls.Add(this.xIRCBotAnnounceServerJoins);
             this.gIRCOptions.Controls.Add(this.xIRCBotForwardFromServer);
-            this.gIRCOptions.Location = new System.Drawing.Point(8, 316);
+            this.gIRCOptions.Location = new System.Drawing.Point(8, 206);
             this.gIRCOptions.Name = "gIRCOptions";
-            this.gIRCOptions.Size = new System.Drawing.Size(636, 136);
+            this.gIRCOptions.Size = new System.Drawing.Size(636, 162);
             this.gIRCOptions.TabIndex = 5;
             this.gIRCOptions.TabStop = false;
             this.gIRCOptions.Text = "Options";
@@ -2764,17 +2795,27 @@ namespace fCraft.ConfigGUI {
             // xIRCBotAnnounceServerEvents
             // 
             this.xIRCBotAnnounceServerEvents.AutoSize = true;
-            this.xIRCBotAnnounceServerEvents.Location = new System.Drawing.Point(38, 70);
+            this.xIRCBotAnnounceServerEvents.Location = new System.Drawing.Point(38, 109);
             this.xIRCBotAnnounceServerEvents.Name = "xIRCBotAnnounceServerEvents";
-            this.xIRCBotAnnounceServerEvents.Size = new System.Drawing.Size(419, 19);
+            this.xIRCBotAnnounceServerEvents.Size = new System.Drawing.Size(417, 19);
             this.xIRCBotAnnounceServerEvents.TabIndex = 7;
-            this.xIRCBotAnnounceServerEvents.Text = "Announce Minecraft events (kicks, bans, promotions, demotions) on IRC.";
+            this.xIRCBotAnnounceServerEvents.Text = "Announce SERVER events (kicks, bans, promotions, demotions) on IRC.";
             this.xIRCBotAnnounceServerEvents.UseVisualStyleBackColor = true;
+            // 
+            // xIRCUseColor
+            // 
+            this.xIRCUseColor.AutoSize = true;
+            this.xIRCUseColor.Location = new System.Drawing.Point(325, 34);
+            this.xIRCUseColor.Name = "xIRCUseColor";
+            this.xIRCUseColor.Size = new System.Drawing.Size(149, 19);
+            this.xIRCUseColor.TabIndex = 2;
+            this.xIRCUseColor.Text = "Use text colors on IRC.";
+            this.xIRCUseColor.UseVisualStyleBackColor = true;
             // 
             // lIRCNoForwardingMessage
             // 
             this.lIRCNoForwardingMessage.AutoSize = true;
-            this.lIRCNoForwardingMessage.Location = new System.Drawing.Point(35, 108);
+            this.lIRCNoForwardingMessage.Location = new System.Drawing.Point(35, 137);
             this.lIRCNoForwardingMessage.Name = "lIRCNoForwardingMessage";
             this.lIRCNoForwardingMessage.Size = new System.Drawing.Size(567, 15);
             this.lIRCNoForwardingMessage.TabIndex = 8;
@@ -2784,41 +2825,60 @@ namespace fCraft.ConfigGUI {
             // xIRCBotAnnounceIRCJoins
             // 
             this.xIRCBotAnnounceIRCJoins.AutoSize = true;
-            this.xIRCBotAnnounceIRCJoins.Location = new System.Drawing.Point(325, 45);
+            this.xIRCBotAnnounceIRCJoins.Location = new System.Drawing.Point(325, 84);
             this.xIRCBotAnnounceIRCJoins.Name = "xIRCBotAnnounceIRCJoins";
-            this.xIRCBotAnnounceIRCJoins.Size = new System.Drawing.Size(295, 19);
+            this.xIRCBotAnnounceIRCJoins.Size = new System.Drawing.Size(303, 19);
             this.xIRCBotAnnounceIRCJoins.TabIndex = 6;
-            this.xIRCBotAnnounceIRCJoins.Text = "Announce users joining/leaving the IRC channels.";
+            this.xIRCBotAnnounceIRCJoins.Text = "Announce people joining/leaving the IRC channels.";
             this.xIRCBotAnnounceIRCJoins.UseVisualStyleBackColor = true;
+            // 
+            // bColorIRC
+            // 
+            this.bColorIRC.BackColor = System.Drawing.Color.White;
+            this.bColorIRC.Location = new System.Drawing.Point(152, 20);
+            this.bColorIRC.Name = "bColorIRC";
+            this.bColorIRC.Size = new System.Drawing.Size(100, 23);
+            this.bColorIRC.TabIndex = 1;
+            this.bColorIRC.UseVisualStyleBackColor = false;
+            this.bColorIRC.Click += new System.EventHandler(this.bColorIRC_Click);
+            // 
+            // lColorIRC
+            // 
+            this.lColorIRC.AutoSize = true;
+            this.lColorIRC.Location = new System.Drawing.Point(35, 24);
+            this.lColorIRC.Name = "lColorIRC";
+            this.lColorIRC.Size = new System.Drawing.Size(111, 15);
+            this.lColorIRC.TabIndex = 0;
+            this.lColorIRC.Text = "IRC message color";
             // 
             // xIRCBotForwardFromIRC
             // 
             this.xIRCBotForwardFromIRC.AutoSize = true;
-            this.xIRCBotForwardFromIRC.Location = new System.Drawing.Point(38, 45);
+            this.xIRCBotForwardFromIRC.Location = new System.Drawing.Point(38, 84);
             this.xIRCBotForwardFromIRC.Name = "xIRCBotForwardFromIRC";
-            this.xIRCBotForwardFromIRC.Size = new System.Drawing.Size(242, 19);
+            this.xIRCBotForwardFromIRC.Size = new System.Drawing.Size(240, 19);
             this.xIRCBotForwardFromIRC.TabIndex = 4;
-            this.xIRCBotForwardFromIRC.Text = "Forward ALL chat from IRC to Minecraft.";
+            this.xIRCBotForwardFromIRC.Text = "Forward ALL chat from IRC to SERVER.";
             this.xIRCBotForwardFromIRC.UseVisualStyleBackColor = true;
             // 
             // xIRCBotAnnounceServerJoins
             // 
             this.xIRCBotAnnounceServerJoins.AutoSize = true;
-            this.xIRCBotAnnounceServerJoins.Location = new System.Drawing.Point(325, 20);
+            this.xIRCBotAnnounceServerJoins.Location = new System.Drawing.Point(325, 59);
             this.xIRCBotAnnounceServerJoins.Name = "xIRCBotAnnounceServerJoins";
-            this.xIRCBotAnnounceServerJoins.Size = new System.Drawing.Size(262, 19);
+            this.xIRCBotAnnounceServerJoins.Size = new System.Drawing.Size(279, 19);
             this.xIRCBotAnnounceServerJoins.TabIndex = 5;
-            this.xIRCBotAnnounceServerJoins.Text = "Announce players joining/leaving Minecraft.";
+            this.xIRCBotAnnounceServerJoins.Text = "Announce people joining/leaving the SERVER.";
             this.xIRCBotAnnounceServerJoins.UseVisualStyleBackColor = true;
             // 
             // xIRCBotForwardFromServer
             // 
             this.xIRCBotForwardFromServer.AutoSize = true;
-            this.xIRCBotForwardFromServer.Location = new System.Drawing.Point(38, 20);
+            this.xIRCBotForwardFromServer.Location = new System.Drawing.Point(38, 59);
             this.xIRCBotForwardFromServer.Name = "xIRCBotForwardFromServer";
-            this.xIRCBotForwardFromServer.Size = new System.Drawing.Size(242, 19);
+            this.xIRCBotForwardFromServer.Size = new System.Drawing.Size(240, 19);
             this.xIRCBotForwardFromServer.TabIndex = 3;
-            this.xIRCBotForwardFromServer.Text = "Forward ALL chat from Minecraft to IRC.";
+            this.xIRCBotForwardFromServer.Text = "Forward ALL chat from SERVER to IRC.";
             this.xIRCBotForwardFromServer.UseVisualStyleBackColor = true;
             // 
             // gIRCNetwork
@@ -2899,11 +2959,11 @@ namespace fCraft.ConfigGUI {
             // 
             this.lIRCNickServ.AutoSize = true;
             this.lIRCNickServ.Enabled = false;
-            this.lIRCNickServ.Location = new System.Drawing.Point(26, 129);
+            this.lIRCNickServ.Location = new System.Drawing.Point(35, 129);
             this.lIRCNickServ.Name = "lIRCNickServ";
-            this.lIRCNickServ.Size = new System.Drawing.Size(89, 15);
+            this.lIRCNickServ.Size = new System.Drawing.Size(80, 15);
             this.lIRCNickServ.TabIndex = 14;
-            this.lIRCNickServ.Text = "NickServ\'s nick";
+            this.lIRCNickServ.Text = "NickServ nick";
             // 
             // nIRCDelay
             // 
@@ -3021,9 +3081,9 @@ namespace fCraft.ConfigGUI {
             this.lIRCBotNetwork.AutoSize = true;
             this.lIRCBotNetwork.Location = new System.Drawing.Point(26, 22);
             this.lIRCBotNetwork.Name = "lIRCBotNetwork";
-            this.lIRCBotNetwork.Size = new System.Drawing.Size(89, 15);
+            this.lIRCBotNetwork.Size = new System.Drawing.Size(93, 15);
             this.lIRCBotNetwork.TabIndex = 0;
-            this.lIRCBotNetwork.Text = "IRC server host";
+            this.lIRCBotNetwork.Text = "IRC Server Host";
             // 
             // lIRCBotNick
             // 
@@ -3067,6 +3127,7 @@ namespace fCraft.ConfigGUI {
             // 
             this.cIRCList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cIRCList.Enabled = false;
+            this.cIRCList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cIRCList.FormattingEnabled = true;
             this.cIRCList.Location = new System.Drawing.Point(321, 11);
             this.cIRCList.Name = "cIRCList";
@@ -3076,50 +3137,16 @@ namespace fCraft.ConfigGUI {
             // 
             // tabAdvanced
             // 
-            this.tabAdvanced.Controls.Add(this.gCrashReport);
+            this.tabAdvanced.BackColor = System.Drawing.Color.IndianRed;
             this.tabAdvanced.Controls.Add(this.gPerformance);
             this.tabAdvanced.Controls.Add(this.gAdvancedMisc);
+            this.tabAdvanced.Controls.Add(this.gCrashReport);
             this.tabAdvanced.Location = new System.Drawing.Point(4, 24);
             this.tabAdvanced.Name = "tabAdvanced";
             this.tabAdvanced.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
             this.tabAdvanced.Size = new System.Drawing.Size(652, 482);
             this.tabAdvanced.TabIndex = 6;
             this.tabAdvanced.Text = "Advanced";
-            this.tabAdvanced.UseVisualStyleBackColor = true;
-            // 
-            // gCrashReport
-            // 
-            this.gCrashReport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.gCrashReport.Controls.Add(this.lCrashReportDisclaimer);
-            this.gCrashReport.Controls.Add(this.xSubmitCrashReports);
-            this.gCrashReport.Location = new System.Drawing.Point(8, 13);
-            this.gCrashReport.Name = "gCrashReport";
-            this.gCrashReport.Size = new System.Drawing.Size(636, 99);
-            this.gCrashReport.TabIndex = 6;
-            this.gCrashReport.TabStop = false;
-            this.gCrashReport.Text = "Crash Reporting";
-            // 
-            // lCrashReportDisclaimer
-            // 
-            this.lCrashReportDisclaimer.AutoSize = true;
-            this.lCrashReportDisclaimer.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lCrashReportDisclaimer.Location = new System.Drawing.Point(42, 42);
-            this.lCrashReportDisclaimer.Name = "lCrashReportDisclaimer";
-            this.lCrashReportDisclaimer.Size = new System.Drawing.Size(521, 39);
-            this.lCrashReportDisclaimer.TabIndex = 1;
-            this.lCrashReportDisclaimer.Text = resources.GetString("lCrashReportDisclaimer.Text");
-            // 
-            // xSubmitCrashReports
-            // 
-            this.xSubmitCrashReports.AutoSize = true;
-            this.xSubmitCrashReports.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.xSubmitCrashReports.Location = new System.Drawing.Point(6, 20);
-            this.xSubmitCrashReports.Name = "xSubmitCrashReports";
-            this.xSubmitCrashReports.Size = new System.Drawing.Size(446, 19);
-            this.xSubmitCrashReports.TabIndex = 0;
-            this.xSubmitCrashReports.Text = "Automatically submit crash reports to fCraft developers (fCraft.net)";
-            this.xSubmitCrashReports.UseVisualStyleBackColor = true;
             // 
             // gPerformance
             // 
@@ -3178,6 +3205,7 @@ namespace fCraft.ConfigGUI {
             // cProcessPriority
             // 
             this.cProcessPriority.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cProcessPriority.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cProcessPriority.Items.AddRange(new object[] {
             "(system default)",
             "High",
@@ -3284,7 +3312,7 @@ namespace fCraft.ConfigGUI {
             // 
             this.gAdvancedMisc.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.gAdvancedMisc.Controls.Add(this.xHeartbeatEnabled);
+            this.gAdvancedMisc.Controls.Add(this.xAutoRank);
             this.gAdvancedMisc.Controls.Add(this.nMaxUndoStates);
             this.gAdvancedMisc.Controls.Add(this.lMaxUndoStates);
             this.gAdvancedMisc.Controls.Add(this.lIPWarning);
@@ -3297,27 +3325,26 @@ namespace fCraft.ConfigGUI {
             this.gAdvancedMisc.Controls.Add(this.xMaxUndo);
             this.gAdvancedMisc.Controls.Add(this.xRelayAllBlockUpdates);
             this.gAdvancedMisc.Controls.Add(this.xNoPartialPositionUpdates);
-            this.gAdvancedMisc.Location = new System.Drawing.Point(8, 118);
+            this.gAdvancedMisc.Location = new System.Drawing.Point(8, 99);
             this.gAdvancedMisc.Name = "gAdvancedMisc";
-            this.gAdvancedMisc.Size = new System.Drawing.Size(636, 194);
+            this.gAdvancedMisc.Size = new System.Drawing.Size(636, 213);
             this.gAdvancedMisc.TabIndex = 1;
             this.gAdvancedMisc.TabStop = false;
             this.gAdvancedMisc.Text = "Miscellaneous";
             // 
-            // xHeartbeatEnabled
+            // xAutoRank
             // 
-            this.xHeartbeatEnabled.AutoSize = true;
-            this.xHeartbeatEnabled.Location = new System.Drawing.Point(6, 20);
-            this.xHeartbeatEnabled.Name = "xHeartbeatEnabled";
-            this.xHeartbeatEnabled.Size = new System.Drawing.Size(561, 19);
-            this.xHeartbeatEnabled.TabIndex = 24;
-            this.xHeartbeatEnabled.Text = "Enable built-in heartbeat sender (when disabled, status data is written to heartb" +
-    "eatdata.txt instead).";
-            this.xHeartbeatEnabled.UseVisualStyleBackColor = true;
+            this.xAutoRank.AutoSize = true;
+            this.xAutoRank.Location = new System.Drawing.Point(9, 188);
+            this.xAutoRank.Name = "xAutoRank";
+            this.xAutoRank.Size = new System.Drawing.Size(121, 19);
+            this.xAutoRank.TabIndex = 24;
+            this.xAutoRank.Text = "Enable AutoRank";
+            this.xAutoRank.UseVisualStyleBackColor = true;
             // 
             // nMaxUndoStates
             // 
-            this.nMaxUndoStates.Location = new System.Drawing.Point(115, 95);
+            this.nMaxUndoStates.Location = new System.Drawing.Point(115, 71);
             this.nMaxUndoStates.Minimum = new decimal(new int[] {
             1,
             0,
@@ -3336,7 +3363,7 @@ namespace fCraft.ConfigGUI {
             // lMaxUndoStates
             // 
             this.lMaxUndoStates.AutoSize = true;
-            this.lMaxUndoStates.Location = new System.Drawing.Point(179, 97);
+            this.lMaxUndoStates.Location = new System.Drawing.Point(179, 73);
             this.lMaxUndoStates.Name = "lMaxUndoStates";
             this.lMaxUndoStates.Size = new System.Drawing.Size(72, 15);
             this.lMaxUndoStates.TabIndex = 22;
@@ -3346,7 +3373,7 @@ namespace fCraft.ConfigGUI {
             // 
             this.lIPWarning.AutoSize = true;
             this.lIPWarning.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lIPWarning.Location = new System.Drawing.Point(112, 175);
+            this.lIPWarning.Location = new System.Drawing.Point(112, 131);
             this.lIPWarning.Name = "lIPWarning";
             this.lIPWarning.Size = new System.Drawing.Size(408, 13);
             this.lIPWarning.TabIndex = 20;
@@ -3355,7 +3382,7 @@ namespace fCraft.ConfigGUI {
             // 
             // tIP
             // 
-            this.tIP.Location = new System.Drawing.Point(115, 151);
+            this.tIP.Location = new System.Drawing.Point(115, 107);
             this.tIP.MaxLength = 15;
             this.tIP.Name = "tIP";
             this.tIP.Size = new System.Drawing.Size(97, 21);
@@ -3365,7 +3392,7 @@ namespace fCraft.ConfigGUI {
             // xIP
             // 
             this.xIP.AutoSize = true;
-            this.xIP.Location = new System.Drawing.Point(6, 153);
+            this.xIP.Location = new System.Drawing.Point(6, 109);
             this.xIP.Name = "xIP";
             this.xIP.Size = new System.Drawing.Size(103, 19);
             this.xIP.TabIndex = 18;
@@ -3376,7 +3403,7 @@ namespace fCraft.ConfigGUI {
             // lConsoleName
             // 
             this.lConsoleName.AutoSize = true;
-            this.lConsoleName.Location = new System.Drawing.Point(22, 127);
+            this.lConsoleName.Location = new System.Drawing.Point(6, 161);
             this.lConsoleName.Name = "lConsoleName";
             this.lConsoleName.Size = new System.Drawing.Size(87, 15);
             this.lConsoleName.TabIndex = 7;
@@ -3384,7 +3411,7 @@ namespace fCraft.ConfigGUI {
             // 
             // tConsoleName
             // 
-            this.tConsoleName.Location = new System.Drawing.Point(115, 124);
+            this.tConsoleName.Location = new System.Drawing.Point(115, 158);
             this.tConsoleName.Name = "tConsoleName";
             this.tConsoleName.Size = new System.Drawing.Size(167, 21);
             this.tConsoleName.TabIndex = 8;
@@ -3396,7 +3423,7 @@ namespace fCraft.ConfigGUI {
             0,
             0,
             0});
-            this.nMaxUndo.Location = new System.Drawing.Point(257, 95);
+            this.nMaxUndo.Location = new System.Drawing.Point(257, 71);
             this.nMaxUndo.Maximum = new decimal(new int[] {
             2147483647,
             0,
@@ -3415,7 +3442,7 @@ namespace fCraft.ConfigGUI {
             // lMaxUndoUnits
             // 
             this.lMaxUndoUnits.AutoSize = true;
-            this.lMaxUndoUnits.Location = new System.Drawing.Point(349, 97);
+            this.lMaxUndoUnits.Location = new System.Drawing.Point(349, 73);
             this.lMaxUndoUnits.Name = "lMaxUndoUnits";
             this.lMaxUndoUnits.Size = new System.Drawing.Size(259, 15);
             this.lMaxUndoUnits.TabIndex = 6;
@@ -3426,7 +3453,7 @@ namespace fCraft.ConfigGUI {
             this.xMaxUndo.AutoSize = true;
             this.xMaxUndo.Checked = true;
             this.xMaxUndo.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.xMaxUndo.Location = new System.Drawing.Point(6, 96);
+            this.xMaxUndo.Location = new System.Drawing.Point(6, 72);
             this.xMaxUndo.Name = "xMaxUndo";
             this.xMaxUndo.Size = new System.Drawing.Size(100, 19);
             this.xMaxUndo.TabIndex = 4;
@@ -3437,7 +3464,7 @@ namespace fCraft.ConfigGUI {
             // xRelayAllBlockUpdates
             // 
             this.xRelayAllBlockUpdates.AutoSize = true;
-            this.xRelayAllBlockUpdates.Location = new System.Drawing.Point(6, 45);
+            this.xRelayAllBlockUpdates.Location = new System.Drawing.Point(6, 21);
             this.xRelayAllBlockUpdates.Name = "xRelayAllBlockUpdates";
             this.xRelayAllBlockUpdates.Size = new System.Drawing.Size(560, 19);
             this.xRelayAllBlockUpdates.TabIndex = 1;
@@ -3448,27 +3475,278 @@ namespace fCraft.ConfigGUI {
             // xNoPartialPositionUpdates
             // 
             this.xNoPartialPositionUpdates.AutoSize = true;
-            this.xNoPartialPositionUpdates.Location = new System.Drawing.Point(6, 70);
+            this.xNoPartialPositionUpdates.Location = new System.Drawing.Point(6, 46);
             this.xNoPartialPositionUpdates.Name = "xNoPartialPositionUpdates";
             this.xNoPartialPositionUpdates.Size = new System.Drawing.Size(326, 19);
             this.xNoPartialPositionUpdates.TabIndex = 2;
             this.xNoPartialPositionUpdates.Text = "Do not use partial position updates (opcodes 9, 10, 11).";
             this.xNoPartialPositionUpdates.UseVisualStyleBackColor = true;
             // 
+            // gCrashReport
+            // 
+            this.gCrashReport.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.gCrashReport.Controls.Add(this.xCrash);
+            this.gCrashReport.Controls.Add(this.lCrashReportDisclaimer);
+            this.gCrashReport.Location = new System.Drawing.Point(8, 13);
+            this.gCrashReport.Name = "gCrashReport";
+            this.gCrashReport.Size = new System.Drawing.Size(636, 80);
+            this.gCrashReport.TabIndex = 0;
+            this.gCrashReport.TabStop = false;
+            this.gCrashReport.Text = "Crash Reporting";
+            // 
+            // xCrash
+            // 
+            this.xCrash.AutoSize = true;
+            this.xCrash.Location = new System.Drawing.Point(25, 25);
+            this.xCrash.Name = "xCrash";
+            this.xCrash.Size = new System.Drawing.Size(15, 14);
+            this.xCrash.TabIndex = 2;
+            this.xCrash.UseVisualStyleBackColor = true;
+            // 
+            // lCrashReportDisclaimer
+            // 
+            this.lCrashReportDisclaimer.AutoSize = true;
+            this.lCrashReportDisclaimer.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lCrashReportDisclaimer.Location = new System.Drawing.Point(45, 26);
+            this.lCrashReportDisclaimer.Name = "lCrashReportDisclaimer";
+            this.lCrashReportDisclaimer.Size = new System.Drawing.Size(468, 39);
+            this.lCrashReportDisclaimer.TabIndex = 1;
+            this.lCrashReportDisclaimer.Text = "Send all Crash Reports To The LegendCraft Dev Team\r\nCrash reports are when seriou" +
+    "s unexpected errors occur. Being able to receive crash reports helps\r\nidentify b" +
+    "ugs and improve LegendCraft! ";
+            // 
+            // Misc
+            // 
+            this.Misc.BackColor = System.Drawing.Color.IndianRed;
+            this.Misc.Controls.Add(this.groupBox3);
+            this.Misc.Controls.Add(this.groupBox1);
+            this.Misc.Location = new System.Drawing.Point(4, 24);
+            this.Misc.Name = "Misc";
+            this.Misc.Padding = new System.Windows.Forms.Padding(3);
+            this.Misc.Size = new System.Drawing.Size(652, 482);
+            this.Misc.TabIndex = 11;
+            this.Misc.Text = "Misc";
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.Controls.Add(this.label5);
+            this.groupBox3.Controls.Add(this.websiteURL);
+            this.groupBox3.Controls.Add(this.ReqsEditor);
+            this.groupBox3.Controls.Add(this.SwearEditor);
+            this.groupBox3.Controls.Add(this.MaxCapsValue);
+            this.groupBox3.Controls.Add(this.MaxCaps);
+            this.groupBox3.Controls.Add(this.SwearBox);
+            this.groupBox3.Controls.Add(this.label3);
+            this.groupBox3.Location = new System.Drawing.Point(31, 199);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Size = new System.Drawing.Size(595, 142);
+            this.groupBox3.TabIndex = 27;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Other Configurations";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(10, 73);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(76, 15);
+            this.label5.TabIndex = 28;
+            this.label5.Text = "WebsiteURL";
+            // 
+            // websiteURL
+            // 
+            this.websiteURL.Location = new System.Drawing.Point(110, 67);
+            this.websiteURL.Name = "websiteURL";
+            this.websiteURL.Size = new System.Drawing.Size(212, 21);
+            this.websiteURL.TabIndex = 28;
+            this.websiteURL.TextChanged += new System.EventHandler(this.websiteURL_TextChanged);
+            // 
+            // ReqsEditor
+            // 
+            this.ReqsEditor.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.ReqsEditor.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.ReqsEditor.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.ReqsEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ReqsEditor.Location = new System.Drawing.Point(442, 94);
+            this.ReqsEditor.Name = "ReqsEditor";
+            this.ReqsEditor.Size = new System.Drawing.Size(125, 23);
+            this.ReqsEditor.TabIndex = 26;
+            this.ReqsEditor.Text = "Edit Requirements";
+            this.ReqsEditor.UseVisualStyleBackColor = false;
+            this.ReqsEditor.Click += new System.EventHandler(this.ReqsEditor_Click);
+            // 
+            // SwearEditor
+            // 
+            this.SwearEditor.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.SwearEditor.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.SwearEditor.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.SwearEditor.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SwearEditor.Location = new System.Drawing.Point(442, 65);
+            this.SwearEditor.Name = "SwearEditor";
+            this.SwearEditor.Size = new System.Drawing.Size(125, 23);
+            this.SwearEditor.TabIndex = 25;
+            this.SwearEditor.Text = "Edit Profanity List";
+            this.SwearEditor.UseVisualStyleBackColor = false;
+            this.SwearEditor.Click += new System.EventHandler(this.SwearEditor_Click);
+            // 
+            // MaxCapsValue
+            // 
+            this.MaxCapsValue.Location = new System.Drawing.Point(110, 32);
+            this.MaxCapsValue.Maximum = new decimal(new int[] {
+            50,
+            0,
+            0,
+            0});
+            this.MaxCapsValue.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.MaxCapsValue.Name = "MaxCapsValue";
+            this.MaxCapsValue.Size = new System.Drawing.Size(75, 21);
+            this.MaxCapsValue.TabIndex = 21;
+            this.MaxCapsValue.Value = new decimal(new int[] {
+            8,
+            0,
+            0,
+            0});
+            // 
+            // MaxCaps
+            // 
+            this.MaxCaps.AutoSize = true;
+            this.MaxCaps.Location = new System.Drawing.Point(10, 34);
+            this.MaxCaps.Name = "MaxCaps";
+            this.MaxCaps.Size = new System.Drawing.Size(94, 15);
+            this.MaxCaps.TabIndex = 20;
+            this.MaxCaps.Text = "Maximum Caps";
+            // 
+            // SwearBox
+            // 
+            this.SwearBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SwearBox.HideSelection = false;
+            this.SwearBox.Location = new System.Drawing.Point(442, 34);
+            this.SwearBox.MaxLength = 64;
+            this.SwearBox.Name = "SwearBox";
+            this.SwearBox.Size = new System.Drawing.Size(125, 21);
+            this.SwearBox.TabIndex = 22;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(229, 34);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(207, 15);
+            this.label3.TabIndex = 23;
+            this.label3.Text = "Word for swears to be replaced with: ";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.CustomColor);
+            this.groupBox1.Controls.Add(this.CustomText);
+            this.groupBox1.Controls.Add(this.CustomName);
+            this.groupBox1.Controls.Add(this.label2);
+            this.groupBox1.Controls.Add(this.CustomAliases);
+            this.groupBox1.Location = new System.Drawing.Point(31, 27);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(595, 146);
+            this.groupBox1.TabIndex = 26;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Custom Chat Channel";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(16, 26);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(224, 15);
+            this.label1.TabIndex = 16;
+            this.label1.Text = "Custom Chat Channel Command Name";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Cursor = System.Windows.Forms.Cursors.Help;
+            this.label4.ForeColor = System.Drawing.Color.Red;
+            this.label4.Location = new System.Drawing.Point(450, 17);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(139, 60);
+            this.label4.TabIndex = 25;
+            this.label4.Text = "The name should be \r\nin this format: \r\n\'staffchat\'. No spaces or \r\nsymbols (inclu" +
+    "ding \"/\")";
+            this.label4.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // CustomColor
+            // 
+            this.CustomColor.BackColor = System.Drawing.Color.White;
+            this.CustomColor.Location = new System.Drawing.Point(244, 62);
+            this.CustomColor.Name = "CustomColor";
+            this.CustomColor.Size = new System.Drawing.Size(100, 23);
+            this.CustomColor.TabIndex = 15;
+            this.CustomColor.UseVisualStyleBackColor = false;
+            this.CustomColor.Click += new System.EventHandler(this.button1_Click);
+            // 
+            // CustomText
+            // 
+            this.CustomText.AutoSize = true;
+            this.CustomText.Location = new System.Drawing.Point(82, 70);
+            this.CustomText.Name = "CustomText";
+            this.CustomText.Size = new System.Drawing.Size(158, 15);
+            this.CustomText.TabIndex = 14;
+            this.CustomText.Text = "Custom Chat Channel Color";
+            this.CustomText.Click += new System.EventHandler(this.label1_Click);
+            // 
+            // CustomName
+            // 
+            this.CustomName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CustomName.HideSelection = false;
+            this.CustomName.Location = new System.Drawing.Point(246, 20);
+            this.CustomName.MaxLength = 64;
+            this.CustomName.Name = "CustomName";
+            this.CustomName.Size = new System.Drawing.Size(169, 21);
+            this.CustomName.TabIndex = 17;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(72, 115);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(168, 15);
+            this.label2.TabIndex = 18;
+            this.label2.Text = "Custom Chat Channel Aliases";
+            // 
+            // CustomAliases
+            // 
+            this.CustomAliases.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.CustomAliases.HideSelection = false;
+            this.CustomAliases.Location = new System.Drawing.Point(244, 109);
+            this.CustomAliases.MaxLength = 64;
+            this.CustomAliases.Name = "CustomAliases";
+            this.CustomAliases.Size = new System.Drawing.Size(169, 21);
+            this.CustomAliases.TabIndex = 19;
+            // 
             // bOK
             // 
             this.bOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bOK.BackColor = System.Drawing.Color.Brown;
             this.bOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bOK.Location = new System.Drawing.Point(360, 528);
             this.bOK.Name = "bOK";
             this.bOK.Size = new System.Drawing.Size(100, 28);
             this.bOK.TabIndex = 1;
             this.bOK.Text = "OK";
+            this.bOK.UseVisualStyleBackColor = false;
             this.bOK.Click += new System.EventHandler(this.bSave_Click);
             // 
             // bCancel
             // 
             this.bCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bCancel.BackColor = System.Drawing.Color.Brown;
             this.bCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.bCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bCancel.Location = new System.Drawing.Point(466, 528);
@@ -3476,41 +3754,52 @@ namespace fCraft.ConfigGUI {
             this.bCancel.Size = new System.Drawing.Size(100, 28);
             this.bCancel.TabIndex = 2;
             this.bCancel.Text = "Cancel";
+            this.bCancel.UseVisualStyleBackColor = false;
             this.bCancel.Click += new System.EventHandler(this.bCancel_Click);
             // 
             // bResetTab
             // 
             this.bResetTab.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bResetTab.BackColor = System.Drawing.Color.Gainsboro;
+            this.bResetTab.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bResetTab.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
+            this.bResetTab.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bResetTab.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bResetTab.Location = new System.Drawing.Point(132, 528);
             this.bResetTab.Name = "bResetTab";
             this.bResetTab.Size = new System.Drawing.Size(100, 28);
             this.bResetTab.TabIndex = 5;
             this.bResetTab.Text = "Reset Tab";
-            this.bResetTab.UseVisualStyleBackColor = true;
+            this.bResetTab.UseVisualStyleBackColor = false;
             this.bResetTab.Click += new System.EventHandler(this.bResetTab_Click);
             // 
             // bResetAll
             // 
             this.bResetAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bResetAll.BackColor = System.Drawing.Color.Gainsboro;
+            this.bResetAll.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bResetAll.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
+            this.bResetAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.bResetAll.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bResetAll.Location = new System.Drawing.Point(12, 528);
             this.bResetAll.Name = "bResetAll";
             this.bResetAll.Size = new System.Drawing.Size(114, 28);
             this.bResetAll.TabIndex = 4;
             this.bResetAll.Text = "Reset All Defaults";
-            this.bResetAll.UseVisualStyleBackColor = true;
+            this.bResetAll.UseVisualStyleBackColor = false;
             this.bResetAll.Click += new System.EventHandler(this.bResetAll_Click);
             // 
             // bApply
             // 
             this.bApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bApply.BackColor = System.Drawing.Color.Brown;
             this.bApply.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bApply.Location = new System.Drawing.Point(572, 528);
             this.bApply.Name = "bApply";
             this.bApply.Size = new System.Drawing.Size(100, 28);
             this.bApply.TabIndex = 3;
             this.bApply.Text = "Apply";
+            this.bApply.UseVisualStyleBackColor = false;
             this.bApply.Click += new System.EventHandler(this.bApply_Click);
             // 
             // toolTip
@@ -3520,84 +3809,62 @@ namespace fCraft.ConfigGUI {
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
-            // gHeartbeatUrl
+            // IColorGlobal
             // 
-            this.gHeartbeatUrl.Controls.Add(this.lHeartbeatUrlWarning);
-            this.gHeartbeatUrl.Controls.Add(this.cHeartbeatUrl);
-            this.gHeartbeatUrl.Controls.Add(this.lHeartbeatUrl);
-            this.gHeartbeatUrl.Location = new System.Drawing.Point(8, 307);
-            this.gHeartbeatUrl.Name = "gHeartbeatUrl";
-            this.gHeartbeatUrl.Size = new System.Drawing.Size(636, 89);
-            this.gHeartbeatUrl.TabIndex = 5;
-            this.gHeartbeatUrl.TabStop = false;
-            this.gHeartbeatUrl.Text = "Heartbeat Service Provider";
+            this.IColorGlobal.AutoSize = true;
+            this.IColorGlobal.Location = new System.Drawing.Point(402, 111);
+            this.IColorGlobal.Name = "IColorGlobal";
+            this.IColorGlobal.Size = new System.Drawing.Size(103, 15);
+            this.IColorGlobal.TabIndex = 10;
+            this.IColorGlobal.Text = "Global Chat Color";
             // 
-            // cHeartbeatUrl
+            // bColorGlobal
             // 
-            this.cHeartbeatUrl.FormattingEnabled = true;
-            this.cHeartbeatUrl.Items.AddRange(new object[] {
-            "https://minecraft.net/heartbeat.jsp",
-            "http://www.classicube.net/server/heartbeat"});
-            this.cHeartbeatUrl.Location = new System.Drawing.Point(123, 22);
-            this.cHeartbeatUrl.Name = "cHeartbeatUrl";
-            this.cHeartbeatUrl.Size = new System.Drawing.Size(507, 23);
-            this.cHeartbeatUrl.TabIndex = 1;
-            // 
-            // lHeartbeatUrl
-            // 
-            this.lHeartbeatUrl.AutoSize = true;
-            this.lHeartbeatUrl.Location = new System.Drawing.Point(25, 25);
-            this.lHeartbeatUrl.Name = "lHeartbeatUrl";
-            this.lHeartbeatUrl.Size = new System.Drawing.Size(92, 15);
-            this.lHeartbeatUrl.TabIndex = 0;
-            this.lHeartbeatUrl.Text = "Heartbeat URL:";
-            // 
-            // lHeartbeatUrlWarning
-            // 
-            this.lHeartbeatUrlWarning.AutoSize = true;
-            this.lHeartbeatUrlWarning.Location = new System.Drawing.Point(120, 48);
-            this.lHeartbeatUrlWarning.Name = "lHeartbeatUrlWarning";
-            this.lHeartbeatUrlWarning.Size = new System.Drawing.Size(427, 30);
-            this.lHeartbeatUrlWarning.TabIndex = 2;
-            this.lHeartbeatUrlWarning.Text = "Use caution. Note that different providers may use different player databases.\r\nI" +
-    "t\'s recommended to wipe your PlayerDB completely after switching providers.";
+            this.bColorGlobal.BackColor = System.Drawing.Color.White;
+            this.bColorGlobal.Location = new System.Drawing.Point(525, 111);
+            this.bColorGlobal.Name = "bColorGlobal";
+            this.bColorGlobal.Size = new System.Drawing.Size(100, 23);
+            this.bColorGlobal.TabIndex = 13;
+            this.bColorGlobal.UseVisualStyleBackColor = false;
+            this.bColorGlobal.Click += new System.EventHandler(this.bColorGlobal_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.DarkRed;
             this.ClientSize = new System.Drawing.Size(684, 568);
+            this.Controls.Add(this.tabs);
             this.Controls.Add(this.bApply);
             this.Controls.Add(this.bResetAll);
             this.Controls.Add(this.bResetTab);
             this.Controls.Add(this.bCancel);
             this.Controls.Add(this.bOK);
-            this.Controls.Add(this.tabs);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(700, 547);
             this.Name = "MainForm";
-            this.Text = "fCraft Config Tool";
+            this.Text = "LegendCraft Config Tool";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigUI_FormClosing);
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.tabs.ResumeLayout(false);
             this.tabGeneral.ResumeLayout(false);
-            this.gUpdaterSettings.ResumeLayout(false);
-            this.gUpdaterSettings.PerformLayout();
-            this.groupBox2.ResumeLayout(false);
-            this.gHelpAndSupport.ResumeLayout(false);
-            this.gInformation.ResumeLayout(false);
-            this.gInformation.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).EndInit();
             this.gBasic.ResumeLayout(false);
             this.gBasic.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayersPerWorld)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nPort)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).EndInit();
+            this.groupBox4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.groupBox2.ResumeLayout(false);
+            this.gInformation.ResumeLayout(false);
+            this.gInformation.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).EndInit();
             this.tabChat.ResumeLayout(false);
-            this.gChatColors.ResumeLayout(false);
-            this.gChatColors.PerformLayout();
             this.gAppearence.ResumeLayout(false);
             this.gAppearence.PerformLayout();
+            this.gChatColors.ResumeLayout(false);
+            this.gChatColors.PerformLayout();
             this.tabWorlds.ResumeLayout(false);
             this.tabWorlds.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvWorlds)).EndInit();
@@ -3620,13 +3887,15 @@ namespace fCraft.ConfigGUI {
             this.gSpamChat.ResumeLayout(false);
             this.gSpamChat.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nAntispamMaxWarnings)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.nAntispamMuteDuration)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nSpamMute)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nAntispamInterval)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nAntispamMessageCount)).EndInit();
             this.gVerify.ResumeLayout(false);
             this.gVerify.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxConnectionsPerIP)).EndInit();
-            this.tabSavingAndBackup.ResumeLayout(false);
+            this.gUpdate.ResumeLayout(false);
+            this.groupBox5.ResumeLayout(false);
+            this.groupBox5.PerformLayout();
             this.gDataBackup.ResumeLayout(false);
             this.gDataBackup.PerformLayout();
             this.gSaving.ResumeLayout(false);
@@ -3645,8 +3914,8 @@ namespace fCraft.ConfigGUI {
             this.gConsole.PerformLayout();
             this.tabIRC.ResumeLayout(false);
             this.tabIRC.PerformLayout();
-            this.gIRCFormatting.ResumeLayout(false);
-            this.gIRCFormatting.PerformLayout();
+            this.gIRCAdv.ResumeLayout(false);
+            this.gIRCAdv.PerformLayout();
             this.gIRCOptions.ResumeLayout(false);
             this.gIRCOptions.PerformLayout();
             this.gIRCNetwork.ResumeLayout(false);
@@ -3654,8 +3923,6 @@ namespace fCraft.ConfigGUI {
             ((System.ComponentModel.ISupportInitialize)(this.nIRCDelay)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nIRCBotPort)).EndInit();
             this.tabAdvanced.ResumeLayout(false);
-            this.gCrashReport.ResumeLayout(false);
-            this.gCrashReport.PerformLayout();
             this.gPerformance.ResumeLayout(false);
             this.gPerformance.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nTickInterval)).EndInit();
@@ -3664,283 +3931,304 @@ namespace fCraft.ConfigGUI {
             this.gAdvancedMisc.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndoStates)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxUndo)).EndInit();
-            this.gHeartbeatUrl.ResumeLayout(false);
-            this.gHeartbeatUrl.PerformLayout();
+            this.gCrashReport.ResumeLayout(false);
+            this.gCrashReport.PerformLayout();
+            this.Misc.ResumeLayout(false);
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).EndInit();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private TabControl tabs;
-        private Button bOK;
-        private Button bCancel;
-        private Button bResetTab;
-        private TabPage tabGeneral;
-        private TabPage tabRanks;
-        private Label lServerName;
-        private TextBox tServerName;
-        private Label lMOTD;
-        private TextBox tMOTD;
-        private Label lMaxPlayers;
-        private NumericUpDown nMaxPlayers;
-        private TabPage tabSavingAndBackup;
-        private ComboBox cPublic;
-        private Label lPublic;
-        private Button bMeasure;
-        private Label lUploadBandwidthUnits;
-        private NumericUpDown nUploadBandwidth;
-        private Label lUploadBandwidth;
-        private TabPage tabLogging;
-        private TabPage tabAdvanced;
-        private Label lTickIntervalUnits;
-        private NumericUpDown nTickInterval;
-        private Label lTickInterval;
-        private Label lAdvancedWarning;
-        private ListBox vRanks;
-        private Button bAddRank;
-        private Label lPermissions;
-        private ListView vPermissions;
-        private ColumnHeader chPermissions;
-        private GroupBox gRankOptions;
-        private Button bDeleteRank;
-        private Label lRankColor;
-        private TextBox tRankName;
-        private Label lRankName;
-        private TextBox tPrefix;
-        private Label lPrefix;
-        private Label lAntiGrief2;
-        private NumericUpDown nAntiGriefBlocks;
-        private CheckBox xDrawLimit;
-        private Label lDrawLimitUnits;
-        private GroupBox gBasic;
-        private ComboBox cDefaultRank;
-        private Label lDefaultRank;
-        private GroupBox gSaving;
-        private NumericUpDown nSaveInterval;
-        private Label lSaveIntervalUnits;
-        private CheckBox xSaveInterval;
-        private GroupBox gBackups;
-        private CheckBox xBackupOnStartup;
-        private NumericUpDown nBackupInterval;
-        private Label lBackupIntervalUnits;
-        private CheckBox xBackupInterval;
-        private CheckBox xBackupOnMapChange;
-        private CheckBox xRelayAllBlockUpdates;
-        private ComboBox cProcessPriority;
-        private Label lProcessPriority;
-        private Button bResetAll;
-        private GroupBox gLogFile;
-        private ComboBox cLogMode;
-        private Label lLogMode;
-        private GroupBox gConsole;
-        private ListView vLogFileOptions;
-        private ColumnHeader columnHeader2;
-        private Label lLogLimitUnits;
-        private NumericUpDown nLogLimit;
-        private ListView vConsoleOptions;
-        private ColumnHeader columnHeader3;
-        private CheckBox xLogLimit;
-        private CheckBox xReserveSlot;
-        private NumericUpDown nDrawLimit;
-        private Label lKickIdleUnits;
-        private NumericUpDown nKickIdle;
-        private CheckBox xKickIdle;
-        private CheckBox xNoPartialPositionUpdates;
-        private Label lMaxBackups;
-        private NumericUpDown nMaxBackups;
-        private Label lMaxBackupSize;
-        private NumericUpDown nMaxBackupSize;
-        private CheckBox xMaxBackupSize;
-        private CheckBox xMaxBackups;
-        private Label lThrottlingUnits;
-        private NumericUpDown nThrottling;
-        private Label lThrottling;
-        private Button bApply;
-        private Button bColorRank;
-        private TabPage tabSecurity;
-        private GroupBox gVerify;
-        private Label lVerifyNames;
-        private ComboBox cVerifyNames;
-        private GroupBox gSpamChat;
-        private Label lAntispamIntervalUnits;
-        private NumericUpDown nAntispamInterval;
-        private Label lAntispamMessageCount;
-        private NumericUpDown nAntispamMessageCount;
-        private CheckBox xLowLatencyMode;
-        private CheckBox xAntispamKicks;
-        private Label lAntispamMuteDurationUnits;
-        private NumericUpDown nAntispamMuteDuration;
-        private Label lAntispamMaxWarnings;
-        private NumericUpDown nAntispamMaxWarnings;
-        private CheckBox xBackupOnlyWhenChanged;
-        private Label lPort;
-        private NumericUpDown nPort;
-        private Button bRules;
-        private TabPage tabIRC;
-        private GroupBox gIRCNetwork;
-        private CheckBox xIRCBotEnabled;
-        private CheckBox xIRCBotAnnounceServerJoins;
-        private Label lIRCBotChannels;
-        private NumericUpDown nIRCBotPort;
-        private Label lIRCBotPort;
-        private TextBox tIRCBotNetwork;
-        private Label lIRCBotNetwork;
-        private Label lIRCBotNick;
-        private TextBox tIRCBotNick;
-        private CheckBox xIRCBotForwardFromServer;
-        private GroupBox gIRCOptions;
-        private TextBox tIRCBotChannels;
-        private Label lIRCBotChannels3;
-        private Label lIRCBotChannels2;
-        private CheckBox xIRCBotForwardFromIRC;
-        private CheckBox xMaxConnectionsPerIP;
-        private TabPage tabWorlds;
-        private DataGridView dgvWorlds;
-        private Button bWorldDelete;
-        private Button bAddWorld;
-        private Button bWorldEdit;
-        private ComboBox cMainWorld;
-        private Label lMainWorld;
-        private GroupBox gInformation;
-        private CheckBox xAnnouncements;
-        private Button bAnnouncements;
-        private Label lAnnouncementsUnits;
-        private NumericUpDown nAnnouncements;
-        private Label lAntiGrief3;
-        private NumericUpDown nAntiGriefSeconds;
-        private CheckBox xAntiGrief;
-        private Label lAntiGrief1;
-        private GroupBox gSecurityMisc;
-        private CheckBox xAnnounceKickAndBanReasons;
-        private CheckBox xRequireRankChangeReason;
-        private CheckBox xRequireBanReason;
-        private CheckBox xAnnounceRankChanges;
-        private Button bPortCheck;
-        private CheckBox xIRCBotAnnounceIRCJoins;
-        private GroupBox gAdvancedMisc;
-        private Label lIRCDelay;
-        private NumericUpDown nIRCDelay;
-        private ComboBox cPatrolledRank;
-        private Label lPatrolledRank;
-        private Label lPatrolledRankAndBelow;
-        private Button bLowerRank;
-        private Button bRaiseRank;
-        private Label lRankList;
-        private CheckBox xIRCRegisteredNick;
-        private TextBox tIRCNickServMessage;
-        private Label lIRCNickServMessage;
-        private TextBox tIRCNickServ;
-        private Label lIRCNickServ;
-        private ToolTip toolTip;
-        private Label lIRCNoForwardingMessage;
-        private Label lIRCDelayUnits;
-        private NumericUpDown nMaxUndo;
-        private Label lMaxUndoUnits;
-        private CheckBox xMaxUndo;
-        private Label lDefaultBuildRank;
-        private ComboBox cDefaultBuildRank;
-        private Button bGreeting;
-        private ComboBox cIRCList;
-        private Label lIRCList;
-        private CheckBox xIRCListShowNonEnglish;
-        private CheckBox xAllowUnverifiedLAN;
-        private TabPage tabChat;
-        private GroupBox gAppearence;
-        private CheckBox xShowJoinedWorldMessages;
-        private CheckBox xRankColorsInWorldNames;
-        private Button bColorPM;
-        private Label lColorPM;
-        private Button bColorAnnouncement;
-        private Label lColorAnnouncement;
-        private Button bColorSay;
-        private Button bColorHelp;
-        private Button bColorSys;
-        private CheckBox xRankPrefixesInList;
-        private CheckBox xRankPrefixesInChat;
-        private CheckBox xRankColorsInChat;
-        private Label lColorSay;
-        private Label lColorHelp;
-        private Label lColorSys;
+        private System.Windows.Forms.TabControl tabs;
+        private System.Windows.Forms.Button bOK;
+        private System.Windows.Forms.Button bCancel;
+        private System.Windows.Forms.Button bResetTab;
+        private System.Windows.Forms.TabPage tabGeneral;
+        private System.Windows.Forms.TabPage tabRanks;
+        private System.Windows.Forms.Label lServerName;
+        private System.Windows.Forms.TextBox tServerName;
+        private System.Windows.Forms.Label lMOTD;
+        private System.Windows.Forms.TextBox tMOTD;
+        private System.Windows.Forms.Label lMaxPlayers;
+        private System.Windows.Forms.NumericUpDown nMaxPlayers;
+        private System.Windows.Forms.TabPage gUpdate;
+        private System.Windows.Forms.ComboBox cPublic;
+        private System.Windows.Forms.Label lPublic;
+        private System.Windows.Forms.Button bMeasure;
+        private System.Windows.Forms.Label lUploadBandwidthUnits;
+        private System.Windows.Forms.NumericUpDown nUploadBandwidth;
+        private System.Windows.Forms.Label lUploadBandwidth;
+        private System.Windows.Forms.TabPage tabLogging;
+        private System.Windows.Forms.TabPage tabAdvanced;
+        private System.Windows.Forms.Label lTickIntervalUnits;
+        private System.Windows.Forms.NumericUpDown nTickInterval;
+        private System.Windows.Forms.Label lTickInterval;
+        private System.Windows.Forms.Label lAdvancedWarning;
+        private System.Windows.Forms.ListBox vRanks;
+        private System.Windows.Forms.Button bAddRank;
+        private System.Windows.Forms.Label lPermissions;
+        private System.Windows.Forms.ListView vPermissions;
+        private System.Windows.Forms.ColumnHeader chPermissions;
+        private System.Windows.Forms.GroupBox gRankOptions;
+        private System.Windows.Forms.Button bDeleteRank;
+        private System.Windows.Forms.Label lRankColor;
+        private System.Windows.Forms.TextBox tRankName;
+        private System.Windows.Forms.Label lRankName;
+        private System.Windows.Forms.TextBox tPrefix;
+        private System.Windows.Forms.Label lPrefix;
+        private System.Windows.Forms.Label lAntiGrief2;
+        private System.Windows.Forms.NumericUpDown nAntiGriefBlocks;
+        private System.Windows.Forms.CheckBox xDrawLimit;
+        private System.Windows.Forms.Label lDrawLimitUnits;
+        private System.Windows.Forms.GroupBox gBasic;
+        private System.Windows.Forms.ComboBox cDefaultRank;
+        private System.Windows.Forms.Label lDefaultRank;
+        private System.Windows.Forms.GroupBox gSaving;
+        private System.Windows.Forms.NumericUpDown nSaveInterval;
+        private System.Windows.Forms.Label lSaveIntervalUnits;
+        private System.Windows.Forms.CheckBox xSaveInterval;
+        private System.Windows.Forms.GroupBox gBackups;
+        private System.Windows.Forms.CheckBox xBackupOnStartup;
+        private System.Windows.Forms.NumericUpDown nBackupInterval;
+        private System.Windows.Forms.Label lBackupIntervalUnits;
+        private System.Windows.Forms.CheckBox xBackupInterval;
+        private System.Windows.Forms.CheckBox xBackupOnJoin;
+        private System.Windows.Forms.CheckBox xRelayAllBlockUpdates;
+        private System.Windows.Forms.ComboBox cProcessPriority;
+        private System.Windows.Forms.Label lProcessPriority;
+        private System.Windows.Forms.Button bResetAll;
+        private System.Windows.Forms.GroupBox gLogFile;
+        private System.Windows.Forms.ComboBox cLogMode;
+        private System.Windows.Forms.Label lLogMode;
+        private System.Windows.Forms.GroupBox gConsole;
+        private System.Windows.Forms.ListView vLogFileOptions;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.Label lLogLimitUnits;
+        private System.Windows.Forms.NumericUpDown nLogLimit;
+        private System.Windows.Forms.ListView vConsoleOptions;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.CheckBox xLogLimit;
+        private System.Windows.Forms.CheckBox xReserveSlot;
+        private System.Windows.Forms.NumericUpDown nDrawLimit;
+        private System.Windows.Forms.Label lKickIdleUnits;
+        private System.Windows.Forms.NumericUpDown nKickIdle;
+        private System.Windows.Forms.CheckBox xKickIdle;
+        private System.Windows.Forms.CheckBox xNoPartialPositionUpdates;
+        private System.Windows.Forms.Label lMaxBackups;
+        private System.Windows.Forms.NumericUpDown nMaxBackups;
+        private System.Windows.Forms.Label lMaxBackupSize;
+        private System.Windows.Forms.NumericUpDown nMaxBackupSize;
+        private System.Windows.Forms.CheckBox xMaxBackupSize;
+        private System.Windows.Forms.CheckBox xMaxBackups;
+        private System.Windows.Forms.Label lThrottlingUnits;
+        private System.Windows.Forms.NumericUpDown nThrottling;
+        private System.Windows.Forms.Label lThrottling;
+        private System.Windows.Forms.Button bApply;
+        private System.Windows.Forms.Button bColorRank;
+        private System.Windows.Forms.TabPage tabSecurity;
+        private System.Windows.Forms.GroupBox gVerify;
+        private System.Windows.Forms.Label lVerifyNames;
+        private System.Windows.Forms.ComboBox cVerifyNames;
+        private System.Windows.Forms.GroupBox gSpamChat;
+        private System.Windows.Forms.Label lAntispamInterval;
+        private System.Windows.Forms.NumericUpDown nAntispamInterval;
+        private System.Windows.Forms.Label lAntispamMessageCount;
+        private System.Windows.Forms.NumericUpDown nAntispamMessageCount;
+        private System.Windows.Forms.Label lSpamChat;
+        private System.Windows.Forms.CheckBox xLowLatencyMode;
+        private System.Windows.Forms.CheckBox xAntispamKicks;
+        private System.Windows.Forms.Label lSpamMuteSeconds;
+        private System.Windows.Forms.NumericUpDown nSpamMute;
+        private System.Windows.Forms.Label lSpamMute;
+        private System.Windows.Forms.Label lAntispamMaxWarnings;
+        private System.Windows.Forms.NumericUpDown nAntispamMaxWarnings;
+        private System.Windows.Forms.CheckBox xBackupOnlyWhenChanged;
+        private System.Windows.Forms.Label lPort;
+        private System.Windows.Forms.NumericUpDown nPort;
+        private System.Windows.Forms.Button bRules;
+        private System.Windows.Forms.TabPage tabIRC;
+        private System.Windows.Forms.GroupBox gIRCNetwork;
+        private System.Windows.Forms.CheckBox xIRCBotEnabled;
+        private System.Windows.Forms.CheckBox xIRCBotAnnounceServerJoins;
+        private System.Windows.Forms.Label lIRCBotChannels;
+        private System.Windows.Forms.NumericUpDown nIRCBotPort;
+        private System.Windows.Forms.Label lIRCBotPort;
+        private System.Windows.Forms.TextBox tIRCBotNetwork;
+        private System.Windows.Forms.Label lIRCBotNetwork;
+        private System.Windows.Forms.Label lIRCBotNick;
+        private System.Windows.Forms.TextBox tIRCBotNick;
+        private System.Windows.Forms.CheckBox xIRCBotForwardFromServer;
+        private System.Windows.Forms.GroupBox gIRCOptions;
+        private System.Windows.Forms.TextBox tIRCBotChannels;
+        private System.Windows.Forms.Label lIRCBotChannels3;
+        private System.Windows.Forms.Label lIRCBotChannels2;
+        private System.Windows.Forms.CheckBox xIRCBotForwardFromIRC;
+        private System.Windows.Forms.CheckBox xMaxConnectionsPerIP;
+        private System.Windows.Forms.TabPage tabWorlds;
+        private System.Windows.Forms.DataGridView dgvWorlds;
+        private System.Windows.Forms.Button bWorldDelete;
+        private System.Windows.Forms.Button bAddWorld;
+        private System.Windows.Forms.Button bWorldEdit;
+        private System.Windows.Forms.ComboBox cMainWorld;
+        private System.Windows.Forms.Label lMainWorld;
+        private System.Windows.Forms.GroupBox gInformation;
+        private System.Windows.Forms.CheckBox xAnnouncements;
+        private System.Windows.Forms.Button bAnnouncements;
+        private System.Windows.Forms.Label lAnnouncementsUnits;
+        private System.Windows.Forms.NumericUpDown nAnnouncements;
+        private System.Windows.Forms.Label lAntiGrief3;
+        private System.Windows.Forms.NumericUpDown nAntiGriefSeconds;
+        private System.Windows.Forms.CheckBox xAntiGrief;
+        private System.Windows.Forms.Label lAntiGrief1;
+        private System.Windows.Forms.GroupBox gSecurityMisc;
+        private System.Windows.Forms.CheckBox xAnnounceKickAndBanReasons;
+        private System.Windows.Forms.CheckBox xRequireRankChangeReason;
+        private System.Windows.Forms.CheckBox xRequireBanReason;
+        private System.Windows.Forms.CheckBox xAnnounceRankChanges;
+        private System.Windows.Forms.Button bColorIRC;
+        private System.Windows.Forms.Label lColorIRC;
+        private System.Windows.Forms.CheckBox xIRCBotAnnounceIRCJoins;
+        private System.Windows.Forms.GroupBox gCrashReport;
+        private System.Windows.Forms.Label lCrashReportDisclaimer;
+        private System.Windows.Forms.GroupBox gAdvancedMisc;
+        private System.Windows.Forms.Label lIRCDelay;
+        private System.Windows.Forms.NumericUpDown nIRCDelay;
+        private System.Windows.Forms.ComboBox cPatrolledRank;
+        private System.Windows.Forms.Label lPatrolledRank;
+        private System.Windows.Forms.Label lPatrolledRankAndBelow;
+        private System.Windows.Forms.Button bLowerRank;
+        private System.Windows.Forms.Button bRaiseRank;
+        private System.Windows.Forms.Label lRankList;
+        private System.Windows.Forms.CheckBox xIRCRegisteredNick;
+        private System.Windows.Forms.TextBox tIRCNickServMessage;
+        private System.Windows.Forms.Label lIRCNickServMessage;
+        private System.Windows.Forms.TextBox tIRCNickServ;
+        private System.Windows.Forms.Label lIRCNickServ;
+        private System.Windows.Forms.ToolTip toolTip;
+        private System.Windows.Forms.Label lIRCNoForwardingMessage;
+        private System.Windows.Forms.Label lIRCDelayUnits;
+        private System.Windows.Forms.NumericUpDown nMaxUndo;
+        private System.Windows.Forms.Label lMaxUndoUnits;
+        private System.Windows.Forms.CheckBox xMaxUndo;
+        private System.Windows.Forms.Label lDefaultBuildRank;
+        private System.Windows.Forms.ComboBox cDefaultBuildRank;
+        private System.Windows.Forms.Button bGreeting;
+        private System.Windows.Forms.ComboBox cIRCList;
+        private System.Windows.Forms.Label lIRCList;
+        private System.Windows.Forms.CheckBox xIRCListShowNonEnglish;
+        private System.Windows.Forms.CheckBox xAllowUnverifiedLAN;
+        private System.Windows.Forms.TabPage tabChat;
+        private System.Windows.Forms.GroupBox gAppearence;
+        private System.Windows.Forms.CheckBox xShowJoinedWorldMessages;
+        private System.Windows.Forms.CheckBox xRankColorsInWorldNames;
+        private System.Windows.Forms.Button bColorPM;
+        private System.Windows.Forms.Label lColorPM;
+        private System.Windows.Forms.Button bColorAnnouncement;
+        private System.Windows.Forms.Label lColorAnnouncement;
+        private System.Windows.Forms.Button bColorSay;
+        private System.Windows.Forms.Button bColorHelp;
+        private System.Windows.Forms.Button bColorSys;
+        private System.Windows.Forms.CheckBox xRankPrefixesInList;
+        private System.Windows.Forms.CheckBox xRankPrefixesInChat;
+        private System.Windows.Forms.CheckBox xRankColorsInChat;
+        private System.Windows.Forms.Label lColorSay;
+        private System.Windows.Forms.Label lColorHelp;
+        private System.Windows.Forms.Label lColorSys;
         private ChatPreview chatPreview;
-        private GroupBox gChatColors;
-        private Label lColorWarning;
-        private Button bColorWarning;
-        private Label lColorMe;
-        private Button bColorMe;
-        private Label lLogFileOptionsDescription;
-        private Label lLogConsoleOptionsDescription;
-        private CheckBox xIRCBotAnnounceServerEvents;
-        private CheckBox xIRCShowColorsFromServer;
-        private CheckBox xAllowFreePlayers;
-        private Button bMapPath;
-        private CheckBox xMapPath;
-        private TextBox tMapPath;
-        private CheckBox xAllowSecurityCircumvention;
-        private Label lConsoleName;
-        private TextBox tConsoleName;
-        private CheckBox xShowConnectionMessages;
-        private GroupBox gHelpAndSupport;
-        private Button bReadme;
-        private Button bReportABug;
-        private Button bCredits;
-        private GroupBox groupBox2;
-        private Button bOpenWiki;
-        private ComboBox cUpdaterMode;
-        private Label lUpdater;
-        private GroupBox gUpdaterSettings;
-        private Button bShowAdvancedUpdaterSettings;
-        private Label lIPWarning;
-        private TextBox tIP;
-        private CheckBox xIP;
-        private NumericUpDown nMaxConnectionsPerIP;
-        private NumericUpDown nMaxPlayersPerWorld;
-        private Label lMaxPlayersPerWorld;
-        private CheckBox xAnnounceRankChangeReasons;
-        private CheckBox xRequireKickReason;
-        private GroupBox gPermissionLimits;
-        private FlowLayoutPanel permissionLimitBoxContainer;
-        private GroupBox gDataBackup;
-        private CheckBox xBackupDataOnStartup;
-        private GroupBox gBlockDB;
-        private ComboBox cBlockDBAutoEnableRank;
-        private CheckBox xBlockDBAutoEnable;
-        private CheckBox xBlockDBEnabled;
-        private CheckBox xWoMEnableEnvExtensions;
-        private NumericUpDown nCopyPasteSlots;
-        private Label lCopyPasteSlots;
-        private DataGridViewTextBoxColumn dgvcName;
-        private DataGridViewTextBoxColumn dgvcDescription;
-        private DataGridViewComboBoxColumn dgvcAccess;
-        private DataGridViewComboBoxColumn dgvcBuild;
-        private DataGridViewComboBoxColumn dgvcBackup;
-        private DataGridViewCheckBoxColumn dgvcHidden;
-        private DataGridViewCheckBoxColumn dgvcBlockDB;
-        private Label lFillLimitUnits;
-        private NumericUpDown nFillLimit;
-        private Label lFillLimit;
-        private NumericUpDown nMaxUndoStates;
-        private Label lMaxUndoStates;
-        private GroupBox gPerformance;
-        private Button bChangelog;
-        private GroupBox gIRCFormatting;
-        private CheckBox xIRCShowColorsFromIRC;
-        private GroupBox gCrashReport;
-        private Label lCrashReportDisclaimer;
-        private CheckBox xSubmitCrashReports;
-        private CheckBox xAntispamMessageCount;
-        private CheckBox xAntispamMuteDuration;
-        private CheckBox xHeartbeatEnabled;
-        private CheckBox xIRCShowEmotesFromIRC;
-        private Label label2;
-        private Label label1;
-        private CheckBox xIRCShowEmotesFromServer;
-        private Button bColorIRC;
-        private Label lColorIRC;
-        private CheckBox xAllowEmailAccounts;
-        private GroupBox gHeartbeatUrl;
-        private Label lHeartbeatUrlWarning;
-        private ComboBox cHeartbeatUrl;
-        private Label lHeartbeatUrl;
+        private System.Windows.Forms.GroupBox gChatColors;
+        private System.Windows.Forms.Label lColorWarning;
+        private System.Windows.Forms.Button bColorWarning;
+        private System.Windows.Forms.Label lColorMe;
+        private System.Windows.Forms.Button bColorMe;
+        private System.Windows.Forms.Label lLogFileOptionsDescription;
+        private System.Windows.Forms.Label lLogConsoleOptionsDescription;
+        private System.Windows.Forms.CheckBox xIRCBotAnnounceServerEvents;
+        private System.Windows.Forms.CheckBox xIRCUseColor;
+        private System.Windows.Forms.Button bMapPath;
+        private System.Windows.Forms.CheckBox xMapPath;
+        private System.Windows.Forms.TextBox tMapPath;
+        private System.Windows.Forms.CheckBox xAllowSecurityCircumvention;
+        private System.Windows.Forms.Label lConsoleName;
+        private System.Windows.Forms.TextBox tConsoleName;
+        private System.Windows.Forms.CheckBox xShowConnectionMessages;
+        private System.Windows.Forms.Button bReadme;
+        private System.Windows.Forms.Button bCredits;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label lIPWarning;
+        private System.Windows.Forms.TextBox tIP;
+        private System.Windows.Forms.CheckBox xIP;
+        private System.Windows.Forms.NumericUpDown nMaxConnectionsPerIP;
+        private System.Windows.Forms.NumericUpDown nMaxPlayersPerWorld;
+        private System.Windows.Forms.Label lMaxPlayersPerWorld;
+        private System.Windows.Forms.CheckBox xAnnounceRankChangeReasons;
+        private System.Windows.Forms.CheckBox xRequireKickReason;
+        private System.Windows.Forms.GroupBox gPermissionLimits;
+        private System.Windows.Forms.FlowLayoutPanel permissionLimitBoxContainer;
+        private System.Windows.Forms.GroupBox gDataBackup;
+        private System.Windows.Forms.CheckBox xBackupDataOnStartup;
+        private System.Windows.Forms.GroupBox gBlockDB;
+        private System.Windows.Forms.ComboBox cBlockDBAutoEnableRank;
+        private System.Windows.Forms.CheckBox xBlockDBAutoEnable;
+        private System.Windows.Forms.CheckBox xBlockDBEnabled;
+        private System.Windows.Forms.CheckBox xWoMEnableEnvExtensions;
+        private System.Windows.Forms.NumericUpDown nCopyPasteSlots;
+        private System.Windows.Forms.Label lCopyPasteSlots;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dgvcName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn dgvcDescription;
+        private System.Windows.Forms.DataGridViewComboBoxColumn dgvcAccess;
+        private System.Windows.Forms.DataGridViewComboBoxColumn dgvcBuild;
+        private System.Windows.Forms.DataGridViewComboBoxColumn dgvcBackup;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn dgvcHidden;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn dgvcBlockDB;
+        private System.Windows.Forms.Label lFillLimitUnits;
+        private System.Windows.Forms.NumericUpDown nFillLimit;
+        private System.Windows.Forms.Label lFillLimit;
+        private System.Windows.Forms.NumericUpDown nMaxUndoStates;
+        private System.Windows.Forms.Label lMaxUndoStates;
+        private System.Windows.Forms.GroupBox gPerformance;
+        private System.Windows.Forms.Button bChangelog;
+        private System.Windows.Forms.TabPage Misc;
+        private System.Windows.Forms.Label CustomText;
+        private System.Windows.Forms.Button CustomColor;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox CustomName;
+        private System.Windows.Forms.TextBox CustomAliases;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label MaxCaps;
+        private System.Windows.Forms.NumericUpDown MaxCapsValue;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox SwearBox;
+        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.Button SwearEditor;
+        private System.Windows.Forms.Button ReqsEditor;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.TextBox websiteURL;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.ToolTip toolTip1;
+        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.Button bWiki;
+        private System.Windows.Forms.Button bWeb;
+        private System.Windows.Forms.ComboBox HeartBeatUrlComboBox;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.CheckBox xCrash;
+        private System.Windows.Forms.GroupBox groupBox5;
+        private System.Windows.Forms.Button bUpdate;
+        private System.Windows.Forms.CheckBox checkUpdate;
+        private System.Windows.Forms.GroupBox gIRCAdv;
+        private System.Windows.Forms.TextBox tServPass;
+        private System.Windows.Forms.CheckBox xServPass;
+        private System.Windows.Forms.TextBox tChanPass;
+        private System.Windows.Forms.CheckBox xChanPass;
+        private System.Windows.Forms.CheckBox xAutoRank;
+        private System.Windows.Forms.Button bColorGlobal;
+        private System.Windows.Forms.Label IColorGlobal;
     }
 }

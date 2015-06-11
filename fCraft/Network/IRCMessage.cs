@@ -1,4 +1,4 @@
-﻿/* Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿/* Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
  * 
  * Based, in part, on SmartIrc4net code. Original license is reproduced below.
  * 
@@ -26,7 +26,7 @@
  */
 
 namespace fCraft {
-    /// <summary> Represents a parsed incoming IRC message. </summary>
+    // ReSharper disable FieldCanBeMadeReadOnly.Global
     public sealed class IRCMessage {
         public string From { get; private set; }
         public string Nick { get; private set; }
@@ -40,11 +40,11 @@ namespace fCraft {
         public IRCMessageType Type { get; private set; }
         public IRCReplyCode ReplyCode { get; private set; }
 
-        public IRCMessage( string from, string nick, string ident, string host, string channel, string message, string rawMessage, IRCMessageType type, IRCReplyCode replyCode ) {
+        public IRCMessage( string from, string nick, string ident, string host, string channel, string message, string rawMessage, IRCMessageType type, IRCReplyCode replycode ) {
             RawMessage = rawMessage;
             RawMessageArray = rawMessage.Split( new[] { ' ' } );
             Type = type;
-            ReplyCode = replyCode;
+            ReplyCode = replycode;
             From = from;
             Nick = nick;
             Ident = ident;

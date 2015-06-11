@@ -1,8 +1,6 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that handles non-aligned (single-mark) pasting for /Paste and /PasteNot.
-    /// Preserves original orientation of the CopyState. </summary>
     sealed class QuickPasteDrawOperation : PasteDrawOperation {
         public override string Name {
             get {

@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using JetBrains.Annotations;
 
@@ -20,7 +20,7 @@ namespace fCraft {
     }
 
 
-    /// <summary> Class for generating and filtering 2D and 3D noise, extensively used by RealisticMapGenState and Cloudy brush. </summary>
+    /// <summary> Class for generating and filtering 2D noise, extensively used by MapGenerator. </summary>
     public sealed class Noise {
         public readonly int Seed;
         public readonly NoiseInterpolationMode InterpolationMode;
@@ -31,13 +31,11 @@ namespace fCraft {
         }
 
 
-        /// <summary> 1D linear interpolation (LERP) </summary>
         public static float InterpolateLinear( float v0, float v1, float x ) {
             return v0 * (1 - x) + v1 * x;
         }
 
 
-        /// <summary> 2D linear interpolation (LERP) </summary>
         public static float InterpolateLinear( float v00, float v01, float v10, float v11, float x, float y ) {
             return InterpolateLinear( InterpolateLinear( v00, v10, x ),
                                       InterpolateLinear( v01, v11, x ),
@@ -45,14 +43,11 @@ namespace fCraft {
         }
 
 
-        /// <summary> 1D cosine interpolation </summary>
         public static float InterpolateCosine( float v0, float v1, float x ) {
             double f = (1 - Math.Cos( x * Math.PI )) * .5;
             return (float)(v0 * (1 - f) + v1 * f);
         }
 
-
-        /// <summary> 2D cosine interpolation </summary>
         public static float InterpolateCosine( float v00, float v01, float v10, float v11, float x, float y ) {
             return InterpolateCosine( InterpolateCosine( v00, v10, x ),
                                       InterpolateCosine( v01, v11, x ),
@@ -60,8 +55,8 @@ namespace fCraft {
         }
 
 
-        /// <summary> 1D Cubic Spline interpolation method, based on work by Paul Bourke.
-        /// Interpolates on the curve formed by values v0 through v3, between point v1 and v2. </summary>
+        // Cubic and Catmull-Rom Spline interpolation methods by Paul Bourke
+        // http://local.wasp.uwa.edu.au/~pbourke/miscellaneous/interpolation/
         public static float InterpolateCubic( float v0, float v1, float v2, float v3, float mu ) {
             float mu2 = mu * mu;
             float a0 = v3 - v2 - v0 + v1;
@@ -72,8 +67,6 @@ namespace fCraft {
         }
 
 
-        /// <summary> 2D Catmull-Rom Spline interpolation method, based on work by Paul Bourkee.
-        /// Interpolates on the curve formed by values v0 through v3, between point v1 and v2. </summary>
         public static float InterpolateSpline( float v0, float v1, float v2, float v3, float mu ) {
             float mu2 = mu * mu;
             float a0 = -0.5f * v0 + 1.5f * v1 - 1.5f * v2 + 0.5f * v3;
@@ -84,17 +77,12 @@ namespace fCraft {
         }
 
 
-        /// <summary> Gets random value at given 2D coordinate. Coordinates can be in any range.
-        /// Result is normalized to 0.0-1.0. Guaranteed to produce same result for same coordinates between calls. </summary>
         public float StaticNoise( int x, int y ) {
             int n = Seed + x + y * short.MaxValue;
             n = (n << 13) ^ n;
             return (float)(1.0 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7FFFFFFF) / 1073741824d);
         }
 
-
-        /// <summary> Gets random value at given 3D coordinate. Coordinates can be in any range.
-        /// Result is normalized to 0.0-1.0. Guaranteed to produce same result for same coordinates between calls. </summary>
         public float StaticNoise( int x, int y, int z ) {
             int n = Seed + x + y * 1625 + z * 2642245;
             n = (n << 13) ^ n;
@@ -103,10 +91,6 @@ namespace fCraft {
 
 
         readonly float[,] points = new float[4, 4];
-
-        /// <summary> Gets noise for given 2D floating-point coordinate, using chosen InterpolationMode. 
-        /// Coordinates must be castable to integer (i.e. between Int32.MinValue and Int64.MaxValue).
-        /// Result is normalized to 0.0-1.0. Guaranteed to produce same result for same coordinates between calls. </summary>
         public float InterpolatedNoise( float x, float y ) {
             int xInt = (int)Math.Floor( x );
             float xFloat = x - xInt;
@@ -161,10 +145,6 @@ namespace fCraft {
         }
 
         //readonly float[, ,] points3D = new float[4, 4, 4];
-        /// <summary> Gets noise for given 2D floating-point coordinate, using chosen InterpolationMode.
-        /// Only Linear and Cosine interpolation is currently supported.
-        /// Coordinates must be castable to integer (i.e. between Int32.MinValue and Int64.MaxValue).
-        /// Result is normalized to 0.0-1.0. Guaranteed to produce same result for same coordinates between calls. </summary>
         public float InterpolatedNoise( float x, float y, float z ) {
             int xInt = (int)Math.Floor( x );
             float xFloat = x - xInt;
@@ -237,29 +217,7 @@ namespace fCraft {
         }
 
 
-        public float PerlinNoiseMax( int startOctave, int endOctave, float decay ) {
-            if( startOctave < 0 ) throw new ArgumentOutOfRangeException( "startOctave" );
-            if( startOctave > endOctave ) throw new ArgumentOutOfRangeException( "endOctave" );
-            float amplitude = (float)Math.Pow( decay, startOctave );
-            float total = 0;
-
-            for( int n = startOctave; n <= endOctave; n++ ) {
-                total += amplitude;
-                amplitude *= decay;
-            }
-            return total;
-        }
-
-        public float PerlinNoiseMax2( int startOctave, int endOctave, float decay ) {
-            if( startOctave < 0 ) throw new ArgumentOutOfRangeException( "startOctave" );
-            if( startOctave > endOctave ) throw new ArgumentOutOfRangeException( "endOctave" );
-            return (float)(Math.Pow( decay, startOctave ) - Math.Pow( decay, endOctave + 1 ))/(1 - decay);
-        }
-
-
         public float PerlinNoise( float x, float y, int startOctave, int endOctave, float decay ) {
-            if( startOctave < 0 ) throw new ArgumentOutOfRangeException( "startOctave" );
-            if( startOctave > endOctave ) throw new ArgumentOutOfRangeException( "endOctave" );
             float total = 0;
 
             float frequency = (float)Math.Pow( 2, startOctave );
@@ -270,21 +228,19 @@ namespace fCraft {
                 frequency *= 2;
                 amplitude *= decay;
             }
-
             return total;
         }
 
-
         public float PerlinNoise( float x, float y, float z, int startOctave, int endOctave, float decay ) {
-            if( startOctave < 0 ) throw new ArgumentOutOfRangeException( "startOctave" );
-            if( startOctave > endOctave ) throw new ArgumentOutOfRangeException( "endOctave" );
             float total = 0;
 
             float frequency = (float)Math.Pow( 2, startOctave );
             float amplitude = (float)Math.Pow( decay, startOctave );
 
             for( int n = startOctave; n <= endOctave; n++ ) {
-                total += InterpolatedNoise( x * frequency + frequency, y * frequency + frequency, z * frequency + frequency ) * amplitude;
+                total +=
+                    InterpolatedNoise( x * frequency + frequency, y * frequency + frequency, z * frequency + frequency ) *
+                    amplitude;
                 frequency *= 2;
                 amplitude *= decay;
             }
@@ -293,44 +249,31 @@ namespace fCraft {
 
 
         public void PerlinNoise( [NotNull] float[,] map, int startOctave, int endOctave, float decay, int offsetX, int offsetY ) {
-            if( startOctave < 0 ) throw new ArgumentOutOfRangeException( "startOctave" );
-            if( startOctave > endOctave ) throw new ArgumentOutOfRangeException( "endOctave" );
             if( map == null ) throw new ArgumentNullException( "map" );
             float maxDim = 1f / Math.Max( map.GetLength( 0 ), map.GetLength( 1 ) );
-            float divisor = PerlinNoiseMax2( startOctave, endOctave, decay );
-
             for( int x = map.GetLength( 0 ) - 1; x >= 0; x-- ) {
                 for( int y = map.GetLength( 1 ) - 1; y >= 0; y-- ) {
-                    map[x, y] = PerlinNoise( x*maxDim + offsetX, y*maxDim + offsetY, startOctave, endOctave, decay )/
-                                divisor;
+                    map[x, y] += PerlinNoise( x * maxDim + offsetX, y * maxDim + offsetY, startOctave, endOctave, decay );
                 }
             }
         }
 
 
-        public void PerlinNoise( [NotNull] float[,,] map, int startOctave, int endOctave, float decay, int offsetX,
-                                 int offsetY, int offsetZ ) {
-            if( startOctave < 0 ) throw new ArgumentOutOfRangeException( "startOctave" );
-            if( startOctave > endOctave ) throw new ArgumentOutOfRangeException( "endOctave" );
+        public void PerlinNoise( [NotNull] float[, ,] map, int startOctave, int endOctave, float decay, int offsetX, int offsetY, int offsetZ ) {
             if( map == null ) throw new ArgumentNullException( "map" );
-            float maxDim = 1f/Math.Max( map.GetLength( 0 ), Math.Max( map.GetLength( 2 ), map.GetLength( 1 ) ) );
-            float divisor = PerlinNoiseMax2( startOctave, endOctave, decay );
+            float maxDim = 1f / Math.Max( map.GetLength( 0 ), Math.Max( map.GetLength( 2 ), map.GetLength( 1 ) ) );
             for( int x = map.GetLength( 0 ) - 1; x >= 0; x-- ) {
                 for( int y = map.GetLength( 1 ) - 1; y >= 0; y-- ) {
                     for( int z = map.GetLength( 2 ) - 1; z >= 0; z-- ) {
-                        map[x, y, z] = PerlinNoise( x*maxDim + offsetX,
-                                                    y*maxDim + offsetY,
-                                                    z*maxDim + offsetZ,
-                                                    startOctave,
-                                                    endOctave,
-                                                    decay )/divisor;
+                        map[x, y, z] += PerlinNoise( x * maxDim + offsetX, y * maxDim + offsetY, z * maxDim + offsetZ,
+                                                     startOctave, endOctave, decay );
                     }
                 }
             }
         }
 
 
-        #region Normalization
+        #region Normalize
 
         public static void Normalize( float[,] map ) {
             Normalize( map, 0, 1 );
@@ -342,63 +285,61 @@ namespace fCraft {
         }
 
 
-        public unsafe static void Normalize( float[, ,] map, out float multiplier, out float constant ) {
+        public static void Normalize( float[, ,] map, out float multiplier, out float constant ) {
+            CalculateNormalizationParams( map, out multiplier, out constant, 0f, 1f );
+        }
+
+        public unsafe static void CalculateNormalizationParams( float[, ,] map, out float multiplier, out float constant, float low, float high ) {
             fixed( float* ptr = map ) {
-                CalculateNormalizationParams( ptr, map.Length, 0f, 1f, out multiplier, out constant );
+                float min = float.MaxValue,
+                      max = float.MinValue;
+
+                for( int i = 0; i < map.Length; i++ ) {
+                    min = Math.Min( min, ptr[i] );
+                    max = Math.Max( max, ptr[i] );
+                }
+
+                multiplier = (high - low) / (max - min);
+                constant = -min * (high - low) / (max - min) + low;
+
                 for( int i = 0; i < map.Length; i++ ) {
                     ptr[i] = ptr[i] * multiplier + constant;
                 }
             }
-        }
-
-
-        public unsafe static void CalculateNormalizationParams( float[,,] map, float low, float high, out float multiplier, out float constant ) {
-            fixed( float* ptr = map ) {
-                CalculateNormalizationParams( ptr, map.Length, low, high, out multiplier, out constant );
-            }
-        }
-
-
-        public unsafe static void CalculateNormalizationParams( float[,] map, float low, float high, out float multiplier, out float constant ) {
-            fixed( float* ptr = map ) {
-                CalculateNormalizationParams( ptr, map.Length, low, high, out multiplier, out constant );
-            }
-        }
-
-
-        public unsafe static void CalculateNormalizationParams( float* ptr, int length, float low, float high, out float multiplier, out float constant ) {
-            float min = float.MaxValue,
-                  max = float.MinValue;
-
-            for( int i = 0; i < length; i++ ) {
-                min = Math.Min( min, ptr[i] );
-                max = Math.Max( max, ptr[i] );
-            }
-
-            multiplier = ( high - low ) / ( max - min );
-            constant = -min * ( high - low ) / ( max - min ) + low;
         }
 
 
         public unsafe static void Normalize( float[,] map, float low, float high ) {
+            int length = map.GetLength( 0 ) * map.GetLength( 1 );
             fixed( float* ptr = map ) {
-                float multiplier, constant;
-                CalculateNormalizationParams( ptr, map.Length, low, high, out multiplier, out constant );
-                for( int i = 0; i < map.Length; i++ ) {
-                    ptr[i] = ptr[i] * multiplier + constant;
-                }
+                Normalize( ptr, length, low, high );
             }
         }
 
 
         public unsafe static void Normalize( float[,,] map, float low, float high ) {
+            int length = map.GetLength( 0 ) * map.GetLength( 1 ) * map.GetLength( 2 );
             fixed( float* ptr = map ) {
-                float multiplier, constant;
-                CalculateNormalizationParams( ptr, map.Length, low, high, out multiplier, out constant );
-                for( int i = 0; i < map.Length; i++ ) {
+                Normalize( ptr, length, low, high );
+            }
+        }
+
+
+        unsafe static void Normalize( float* ptr, int length, float low, float high ) {
+            float min = float.MaxValue,
+                  max = float.MinValue;
+
+                for( int i = 0; i < length; i++ ) {
+                    min = Math.Min( min, ptr[i] );
+                    max = Math.Max( max, ptr[i] );
+                }
+
+                float multiplier = (high - low) / (max - min);
+                float constant = -min * (high - low) / (max - min) + low;
+
+                for( int i = 0; i < length; i++ ) {
                     ptr[i] = ptr[i] * multiplier + constant;
                 }
-            }
         }
 
         #endregion
@@ -534,34 +475,21 @@ namespace fCraft {
 
         public static float[,] CalculateSlope( [NotNull] float[,] heightmap ) {
             if( heightmap == null ) throw new ArgumentNullException( "heightmap" );
-            float[,] output = new float[heightmap.GetLength( 0 ),heightmap.GetLength( 1 )];
-            int width1 = heightmap.GetLength( 0 ) - 1,
-                height1 = heightmap.GetLength( 1 ) - 1;
+            float[,] output = new float[heightmap.GetLength( 0 ), heightmap.GetLength( 1 )];
 
-            for( int x = width1; x >= 0; x-- ) {
-                for( int y = height1; y >= 0; y-- ) {
-                    if( (x == 0) || (y == 0) || (x == width1) || (y == height1) ) {
-                        output[x, y] = (Math.Abs( heightmap[x, Math.Max( 0, y - 1 )] - heightmap[x, y] )*3 +
-                                        Math.Abs( heightmap[x, Math.Min( height1, y + 1 )] - heightmap[x, y] )*3 +
-                                        Math.Abs( heightmap[Math.Max( 0, x - 1 ), y] - heightmap[x, y] )*3 +
-                                        Math.Abs( heightmap[Math.Min( width1, x + 1 ), y] - heightmap[x, y] )*3 +
-                                        Math.Abs( heightmap[Math.Max( 0, x - 1 ), Math.Max( 0, y - 1 )] -
-                                                  heightmap[x, y] )*2 +
-                                        Math.Abs( heightmap[Math.Min( width1, x + 1 ), Math.Max( 0, y - 1 )] -
-                                                  heightmap[x, y] )*2 +
-                                        Math.Abs( heightmap[Math.Max( 0, x - 1 ), Math.Min( height1, y + 1 )] -
-                                                  heightmap[x, y] )*2 +
-                                        Math.Abs( heightmap[Math.Min( width1, x + 1 ), Math.Min( height1, y + 1 )] -
-                                                  heightmap[x, y] )*2)/20f;
+            for( int x = heightmap.GetLength( 0 ) - 1; x >= 0; x-- ) {
+                for( int y = heightmap.GetLength( 1 ) - 1; y >= 0; y-- ) {
+                    if( (x == 0) || (y == 0) || (x == heightmap.GetLength( 0 ) - 1) || (y == heightmap.GetLength( 1 ) - 1) ) {
+                        output[x, y] = 0;
                     } else {
-                        output[x, y] = (Math.Abs( heightmap[x, y - 1] - heightmap[x, y] )*3 +
-                                        Math.Abs( heightmap[x, y + 1] - heightmap[x, y] )*3 +
-                                        Math.Abs( heightmap[x - 1, y] - heightmap[x, y] )*3 +
-                                        Math.Abs( heightmap[x + 1, y] - heightmap[x, y] )*3 +
-                                        Math.Abs( heightmap[x - 1, y - 1] - heightmap[x, y] )*2 +
-                                        Math.Abs( heightmap[x + 1, y - 1] - heightmap[x, y] )*2 +
-                                        Math.Abs( heightmap[x - 1, y + 1] - heightmap[x, y] )*2 +
-                                        Math.Abs( heightmap[x + 1, y + 1] - heightmap[x, y] )*2)/20f;
+                        output[x, y] = (Math.Abs( heightmap[x, y - 1] - heightmap[x, y] ) * 3 +
+                                        Math.Abs( heightmap[x, y + 1] - heightmap[x, y] ) * 3 +
+                                        Math.Abs( heightmap[x - 1, y] - heightmap[x, y] ) * 3 +
+                                        Math.Abs( heightmap[x + 1, y] - heightmap[x, y] ) * 3 +
+                                        Math.Abs( heightmap[x - 1, y - 1] - heightmap[x, y] ) * 2 +
+                                        Math.Abs( heightmap[x + 1, y - 1] - heightmap[x, y] ) * 2 +
+                                        Math.Abs( heightmap[x - 1, y + 1] - heightmap[x, y] ) * 2 +
+                                        Math.Abs( heightmap[x + 1, y + 1] - heightmap[x, y] ) * 2) / 20f;
                     }
                 }
             }
@@ -570,12 +498,13 @@ namespace fCraft {
         }
 
 
+
         const int ThresholdSearchPasses = 10;
 
         public unsafe static float FindThreshold( [NotNull] float[,] data, float desiredCoverage ) {
             if( data == null ) throw new ArgumentNullException( "data" );
-            if( desiredCoverage < float.Epsilon ) return 0;
-            if( desiredCoverage > 1 - float.Epsilon ) return 1;
+            if( desiredCoverage == 0 ) return 0;
+            if( desiredCoverage == 1 ) return 1;
             float threshold = 0.5f;
             fixed( float* ptr = data ) {
                 for( int i = 0; i < ThresholdSearchPasses; i++ ) {
@@ -593,8 +522,8 @@ namespace fCraft {
 
         public unsafe static float FindThreshold( [NotNull] float[,,] data, float desiredCoverage ) {
             if( data == null ) throw new ArgumentNullException( "data" );
-            if( desiredCoverage < float.Epsilon ) return 0;
-            if( desiredCoverage > 1 - float.Epsilon ) return 1;
+            if( desiredCoverage == 0 ) return 0;
+            if( desiredCoverage == 1 ) return 1;
             float threshold = 0.5f;
             fixed( float* ptr = data ) {
                 for( int i = 0; i < ThresholdSearchPasses; i++ ) {

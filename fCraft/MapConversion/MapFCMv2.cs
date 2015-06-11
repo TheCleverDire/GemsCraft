@@ -1,4 +1,4 @@
-// Part of fCraft | Copyright (c) 2009-2014 Matvei Stefarov <me@matvei.org> | BSD-3 | See LICENSE.txt
+// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -7,24 +7,13 @@ using JetBrains.Annotations;
 
 namespace fCraft.MapConversion {
     /// <summary> fCraft map format converter, for obsolete format version #2 (2010). </summary>
-    public sealed class MapFCMv2 : IMapImporter {
-        private const uint Identifier = 0xfc000002;
+    public sealed class MapFCMv2 : IMapConverter {
+        public const uint Identifier = 0xfc000002;
 
         public string ServerName {
             get { return "fCraft"; }
         }
 
-        public bool SupportsImport {
-            get { return true; }
-        }
-
-        public bool SupportsExport {
-            get { return false; }
-        }
-
-        public string FileExtension {
-            get { return "fcm"; }
-        }
 
         public MapStorageType StorageType {
             get { return MapStorageType.SingleFile; }
@@ -36,18 +25,18 @@ namespace fCraft.MapConversion {
         }
 
 
-        public bool ClaimsName( string fileName ) {
+        public bool ClaimsName( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             return fileName.EndsWith( ".fcm", StringComparison.OrdinalIgnoreCase );
         }
 
 
-        public bool Claims( string fileName ) {
+        public bool Claims( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             try {
                 using( FileStream mapStream = File.OpenRead( fileName ) ) {
                     BinaryReader reader = new BinaryReader( mapStream );
-                    return ( reader.ReadUInt32() == Identifier );
+                    return (reader.ReadUInt32() == Identifier);
                 }
             } catch( Exception ) {
                 return false;
@@ -56,7 +45,7 @@ namespace fCraft.MapConversion {
         }
 
 
-        public Map LoadHeader( string fileName ) {
+        public Map LoadHeader( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             using( FileStream mapStream = File.OpenRead( fileName ) ) {
                 return LoadHeaderInternal( mapStream );
@@ -73,7 +62,7 @@ namespace fCraft.MapConversion {
                 throw new MapFormatException();
             }
 
-            // Read in the map dimensions
+            // Read in the map dimesions
             int width = reader.ReadInt16();
             int length = reader.ReadInt16();
             int height = reader.ReadInt16();
@@ -83,21 +72,27 @@ namespace fCraft.MapConversion {
             // ReSharper restore UseObjectOrCollectionInitializer
 
             // Read in the spawn location
-            map.Spawn = new Position( reader.ReadInt16(),
-                                      reader.ReadInt16(),
-                                      reader.ReadInt16(),
-                                      reader.ReadByte(),
-                                      reader.ReadByte() );
+            map.Spawn = new Position {
+                X = reader.ReadInt16(),
+                Y = reader.ReadInt16(),
+                Z = reader.ReadInt16(),
+                R = reader.ReadByte(),
+                L = reader.ReadByte()
+            };
 
             return map;
         }
 
 
-        public Map Load( string fileName ) {
+        public Map Load( [NotNull] string fileName ) {
             if( fileName == null ) throw new ArgumentNullException( "fileName" );
             using( FileStream mapStream = File.OpenRead( fileName ) ) {
 
                 Map map = LoadHeaderInternal( mapStream );
+
+                if( !map.ValidateHeader() ) {
+                    throw new MapFormatException( "One or more of the map dimensions are invalid." );
+                }
 
                 BinaryReader reader = new BinaryReader( mapStream );
 
@@ -131,6 +126,13 @@ namespace fCraft.MapConversion {
 
                 return map;
             }
+        }
+
+
+        public bool Save( [NotNull] Map mapToSave, [NotNull] string fileName ) {
+            if( mapToSave == null ) throw new ArgumentNullException( "mapToSave" );
+            if( fileName == null ) throw new ArgumentNullException( "fileName" );
+            throw new NotImplementedException();
         }
 
 

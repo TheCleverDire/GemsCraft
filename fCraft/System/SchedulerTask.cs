@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Text;
 using JetBrains.Annotations;
@@ -67,9 +67,6 @@ namespace fCraft {
         /// <summary> Maximum number of repeats for RunRepeating tasks.
         /// Set to -1 to run forever. </summary>
         public int MaxRepeats { get; set; }
-        
-        /// <summary> Whether this task should be allowed to finish after server shutdown. </summary>
-        public bool IsCritical { get; set; }
 
         /// <summary> Method to call to execute the task. </summary>
         [NotNull]
@@ -244,11 +241,8 @@ namespace fCraft {
             if( Callback.Target != null ) {
                 sb.Append( Callback.Target ).Append( "::" );
             }
-            Type declaringType = Callback.Method.DeclaringType;
-            if( declaringType != null ) {
-                sb.Append( declaringType.Name );
-                sb.Append( '.' );
-            }
+            sb.Append( Callback.Method.DeclaringType.Name );
+            sb.Append( '.' );
             sb.Append( Callback.Method.Name );
             sb.Append( " @ " );
 
@@ -267,8 +261,6 @@ namespace fCraft {
     }
 
 
-    /// <summary> Represents the method that is called when a SchedulerTask is executed. </summary>
-    /// <param name="task"> SchedulerTask associated with the task that was called. </param>
     public delegate void SchedulerCallback( [NotNull] SchedulerTask task );
 
 

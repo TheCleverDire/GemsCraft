@@ -1,44 +1,27 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that creates a wireframe cuboid, optionally filling sides and center. </summary>
     public sealed class CuboidWireframeDrawOperation : DrawOperation {
         public override string Name {
             get { return "CuboidW"; }
         }
 
-        public override int ExpectedMarks {
-            get { return 2; }
-        }
-
-
         public CuboidWireframeDrawOperation( Player player )
-            : base( player ) {}
-
-
-        bool fillSides, fillCenter;
+            : base( player ) {
+        }
 
 
         public override bool Prepare( Vector3I[] marks ) {
             if( !base.Prepare( marks ) ) return false;
 
-            int hollowVolume = Math.Max( 0, Bounds.Width - 2 ) * Math.Max( 0, Bounds.Length - 2 ) *
-                               Math.Max( 0, Bounds.Height - 2 );
-            int sideVolumeX = Math.Max( 0, Bounds.Width - 2 ) * Math.Max( 0, Bounds.Length - 2 ) *
-                              ( Bounds.ZMax != Bounds.ZMin ? 2 : 1 );
-            int sideVolumeY = Math.Max( 0, Bounds.Length - 2 ) * Math.Max( 0, Bounds.Height - 2 ) *
-                              ( Bounds.XMax != Bounds.XMin ? 2 : 1 );
-            int sideVolumeZ = Math.Max( 0, Bounds.Height - 2 ) * Math.Max( 0, Bounds.Width - 2 ) *
-                              ( Bounds.YMax != Bounds.YMin ? 2 : 1 );
+            int hollowVolume = Math.Max( 0, Bounds.Width - 2 ) * Math.Max( 0, Bounds.Length - 2 ) * Math.Max( 0, Bounds.Height - 2 );
+            int sideVolumeX = Math.Max( 0, Bounds.Width - 2 ) * Math.Max( 0, Bounds.Length - 2 ) * (Bounds.ZMax != Bounds.ZMin ? 2 : 1);
+            int sideVolumeY = Math.Max( 0, Bounds.Length - 2 ) * Math.Max( 0, Bounds.Height - 2 ) * (Bounds.XMax != Bounds.XMin ? 2 : 1);
+            int sideVolumeZ = Math.Max( 0, Bounds.Height - 2 ) * Math.Max( 0, Bounds.Width - 2 ) * (Bounds.YMax != Bounds.YMin ? 2 : 1);
 
-            fillSides = Brush.AlternateBlocks > 1 && ( sideVolumeX > 0 || sideVolumeY > 0 || sideVolumeZ > 0 );
-            fillCenter = Brush.AlternateBlocks > 2 && hollowVolume > 0;
-
-            BlocksTotalEstimate = Bounds.Volume;
-            if( !fillSides ) BlocksTotalEstimate -= sideVolumeX + sideVolumeY + sideVolumeZ;
-            if( !fillCenter ) BlocksTotalEstimate -= hollowVolume;
+            BlocksTotalEstimate = Bounds.Volume - hollowVolume - sideVolumeX - sideVolumeY - sideVolumeZ;
 
             coordEnumerator = BlockEnumerator().GetEnumerator();
             return true;
@@ -46,8 +29,6 @@ namespace fCraft.Drawing {
 
 
         IEnumerator<Vector3I> coordEnumerator;
-
-
         public override int DrawBatch( int maxBlocksToDraw ) {
             int blocksDone = 0;
             while( coordEnumerator.MoveNext() ) {
@@ -113,47 +94,6 @@ namespace fCraft.Drawing {
                     if( Bounds.XMin != Bounds.XMax ) {
                         yield return new Vector3I( Bounds.XMax, Bounds.YMax, z );
                         if( Bounds.YMin != Bounds.YMax ) yield return new Vector3I( Bounds.XMax, Bounds.YMin, z );
-                    }
-                }
-            }
-
-            // Draw sides
-            if( fillSides ) {
-                AlternateBlockIndex = 1;
-                if( Bounds.Length > 2 && Bounds.Height > 2 ) {
-                    for( int y = Bounds.YMin + 1; y < Bounds.YMax; y++ ) {
-                        for( int z = Bounds.ZMin + 1; z < Bounds.ZMax; z++ ) {
-                            yield return new Vector3I( Bounds.XMin, y, z );
-                            if( Bounds.XMin != Bounds.XMax ) yield return new Vector3I( Bounds.XMax, y, z );
-                        }
-                    }
-                }
-                if( Bounds.Width > 2 && Bounds.Height > 2 ) {
-                    for( int x = Bounds.XMin + 1; x < Bounds.XMax; x++ ) {
-                        for( int z = Bounds.ZMin + 1; z < Bounds.ZMax; z++ ) {
-                            yield return new Vector3I( x, Bounds.YMin, z );
-                            if( Bounds.YMin != Bounds.YMax ) yield return new Vector3I( x, Bounds.YMax, z );
-                        }
-                    }
-                }
-                if( Bounds.Length > 2 && Bounds.Width > 2 ) {
-                    for( int x = Bounds.XMin + 1; x < Bounds.XMax; x++ ) {
-                        for( int y = Bounds.YMin + 1; y < Bounds.YMax; y++ ) {
-                            yield return new Vector3I( x, y, Bounds.ZMin );
-                            if( Bounds.ZMin != Bounds.ZMax ) yield return new Vector3I( x, y, Bounds.ZMax );
-                        }
-                    }
-                }
-            }
-
-            // Draw filling
-            if( fillCenter ) {
-                AlternateBlockIndex = 2;
-                for( int x = Bounds.XMin + 1; x < Bounds.XMax; x++ ) {
-                    for( int y = Bounds.YMin + 1; y < Bounds.YMax; y++ ) {
-                        for( int z = Bounds.ZMin + 1; z < Bounds.ZMax; z++ ) {
-                            yield return new Vector3I( x, y, z );
-                        }
                     }
                 }
             }

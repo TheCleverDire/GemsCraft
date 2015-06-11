@@ -1,8 +1,8 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 
 namespace fCraft.Drawing {
-    /// <summary> A self-contained DrawOperation that provides its own brush.
+    /// <summary> A self-contained DrawOperation that prodivides its own brush.
     /// Purpose of this class is mostly to take care of the boilerplate code. </summary>
     public abstract class DrawOpWithBrush : DrawOperation, IBrushFactory, IBrush, IBrushInstance {
 
@@ -14,7 +14,7 @@ namespace fCraft.Drawing {
             : base( player ) {
         }
 
-        public abstract bool ReadParams( CommandReader cmd );
+        public abstract bool ReadParams( Command cmd );
 
 
         protected abstract Block NextBlock();
@@ -34,7 +34,7 @@ namespace fCraft.Drawing {
             get { return null; }
         }
 
-        IBrush IBrushFactory.MakeBrush( Player player, CommandReader cmd ) {
+        IBrush IBrushFactory.MakeBrush( Player player, Command cmd ) {
             return this;
         }
 
@@ -51,7 +51,7 @@ namespace fCraft.Drawing {
             get { throw new NotImplementedException(); }
         }
 
-        IBrushInstance IBrush.MakeInstance( Player player, CommandReader cmd, DrawOperation op ) {
+        IBrushInstance IBrush.MakeInstance( Player player, Command cmd, DrawOperation op ) {
             if( ReadParams( cmd ) ) {
                 return this;
             } else {
@@ -72,8 +72,8 @@ namespace fCraft.Drawing {
             get { return Description; }
         }
 
-        int IBrushInstance.AlternateBlocks {
-            get { return 1; }
+        bool IBrushInstance.HasAlternateBlock {
+            get { return false; }
         }
 
         bool IBrushInstance.Begin( Player player, DrawOperation op ) {

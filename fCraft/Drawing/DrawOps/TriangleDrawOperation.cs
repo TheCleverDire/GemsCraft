@@ -1,10 +1,8 @@
-﻿// fCraft is Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// fCraft is Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 // TriangleDrawOperation contributed by Conrad "Redshift" Morgan
 using System;
 
 namespace fCraft.Drawing {
-    /// <summary> Draw operation that creates a filled triangle, 1 block thick,
-    /// using three given coordinates as vertices. </summary>
     public sealed class TriangleDrawOperation : DrawOperation {
         public override string Name {
             get { return "Triangle"; }

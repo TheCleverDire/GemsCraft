@@ -1,17 +1,14 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using JetBrains.Annotations;
 
 namespace fCraft.Drawing {
-    /// <summary> Constructs ReplaceBrushBrush. </summary>
     public sealed class ReplaceBrushBrushFactory : IBrushFactory {
-        /// <summary> Singleton instance of the ReplaceBrushBrushFactory. </summary>
         public static readonly ReplaceBrushBrushFactory Instance = new ReplaceBrushBrushFactory();
 
         ReplaceBrushBrushFactory() {
-            Aliases = new[] { "rb" };
+            Aliases=new[] { "rb" };
         }
-
 
         public string Name {
             get { return "ReplaceBrush"; }
@@ -21,14 +18,12 @@ namespace fCraft.Drawing {
 
         const string HelpString = "ReplaceBrush brush: Replaces blocks of a given type with output of another brush. " +
                                   "Usage: &H/Brush rb <Block> <BrushName>";
-
         public string Help {
             get { return HelpString; }
         }
 
-
         [CanBeNull]
-        public IBrush MakeBrush( Player player, CommandReader cmd ) {
+        public IBrush MakeBrush( [NotNull] Player player, [NotNull] Command cmd ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( cmd == null ) throw new ArgumentNullException( "cmd" );
 
@@ -37,8 +32,8 @@ namespace fCraft.Drawing {
                 return null;
             }
 
-            Block block;
-            if( !cmd.NextBlock( player, false, out block ) ) return null;
+            Block block = cmd.NextBlock( player );
+            if( block == Block.Undefined ) return null;
 
             string brushName = cmd.Next();
             if( brushName == null || !CommandManager.IsValidCommandName( brushName ) ) {
@@ -62,18 +57,15 @@ namespace fCraft.Drawing {
     }
 
 
-    /// <summary> Brush that replaces all blocks of the given type with output of a brush. </summary>
     public sealed class ReplaceBrushBrush : IBrushInstance, IBrush {
         public Block Block { get; private set; }
         public IBrush Replacement { get; private set; }
         public IBrushInstance ReplacementInstance { get; private set; }
 
-
         public ReplaceBrushBrush( Block block, [NotNull] IBrush replacement ) {
-            Block = block;
-            Replacement = replacement;
+            Block=block;
+            Replacement=replacement;
         }
-
 
         public ReplaceBrushBrush( [NotNull] ReplaceBrushBrush other ) {
             if( other == null ) throw new ArgumentNullException( "other" );
@@ -101,14 +93,14 @@ namespace fCraft.Drawing {
 
 
         [CanBeNull]
-        public IBrushInstance MakeInstance( Player player, CommandReader cmd, DrawOperation op ) {
+        public IBrushInstance MakeInstance( [NotNull] Player player, [NotNull] Command cmd, [NotNull] DrawOperation op ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( cmd == null ) throw new ArgumentNullException( "cmd" );
             if( op == null ) throw new ArgumentNullException( "op" );
 
             if( cmd.HasNext ) {
-                Block block;
-                if( !cmd.NextBlock( player, false, out block ) ) return null;
+                Block block = cmd.NextBlock( player );
+                if( block == Block.Undefined ) return null;
 
                 string brushName = cmd.Next();
                 if( brushName == null || !CommandManager.IsValidCommandName( brushName ) ) {
@@ -146,8 +138,8 @@ namespace fCraft.Drawing {
         }
 
 
-        public int AlternateBlocks {
-            get { return 1; }
+        public bool HasAlternateBlock {
+            get { return false; }
         }
 
 
@@ -156,7 +148,7 @@ namespace fCraft.Drawing {
         }
 
 
-        public bool Begin( Player player, DrawOperation op ) {
+        public bool Begin( [NotNull] Player player, [NotNull] DrawOperation op ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( op == null ) throw new ArgumentNullException( "op" );
             op.Context |= BlockChangeContext.Replaced;
@@ -164,13 +156,13 @@ namespace fCraft.Drawing {
         }
 
 
-        public Block NextBlock( DrawOperation op ) {
+        public Block NextBlock( [NotNull] DrawOperation op ) {
             if( op == null ) throw new ArgumentNullException( "op" );
             Block block = op.Map.GetBlock( op.Coords );
             if( block == Block ) {
                 return ReplacementInstance.NextBlock( op );
             }
-            return Block.None;
+            return Block.Undefined;
         }
 
 

@@ -1,17 +1,15 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using JetBrains.Annotations;
 
+// ReSharper disable UnusedMemberInSuper.Global
 namespace fCraft.Drawing {
 
-    /// <summary> Class that describes a type of brush in general, and allows creating new brushes with /Brush.
+    /// <summary> Class that desribes a type of brush in general, and allows creating new brushes with /Brush.
     /// One instance of IBrushFactory for each type of brush is kept by the BrushManager. </summary>
     public interface IBrushFactory {
-        /// <summary> Name of the brush. Should be unique. </summary>
         [NotNull]
         string Name { get; }
-        
-        /// <summary> Information printed to the player when they call "/help brush ThisBrushesName".
-        /// Should include description and usage information. </summary>
+
         [NotNull]
         string Help { get; }
 
@@ -24,7 +22,7 @@ namespace fCraft.Drawing {
         /// Errors and warnings about the brush creation should be communicated by messaging the player. </param>
         /// <param name="cmd"> Parameters passed to the /Brush command (after the brush name). </param>
         /// <returns> A newly-made brush, or null if there was some problem with parameters/permissions. </returns>
-        IBrush MakeBrush( [NotNull] Player player, [NotNull] CommandReader cmd );
+        IBrush MakeBrush( [NotNull] Player player, [NotNull] Command cmd );
     }
 
 
@@ -46,7 +44,7 @@ namespace fCraft.Drawing {
         /// If any are given, these parameters should generally replace any stored configuration. </param>
         /// <param name="op"> DrawOperation that will be using this brush. </param>
         /// <returns> A newly-made brush, or null if there was some problem with parameters/permissions. </returns>
-        IBrushInstance MakeInstance( [NotNull] Player player, [NotNull] CommandReader cmd, [NotNull] DrawOperation op );
+        IBrushInstance MakeInstance( [NotNull] Player player, [NotNull] Command cmd, [NotNull] DrawOperation op );
     }
 
 
@@ -63,7 +61,7 @@ namespace fCraft.Drawing {
         string InstanceDescription { get; }
 
         /// <summary> Whether the brush is capable of providing alternate blocks (e.g. for filling hollow DrawOps).</summary>
-        int AlternateBlocks { get; }
+        bool HasAlternateBlock { get; }
 
         /// <summary> Called when the DrawOperation starts. Should be used to verify that the brush is ready for use.
         /// Resources used by the brush should be obtained here. </summary>

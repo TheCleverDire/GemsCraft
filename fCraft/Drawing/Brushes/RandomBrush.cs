@@ -1,4 +1,4 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,7 +6,6 @@ using System.Text;
 using JetBrains.Annotations;
 
 namespace fCraft.Drawing {
-    /// <summary> Constructs RandomBrush. </summary>
     public sealed class RandomBrushFactory : IBrushFactory {
         public static readonly RandomBrushFactory Instance = new RandomBrushFactory();
 
@@ -28,19 +27,19 @@ namespace fCraft.Drawing {
 
 
         [CanBeNull]
-        public IBrush MakeBrush( Player player, CommandReader cmd ) {
+        public IBrush MakeBrush( [NotNull] Player player, [NotNull] Command cmd ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( cmd == null ) throw new ArgumentNullException( "cmd" );
 
             List<Block> blocks = new List<Block>();
             List<int> blockRatios = new List<int>();
             while( cmd.HasNext ) {
-                int ratio;
-                Block block;
-                if( !cmd.NextBlockWithParam( player, true, out block, out ratio ) ) return null;
-                if( ratio < 1 || ratio > RandomBrush.MaxRatio ) {
-                    player.Message( "Random brush: Invalid block ratio ({0}). Must be between 1 and {1}.",
-                                    ratio, RandomBrush.MaxRatio );
+                int ratio = 1;
+                Block block = cmd.NextBlockWithParam( player, ref ratio );
+                if( block == Block.Undefined ) return null;
+                if( ratio < 0 || ratio > RandomBrush.MaxRatio ) {
+                    player.Message( "{0} brush: Invalid block ratio ({1}). Must be between 1 and {2}.",
+                                    Name, ratio, RandomBrush.MaxRatio );
                     return null;
                 }
                 blocks.Add( block );
@@ -58,9 +57,7 @@ namespace fCraft.Drawing {
     }
 
 
-    /// <summary> Brush that creates a random pattern,
-    /// with individually adjustable probabilities for each blocktype. </summary>
-    public sealed class RandomBrush : IBrushInstance, IBrush {
+    public unsafe sealed class RandomBrush : IBrushInstance, IBrush {
         public const int MaxRatio = 10000;
 
         public Block[] Blocks { get; private set; }
@@ -75,9 +72,9 @@ namespace fCraft.Drawing {
 
 
         public RandomBrush( Block oneBlock, int ratio ) {
-            Blocks = new[] { oneBlock, Block.None };
+            Blocks = new[] { oneBlock, Block.Undefined };
             BlockRatios = new[] { ratio, 1 };
-            actualBlocks = new[] { oneBlock, Block.None };
+            actualBlocks = new[] { oneBlock, Block.Undefined };
         }
 
 
@@ -114,7 +111,7 @@ namespace fCraft.Drawing {
             get {
                 if( Blocks.Length == 0 ) {
                     return Factory.Name;
-                } else if( Blocks.Length == 1 || (Blocks.Length == 2 && Blocks[1] == Block.None) ) {
+                } else if( Blocks.Length == 1 || (Blocks.Length == 2 && Blocks[1] == Block.Undefined) ) {
                     return String.Format( "{0}({1})", Factory.Name, Blocks[0] );
                 } else {
                     StringBuilder sb = new StringBuilder();
@@ -136,7 +133,7 @@ namespace fCraft.Drawing {
 
 
         [CanBeNull]
-        public IBrushInstance MakeInstance( Player player, CommandReader cmd, DrawOperation state ) {
+        public IBrushInstance MakeInstance( [NotNull] Player player, [NotNull] Command cmd, [NotNull] DrawOperation state ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( cmd == null ) throw new ArgumentNullException( "cmd" );
             if( state == null ) throw new ArgumentNullException( "state" );
@@ -144,14 +141,14 @@ namespace fCraft.Drawing {
             List<Block> blocks = new List<Block>();
             List<int> blockRatios = new List<int>();
             while( cmd.HasNext ) {
-                int ratio;
-                Block block;
-                if( !cmd.NextBlockWithParam( player, true, out block, out ratio ) ) return null;
-                if( ratio < 1 || ratio > MaxRatio ) {
-                    player.Message( "RandomBrush: Invalid block ratio ({0}). Must be between 1 and {1}.",
+                int ratio = 1;
+                Block block = cmd.NextBlockWithParam( player, ref ratio );
+                if( ratio < 0 || ratio > MaxRatio ) {
+                    player.Message( "Invalid block ratio ({0}). Must be between 1 and {1}.",
                                     ratio, MaxRatio );
                     return null;
                 }
+                if( block == Block.Undefined ) return null;
                 blocks.Add( block );
                 blockRatios.Add( ratio );
             }
@@ -180,8 +177,8 @@ namespace fCraft.Drawing {
         }
 
 
-        public int AlternateBlocks {
-            get { return 1; }
+        public bool HasAlternateBlock {
+            get { return false; }
         }
 
 
@@ -190,7 +187,7 @@ namespace fCraft.Drawing {
         }
 
 
-        public bool Begin( Player player, DrawOperation op ) {
+        public bool Begin( [NotNull] Player player, [NotNull] DrawOperation op ) {
             if( player == null ) throw new ArgumentNullException( "player" );
             if( op == null ) throw new ArgumentNullException( "op" );
             if( Blocks == null || Blocks.Length == 0 ) {
@@ -200,12 +197,12 @@ namespace fCraft.Drawing {
         }
 
 
-        public Block NextBlock( DrawOperation op ) {
+        public Block NextBlock( [NotNull] DrawOperation op ) {
             if( op == null ) throw new ArgumentNullException( "op" );
             int n = seed ^ (op.Coords.X + 1290 * op.Coords.Y + 1664510 * op.Coords.Z);
             n = (n << 13) ^ n;
             n = (n * (n * n * 15731 + 789221) + 1376312589) & 0x7FFFFFFF;
-            double derp = (n / (double)0x7FFFFFFF) * actualBlocks.Length;
+            double derp = (((double)n) / (double)0x7FFFFFFF) * actualBlocks.Length;
             return actualBlocks[(int)Math.Floor( derp )];
         }
 

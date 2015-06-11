@@ -1,9 +1,9 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 
 namespace fCraft {
     /// <summary> Command categories. A command may belong to more than one category.
-    /// Use binary flag logic to test whether a command belongs to a particular category. </summary>
+    /// Use binary flag logic (value & flag == flag) to test whether a command belongs to a particular category. </summary>
     [Flags]
     public enum CommandCategory {
         /// <summary> Default command category. Do not use it. </summary>
@@ -31,6 +31,10 @@ namespace fCraft {
         Zone = 64,
 
         /// <summary> Commands that are only used for diagnostics and debugging. </summary>
-        Debug = 128
+        Debug = 128,
+        /// <summary> Commands that are just fun. </summary>
+        Fun = 256,
+        /// <summary> Commands that use advanced mathematics. </summary>
+        Math = 512
     }
 }

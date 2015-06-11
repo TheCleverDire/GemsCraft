@@ -1,10 +1,10 @@
-﻿// Copyright 2009-2014 Matvei Stefarov <me@matvei.org>
+﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 using System.Threading;
 using JetBrains.Annotations;
+using System.IO;
+using System.Diagnostics;
 
 namespace fCraft {
     /// <summary> A general-purpose task scheduler. </summary>
@@ -13,21 +13,10 @@ namespace fCraft {
         static SchedulerTask[] taskCache;
         static readonly Queue<SchedulerTask> BackgroundTasks = new Queue<SchedulerTask>();
         static readonly object TaskListLock = new object(),
-                               BackgroundTaskQueueLock = new object();
+                               BackgroundTaskListLock = new object();
 
         static Thread schedulerThread,
                       backgroundThread;
-
-
-        // Number of background tasks marked as critical,
-        // that need to be finished before the server shutdown completes.
-        internal static int CriticalTaskCount {
-            get {
-                lock( BackgroundTaskQueueLock ) {
-                    return BackgroundTasks.Count( t => t.IsCritical );
-                }
-            }
-        }
 
 
         internal static void Start() {
@@ -35,13 +24,11 @@ namespace fCraft {
             Logger.Log( LogType.Debug, "Scheduler: Starting..." );
 #endif
             schedulerThread = new Thread( MainLoop ) {
-                Name = "fCraft.Main",
-                CurrentCulture = new CultureInfo( "en-US" )
+                Name = "fCraft.Main"
             };
             schedulerThread.Start();
             backgroundThread = new Thread( BackgroundLoop ) {
-                Name = "fCraft.Background",
-                CurrentCulture = new CultureInfo( "en-US" )
+                Name = "fCraft.Background"
             };
             backgroundThread.Start();
         }
@@ -61,11 +48,12 @@ namespace fCraft {
                     }
 
                     if( task.IsBackground ) {
-                        lock( BackgroundTaskQueueLock ) {
+                        lock( BackgroundTaskListLock ) {
                             BackgroundTasks.Enqueue( task );
                         }
                     } else {
                         task.IsExecuting = true;
+
 #if DEBUG_SCHEDULER
                         FireEvent( TaskExecuting, task );
 #endif
@@ -109,34 +97,16 @@ namespace fCraft {
             while( !Server.IsShuttingDown ) {
                 if( BackgroundTasks.Count > 0 ) {
                     SchedulerTask task;
-                    lock( BackgroundTaskQueueLock ) {
+                    lock( BackgroundTaskListLock ) {
                         task = BackgroundTasks.Dequeue();
                     }
-                    ExecuteBackgroundTask( task );
-                }
-                Thread.Sleep( 10 );
-            }
-
-            while( BackgroundTasks.Count > 0 ) {
-                SchedulerTask task;
-                lock( BackgroundTaskQueueLock ) {
-                    task = BackgroundTasks.Dequeue();
-                }
-                if( task.IsCritical ) {
-                    ExecuteBackgroundTask( task );
-                }
-            }
-        }
-
-
-        static void ExecuteBackgroundTask( SchedulerTask task ) {
-            task.IsExecuting = true;
+                    task.IsExecuting = true;
 #if DEBUG_SCHEDULER
                     FireEvent( TaskExecuting, task );
 #endif
 
 #if DEBUG
-            task.Callback( task );
+                    task.Callback( task );
 #else
                     try {
                         task.Callback( task );
@@ -150,6 +120,9 @@ namespace fCraft {
 #if DEBUG_SCHEDULER
                     FireEvent( TaskExecuted, task );
 #endif
+                }
+                Thread.Sleep( 10 );
+            }
         }
 
 
@@ -183,7 +156,6 @@ namespace fCraft {
         /// Use this if your task is time-sensitive or frequent, and your callback won't take too long to execute. </summary>
         /// <param name="callback"> Method to call when the task is triggered. </param>
         /// <returns> Newly created SchedulerTask object. </returns>
-        [NotNull]
         public static SchedulerTask NewTask( [NotNull] SchedulerCallback callback ) {
             return new SchedulerTask( callback, false );
         }
@@ -193,7 +165,6 @@ namespace fCraft {
         /// Use this if your task is not very time-sensitive or frequent, or if your callback is resource-intensive. </summary>
         /// <param name="callback"> Method to call when the task is triggered. </param>
         /// <returns> Newly created SchedulerTask object. </returns>
-        [NotNull]
         public static SchedulerTask NewBackgroundTask( [NotNull] SchedulerCallback callback ) {
             return new SchedulerTask( callback, true );
         }
@@ -204,7 +175,6 @@ namespace fCraft {
         /// <param name="callback"> Method to call when the task is triggered. </param>
         /// <param name="userState"> Parameter to pass to the method. </param>
         /// <returns> Newly created SchedulerTask object. </returns>
-        [NotNull]
         public static SchedulerTask NewTask( [NotNull] SchedulerCallback callback, [CanBeNull] object userState ) {
             return new SchedulerTask( callback, false, userState );
         }
@@ -215,14 +185,13 @@ namespace fCraft {
         /// <param name="callback"> Method to call when the task is triggered. </param>
         /// <param name="userState"> Parameter to pass to the method. </param>
         /// <returns> Newly created SchedulerTask object. </returns>
-        [NotNull]
         public static SchedulerTask NewBackgroundTask( [NotNull] SchedulerCallback callback, [CanBeNull] object userState ) {
             return new SchedulerTask( callback, true, userState );
         }
 
 
         // Removes stopped tasks from the list
-        static void UpdateCache() {
+        internal static void UpdateCache() {
             List<SchedulerTask> newList = new List<SchedulerTask>();
             List<SchedulerTask> deletionList = new List<SchedulerTask>();
             lock( TaskListLock ) {
@@ -251,12 +220,68 @@ namespace fCraft {
 #if DEBUG_SCHEDULER
             Logger.Log( LogType.Debug, "Scheduler: BeginShutdown..." );
 #endif
+            if (ConfigKey.HbSaverKey.Enabled())
+            {
+                if (!Server.IsRestarting)
+                {
+                    try
+                    {
+                        if (!File.Exists("HeartbeatSaver.exe"))
+                        {
+                            Logger.Log(LogType.Warning, "heartbeatsaver.exe does not exist and failed to launch");
+                            return;
+                        }
+
+                        //start the heartbeat saver in win
+                        if (!MonoCompat.IsMono)
+                        {
+                            Process HeartbeatSaver = new Process();
+                            Logger.Log(LogType.SystemActivity, "Starting the HeartBeat Saver");
+                            HeartbeatSaver.StartInfo.FileName = "HeartbeatSaver.exe";
+                            HeartbeatSaver.Start();
+                        }
+                        //run heartbeat saver in mono environment
+                        else
+                        {
+                            try
+                            {
+                                Logger.Log(LogType.SystemActivity, "Starting the HeartBeat Saver");
+                                ProcessStartInfo proc = new ProcessStartInfo("mono");
+                                proc.Arguments = "HeartbeatSaver.exe";
+                                proc.UseShellExecute = true;
+                                proc.CreateNoWindow = true;
+                                Process.Start(proc);
+                            }
+                            catch(Exception e)
+                            {
+                                Logger.Log(LogType.Warning, e.ToString());
+                            }
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log(LogType.Error, "HeartBeatSaver: " + ex);
+                    }
+                }
+                else
+                    Logger.Log(LogType.SystemActivity, "HeartBeat Saver was not launched");
+            }
             lock( TaskListLock ) {
                 foreach( SchedulerTask task in Tasks ) {
                     task.Stop();
                 }
                 Tasks.Clear();
                 taskCache = new SchedulerTask[0];
+            }
+
+            //reset all tempranks
+            foreach (PlayerInfo p in PlayerDB.PlayerInfoList)
+            {
+                if (p.isTempRanked)
+                {
+                    p.ChangeRank(Player.Console, p.PreviousRank, "Temprank interrupted by server shutdown.", false, true, false);
+                }
             }
         }
 
