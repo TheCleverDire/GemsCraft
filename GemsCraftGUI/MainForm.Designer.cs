@@ -30,9 +30,9 @@ namespace GemsCraftGUI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.bApply = new System.Windows.Forms.Button();
@@ -66,7 +66,6 @@ namespace GemsCraftGUI
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.bWiki = new System.Windows.Forms.Button();
             this.bWeb = new System.Windows.Forms.Button();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.bChangelog = new System.Windows.Forms.Button();
             this.bCredits = new System.Windows.Forms.Button();
@@ -79,7 +78,6 @@ namespace GemsCraftGUI
             this.bRules = new System.Windows.Forms.Button();
             this.bAnnouncements = new System.Windows.Forms.Button();
             this.tabChat = new System.Windows.Forms.TabPage();
-            this.chatPreview1 = new fCraft.ConfigGUI.ChatPreview();
             this.gAppearence = new System.Windows.Forms.GroupBox();
             this.xShowConnectionMessages = new System.Windows.Forms.CheckBox();
             this.xShowJoinedWorldMessages = new System.Windows.Forms.CheckBox();
@@ -321,6 +319,8 @@ namespace GemsCraftGUI
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.chatPreview1 = new fCraft.ConfigGUI.ChatPreview();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabs.SuspendLayout();
@@ -331,7 +331,6 @@ namespace GemsCraftGUI
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).BeginInit();
             this.groupBox4.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.gInformation.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).BeginInit();
@@ -390,6 +389,7 @@ namespace GemsCraftGUI
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).BeginInit();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -484,9 +484,6 @@ namespace GemsCraftGUI
             this.bOK.TabIndex = 7;
             this.bOK.Text = "OK";
             this.bOK.UseVisualStyleBackColor = false;
-            this.bOK.Click += new System.EventHandler(this.bSave_Click);
-            this.bCancel.Click += new System.EventHandler(this.bCancel_Click);
-            this.bApply.Click += new System.EventHandler(this.bApply_Click);
             // 
             // tabs
             // 
@@ -647,7 +644,6 @@ namespace GemsCraftGUI
             this.cDefaultRank.Name = "cDefaultRank";
             this.cDefaultRank.Size = new System.Drawing.Size(170, 23);
             this.cDefaultRank.TabIndex = 18;
-            this.cDefaultRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultRank_SelectedIndexChanged);
             // 
             // lDefaultRank
             // 
@@ -679,7 +675,6 @@ namespace GemsCraftGUI
             this.bMeasure.TabIndex = 16;
             this.bMeasure.Text = "Measure";
             this.bMeasure.UseVisualStyleBackColor = false;
-            this.bMeasure.Click += new System.EventHandler(this.bMeasure_Click);
             // 
             // tServerName
             // 
@@ -791,7 +786,6 @@ namespace GemsCraftGUI
             0,
             0,
             0});
-            this.nMaxPlayers.ValueChanged += new System.EventHandler(this.nMaxPlayers_ValueChanged);
             // 
             // lPublic
             // 
@@ -851,16 +845,6 @@ namespace GemsCraftGUI
             this.bWeb.Text = "Website";
             this.bWeb.UseVisualStyleBackColor = false;
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(212, 294);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(213, 175);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
-            // 
             // groupBox2
             // 
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
@@ -887,7 +871,6 @@ namespace GemsCraftGUI
             this.bChangelog.TabIndex = 2;
             this.bChangelog.Text = "Changelog";
             this.bChangelog.UseVisualStyleBackColor = false;
-            this.bChangelog.Click += new System.EventHandler(this.bChangelog_Click);
             // 
             // bCredits
             // 
@@ -901,7 +884,6 @@ namespace GemsCraftGUI
             this.bCredits.TabIndex = 1;
             this.bCredits.Text = "Credits";
             this.bCredits.UseVisualStyleBackColor = false;
-            this.bCredits.Click += new System.EventHandler(this.bCredits_Click);
             // 
             // bReadme
             // 
@@ -915,7 +897,6 @@ namespace GemsCraftGUI
             this.bReadme.TabIndex = 1;
             this.bReadme.Text = "Readme";
             this.bReadme.UseVisualStyleBackColor = false;
-            this.bReadme.Click += new System.EventHandler(this.bReadme_Click);
             // 
             // gInformation
             // 
@@ -946,7 +927,6 @@ namespace GemsCraftGUI
             this.bGreeting.TabIndex = 5;
             this.bGreeting.Text = "Edit Greeting";
             this.bGreeting.UseVisualStyleBackColor = false;
-            this.bGreeting.Click += new System.EventHandler(this.bGreeting_Click);
             // 
             // lAnnouncementsUnits
             // 
@@ -991,7 +971,6 @@ namespace GemsCraftGUI
             this.xAnnouncements.TabIndex = 0;
             this.xAnnouncements.Text = "Show announcements every";
             this.xAnnouncements.UseVisualStyleBackColor = false;
-            this.xAnnouncements.CheckedChanged += new System.EventHandler(this.xAnnouncements_CheckedChanged);
             // 
             // bRules
             // 
@@ -1007,7 +986,6 @@ namespace GemsCraftGUI
             this.bRules.TabIndex = 4;
             this.bRules.Text = "Edit Rules";
             this.bRules.UseVisualStyleBackColor = false;
-            this.bRules.Click += new System.EventHandler(this.bRules_Click);
             // 
             // bAnnouncements
             // 
@@ -1024,7 +1002,6 @@ namespace GemsCraftGUI
             this.bAnnouncements.TabIndex = 3;
             this.bAnnouncements.Text = "Edit Announcements";
             this.bAnnouncements.UseVisualStyleBackColor = false;
-            this.bAnnouncements.Click += new System.EventHandler(this.bAnnouncements_Click);
             // 
             // tabChat
             // 
@@ -1038,13 +1015,6 @@ namespace GemsCraftGUI
             this.tabChat.Size = new System.Drawing.Size(652, 484);
             this.tabChat.TabIndex = 10;
             this.tabChat.Text = "Chat";
-            // 
-            // chatPreview1
-            // 
-            this.chatPreview1.Location = new System.Drawing.Point(7, 257);
-            this.chatPreview1.Name = "chatPreview1";
-            this.chatPreview1.Size = new System.Drawing.Size(637, 214);
-            this.chatPreview1.TabIndex = 2;
             // 
             // gAppearence
             // 
@@ -1173,7 +1143,6 @@ namespace GemsCraftGUI
             this.bColorMe.Size = new System.Drawing.Size(100, 23);
             this.bColorMe.TabIndex = 13;
             this.bColorMe.UseVisualStyleBackColor = false;
-            this.bColorMe.Click += new System.EventHandler(this.bColorMe_Click);
             // 
             // lColorWarning
             // 
@@ -1192,7 +1161,6 @@ namespace GemsCraftGUI
             this.bColorWarning.Size = new System.Drawing.Size(100, 23);
             this.bColorWarning.TabIndex = 3;
             this.bColorWarning.UseVisualStyleBackColor = false;
-            this.bColorWarning.Click += new System.EventHandler(this.bColorWarning_Click);
             // 
             // bColorSys
             // 
@@ -1202,7 +1170,6 @@ namespace GemsCraftGUI
             this.bColorSys.Size = new System.Drawing.Size(100, 23);
             this.bColorSys.TabIndex = 1;
             this.bColorSys.UseVisualStyleBackColor = false;
-            this.bColorSys.Click += new System.EventHandler(this.bColorSys_Click);
             // 
             // lColorSys
             // 
@@ -1221,7 +1188,6 @@ namespace GemsCraftGUI
             this.bColorPM.Size = new System.Drawing.Size(100, 23);
             this.bColorPM.TabIndex = 5;
             this.bColorPM.UseVisualStyleBackColor = false;
-            this.bColorPM.Click += new System.EventHandler(this.bColorPM_Click);
             // 
             // lColorHelp
             // 
@@ -1267,7 +1233,6 @@ namespace GemsCraftGUI
             this.bColorAnnouncement.Size = new System.Drawing.Size(100, 23);
             this.bColorAnnouncement.TabIndex = 9;
             this.bColorAnnouncement.UseVisualStyleBackColor = false;
-            this.bColorAnnouncement.Click += new System.EventHandler(this.bColorAnnouncement_Click);
             // 
             // lColorAnnouncement
             // 
@@ -1286,7 +1251,6 @@ namespace GemsCraftGUI
             this.bColorHelp.Size = new System.Drawing.Size(100, 23);
             this.bColorHelp.TabIndex = 7;
             this.bColorHelp.UseVisualStyleBackColor = false;
-            this.bColorHelp.Click += new System.EventHandler(this.bColorHelp_Click);
             // 
             // bColorSay
             // 
@@ -1296,7 +1260,6 @@ namespace GemsCraftGUI
             this.bColorSay.Size = new System.Drawing.Size(100, 23);
             this.bColorSay.TabIndex = 11;
             this.bColorSay.UseVisualStyleBackColor = false;
-            this.bColorSay.Click += new System.EventHandler(this.bColorSay_Click);
             // 
             // tabWorlds
             // 
@@ -1345,7 +1308,6 @@ namespace GemsCraftGUI
             this.bMapPath.TabIndex = 10;
             this.bMapPath.Text = "Browse";
             this.bMapPath.UseVisualStyleBackColor = false;
-            this.bMapPath.Click += new System.EventHandler(this.bMapPath_Click);
             // 
             // xMapPath
             // 
@@ -1357,7 +1319,6 @@ namespace GemsCraftGUI
             this.xMapPath.TabIndex = 8;
             this.xMapPath.Text = "Custom path for storing maps:";
             this.xMapPath.UseVisualStyleBackColor = true;
-            this.xMapPath.CheckedChanged += new System.EventHandler(this.xMapPath_CheckedChanged);
             // 
             // tMapPath
             // 
@@ -1390,7 +1351,6 @@ namespace GemsCraftGUI
             this.cDefaultBuildRank.Name = "cDefaultBuildRank";
             this.cDefaultBuildRank.Size = new System.Drawing.Size(121, 23);
             this.cDefaultBuildRank.TabIndex = 7;
-            this.cDefaultBuildRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultBuildRank_SelectedIndexChanged);
             // 
             // cMainWorld
             // 
@@ -1425,7 +1385,6 @@ namespace GemsCraftGUI
             this.bWorldEdit.TabIndex = 2;
             this.bWorldEdit.Text = "Edit";
             this.bWorldEdit.UseVisualStyleBackColor = false;
-            this.bWorldEdit.Click += new System.EventHandler(this.bWorldEdit_Click);
             // 
             // bAddWorld
             // 
@@ -1439,7 +1398,6 @@ namespace GemsCraftGUI
             this.bAddWorld.TabIndex = 1;
             this.bAddWorld.Text = "Add World";
             this.bAddWorld.UseVisualStyleBackColor = false;
-            this.bAddWorld.Click += new System.EventHandler(this.bAddWorld_Click);
             // 
             // bWorldDelete
             // 
@@ -1454,7 +1412,6 @@ namespace GemsCraftGUI
             this.bWorldDelete.TabIndex = 3;
             this.bWorldDelete.Text = "Delete World";
             this.bWorldDelete.UseVisualStyleBackColor = false;
-            this.bWorldDelete.Click += new System.EventHandler(this.bWorldDel_Click);
             // 
             // dgvWorlds
             // 
@@ -1483,8 +1440,6 @@ namespace GemsCraftGUI
             this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvWorlds.Size = new System.Drawing.Size(636, 325);
             this.dgvWorlds.TabIndex = 0;
-            this.dgvWorlds.SelectionChanged += new System.EventHandler(this.dgvWorlds_Click);
-            this.dgvWorlds.Click += new System.EventHandler(this.dgvWorlds_Click);
             // 
             // dgvcName
             // 
@@ -3810,6 +3765,23 @@ namespace GemsCraftGUI
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // chatPreview1
+            // 
+            this.chatPreview1.Location = new System.Drawing.Point(7, 257);
+            this.chatPreview1.Name = "chatPreview1";
+            this.chatPreview1.Size = new System.Drawing.Size(637, 214);
+            this.chatPreview1.TabIndex = 2;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(212, 294);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(213, 175);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 5;
+            this.pictureBox1.TabStop = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -3829,7 +3801,6 @@ namespace GemsCraftGUI
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).EndInit();
             this.groupBox4.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.gInformation.ResumeLayout(false);
             this.gInformation.PerformLayout();
@@ -3913,6 +3884,7 @@ namespace GemsCraftGUI
             ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }

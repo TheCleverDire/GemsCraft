@@ -32,6 +32,7 @@ namespace GemsCraftGUI
         {
             instance = this;
             InitializeComponent();
+            EventHandlersFix();
             dgvcBlockDB.TrueValue = YesNoAuto.Yes;
             dgvcBlockDB.FalseValue = YesNoAuto.No;
             dgvcBlockDB.IndeterminateValue = YesNoAuto.Auto;
@@ -40,7 +41,106 @@ namespace GemsCraftGUI
             Text = "GemsCraft Configuration " + fCraft.Updater.LatestStable;
         }
 
+        //DO NOT MODIFY THE HANDLERS REGION!
+        //YOU COULD POTENTIALLY MESS UP THE PROGRAM IF MODIFED AND NOT NOTICED
+        #region Handlers
+        //Fixes all event handlers that were lost on the GUI switch
+        void EventHandlersFix()
+        {
+            //All the Config Handlers
+            this.HeartBeatUrlComboBox.SelectedIndexChanged += new System.EventHandler(this.HeartBeatUrlComboBox_SelectedIndexChanged);
+            this.nMaxPlayersPerWorld.Validating += new System.ComponentModel.CancelEventHandler(this.nMaxPlayerPerWorld_Validating);
+            this.cDefaultRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultRank_SelectedIndexChanged);
+            this.bMeasure.Click += new System.EventHandler(this.bMeasure_Click);
+            this.nMaxPlayers.ValueChanged += new System.EventHandler(this.nMaxPlayers_ValueChanged);
+            this.bChangelog.Click += new System.EventHandler(this.bChangelog_Click);
+            this.bCredits.Click += new System.EventHandler(this.bCredits_Click);
+            this.bReadme.Click += new System.EventHandler(this.bReadme_Click);
+            this.bGreeting.Click += new System.EventHandler(this.bGreeting_Click);
+            this.xAnnouncements.CheckedChanged += new System.EventHandler(this.xAnnouncements_CheckedChanged);
+            this.bRules.Click += new System.EventHandler(this.bRules_Click);
+            this.bAnnouncements.Click += new System.EventHandler(this.bAnnouncements_Click);
+            this.xRankPrefixesInChat.CheckedChanged += new System.EventHandler(this.xRankPrefixesInChat_CheckedChanged);
+            this.bColorMe.Click += new System.EventHandler(this.bColorMe_Click);
+            this.bColorWarning.Click += new System.EventHandler(this.bColorWarning_Click);
+            this.bColorSys.Click += new System.EventHandler(this.bColorSys_Click);
+            this.bColorPM.Click += new System.EventHandler(this.bColorPM_Click);
+            this.bColorAnnouncement.Click += new System.EventHandler(this.bColorAnnouncement_Click);
+            this.bColorHelp.Click += new System.EventHandler(this.bColorHelp_Click);
+            this.bColorSay.Click += new System.EventHandler(this.bColorSay_Click);
+            this.bMapPath.Click += new System.EventHandler(this.bMapPath_Click);
+            this.xMapPath.CheckedChanged += new System.EventHandler(this.xMapPath_CheckedChanged);
+            this.cDefaultBuildRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultBuildRank_SelectedIndexChanged);
+            this.bWorldEdit.Click += new System.EventHandler(this.bWorldEdit_Click);
+            this.bAddWorld.Click += new System.EventHandler(this.bAddWorld_Click);
+            this.bWorldDelete.Click += new System.EventHandler(this.bWorldDel_Click);
+            this.dgvWorlds.SelectionChanged += new System.EventHandler(this.dgvWorlds_Click);
+            this.dgvWorlds.Click += new System.EventHandler(this.dgvWorlds_Click);
+            this.bLowerRank.Click += new System.EventHandler(this.bLowerRank_Click);
+            this.bRaiseRank.Click += new System.EventHandler(this.bRaiseRank_Click);
+            this.nFillLimit.ValueChanged += new System.EventHandler(this.nFillLimit_ValueChanged);
+            this.nCopyPasteSlots.ValueChanged += new System.EventHandler(this.nCopyPasteSlots_ValueChanged);
+            this.xAllowSecurityCircumvention.CheckedChanged += new System.EventHandler(this.xAllowSecurityCircumvention_CheckedChanged);
+            this.nAntiGriefSeconds.ValueChanged += new System.EventHandler(this.nAntiGriefSeconds_ValueChanged);
+            this.bColorRank.Click += new System.EventHandler(this.bColorRank_Click);
+            this.xDrawLimit.CheckedChanged += new System.EventHandler(this.xDrawLimit_CheckedChanged);
+            this.nDrawLimit.ValueChanged += new System.EventHandler(this.nDrawLimit_ValueChanged);
+            this.nKickIdle.ValueChanged += new System.EventHandler(this.nKickIdle_ValueChanged);
+            this.xAntiGrief.CheckedChanged += new System.EventHandler(this.xAntiGrief_CheckedChanged);
+            this.xKickIdle.CheckedChanged += new System.EventHandler(this.xKickIdle_CheckedChanged);
+            this.nAntiGriefBlocks.ValueChanged += new System.EventHandler(this.nAntiGriefBlocks_ValueChanged);
+            this.xReserveSlot.CheckedChanged += new System.EventHandler(this.xReserveSlot_CheckedChanged);
+            this.tPrefix.Validating += new System.ComponentModel.CancelEventHandler(this.tPrefix_Validating);
+            this.tRankName.Validating += new System.ComponentModel.CancelEventHandler(this.tRankName_Validating);
+            this.bDeleteRank.Click += new System.EventHandler(this.bDeleteRank_Click);
+            this.vPermissions.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.vPermissions_ItemChecked);
+            this.bAddRank.Click += new System.EventHandler(this.bAddRank_Click);
+            this.vRanks.SelectedIndexChanged += new System.EventHandler(this.vRanks_SelectedIndexChanged);
+            this.cBlockDBAutoEnableRank.SelectedIndexChanged += new System.EventHandler(this.cBlockDBAutoEnableRank_SelectedIndexChanged);
+            this.xBlockDBAutoEnable.CheckedChanged += new System.EventHandler(this.xBlockDBAutoEnable_CheckedChanged);
+            this.xBlockDBEnabled.CheckedChanged += new System.EventHandler(this.xBlockDBEnabled_CheckedChanged);
+            this.cPatrolledRank.SelectedIndexChanged += new System.EventHandler(this.cPatrolledRank_SelectedIndexChanged);
+            this.xAnnounceRankChanges.CheckedChanged += new System.EventHandler(this.xAnnounceRankChanges_CheckedChanged);
+            this.xAntispamKicks.CheckedChanged += new System.EventHandler(this.xSpamChatKick_CheckedChanged);
+            this.xMaxConnectionsPerIP.CheckedChanged += new System.EventHandler(this.xMaxConnectionsPerIP_CheckedChanged);
+            this.cVerifyNames.SelectedIndexChanged += new System.EventHandler(this.cVerifyNames_SelectedIndexChanged);
+            this.bUpdate.Click += new System.EventHandler(this.bUpdate_Click);
+            this.xSaveInterval.CheckedChanged += new System.EventHandler(this.xSaveAtInterval_CheckedChanged);
+            this.xMaxBackupSize.CheckedChanged += new System.EventHandler(this.xMaxBackupSize_CheckedChanged);
+            this.xMaxBackups.CheckedChanged += new System.EventHandler(this.xMaxBackups_CheckedChanged);
+            this.xBackupInterval.CheckedChanged += new System.EventHandler(this.xBackupAtInterval_CheckedChanged);
+            this.xLogLimit.CheckedChanged += new System.EventHandler(this.xLogLimit_CheckedChanged);
+            this.vLogFileOptions.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.vLogFileOptions_ItemChecked);
+            this.vConsoleOptions.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.vConsoleOptions_ItemChecked);
+            this.xServPass.CheckedChanged += new System.EventHandler(this.xServPass_CheckedChanged);
+            this.xChanPass.CheckedChanged += new System.EventHandler(this.xChanPass_CheckedChanged);
+            this.xIRCListShowNonEnglish.CheckedChanged += new System.EventHandler(this.xIRCListShowNonEnglish_CheckedChanged);
+            this.bColorIRC.Click += new System.EventHandler(this.bColorIRC_Click);
+            this.xIRCRegisteredNick.CheckedChanged += new System.EventHandler(this.xIRCRegisteredNick_CheckedChanged);
+            this.xIRCBotEnabled.CheckedChanged += new System.EventHandler(this.xIRC_CheckedChanged);
+            this.cIRCList.SelectedIndexChanged += new System.EventHandler(this.cIRCList_SelectedIndexChanged);
+            this.nMaxUndoStates.ValueChanged += new System.EventHandler(this.nMaxUndo_ValueChanged);
+            this.tIP.Validating += new System.ComponentModel.CancelEventHandler(this.tIP_Validating);
+            this.xIP.CheckedChanged += new System.EventHandler(this.xIP_CheckedChanged);
+            this.nMaxUndo.ValueChanged += new System.EventHandler(this.nMaxUndo_ValueChanged);
+            this.xMaxUndo.CheckedChanged += new System.EventHandler(this.xMaxUndo_CheckedChanged);
+            this.websiteURL.TextChanged += new System.EventHandler(this.websiteURL_TextChanged);
+            this.ReqsEditor.Click += new System.EventHandler(this.ReqsEditor_Click);
+            this.SwearEditor.Click += new System.EventHandler(this.SwearEditor_Click);
+            this.CustomColor.Click += new System.EventHandler(this.button1_Click);
+            this.CustomText.Click += new System.EventHandler(this.label1_Click);
+            this.bOK.Click += new System.EventHandler(this.bSave_Click);
+            this.bCancel.Click += new System.EventHandler(this.bCancel_Click);
+            this.bResetTab.Click += new System.EventHandler(this.bResetTab_Click);
+            this.bResetAll.Click += new System.EventHandler(this.bResetAll_Click);
+            this.bApply.Click += new System.EventHandler(this.bApply_Click);
+            this.bColorGlobal.Click += new System.EventHandler(this.bColorGlobal_Click);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigUI_FormClosing);
+            this.Load += new System.EventHandler(this.MainForm_Load);
 
+            //Server Handlers
+        }
+        #endregion
         void Init(object sender, EventArgs e)
         {
             // fills Permission and LogType lists
