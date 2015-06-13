@@ -35,22 +35,26 @@ using System.Reflection;
 using System.Linq;
 using fCraft.Events;
 
-namespace fCraft.ServerCLI {
+namespace fCraft.ServerCLI
+{
 
-    static class Program {
-        static bool useColor = true;
+    static class Program
+    {
+        static bool _useColor = true;
 
-        static void Main( string[] args ) {
+        static void Main(string[] args)
+        {
             Logger.Logged += OnLogged;
             Heartbeat.UriChanged += OnHeartbeatUriChanged;
 
-            Console.Title = "LegendCraft " + fCraft.Updater.LatestStable + " - starting...";
+            Console.Title = "GemsCraft " + Updater.LatestStable + " - starting...";
 
 #if !DEBUG
-            try {
+            try
+            {
 #endif
-                Server.InitLibrary( args );
-                useColor = !Server.HasArg( ArgKey.NoConsoleColor );
+                Server.InitLibrary(args);
+                _useColor = !Server.HasArg(ArgKey.NoConsoleColor);
 
                 Server.InitServer();
 
@@ -58,197 +62,220 @@ namespace fCraft.ServerCLI {
                 {
                     CheckForUpdates();
                 }
-                Console.Title = "LegendCraft " + Updater.LatestStable + " - " + ConfigKey.ServerName.GetString();
+                Console.Title = "GemsCraft " + Updater.LatestStable + " - " + ConfigKey.ServerName.GetString();
 
-                if( !ConfigKey.ProcessPriority.IsBlank() ) {
-                    try {
+                if (!ConfigKey.ProcessPriority.IsBlank())
+                {
+                    try
+                    {
                         Process.GetCurrentProcess().PriorityClass = ConfigKey.ProcessPriority.GetEnum<ProcessPriorityClass>();
-                    } catch( Exception ) {
-                        Logger.Log( LogType.Warning, "Program.Main: Could not set process priority, using defaults." );
+                    }
+                    catch (Exception)
+                    {
+                        Logger.Log(LogType.Warning, "Program.Main: Could not set process priority, using defaults.");
                     }
                 }
 
-                if( Server.StartServer() ) {
-                    Console.WriteLine( "** Running LegendCraft version {0} **", Updater.LatestStable );
-                    Console.WriteLine( "** Server is now ready. Type /Shutdown to exit safely. **" );
+                if (Server.StartServer())
+                {
+                    Console.WriteLine("** Running GemsCraft version {0} **", Updater.LatestStable);
+                    Console.WriteLine("** Server is now ready. Type /Shutdown to exit safely. **");
 
-                    while( !Server.IsShuttingDown ) {
+                    while (!Server.IsShuttingDown)
+                    {
                         string cmd = Console.ReadLine();
-                        if( cmd.Equals( "/Clear", StringComparison.OrdinalIgnoreCase ) ) {
+                        if (cmd.Equals("/Clear", StringComparison.OrdinalIgnoreCase))
+                        {
                             Console.Clear();
-                        } else {
-                            try {
-                                Player.Console.ParseMessage( cmd, true, false);
-                            } catch( Exception ex ) {
-                                Logger.LogAndReportCrash( "Error while executing a command from console", "ServerCLI", ex, false );
+                        }
+                        else
+                        {
+                            try
+                            {
+                                Player.Console.ParseMessage(cmd, true, false);
+                            }
+                            catch (Exception ex)
+                            {
+                                Logger.LogAndReportCrash("Error while executing a command from console", "ServerCLI", ex, false);
                             }
                         }
                     }
 
-                } else {
-                    ReportFailure( ShutdownReason.FailedToStart );
+                }
+                else
+                {
+                    ReportFailure(ShutdownReason.FailedToStart);
                 }
 #if !DEBUG
-            } catch( Exception ex ) {
-                Logger.LogAndReportCrash( "Unhandled exception in ServerCLI", "ServerCLI", ex, true );
-                ReportFailure( ShutdownReason.Crashed );
-            } finally {
+            }
+            catch (Exception ex)
+            {
+                Logger.LogAndReportCrash("Unhandled exception in ServerCLI", "ServerCLI", ex, true);
+                ReportFailure(ShutdownReason.Crashed);
+            }
+            finally
+            {
                 Console.ResetColor();
             }
 #endif
         }
 
 
-        static void ReportFailure( ShutdownReason reason ) {
-            Console.Title = String.Format( "LegendCraft {0} {1}", Updater.LatestStable, reason );
-            if( useColor ) Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine( "** {0} **", reason );
-            if( useColor ) Console.ResetColor();
-            Server.Shutdown( new ShutdownParams( reason, TimeSpan.Zero, false, false ), true );
-            if( !Server.HasArg( ArgKey.ExitOnCrash ) ) {
+        static void ReportFailure(ShutdownReason reason)
+        {
+            Console.Title = String.Format("GemsCraft {0} {1}", Updater.LatestStable, reason);
+            if (_useColor) Console.ForegroundColor = ConsoleColor.Red;
+            Console.Error.WriteLine("** {0} **", reason);
+            if (_useColor) Console.ResetColor();
+            Server.Shutdown(new ShutdownParams(reason, TimeSpan.Zero, false, false), true);
+            if (!Server.HasArg(ArgKey.ExitOnCrash))
+            {
                 Console.ReadLine();
             }
         }
 
 
         [DebuggerStepThrough]
-        static void OnLogged( object sender, LogEventArgs e ) {
-            if( !e.WriteToConsole ) return;
-            switch( e.MessageType ) {
+        static void OnLogged(object sender, LogEventArgs e)
+        {
+            if (!e.WriteToConsole) return;
+            switch (e.MessageType)
+            {
                 case LogType.Error:
-                    if(useColor)Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Error.WriteLine( e.Message );
-                    if( useColor ) Console.ResetColor();
+                    if (_useColor) Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Error.WriteLine(e.Message);
+                    if (_useColor) Console.ResetColor();
                     return;
 
                 case LogType.SeriousError:
-                    if( useColor ) Console.ForegroundColor = ConsoleColor.White;
-                    if( useColor ) Console.BackgroundColor = ConsoleColor.Red;
-                    Console.Error.WriteLine( e.Message );
-                    if( useColor ) Console.ResetColor();
+                    if (_useColor) Console.ForegroundColor = ConsoleColor.White;
+                    if (_useColor) Console.BackgroundColor = ConsoleColor.Red;
+                    Console.Error.WriteLine(e.Message);
+                    if (_useColor) Console.ResetColor();
                     return;
 
                 case LogType.Warning:
-                    if( useColor ) Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine( e.Message );
-                    if( useColor ) Console.ResetColor();
+                    if (_useColor) Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(e.Message);
+                    if (_useColor) Console.ResetColor();
                     return;
 
                 case LogType.Debug:
                 case LogType.Trace:
-                    if( useColor ) Console.ForegroundColor = ConsoleColor.DarkGray;
-                    Console.WriteLine( e.Message );
-                    if( useColor ) Console.ResetColor();
+                    if (_useColor) Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine(e.Message);
+                    if (_useColor) Console.ResetColor();
                     return;
 
                 default:
-                    Console.WriteLine( e.Message );
+                    Console.WriteLine(e.Message);
                     return;
             }
         }
 
 
-        static void OnHeartbeatUriChanged( object sender, UriChangedEventArgs e ) {
-            File.WriteAllText( "externalurl.txt", e.NewUri.ToString(), Encoding.ASCII );
-            Console.WriteLine( "** URL: {0} **", e.NewUri );
-            Console.WriteLine( "URL is also saved to file externalurl.txt" );
+        static void OnHeartbeatUriChanged(object sender, UriChangedEventArgs e)
+        {
+            File.WriteAllText("externalurl.txt", e.NewUri.ToString(), Encoding.ASCII);
+            Console.WriteLine("** URL: {0} **", e.NewUri);
+            Console.WriteLine("URL is also saved to file externalurl.txt");
         }
 
 
         #region Updates
 
 
-        static readonly AutoResetEvent UpdateDownloadWaiter = new AutoResetEvent( false );
+        static readonly AutoResetEvent UpdateDownloadWaiter = new AutoResetEvent(false);
 
-        static readonly object progressReportLock = new object();
-        static void OnUpdateDownloadProgress( object sender, DownloadProgressChangedEventArgs e ) {
-            lock( progressReportLock ) {
+        static readonly object ProgressReportLock = new object();
+        static void OnUpdateDownloadProgress(object sender, DownloadProgressChangedEventArgs e)
+        {
+            lock (ProgressReportLock)
+            {
                 Console.CursorLeft = 0;
                 int maxProgress = Console.WindowWidth - 9;
                 int progress = (int)Math.Round((e.ProgressPercentage / 100f) * (maxProgress - 1));
-                Console.Write( "{0,3}% |", e.ProgressPercentage );
-                Console.Write( new String( '=', progress ) );
-                Console.Write( '>' );
-                Console.Write( new String( ' ', maxProgress - progress ) );
-                Console.Write( '|' );
+                Console.Write("{0,3}% |", e.ProgressPercentage);
+                Console.Write(new String('=', progress));
+                Console.Write('>');
+                Console.Write(new String(' ', maxProgress - progress));
+                Console.Write('|');
             }
         }
 
 
 
-        static void CheckForUpdates()
+        private static void CheckForUpdates()
         {
-            Console.WriteLine("Checking for LegendCraft updates...");
+            Logger.Log(LogType.SystemActivity, "Checking for GemsCraft updates...");
+
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://raw.githubusercontent.com/LeChosenOne/LegendCraft/master/README.md");
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-                if (response.StatusCode == HttpStatusCode.OK)
+                if (!Updater.HasMostRecentVersion())
                 {
-                    using (Stream stream = response.GetResponseStream())
+                    if (!Updater.HasMostRecentVersion())
+
+                        Console.WriteLine(
+                            "Server.Run: Your GemsCraft version is out of date. A GemsCraft Update is available!");
+                    Console.WriteLine("Download the latest GemsCraft version and restart the server? (Y/N)");
+                    string answer = Console.ReadLine();
+                    if (answer != null &&
+                        (answer.ToLower() == "y" || answer.ToLower() == "yes" || answer.ToLower() == "yup" ||
+                         answer.ToLower() == "yeah")) //preparedness at its finest.... Dear Lord LeChosenOne
                     {
-                        if (stream != null)
+                        using (var client = new WebClient())
                         {
-                            StreamReader streamReader = new StreamReader(stream);
-                            string version = streamReader.ReadLine();
-
-                            //update is available, prompt for a download
-                            if (version != null && version != fCraft.Updater.LatestStable)
+                            try
                             {
-
-                                Console.WriteLine("Server.Run: Your LegendCraft version is out of date. A LegendCraft Update is available!");
-                                Console.WriteLine("Download the latest LegendCraft version and restart the server? (Y/N)");
-                                string answer = Console.ReadLine();
-                                if (answer.ToLower() == "y" || answer.ToLower() == "yes" || answer.ToLower() == "yup" || answer.ToLower() == "yeah")//preparedness at its finest
-                                {
-                                    using (var client = new WebClient())
-                                    {
-                                        try
-                                        {
-                                            //download new zip in current directory
-                                            Process.Start("http://www.legend-craft.tk/download/latest");
-                                            Console.WriteLine("Downloading the latest LegendCraft Version. Please replace all the files (not folders) in your current folder with the new ones after shutting down.");
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Console.WriteLine("Update error: " + ex);
-                                        }
-
-                                    }
-
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Update ignored. To ignore future LegendCraft update requests, uncheck the box in configGUI.");
-                                }
-
+                                //download new zip in current directory
+                                Process.Start("http://gemscraft.net/Version/" + Updater.LatestStable + ".zip");
+                                Console.WriteLine(
+                                    "Downloading the latest LegendCraft Version. Please replace all the files (not folders) in your current folder with the new ones after shutting down.");
                             }
-                            else
+                            catch (Exception ex)
                             {
-                                Console.WriteLine("Your LegendCraft version is up to date!");
+                                Console.WriteLine("Update error: " + ex);
                             }
+
                         }
+
                     }
+                    else if (answer == null)
+                    {
+                        Console.WriteLine("Invalid response of null. Retrying...");
+                        CheckForUpdates();
+                    }
+                    else
+                    {
+                        Console.WriteLine(
+                            "Update ignored. To ignore future LegendCraft update requests, uncheck the box in configGUI.");
+                    }
+
+                }
+                else
+                {
+                    Console.WriteLine("Your GemsCraft version is up to date!");
                 }
             }
-
             catch (WebException error)
             {
-                Console.WriteLine("There was an internet connection error. Server was unable to check for updates. Error: \n\r" + error);
+                Console.WriteLine(
+                    "There was an internet connection error. Server was unable to check for updates. Error: \n\r" +
+                    error);
             }
             catch (Exception e)
             {
                 Console.WriteLine("There was an error in trying to check for updates:\n\r " + e);
             }
+
         }
 
-
-        static void RestartForUpdate() {
-            string restartArgs = String.Format( "{0} --restart=\"{1}\"",
+        static void RestartForUpdate()
+        {
+            string restartArgs = String.Format("{0} --restart=\"{1}\"",
                                                 Server.GetArgString(),
-                                                MonoCompat.PrependMono( "ServerCLI.exe" ) );
-            MonoCompat.StartDotNetProcess( Paths.UpdaterFileName, restartArgs, true );
+                                                MonoCompat.PrependMono("ServerCLI.exe"));
+            MonoCompat.StartDotNetProcess(Paths.UpdaterFileName, restartArgs, true);
         }
 
         #endregion

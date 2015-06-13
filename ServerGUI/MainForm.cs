@@ -1,42 +1,39 @@
 ﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 //Modified LegendCraft Team
 using System;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using System.Threading;
 using System.Net;
 using System.IO;
-using System.IO.Compression;
 using fCraft.Events;
 using fCraft.GUI;
-using fCraft.ServerGUI;
 
 namespace fCraft.ServerGUI
 {
 
     public sealed partial class MainForm : Form
     {
-        volatile bool shutdownPending, startupComplete, shutdownComplete;
+        volatile bool _shutdownPending, _startupComplete, _shutdownComplete;
         const int MaxLinesInLog = 2000,
                   LinesToTrimWhenExceeded = 50;
-        bool listening = false;
+        bool _listening;
 
         public MainForm()
         {
             InitializeComponent();
             Shown += StartUp;
             console.OnCommand += console_Enter;            
-            logBox.LinkClicked += new LinkClickedEventHandler(Link_Clicked);
-            MenuItem[] menuItems = new MenuItem[] { new MenuItem("Copy", new EventHandler(CopyMenuOnClickHandler)) };
+            logBox.LinkClicked += Link_Clicked;
+            MenuItem[] menuItems = { new MenuItem("Copy", CopyMenuOnClickHandler) };
             logBox.ContextMenu = new ContextMenu(menuItems);
-            logBox.ContextMenu.Popup += new EventHandler(CopyMenuPopupHandler);
-            playerList.MouseDoubleClick += new MouseEventHandler(playerList_MouseDoubleClick);
+            logBox.ContextMenu.Popup += CopyMenuPopupHandler;
+            playerList.MouseDoubleClick += playerList_MouseDoubleClick;
         }
 
         #region Startup
-        Thread startupThread;
+        Thread _startupThread;
 
         void StartUp(object sender, EventArgs a)
         {
@@ -45,10 +42,12 @@ namespace fCraft.ServerGUI
             Heartbeat.UriChanged += OnHeartbeatUriChanged;
             Server.PlayerListChanged += OnPlayerListChanged;
             Server.ShutdownEnded += OnServerShutdownEnded;
-            Text = "LegendCraft v" + fCraft.Updater.LatestStable + " - starting...";
-            startupThread = new Thread(StartupThread);
-            startupThread.Name = "LegendCraft ServerGUI Startup";
-            startupThread.Start();
+            Text = "GemsCraft " + Updater.LatestStable + " - starting...";
+            _startupThread = new Thread(StartupThread)
+            {
+                Name = "LegendCraft ServerGUI Startup"
+            };
+            _startupThread.Start();
         }
 
         void StartupThread()
@@ -59,10 +58,10 @@ namespace fCraft.ServerGUI
 #endif
                 
                 Server.InitLibrary(Environment.GetCommandLineArgs());
-                if (shutdownPending) return;
+                if (_shutdownPending) return;
 
                 Server.InitServer();
-                if (shutdownPending) return;
+                if (_shutdownPending) return;
 
                 BeginInvoke((Action)OnInitSuccess);
                 if (ConfigKey.CheckForUpdates.GetString() == "True")
@@ -85,10 +84,10 @@ namespace fCraft.ServerGUI
                     }
                 }
 
-                if (shutdownPending) return;
+                if (_shutdownPending) return;
                 if (Server.StartServer())
                 {
-                    startupComplete = true;
+                    _startupComplete = true;
                     BeginInvoke((Action)OnStartupSuccess);
                 }
                 else
@@ -111,48 +110,16 @@ namespace fCraft.ServerGUI
             Text = "LegendCraft " + " - " + ConfigKey.ServerName.GetString();
         }
 
-        void UpdateCheck()
+        static void UpdateCheck()
         {
-            Logger.Log(LogType.SystemActivity, "Checking for LegendCraft updates...");
+            Logger.Log(LogType.SystemActivity, "Checking for GemsCraft updates...");
             try
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create("https://raw.githubusercontent.com/LeChosenOne/LegendCraft/master/README.md");
-                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-                if (response.StatusCode == HttpStatusCode.OK)
-                {
-                    using (Stream stream = response.GetResponseStream())
-                    {
-                        if (stream != null)
-                        {
-                            StreamReader streamReader = new StreamReader(stream);
-                            string version = streamReader.ReadLine();
-                            //update is available, prompt for a download
-                            if (version != null && version != fCraft.Updater.LatestStable)
-                            {
-
-                                Logger.Log(LogType.SystemActivity, "Server.Run: Your LegendCraft version is out of date. A LegendCraft Update is available!");
-
-                                DialogResult answer = MessageBox.Show("Would you like to download the latest LegendCraft Version? (" + version + ")", "LegendCraft Updater", MessageBoxButtons.YesNo);
-                                if (answer == DialogResult.Yes)
-                                {
-                                    Process.Start("https://github.com/LegendCraft/LegendCraft/releases");
-                                }
-                                else
-                                {
-                                    Logger.Log(LogType.SystemActivity, "Update ignored. To ignore future LegendCraft update requests, uncheck the box in configGUI.");
-                                }
-
-                            }
-                            else
-                            {
-                                Logger.Log(LogType.SystemActivity, "Your LegendCraft version is up to date!");
-                            }
-                        }
-                    }
-                }
+                Logger.Log(LogType.SystemActivity,
+                    Updater.HasMostRecentVersion()
+                        ? "GemsCraft is up-to-date!"
+                        : "GemsCraft is out-of-date! To update, run updateinstaller.exe!");
             }
-
             catch (WebException)
             {
                 Console.WriteLine("There was an internet connection error. Server was unable to check for updates.");
@@ -186,7 +153,7 @@ namespace fCraft.ServerGUI
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            if (startupThread != null && !shutdownComplete)
+            if (_startupThread != null && !_shutdownComplete)
             {
                 Shutdown(ShutdownReason.ProcessClosing, true);
                 e.Cancel = true;
@@ -200,15 +167,15 @@ namespace fCraft.ServerGUI
 
         void Shutdown(ShutdownReason reason, bool quit)
         {
-            if (shutdownPending) return;
-            shutdownPending = true;
+            if (_shutdownPending) return;
+            _shutdownPending = true;
             console.Enabled = false;
             console.Text = "Shutting down...";
             Text = "LegendCraft " + " - shutting down...";
             uriDisplay.Enabled = false;
-            if (!startupComplete)
+            if (!_startupComplete)
             {
-                startupThread.Join();
+                _startupThread.Join();
             }
             Server.Shutdown(new ShutdownParams(reason, TimeSpan.Zero, quit, false), false);
         }
@@ -220,7 +187,7 @@ namespace fCraft.ServerGUI
             {
                 BeginInvoke((Action)delegate
                 {
-                    shutdownComplete = true;
+                    _shutdownComplete = true;
                     switch (e.ShutdownParams.Reason)
                     {
                         case ShutdownReason.FailedToInitialize:
@@ -251,7 +218,7 @@ namespace fCraft.ServerGUI
             if (!e.WriteToConsole) return;
             try
             {
-                if (shutdownComplete) return;
+                if (_shutdownComplete) return;
                 if (logBox.InvokeRequired)
                 {
                     BeginInvoke((EventHandler<LogEventArgs>)OnLogged, sender, e);
@@ -287,7 +254,8 @@ namespace fCraft.ServerGUI
                         case LogType.IRC:
                             if (ThemeBox.SelectedItem == null)
                             {
-                                logBox.SelectionColor = System.Drawing.Color.FromName(Color.GetName(fCraft.Color.IRC));
+                                // ReSharper disable once AssignNullToNotNullAttribute
+                                logBox.SelectionColor = System.Drawing.Color.FromName(Color.GetName(Color.IRC));
                             }
                             else
                             {
@@ -405,7 +373,7 @@ namespace fCraft.ServerGUI
         {
             try
             {
-                if (shutdownPending) return;
+                if (_shutdownPending) return;
                 if (uriDisplay.InvokeRequired)
                 {
                     BeginInvoke((EventHandler<UriChangedEventArgs>)OnHeartbeatUriChanged,
@@ -429,7 +397,7 @@ namespace fCraft.ServerGUI
         {
             try
             {
-                if (shutdownPending) return;
+                if (_shutdownPending) return;
                 if (playerList.InvokeRequired)
                 {
                     BeginInvoke((EventHandler)OnPlayerListChanged, null, EventArgs.Empty);
@@ -514,7 +482,7 @@ namespace fCraft.ServerGUI
         }
         private void Link_Clicked(object sender, LinkClickedEventArgs e)
         {
-            System.Diagnostics.Process.Start(e.LinkText);
+            Process.Start(e.LinkText);
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
@@ -536,7 +504,7 @@ namespace fCraft.ServerGUI
         private void CopyMenuOnClickHandler(object sender, EventArgs e)
         {
             if (logBox.SelectedText.Length > 0)
-                Clipboard.SetText(logBox.SelectedText.ToString(), TextDataFormat.Text);
+                Clipboard.SetText(logBox.SelectedText, TextDataFormat.Text);
         }
 
         private void CopyMenuPopupHandler(object sender, EventArgs e)
@@ -679,7 +647,10 @@ namespace fCraft.ServerGUI
                 var v = new PlayerViewer(player);
                 v.Show();
             }
-            catch { } //do nothing at all
+            catch
+            {
+                // ignored
+            } //do nothing at all
         }
         
         
@@ -696,21 +667,21 @@ namespace fCraft.ServerGUI
             }
 
             //if button was already clicked, cancel
-            if (listening)
+            if (_listening)
             {
-                listening = false;
+                _listening = false;
                 bVoice.ForeColor = System.Drawing.Color.Black;
                 return;
             }
 
-                System.Speech.Recognition.SpeechRecognitionEngine engine = new System.Speech.Recognition.SpeechRecognitionEngine();
+                var engine = new System.Speech.Recognition.SpeechRecognitionEngine();
                 bVoice.ForeColor = System.Drawing.Color.Aqua;
-                System.Speech.Recognition.Choices commands = new System.Speech.Recognition.Choices();
-                commands.Add(new string[] { "restart", "shutdown", "status report", "players", "help" });
-                System.Speech.Recognition.Grammar gr = new System.Speech.Recognition.Grammar(new System.Speech.Recognition.GrammarBuilder(commands));
+                var commands = new System.Speech.Recognition.Choices();
+                commands.Add("restart", "shutdown", "status report", "players", "help");
+                var gr = new System.Speech.Recognition.Grammar(new System.Speech.Recognition.GrammarBuilder(commands));
                 try
                 {
-                    listening = true;
+                    _listening = true;
                     engine.RequestRecognizerUpdate();
                     engine.LoadGrammar(gr);
                     engine.SpeechRecognized += engine_SpeechRecognized;
@@ -721,7 +692,7 @@ namespace fCraft.ServerGUI
 
                 catch
                 {
-                    return;
+                    // ignored
                 }
         }
         void engine_SpeechRecognized(object sender, System.Speech.Recognition.SpeechRecognizedEventArgs e)
@@ -733,7 +704,7 @@ namespace fCraft.ServerGUI
                 engine = new System.Speech.Recognition.SpeechRecognitionEngine();
                 String message = "";
                 String results = e.Result.Text;
-                if (!listening)
+                if (!_listening)
                 {
                     return;
                 }
@@ -743,58 +714,49 @@ namespace fCraft.ServerGUI
                         reader.Speak("The available commands are restart, shutdown, status report, and players.");
                         Logger.Log(LogType.ConsoleOutput, "The available commands are restart, shutdown, status report, and a players.");
                         bVoice.ForeColor = System.Drawing.Color.Black;
-                        results = "";
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
-                        listening = false;
+                        _listening = false;
                         break;
                     case "restart":
                         reader.Speak("The server is now restarting.");
                         ShutdownParams param = new ShutdownParams(ShutdownReason.Restarting, TimeSpan.FromSeconds(5), true, true, "Restarting", Player.Console);
                         Server.Shutdown(param, true);
                         bVoice.ForeColor = System.Drawing.Color.Black;
-                        results = "";
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
-                        listening = false;
+                        _listening = false;
                         break;
                     case "shutdown":
                         reader.Speak("The server is now shutting down.");
                         Shutdown(ShutdownReason.ShuttingDown, true);
                         bVoice.ForeColor = System.Drawing.Color.Black;
-                        results = "";
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
-                        listening = false;
+                        _listening = false;
                         break;
                     case "status report":
                         reader.Speak("Server has been up for " + Math.Round(DateTime.UtcNow.Subtract(Server.StartTime).TotalHours, 1, MidpointRounding.AwayFromZero) + " hours.");
                         Player.Console.ParseMessage("/sinfo", true, false);
                         bVoice.ForeColor = System.Drawing.Color.Black;
-                        results = "";
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
-                        listening = false;
+                        _listening = false;
                         break;
                     case "players":
-                        foreach (Player p in Server.Players)
-                        {
-                            message += p.Name;
-                        }
+                        message = Server.Players.Aggregate(message, (current, p) => current + p.Name);
                         reader.Speak(message);
                         Player.Console.ParseMessage("/players", true, false);
                         bVoice.ForeColor = System.Drawing.Color.Black;
-                        results = "";
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
-                        listening = false;
+                        _listening = false;
                         break;
                     default:
                         bVoice.ForeColor = System.Drawing.Color.Black;
-                        results = "";
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
-                        listening = false;
+                        _listening = false;
                         break;
                 }
             }
@@ -803,7 +765,6 @@ namespace fCraft.ServerGUI
                 //Audio Device is either missing or damaged, actual Exception is System.Speech.Internal.Synthesis.AudioException
                 engine.RecognizeAsyncStop();
                 engine.Dispose();
-                return;
             }
         }
         #endregion

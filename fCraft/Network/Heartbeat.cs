@@ -394,7 +394,7 @@ namespace fCraft
                  ProtocolVersion,
                  Uri.EscapeDataString(salt_),
                  Uri.EscapeDataString(ServerName),
-                 "LegendCraft v" + Updater.LatestStable);
+                 "GemsCraft " + Updater.LatestStable);
                 foreach (var pair in CustomData)
                 {
                     sb.AppendFormat("&{0}={1}",

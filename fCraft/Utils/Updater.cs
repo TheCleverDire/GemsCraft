@@ -2,141 +2,65 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Net;
+using System.Net.Cache;
+using System.Reflection;
 using System.Text;
-using JetBrains.Annotations;
+using System.Xml;
+using System.Xml.Linq;
+using fCraft.Events;
 using fCraft.Network;
-using System.Diagnostics;
-using System.IO;
+using JetBrains.Annotations;
 
-namespace fCraft
-{
+namespace fCraft {
     /// <summary> Checks for updates, and keeps track of current version/revision. </summary>
-    public static class Updater
-    {
-        public static string UserAgent
-        {
-            get { return "GemsCraft " + LatestStable(); }
-        }
-        public static readonly string[] FileList = {
-            "ConfigGUI.exe",
-            "fCraft.dll",
-            "fCraftGUI.dll",
-            "ServerCLI.exe",
-            "ServerGUI.exe",
-            "Tutorial.exe",
-            "ServiceStack.Text.dll",
-            "UpdateInstaller.exe"
-        };
+    public static class Updater {
 
-        
-        static String website = "http://GemsCraft.net/Version/";
-        public static String[] websiteVersion = new String[]
-        {
-            TitleExtractor.pageTitle(website + "Major.html"),
-            TitleExtractor.pageTitle(website + "Minor.html"),
-            TitleExtractor.pageTitle(website + "Build.html"),
-            TitleExtractor.pageTitle(website + "Private.html")
-        };
-        public static string LatestStable()
-        {
-            return "2.0";
+        public static readonly ReleaseInfo CurrentRelease = new ReleaseInfo(
+            206,
+            151,
+            new DateTime( 2012, 07, 19, 1, 0, 0, DateTimeKind.Utc ),
+            "", "",
+            ReleaseFlags.Feature
+#if DEBUG
+            | ReleaseFlags.Dev
+#endif
+ );
+
+        public static string UserAgent {
+            get { return "GemsCraft " + LatestStable; }
         }
-        public static string LatestWebsite()
+
+        public const string CurrentVersionUrl = "http://gemscraft.net/latest.html";
+        public const string LatestStable = "Beta 1.0";
+
+        public static bool HasMostRecentVersion()
         {
-            return websiteVersion[0] + "." + websiteVersion[1] + "." +
-                websiteVersion[2] + "." + websiteVersion[3];
+            return LatestStable.Equals(TitleExtractor.pageTitle(CurrentVersionUrl));
         }
         public static string UpdateUrl { get; set; }
+
         public static bool RunAtShutdown { get; set; }
-
-        /// <summary>
-        /// Gets if GemsCraft needs to be updated or not
-        /// </summary>
-        /// <returns>Returns update type</returns>
-        public static UpdaterResult getUpdateStatus()
-        {
-            Version local, website;
-            Version.TryParse(LatestStable(), out local);
-            Version.TryParse(LatestWebsite(), out website);
-            bool major = false, minor = false, build = false, privateA = false;
-            if (local.Major == website.Major)
-            {
-                major = true;
-                if (local.Minor == website.Minor)
-                {
-                    minor = true;
-                    if (local.Build == null && website.Build == null) build = true;
-                    else if (local.Build == null && !(website.Build == null)) return UpdaterResult.Outdated;
-                    else if (!(local.Build == null) && website.Build == null) return UpdaterResult.Dev;
-                    else if (local.Build == website.Build)
-                    {
-                        build = true;
-                        if (local.Revision == null && website.Revision == null) privateA = true;
-                        else if (local.Revision == null && !(website.Revision == null)) return UpdaterResult.Outdated;
-                        else if (!(local.Revision == null) && website.Revision == null) return UpdaterResult.Dev;
-                        else if (local.Revision == website.Revision)
-                        {
-                            privateA = true;
-                        }
-                    }
-                }
-                else if (local.Minor > website.Minor) return UpdaterResult.Dev;
-                else if (local.Minor < website.Minor) return UpdaterResult.Outdated;
-            }
-            else if (local.Major > website.Major) return UpdaterResult.Dev;
-            else if (local.Major < website.Major) return UpdaterResult.Outdated;
-            if (major && minor && build && privateA) return UpdaterResult.Updated;
-            else return UpdaterResult.Dev;
-        }
-        static int ToInt(object i)
-        {
-            return Convert.ToInt32(i);
-        }
-        public static String UpdaterMessage()
-        {
-            UpdaterResult uResult = Updater.getUpdateStatus();
-            switch (uResult)
-            {
-                case UpdaterResult.Dev:
-                    return "You are running an un-released version of GemsCraft. By continueing " +
-                        "to use this version in a non-support time for it, you understand that " +
-                        "many features might not work";
-                case UpdaterResult.Outdated:
-                    return "Your GemsCraft is outdated! For new features, update to the newest GemsCraft Version!";
-                case UpdaterResult.Updated:
-                    return "Your GemsCraft is updated to the most recent release!";
-                default:
-                    return null;
-            }
-        }
     }
 
-    
-    public enum UpdaterResult
-    {
-        Updated, //User is running an appropiate version of GemsCraft
-        Outdated, //User needs to update
-        Dev //Might be unstable
-    }
 
-    public sealed class ReleaseInfo
-    {
-        internal ReleaseInfo(int version, int revision, DateTime releaseDate,
-                              string summary, string changeLog, ReleaseFlags releaseType)
-        {
+    public sealed class ReleaseInfo {
+        internal ReleaseInfo( int version, int revision, DateTime releaseDate,
+                              string summary, string changeLog, ReleaseFlags releaseType ) {
             Version = version;
             Revision = revision;
             Date = releaseDate;
             Summary = summary;
-            ChangeLog = changeLog.Split(new[] { '\n' });
+            ChangeLog = changeLog.Split('\n');
             Flags = releaseType;
         }
 
         public ReleaseFlags Flags { get; private set; }
 
-        public string FlagsString { get { return ReleaseFlagsToString(Flags); } }
+        public string FlagsString { get { return ReleaseFlagsToString( Flags ); } }
 
-        public string[] FlagsList { get { return ReleaseFlagsToStringArray(Flags); } }
+        public string[] FlagsList { get { return ReleaseFlagsToStringArray( Flags ); } }
 
         public int Version { get; private set; }
 
@@ -144,30 +68,9 @@ namespace fCraft
 
         public DateTime Date { get; private set; }
 
-        public TimeSpan Age
-        {
-            get
-            {
-                return DateTime.UtcNow.Subtract(Date);
-            }
-        }
-
-        public string VersionString
-        {
-            get
-            {
-                string formatString = "{0:0.000}_r{1}";
-                if (IsFlagged(ReleaseFlags.Dev))
-                {
-                    formatString += "_dev";
-                }
-                if (IsFlagged(ReleaseFlags.Unstable))
-                {
-                    formatString += "_u";
-                }
-                return String.Format(CultureInfo.InvariantCulture, formatString,
-                                      Decimal.Divide(Version, 1000),
-                                      Revision);
+        public TimeSpan Age {
+            get {
+                return DateTime.UtcNow.Subtract( Date );
             }
         }
 
@@ -175,14 +78,12 @@ namespace fCraft
 
         public string[] ChangeLog { get; private set; }
 
-        public static ReleaseFlags StringToReleaseFlags([NotNull] string str)
-        {
-            if (str == null) throw new ArgumentNullException("str");
+        public static ReleaseFlags StringToReleaseFlags( [NotNull] string str ) {
+            if( str == null ) throw new ArgumentNullException( "str" );
             ReleaseFlags flags = ReleaseFlags.None;
-            for (int i = 0; i < str.Length; i++)
+            foreach (char t in str)
             {
-                switch (Char.ToUpper(str[i]))
-                {
+                switch( Char.ToUpper( t ) ) {
                     case 'A':
                         flags |= ReleaseFlags.APIChange;
                         break;
@@ -218,40 +119,37 @@ namespace fCraft
             return flags;
         }
 
-        public static string ReleaseFlagsToString(ReleaseFlags flags)
-        {
+        public static string ReleaseFlagsToString( ReleaseFlags flags ) {
             StringBuilder sb = new StringBuilder();
-            if ((flags & ReleaseFlags.APIChange) == ReleaseFlags.APIChange) sb.Append('A');
-            if ((flags & ReleaseFlags.Bugfix) == ReleaseFlags.Bugfix) sb.Append('B');
-            if ((flags & ReleaseFlags.ConfigFormatChange) == ReleaseFlags.ConfigFormatChange) sb.Append('C');
-            if ((flags & ReleaseFlags.Dev) == ReleaseFlags.Dev) sb.Append('D');
-            if ((flags & ReleaseFlags.Feature) == ReleaseFlags.Feature) sb.Append('F');
-            if ((flags & ReleaseFlags.MapFormatChange) == ReleaseFlags.MapFormatChange) sb.Append('M');
-            if ((flags & ReleaseFlags.PlayerDBFormatChange) == ReleaseFlags.PlayerDBFormatChange) sb.Append('P');
-            if ((flags & ReleaseFlags.Security) == ReleaseFlags.Security) sb.Append('S');
-            if ((flags & ReleaseFlags.Unstable) == ReleaseFlags.Unstable) sb.Append('U');
-            if ((flags & ReleaseFlags.Optimized) == ReleaseFlags.Optimized) sb.Append('O');
+            if( (flags & ReleaseFlags.APIChange) == ReleaseFlags.APIChange ) sb.Append( 'A' );
+            if( (flags & ReleaseFlags.Bugfix) == ReleaseFlags.Bugfix ) sb.Append( 'B' );
+            if( (flags & ReleaseFlags.ConfigFormatChange) == ReleaseFlags.ConfigFormatChange ) sb.Append( 'C' );
+            if( (flags & ReleaseFlags.Dev) == ReleaseFlags.Dev ) sb.Append( 'D' );
+            if( (flags & ReleaseFlags.Feature) == ReleaseFlags.Feature ) sb.Append( 'F' );
+            if( (flags & ReleaseFlags.MapFormatChange) == ReleaseFlags.MapFormatChange ) sb.Append( 'M' );
+            if( (flags & ReleaseFlags.PlayerDBFormatChange) == ReleaseFlags.PlayerDBFormatChange ) sb.Append( 'P' );
+            if( (flags & ReleaseFlags.Security) == ReleaseFlags.Security ) sb.Append( 'S' );
+            if( (flags & ReleaseFlags.Unstable) == ReleaseFlags.Unstable ) sb.Append( 'U' );
+            if( (flags & ReleaseFlags.Optimized) == ReleaseFlags.Optimized ) sb.Append( 'O' );
             return sb.ToString();
         }
 
-        public static string[] ReleaseFlagsToStringArray(ReleaseFlags flags)
-        {
+        public static string[] ReleaseFlagsToStringArray( ReleaseFlags flags ) {
             List<string> list = new List<string>();
-            if ((flags & ReleaseFlags.APIChange) == ReleaseFlags.APIChange) list.Add("API Changes");
-            if ((flags & ReleaseFlags.Bugfix) == ReleaseFlags.Bugfix) list.Add("Fixes");
-            if ((flags & ReleaseFlags.ConfigFormatChange) == ReleaseFlags.ConfigFormatChange) list.Add("Config Changes");
-            if ((flags & ReleaseFlags.Dev) == ReleaseFlags.Dev) list.Add("Developer");
-            if ((flags & ReleaseFlags.Feature) == ReleaseFlags.Feature) list.Add("New Features");
-            if ((flags & ReleaseFlags.MapFormatChange) == ReleaseFlags.MapFormatChange) list.Add("Map Format Changes");
-            if ((flags & ReleaseFlags.PlayerDBFormatChange) == ReleaseFlags.PlayerDBFormatChange) list.Add("PlayerDB Changes");
-            if ((flags & ReleaseFlags.Security) == ReleaseFlags.Security) list.Add("Security Patch");
-            if ((flags & ReleaseFlags.Unstable) == ReleaseFlags.Unstable) list.Add("Unstable");
-            if ((flags & ReleaseFlags.Optimized) == ReleaseFlags.Optimized) list.Add("Optimized");
+            if( (flags & ReleaseFlags.APIChange) == ReleaseFlags.APIChange ) list.Add( "API Changes" );
+            if( (flags & ReleaseFlags.Bugfix) == ReleaseFlags.Bugfix ) list.Add( "Fixes" );
+            if( (flags & ReleaseFlags.ConfigFormatChange) == ReleaseFlags.ConfigFormatChange ) list.Add( "Config Changes" );
+            if( (flags & ReleaseFlags.Dev) == ReleaseFlags.Dev ) list.Add( "Developer" );
+            if( (flags & ReleaseFlags.Feature) == ReleaseFlags.Feature ) list.Add( "New Features" );
+            if( (flags & ReleaseFlags.MapFormatChange) == ReleaseFlags.MapFormatChange ) list.Add( "Map Format Changes" );
+            if( (flags & ReleaseFlags.PlayerDBFormatChange) == ReleaseFlags.PlayerDBFormatChange ) list.Add( "PlayerDB Changes" );
+            if( (flags & ReleaseFlags.Security) == ReleaseFlags.Security ) list.Add( "Security Patch" );
+            if( (flags & ReleaseFlags.Unstable) == ReleaseFlags.Unstable ) list.Add( "Unstable" );
+            if( (flags & ReleaseFlags.Optimized) == ReleaseFlags.Optimized ) list.Add( "Optimized" );
             return list.ToArray();
         }
 
-        public bool IsFlagged(ReleaseFlags flag)
-        {
+        public bool IsFlagged( ReleaseFlags flag ) {
             return (Flags & flag) == flag;
         }
     }
@@ -260,31 +158,29 @@ namespace fCraft
     #region Enums
 
     /// <summary> Updater behavior. </summary>
-    public enum UpdaterMode
-    {
+    public enum UpdaterMode {
         /// <summary> Does not check for updates. </summary>
-        Disabled,
+        Disabled = 0,
 
         /// <summary> Checks for updates and notifies of availability (in console/log). </summary>
-        Notify,
+        Notify = 1,
 
         /// <summary> Checks for updates, downloads them if available, and prompts to install.
         /// Behavior is frontend-specific: in ServerGUI, a dialog is shown with the list of changes and
         /// options to update immediately or next time. In ServerCLI, asks to type in 'y' to confirm updating
         /// or press any other key to skip. '''Note: Requires user interaction
         /// (if you restart the server remotely while unattended, it may get stuck on this dialog).''' </summary>
-        Prompt,
+        Prompt = 2,
 
         /// <summary> Checks for updates, automatically downloads and installs the updates, and restarts the server. </summary>
-        Auto,
+        Auto = 3,
     }
 
 
     /// <summary> A list of release flags/attributes.
     /// Use binary flag logic (value & flag == flag) or Release.IsFlagged() to test for flags. </summary>
     [Flags]
-    public enum ReleaseFlags
-    {
+    public enum ReleaseFlags {
         None = 0,
 
         /// <summary> The API was notably changed in this release. </summary>
@@ -322,30 +218,3 @@ namespace fCraft
     #endregion
 }
 
-
-namespace fCraft.Events
-{
-    public sealed class CheckingForUpdatesEventArgs : EventArgs, ICancellableEvent
-    {
-        internal CheckingForUpdatesEventArgs(string url)
-        {
-            Url = url;
-        }
-
-        public string Url { get; set; }
-        public bool Cancel { get; set; }
-    }
-
-
-    public sealed class CheckedForUpdatesEventArgs : EventArgs
-    {
-        internal CheckedForUpdatesEventArgs(string url, UpdaterResult result)
-        {
-            Url = url;
-            Result = result;
-        }
-
-        public string Url { get; private set; }
-        public UpdaterResult Result { get; private set; }
-    }
-}

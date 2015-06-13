@@ -16,27 +16,27 @@ namespace fCraft {
         const int PlayersPerPage = 30;
 
         /// <summary> Gives back an array of players arranged from most to least number of bans </summary>
-        static List<PlayerInfo> MostBans = new List<PlayerInfo>(PlayerDB.PlayerInfoList
+        static readonly List<PlayerInfo> MostBans = new List<PlayerInfo>(PlayerDB.PlayerInfoList
                                     .OrderBy(p => p.TimesVisited).ToArray().Reverse());
 
         /// <summary> Gives back an array of players arranged from most to least number of logins </summary>
-        static List<PlayerInfo> TopLogins = new List<PlayerInfo>(PlayerDB.PlayerInfoList
+        static readonly List<PlayerInfo> TopLogins = new List<PlayerInfo>(PlayerDB.PlayerInfoList
                                         .OrderBy(p => p.TimesVisited).ToArray().Reverse());
 
         /// <summary> Gives back an array of players arranged from most to least number of promotions of others </summary>
-        static List<PlayerInfo> MostPromos = new List<PlayerInfo>(PlayerDB.PlayerInfoList
+        static readonly List<PlayerInfo> MostPromos = new List<PlayerInfo>(PlayerDB.PlayerInfoList
                                         .OrderBy(p => p.PromoCount).ToArray().Reverse());
 
         /// <summary> Gives back an array of players arranged from most to least total time spent on server </summary>
-        static List<PlayerInfo> MostTime = new List<PlayerInfo>(PlayerDB.PlayerInfoList
+        static readonly List<PlayerInfo> MostTime = new List<PlayerInfo>(PlayerDB.PlayerInfoList
                                        .OrderBy(p => p.TotalTime).ToArray().Reverse());
 
         /// <summary> Gives back an array of players arranged from most to least number of times kicked others </summary>
-        static List<PlayerInfo> MostKicks = new List<PlayerInfo>(PlayerDB.PlayerInfoList
+        static readonly List<PlayerInfo> MostKicks = new List<PlayerInfo>(PlayerDB.PlayerInfoList
                                        .OrderBy(p => p.TimesKickedOthers).ToArray().Reverse());
 
         /// <summary> Gives back an array of players arranged from most to least number of blocks build </summary>
-        static List<PlayerInfo> TopBuilders = new List<PlayerInfo>(PlayerDB.PlayerInfoList
+        static readonly List<PlayerInfo> TopBuilders = new List<PlayerInfo>(PlayerDB.PlayerInfoList
                                         .OrderBy(p => p.BlocksBuilt).ToArray().Reverse());
 
         internal static void Init() {
@@ -209,7 +209,7 @@ THE SOFTWARE.*/
         static void WebsiteHandler(Player player, Command cmd)
         {
             string bc = cmd.Next();
-            if (bc == null || bc.Length < 1)
+            if (string.IsNullOrEmpty(bc))
             {
                 if (ConfigKey.WebsiteURL.GetString().Length < 1)
                 {
@@ -1653,11 +1653,11 @@ THE SOFTWARE.*/
             }
 
             if( MonoCompat.IsMono ) {
-                player.Message( " Running &5Legend&WCraft&S v{0}, under Mono {1}",
+                player.Message( " Running &1Gems&2Craft&S {0}, under Mono {1}",
                                 Updater.LatestStable,
                                 MonoCompat.MonoVersionString );
             } else {
-                player.Message(" Running &5Legend&WCraft&S v{0}, under .NET {1}",
+                player.Message(" Running &1Gems&2Craft&S {0}, under .NET {1}",
                                 Updater.LatestStable,
                                 Environment.Version);
             }

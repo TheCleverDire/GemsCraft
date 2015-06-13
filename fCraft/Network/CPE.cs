@@ -241,7 +241,7 @@ namespace fCraft
     {
         public static Packet MakeExtInfo(short extCount)
         {
-            String VersionString = "LegendCraft " + Updater.LatestStable;
+            String VersionString = "GemsCraft " + Updater.LatestStable;
             Logger.Log(LogType.Debug, "Send: ExtInfo({0},{1})", VersionString, extCount);
 
             Packet packet = new Packet(OpCode.ExtInfo);

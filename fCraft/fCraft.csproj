@@ -186,6 +186,7 @@
     <Compile Include="Network\CPE.cs" />
     <Compile Include="Network\GlobalChat.cs" />
     <Compile Include="Network\PacketReader.cs" />
+    <Compile Include="Network\TitleExtractor.cs" />
     <Compile Include="Physics\ExplodingPhysics.cs" />
     <Compile Include="Physics\Life\Life2d.cs" />
     <Compile Include="Physics\Life\Life2DZone.cs" />
