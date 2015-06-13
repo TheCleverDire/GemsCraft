@@ -22,7 +22,7 @@
  */
 
 //Modified LegendCraft Team
-
+//Modified for GemsCraft
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -230,7 +230,7 @@ namespace fCraft.ServerCLI
                                 //download new zip in current directory
                                 Process.Start("http://gemscraft.net/Version/" + Updater.LatestStable + ".zip");
                                 Console.WriteLine(
-                                    "Downloading the latest LegendCraft Version. Please replace all the files (not folders) in your current folder with the new ones after shutting down.");
+                                    "Downloading the latest GemsCraft Version. Please replace all the files (not folders) in your current folder with the new ones after shutting down.");
                             }
                             catch (Exception ex)
                             {
@@ -248,7 +248,7 @@ namespace fCraft.ServerCLI
                     else
                     {
                         Console.WriteLine(
-                            "Update ignored. To ignore future LegendCraft update requests, uncheck the box in configGUI.");
+                            "Update ignored. To ignore future GemsCraft update requests, uncheck the box in configGUI.");
                     }
 
                 }

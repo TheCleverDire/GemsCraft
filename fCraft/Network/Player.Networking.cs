@@ -92,7 +92,7 @@ namespace fCraft
 
                 ioThread = new Thread(IoLoop)
                 {
-                    Name = "LegendCraft.Session",
+                    Name = "GemsCraft.Session",
                     IsBackground = true
                 };
                 ioThread.Start();
@@ -106,7 +106,7 @@ namespace fCraft
             }
             catch (Exception ex)
             {
-                Logger.LogAndReportCrash("Session failed to start", "LegendCraft", ex, false);
+                Logger.LogAndReportCrash("Session failed to start", "GemsCraft", ex, false);
                 Disconnect();
             }
         }
@@ -367,7 +367,7 @@ namespace fCraft
             }
             catch (Exception ex)
             {
-                Logger.LogAndReportCrash("Error while parsing player's message", "LegendCraft", ex, false);
+                Logger.LogAndReportCrash("Error while parsing player's message", "GemsCraft", ex, false);
                 MessageNow("&WError while handling your message ({0}: {1})." +
                             "It is recommended that you reconnect to the server.",
                             ex.GetType().Name, ex.Message);
@@ -1135,7 +1135,7 @@ namespace fCraft
 
                 Logger.Log(LogType.Warning,
                             "Player.LoginSequence: Player \"{0}\" tried connecting with Minecraft Beta client from {1}. " +
-                            "LegendCraft does not support Minecraft Beta.",
+                            "GemsCraft does not support Minecraft Beta.",
                             smpPlayerName, IP);
 
                 // send SMP KICK packet

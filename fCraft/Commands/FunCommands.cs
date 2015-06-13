@@ -1203,7 +1203,7 @@ THE SOFTWARE.*/
             if (Option.ToLower() == "about")    //td about
             {
                 player.Message("&cTeam Deathmatch&S is a team game where all players are assigned to a red or blue team. Players cannot shoot players on their own team. The game will start the gun physics and do /gun for you. The game keeps score and notifications come up about the score and time left every 30 seconds. The Score Limit, Time Delay, Time Limit, and Team Assigning are customizable. Detailed help is on &H/TD Help"
-                + "\n&SDeveloped for &5Legend&WCraft&S by &fDingus&0Bungus&S 2013 - Based on the template of ZombieGame.cs written by Jonty800.");
+                + "\n&SDeveloped for &5Legend&WCraft&S by &fDingus&0Bungus&S 2013 - Based on the template of ZombieGame.cs written by Jonty800. Was included into GemsCraft");
                 return;
             }
             if (Option.ToLower() == "settings") //shows the current settings for the game (time limit, time delay, score limit, team assigning)
@@ -1437,7 +1437,7 @@ THE SOFTWARE.*/
             if (Option.ToLower() == "about")    //FFA about
             {
                 player.Message("&cFree For All&S is a gun game where it is everyone versus everyone. The game will start the gun physics and do /gun for you (also unhides players). The game keeps score and notifications come up about the score and time left every 30 seconds. The Score Limit, Time Delay, and Time Limit are customizable. Detailed help is on &H/FFA Help"
-                + "\n&SDeveloped for &5Legend&WCraft&S by &fDingus&0Bungus&S 2013 - Based on the template of ZombieGame.cs written by Jonty800.");
+                + "\n&SDeveloped for &5Legend&WCraft&S by &fDingus&0Bungus&S 2013 - Based on the template of ZombieGame.cs written by Jonty800. Was included into GemsCraft");
                 return;
             }
             if (Option.ToLower() == "settings") //shows the current settings for the game (time limit, time delay, score limit)

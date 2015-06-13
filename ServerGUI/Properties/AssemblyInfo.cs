@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LegendCraft ServerGUI")]
-[assembly: AssemblyDescription("Graphical frontend for LegendCraft server")]
+[assembly: AssemblyTitle("GemsCraft ServerGUI")]
+[assembly: AssemblyDescription("Graphical frontend for your GemsCraft server")]
 [assembly: AssemblyConfiguration( "" )]
-[assembly: AssemblyCompany("LegendCraft")]
-[assembly: AssemblyProduct("LegendCraft ServerGUI")]
+[assembly: AssemblyCompany("GemsCraft")]
+[assembly: AssemblyProduct("GemsCraft ServerGUI")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]

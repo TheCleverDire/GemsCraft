@@ -67,7 +67,7 @@ namespace fCraft.ConfigGUI
             }
 
             //otherwise, send!
-            Uri target = new Uri("http://legend-craft.tk/request");
+            Uri target = new Uri("http://gemscraft.net/report/request");
             StringBuilder sb = new StringBuilder();
 
             if (MonoCompat.IsMono)
@@ -122,7 +122,7 @@ namespace fCraft.ConfigGUI
             }
             if (responseString != null && responseString.StartsWith("ERROR"))
             {
-                MessageBox.Show("Crash report could not be processed by http://legend-craft.tk.");
+                MessageBox.Show("Crash report could not be processed by http://gemscraft.net");
             }
             else
             {
@@ -137,7 +137,7 @@ namespace fCraft.ConfigGUI
                 }
             }
 
-            MessageBox.Show("Report sent. Thank you for helping with the development of LegendCraft!");
+            MessageBox.Show("Report sent. Thank you for helping with the development of GemsCraft!");
             this.Close();
 
         }

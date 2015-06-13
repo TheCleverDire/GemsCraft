@@ -79,7 +79,7 @@ namespace fCraft
                 {
                     thread = new Thread(IoThread)
                     {
-                        Name = "LegendCraft.GlobalChat",
+                        Name = "GemsCraft.GlobalChat",
                         IsBackground = true
                     };
                     thread.Start();
@@ -130,9 +130,9 @@ namespace fCraft
                 line = Color.MinecraftToIrcColors(line);
                 if (channelNames == null || !GCReady)
                     return; // in case IRC bot is disabled.
-                for (int i = 0; i < channelNames.Length; i++)
+                foreach (string t in channelNames)
                 {
-                    SendRawMessage(IRCCommands.Privmsg(channelNames[i], line));
+                    SendRawMessage(IRCCommands.Privmsg(t, line));
                 }
             }
 
@@ -162,9 +162,9 @@ namespace fCraft
                         ActualBotNick = desiredBotNick;
                         reconnect = false;
                         Logger.Log(LogType.SystemActivity,
-                                    "Connecting to LegendCraft Global Chat as {2}",
+                                    "Connecting to GemsCraft Global Chat as {2}",
                                     hostName, port, ActualBotNick);
-                        if (ActualBotNick == "Custom Minecraft Server (LegendCraft)")
+                        if (ActualBotNick == "Custom Minecraft Server (GemsCraft)")
                         {
                             Logger.Log(LogType.Error, "You must set a server name to connect to global chat.");
                             reconnect = false;
@@ -317,13 +317,13 @@ namespace fCraft
                         if (!ResponsibleForInputParsing) return;
                         if (msg.Nick.StartsWith("("))
                         {
-                            SendList.Message("&g[Global] Server {0} joined the LegendCraft Global Chat", msg.Nick);
-                            Logger.Log(LogType.GlobalChat,"[Global] Server {0} joined the LegendCraft Global Chat", msg.Nick);               
+                            SendList.Message("&g[Global] Server {0} joined the GemsCraft Global Chat", msg.Nick);
+                            Logger.Log(LogType.GlobalChat,"[Global] Server {0} joined the GemsCraft Global Chat", msg.Nick);               
                         }
                         else
                         {
-                            SendList.Message("&g[Global] {0} joined the LegendCraft Global Chat", msg.Nick);
-                            Logger.Log(LogType.GlobalChat, "[Global] {0} joined the LegendCraft Global Chat", msg.Nick);                   
+                            SendList.Message("&g[Global] {0} joined the GemsCraft Global Chat", msg.Nick);
+                            Logger.Log(LogType.GlobalChat, "[Global] {0} joined the GemsCraft Global Chat", msg.Nick);                   
                         }
                         return;
 
@@ -348,8 +348,8 @@ namespace fCraft
                     case IRCMessageType.Part:
                     case IRCMessageType.Quit:
                         if (!ResponsibleForInputParsing) return;
-                        SendList.Message("&g[Global] Server {0} left the LegendCraft Global Chat", msg.Nick);
-                        Logger.Log(LogType.GlobalChat, "[Global] Server {0} left the LegendCraft Global Chat", msg.Nick);
+                        SendList.Message("&g[Global] Server {0} left the GemsCraft Global Chat", msg.Nick);
+                        Logger.Log(LogType.GlobalChat, "[Global] Server {0} left the GemsCraft Global Chat", msg.Nick);
                         return;
 
 
@@ -385,7 +385,7 @@ namespace fCraft
                             //wont happen
                             case IRCReplyCode.ErrorBadChannelKey:
                                 Logger.Log(LogType.SystemActivity,
-                                            "Error: Channel password required for {0}. LegendCraft does not currently support passworded channels.",
+                                            "Error: Channel password required for {0}. GemsCraft does not currently support passworded channels.",
                                             msg.Channel);
                                 die = true;
                                 GCReady = false;
@@ -506,26 +506,20 @@ namespace fCraft
         static void AssignBotForInputParsing()
         {
             bool needReassignment = false;
-            for (int i = 0; i < threads.Length; i++)
+            foreach (GlobalThread t in threads.Where(t => !t.ResponsibleForInputParsing && t.IsReady))
             {
-                if (threads[i].ResponsibleForInputParsing && !threads[i].IsReady)
-                {
-                    threads[i].ResponsibleForInputParsing = false;
-                    needReassignment = true;
-                }
+                t.ResponsibleForInputParsing = false;
+                needReassignment = true;
             }
             if (needReassignment)
             {
-                for (int i = 0; i < threads.Length; i++)
+                foreach (GlobalThread t in threads.Where(t => t.IsReady))
                 {
-                    if (threads[i].IsReady)
-                    {
-                        threads[i].ResponsibleForInputParsing = true;
-                        Logger.Log(LogType.SystemActivity,
-                                    "Bot \"{0}\" is now responsible for parsing input.",
-                                    threads[i].ActualBotNick);
-                        return;
-                    }
+                    t.ResponsibleForInputParsing = true;
+                    Logger.Log(LogType.SystemActivity,
+                        "Bot \"{0}\" is now responsible for parsing input.",
+                        t.ActualBotNick);
+                    return;
                 }
                 Logger.Log(LogType.SystemActivity, "All Global Chat bots have disconnected.");
             }
@@ -536,9 +530,9 @@ namespace fCraft
 
         public static void Init()
         {
-            hostName = "irc.dal.net";
+            hostName = "irc.byteirc.org";
             port = 6667;
-            channelNames = new[] { "#LegendCraft" };
+            channelNames = new[] { "#Gems_Craft_Global" };
             for (int i = 0; i < channelNames.Length; i++)
             {
                 channelNames[i] = channelNames[i].Trim();
@@ -561,14 +555,9 @@ namespace fCraft
         {
             if (inString == null) return null;
             StringBuilder newString = new StringBuilder();
-            char ch;
-            for (int i = 0; i < inString.Length; i++)
+            foreach (var ch in inString.Where(ch => (ch <= 0x007A && ch >= 0x0061) || (ch <= 0x005A && ch >= 0x0041) || (ch <= 0x0039 && ch >= 0x0030) || ch == ']'))
             {
-                ch = inString[i];
-                if ((ch <= 0x007A && ch >= 0x0061) || (ch <= 0x005A && ch >= 0x0041) || (ch <= 0x0039 && ch >= 0x0030) || ch == ']')
-                {
-                    newString.Append(ch);
-                }
+                newString.Append(ch);
             }
             return newString.ToString();
         }

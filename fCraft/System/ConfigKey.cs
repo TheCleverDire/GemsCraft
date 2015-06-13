@@ -7,13 +7,13 @@ namespace fCraft {
     public enum ConfigKey {
         #region General
 
-        [StringKey( ConfigSection.General, "[LegendCraft] Default",
+        [StringKey( ConfigSection.General, "[GemsCraft] Default",
 @"The name of the server, as shown on the welcome screen and the
 official server list (if server is public).",
             MinLength = 1, MaxLength = 64 )]
         ServerName,
 
-        [StringKey(ConfigSection.General, "EngineerChat",
+        [StringKey(ConfigSection.General, "GemsChat",
 @"The name of the custom chat channel",
             MinLength = 1, MaxLength = 12)]
         CustomChatName,
@@ -83,7 +83,7 @@ changes if your computer's IP or server's port change." )]
 
 
         [IntKey( ConfigSection.General, 25565,
-@"Port number on your local machine that LegendCraft uses to listen for
+@"Port number on your local machine that GemsCraft uses to listen for
 incoming connections. If you are behind a router, you may need
 to set up port forwarding. You may also need to add a firewall
 exception for ServerGUI/ServerCLI/ConfigGUI. Note that your
@@ -367,7 +367,7 @@ If exceeded, oldest logs will be erased first. Set this to 0 to keep all logs.",
         #region IRC
 
         [BoolKey( ConfigSection.IRC, false,
-@"LegendCraft includes an IRC (Internet Relay Chat) client for
+@"GemsCraft includes an IRC (Internet Relay Chat) client for
 relaying messages to and from any IRC network.
 Note that encrypted IRC (via SSL) is not supported." )]
         IRCBotEnabled,
@@ -467,7 +467,7 @@ with IRC bots falling behind on messages.",
 
         [BoolKey( ConfigSection.Advanced, true,
 @"Crash reports are created when serious unexpected errors occur.
-Being able to receive crash reports helps identify bugs and improve LegendCraft!
+Being able to receive crash reports helps identify bugs and improve GemsCraft!
 The report consists of the error information, OS and runtime versions,
 a copy of config.xml, and last 25 lines of the log file.
 Reports are confidential and are not displayed publicly." )]
@@ -574,7 +574,7 @@ If disabled, heartbeat data is written to heartbeatdata.txt." )]
         [IPKey( ConfigSection.Advanced, IPKeyAttribute.BlankValueMeaning.Any,
 @"If the machine has more than one available IP address (for example
 if you have more than one NIC) you can use this setting to make
-LegendCraft bind to the same IP every time." )]
+GemsCraft bind to the same IP every time." )]
         IP,
 
         [EnumKey( ConfigSection.Advanced, fCraft.BandwidthUseMode.Normal,
@@ -589,7 +589,7 @@ but will reduce bandwidth use." )]
         RestartInterval,
 
         [StringKey(ConfigSection.Advanced, "True",
-@"If enabled, allows the server to respond to connect to online WebPanel at http://legend-craft.tk")]
+@"If enabled, allows the server to respond to connect to online WebPanel at http://gemscraft.net")]
         WebPanelEnabled,
 
         #endregion

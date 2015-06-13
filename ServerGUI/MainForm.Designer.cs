@@ -237,7 +237,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(500, 150);
             this.Name = "MainForm";
-            this.Text = "LegendCraft";
+            this.Text = "GemsCraft";
             this.PlayerOptions.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();

@@ -72,7 +72,7 @@ namespace fCraft {
 #if !DEBUG
                             } catch( Exception ex ) {
                                 Logger.LogAndReportCrash( "An error occured while trying to parse one of the entries on the world list",
-                                                          "LegendCraft", ex, false );
+                                                          "GemsCraft", ex, false );
                             }
 #endif
                         }
@@ -106,7 +106,7 @@ namespace fCraft {
                 if( newMainWorld == null ) {
                     Logger.Log( LogType.Warning,
                                 "Server.Start: Could not load any of the specified worlds, or no worlds were specified. " +
-                                "Creating default \"main\" world. Ignore this message if this is your first time running LegendCraft." );
+                                "Creating default \"main\" world. Ignore this message if this is your first time running GemsCraft." );
                     newMainWorld = AddWorld( null, "main", MapGenerator.GenerateFlatgrass( 128, 128, 64 ), true );
                 }
 

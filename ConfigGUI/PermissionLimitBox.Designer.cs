@@ -31,31 +31,31 @@
             // 
             this.comboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.comboBox.FormattingEnabled = true;
-            this.comboBox.Location = new System.Drawing.Point( 80, 0 );
+            this.comboBox.Location = new System.Drawing.Point(80, 0);
             this.comboBox.Name = "comboBox";
-            this.comboBox.Size = new System.Drawing.Size( 150, 21 );
+            this.comboBox.Size = new System.Drawing.Size(150, 21);
             this.comboBox.TabIndex = 1;
             // 
             // label
             // 
             this.label.AutoSize = true;
-            this.label.Location = new System.Drawing.Point( 3, 3 );
+            this.label.Location = new System.Drawing.Point(3, 3);
             this.label.Name = "label";
-            this.label.Size = new System.Drawing.Size( 33, 13 );
+            this.label.Size = new System.Drawing.Size(33, 13);
             this.label.TabIndex = 0;
             this.label.Text = "Label";
             this.label.TextAlign = System.Drawing.ContentAlignment.TopRight;
             // 
             // PermissionLimitBox
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF( 6F, 13F );
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Transparent;
-            this.Controls.Add( this.comboBox );
-            this.Controls.Add( this.label );
+            this.Controls.Add(this.comboBox);
+            this.Controls.Add(this.label);
             this.Name = "PermissionLimitBox";
-            this.Size = new System.Drawing.Size( 230, 21 );
-            this.ResumeLayout( false );
+            this.Size = new System.Drawing.Size(230, 21);
+            this.ResumeLayout(false);
             this.PerformLayout();
 
         }

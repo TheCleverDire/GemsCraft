@@ -146,7 +146,7 @@ namespace fCraft {
 
 
         public const string DataBackupDirectory = "databackups";
-        public const string DataBackupFileNameFormat = "LegendCraftData_{0:yyyyMMdd'_'HH'-'mm'-'ss}.zip";
+        public const string DataBackupFileNameFormat = "GemsCraftData_{0:yyyyMMdd'_'HH'-'mm'-'ss}.zip";
 
         #endregion
 
@@ -184,7 +184,7 @@ namespace fCraft {
                 }
                 DirectoryInfo info = new DirectoryInfo( path );
                 if( checkForWriteAccess ) {
-                    string randomFileName = Path.Combine( info.FullName, "LegendCraft_write_test_" + Guid.NewGuid() );
+                    string randomFileName = Path.Combine( info.FullName, "GemsCraft_write_test_" + Guid.NewGuid() );
                     using( File.Create( randomFileName ) ) { }
                     File.Delete( randomFileName );
                 }

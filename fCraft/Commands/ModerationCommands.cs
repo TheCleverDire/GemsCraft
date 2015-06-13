@@ -915,7 +915,7 @@ THE SOFTWARE.*/
             IsConsoleSafe = false,
             Permissions = new[] { Permission.Economy },
             Usage = "/Economy [give/take/show/pay] [playername] [pay/give/take: amount]",
-            Help = "&SEconomy commands for LegendCraft. Show will show you the amount of money a player has" +
+            Help = "&SEconomy commands for GemsCraft. Show will show you the amount of money a player has" +
             "and give/take will give or take bits from or to a player. WARNING, give and take will change your server's inflation.",
             Handler = EconomyHandler
         };

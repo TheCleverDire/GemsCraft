@@ -45,7 +45,7 @@ namespace fCraft.ServerGUI
             Text = "GemsCraft " + Updater.LatestStable + " - starting...";
             _startupThread = new Thread(StartupThread)
             {
-                Name = "LegendCraft ServerGUI Startup"
+                Name = "GemsCraft ServerGUI Startup"
             };
             _startupThread.Start();
         }
@@ -107,7 +107,7 @@ namespace fCraft.ServerGUI
 
         void OnInitSuccess()
         {
-            Text = "LegendCraft " + " - " + ConfigKey.ServerName.GetString();
+            Text = "GemsCraft " + " - " + ConfigKey.ServerName.GetString();
         }
 
         static void UpdateCheck()
@@ -171,7 +171,7 @@ namespace fCraft.ServerGUI
             _shutdownPending = true;
             console.Enabled = false;
             console.Text = "Shutting down...";
-            Text = "LegendCraft " + " - shutting down...";
+            Text = "GemsCraft " + " - shutting down...";
             uriDisplay.Enabled = false;
             if (!_startupComplete)
             {

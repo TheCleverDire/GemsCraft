@@ -3512,9 +3512,9 @@
             this.lCrashReportDisclaimer.Name = "lCrashReportDisclaimer";
             this.lCrashReportDisclaimer.Size = new System.Drawing.Size(468, 39);
             this.lCrashReportDisclaimer.TabIndex = 1;
-            this.lCrashReportDisclaimer.Text = "Send all Crash Reports To The LegendCraft Dev Team\r\nCrash reports are when seriou" +
+            this.lCrashReportDisclaimer.Text = "Send all Crash Reports To The GemsCraft Dev Team\r\nCrash reports are when seriou" +
     "s unexpected errors occur. Being able to receive crash reports helps\r\nidentify b" +
-    "ugs and improve LegendCraft! ";
+    "ugs and improve GemsCraft! ";
             // 
             // Misc
             // 
@@ -3843,7 +3843,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MinimumSize = new System.Drawing.Size(700, 547);
             this.Name = "MainForm";
-            this.Text = "LegendCraft Config Tool";
+            this.Text = "GemsCraft Config Tool";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigUI_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.tabs.ResumeLayout(false);

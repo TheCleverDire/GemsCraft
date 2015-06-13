@@ -255,7 +255,7 @@ namespace fCraft {
         ///<summary>Permissions to use LeBot.</summary>
         LeBot,
 
-        ///<summary>Permission to use LegendCraft Economy</summary>
+        ///<summary>Permission to use GemsCraft Economy</summary>
         Economy,
 
         ///<summary>Permission to manage the economy. (Use /give and /take)</summary>
