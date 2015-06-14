@@ -30,9 +30,9 @@ namespace GemsCraftGUI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.bApply = new System.Windows.Forms.Button();
@@ -66,6 +66,7 @@ namespace GemsCraftGUI
             this.groupBox4 = new System.Windows.Forms.GroupBox();
             this.bWiki = new System.Windows.Forms.Button();
             this.bWeb = new System.Windows.Forms.Button();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.bChangelog = new System.Windows.Forms.Button();
             this.bCredits = new System.Windows.Forms.Button();
@@ -316,11 +317,22 @@ namespace GemsCraftGUI
             this.CustomName = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.CustomAliases = new System.Windows.Forms.TextBox();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.ServerTab = new System.Windows.Forms.TabPage();
+            this.pStop = new System.Windows.Forms.Button();
+            this.bStart = new System.Windows.Forms.Button();
+            this.logBox = new System.Windows.Forms.RichTextBox();
+            this.bVoice = new System.Windows.Forms.Button();
+            this.playerListLabel = new System.Windows.Forms.Label();
+            this.playerList = new System.Windows.Forms.ListBox();
+            this.URLLabel = new System.Windows.Forms.Label();
+            this.bPlay = new System.Windows.Forms.Button();
+            this.uriDisplay = new System.Windows.Forms.TextBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.ThemeBox = new System.Windows.Forms.ComboBox();
+            this.SizeBox = new System.Windows.Forms.ComboBox();
             this.chatPreview1 = new fCraft.ConfigGUI.ChatPreview();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.console = new fCraft.ServerGUI.ConsoleBox();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabs.SuspendLayout();
@@ -331,6 +343,7 @@ namespace GemsCraftGUI
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).BeginInit();
             this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.groupBox2.SuspendLayout();
             this.gInformation.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).BeginInit();
@@ -389,13 +402,13 @@ namespace GemsCraftGUI
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).BeginInit();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.ServerTab.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
             // 
             this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.ServerTab);
             this.tabControl1.Location = new System.Drawing.Point(13, 13);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -844,6 +857,16 @@ namespace GemsCraftGUI
             this.bWeb.TabIndex = 1;
             this.bWeb.Text = "Website";
             this.bWeb.UseVisualStyleBackColor = false;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Location = new System.Drawing.Point(212, 294);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(213, 175);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
+            this.pictureBox1.TabIndex = 5;
+            this.pictureBox1.TabStop = false;
             // 
             // groupBox2
             // 
@@ -3748,15 +3771,134 @@ namespace GemsCraftGUI
             this.CustomAliases.Size = new System.Drawing.Size(169, 21);
             this.CustomAliases.TabIndex = 19;
             // 
-            // tabPage2
+            // ServerTab
             // 
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(692, 572);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "tabPage2";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.ServerTab.Controls.Add(this.pStop);
+            this.ServerTab.Controls.Add(this.bStart);
+            this.ServerTab.Controls.Add(this.console);
+            this.ServerTab.Controls.Add(this.logBox);
+            this.ServerTab.Controls.Add(this.bVoice);
+            this.ServerTab.Controls.Add(this.playerListLabel);
+            this.ServerTab.Controls.Add(this.playerList);
+            this.ServerTab.Controls.Add(this.URLLabel);
+            this.ServerTab.Controls.Add(this.bPlay);
+            this.ServerTab.Controls.Add(this.uriDisplay);
+            this.ServerTab.Location = new System.Drawing.Point(4, 22);
+            this.ServerTab.Name = "ServerTab";
+            this.ServerTab.Padding = new System.Windows.Forms.Padding(3);
+            this.ServerTab.Size = new System.Drawing.Size(692, 572);
+            this.ServerTab.TabIndex = 1;
+            this.ServerTab.Text = "tabPage2";
+            this.ServerTab.UseVisualStyleBackColor = true;
+            this.ServerTab.Click += new System.EventHandler(this.tabPage2_Click);
+            // 
+            // pStop
+            // 
+            this.pStop.Location = new System.Drawing.Point(542, 62);
+            this.pStop.Name = "pStop";
+            this.pStop.Size = new System.Drawing.Size(143, 23);
+            this.pStop.TabIndex = 17;
+            this.pStop.Text = "Stop";
+            this.pStop.UseVisualStyleBackColor = true;
+            this.pStop.Click += new System.EventHandler(this.pStop_Click);
+            // 
+            // bStart
+            // 
+            this.bStart.Location = new System.Drawing.Point(543, 33);
+            this.bStart.Name = "bStart";
+            this.bStart.Size = new System.Drawing.Size(143, 23);
+            this.bStart.TabIndex = 16;
+            this.bStart.Text = "Start";
+            this.bStart.UseVisualStyleBackColor = true;
+            this.bStart.Click += new System.EventHandler(this.bStart_Click);
+            // 
+            // logBox
+            // 
+            this.logBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.logBox.BackColor = System.Drawing.Color.Black;
+            this.logBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.logBox.HideSelection = false;
+            this.logBox.Location = new System.Drawing.Point(3, 32);
+            this.logBox.Name = "logBox";
+            this.logBox.ReadOnly = true;
+            this.logBox.Size = new System.Drawing.Size(533, 499);
+            this.logBox.TabIndex = 14;
+            this.logBox.Text = "";
+            // 
+            // bVoice
+            // 
+            this.bVoice.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bVoice.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bVoice.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bVoice.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bVoice.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bVoice.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.bVoice.Image = ((System.Drawing.Image)(resources.GetObject("bVoice.Image")));
+            this.bVoice.Location = new System.Drawing.Point(649, 537);
+            this.bVoice.Name = "bVoice";
+            this.bVoice.Size = new System.Drawing.Size(37, 29);
+            this.bVoice.TabIndex = 13;
+            this.bVoice.UseVisualStyleBackColor = false;
+            // 
+            // playerListLabel
+            // 
+            this.playerListLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.playerListLabel.AutoSize = true;
+            this.playerListLabel.BackColor = System.Drawing.Color.Transparent;
+            this.playerListLabel.Font = new System.Drawing.Font("Lucida Sans", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.playerListLabel.ForeColor = System.Drawing.Color.Black;
+            this.playerListLabel.Location = new System.Drawing.Point(540, 88);
+            this.playerListLabel.Name = "playerListLabel";
+            this.playerListLabel.Size = new System.Drawing.Size(65, 12);
+            this.playerListLabel.TabIndex = 12;
+            this.playerListLabel.Text = "Player list";
+            // 
+            // playerList
+            // 
+            this.playerList.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.playerList.BackColor = System.Drawing.Color.White;
+            this.playerList.FormattingEnabled = true;
+            this.playerList.IntegralHeight = false;
+            this.playerList.Location = new System.Drawing.Point(542, 103);
+            this.playerList.Name = "playerList";
+            this.playerList.Size = new System.Drawing.Size(144, 428);
+            this.playerList.TabIndex = 11;
+            // 
+            // URLLabel
+            // 
+            this.URLLabel.AutoSize = true;
+            this.URLLabel.Font = new System.Drawing.Font("Lucida Sans", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.URLLabel.ForeColor = System.Drawing.Color.Black;
+            this.URLLabel.Location = new System.Drawing.Point(11, 10);
+            this.URLLabel.Name = "URLLabel";
+            this.URLLabel.Size = new System.Drawing.Size(31, 12);
+            this.URLLabel.TabIndex = 9;
+            this.URLLabel.Text = "URL:";
+            // 
+            // bPlay
+            // 
+            this.bPlay.BackColor = System.Drawing.Color.WhiteSmoke;
+            this.bPlay.Enabled = false;
+            this.bPlay.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
+            this.bPlay.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
+            this.bPlay.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.bPlay.Location = new System.Drawing.Point(638, 3);
+            this.bPlay.Name = "bPlay";
+            this.bPlay.Size = new System.Drawing.Size(48, 23);
+            this.bPlay.TabIndex = 8;
+            this.bPlay.Text = "Play";
+            this.bPlay.UseVisualStyleBackColor = false;
+            this.bPlay.Click += new System.EventHandler(this.bPlay_Click);
+            // 
+            // uriDisplay
+            // 
+            this.uriDisplay.Location = new System.Drawing.Point(48, 6);
+            this.uriDisplay.Name = "uriDisplay";
+            this.uriDisplay.Size = new System.Drawing.Size(584, 20);
+            this.uriDisplay.TabIndex = 10;
             // 
             // toolTip
             // 
@@ -3765,6 +3907,42 @@ namespace GemsCraftGUI
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // ThemeBox
+            // 
+            this.ThemeBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ThemeBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ThemeBox.FormattingEnabled = true;
+            this.ThemeBox.Items.AddRange(new object[] {
+            "Default LC",
+            "Alternate LC",
+            "Pink",
+            "Yellow",
+            "Green",
+            "Purple",
+            "Grey"});
+            this.ThemeBox.Location = new System.Drawing.Point(627, -14);
+            this.ThemeBox.Name = "ThemeBox";
+            this.ThemeBox.Size = new System.Drawing.Size(82, 21);
+            this.ThemeBox.TabIndex = 11;
+            this.ThemeBox.Text = "Theme";
+            this.ThemeBox.Visible = false;
+            // 
+            // SizeBox
+            // 
+            this.SizeBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.SizeBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.SizeBox.FormattingEnabled = true;
+            this.SizeBox.Items.AddRange(new object[] {
+            "Normal",
+            "Big",
+            "Large"});
+            this.SizeBox.Location = new System.Drawing.Point(565, -14);
+            this.SizeBox.Name = "SizeBox";
+            this.SizeBox.Size = new System.Drawing.Size(56, 21);
+            this.SizeBox.TabIndex = 10;
+            this.SizeBox.Text = "Size";
+            this.SizeBox.Visible = false;
+            // 
             // chatPreview1
             // 
             this.chatPreview1.Location = new System.Drawing.Point(7, 257);
@@ -3772,21 +3950,20 @@ namespace GemsCraftGUI
             this.chatPreview1.Size = new System.Drawing.Size(637, 214);
             this.chatPreview1.TabIndex = 2;
             // 
-            // pictureBox1
+            // console
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
-            this.pictureBox1.Location = new System.Drawing.Point(212, 294);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(213, 175);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 5;
-            this.pictureBox1.TabStop = false;
+            this.console.Location = new System.Drawing.Point(6, 537);
+            this.console.Name = "console";
+            this.console.Size = new System.Drawing.Size(636, 20);
+            this.console.TabIndex = 15;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(724, 616);
+            this.Controls.Add(this.ThemeBox);
+            this.Controls.Add(this.SizeBox);
             this.Controls.Add(this.tabControl1);
             this.Name = "MainForm";
             this.Text = "MainForm";
@@ -3801,6 +3978,7 @@ namespace GemsCraftGUI
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).EndInit();
             this.groupBox4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.groupBox2.ResumeLayout(false);
             this.gInformation.ResumeLayout(false);
             this.gInformation.PerformLayout();
@@ -3884,7 +4062,8 @@ namespace GemsCraftGUI
             ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.ServerTab.ResumeLayout(false);
+            this.ServerTab.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -3893,7 +4072,7 @@ namespace GemsCraftGUI
 
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage ServerTab;
         private System.Windows.Forms.Button bApply;
         private System.Windows.Forms.Button bResetAll;
         private System.Windows.Forms.Button bResetTab;
@@ -4179,5 +4358,17 @@ namespace GemsCraftGUI
         private System.Windows.Forms.ToolTip toolTip;
         private System.Windows.Forms.ToolTip toolTip1;
         private fCraft.ConfigGUI.ChatPreview chatPreview1;
+        private System.Windows.Forms.Label URLLabel;
+        private System.Windows.Forms.Button bPlay;
+        private System.Windows.Forms.TextBox uriDisplay;
+        private System.Windows.Forms.Label playerListLabel;
+        private System.Windows.Forms.ListBox playerList;
+        private System.Windows.Forms.Button bVoice;
+        private System.Windows.Forms.RichTextBox logBox;
+        private fCraft.ServerGUI.ConsoleBox console;
+        private System.Windows.Forms.Button bStart;
+        private System.Windows.Forms.Button pStop;
+        private System.Windows.Forms.ComboBox ThemeBox;
+        private System.Windows.Forms.ComboBox SizeBox;
     }
 }

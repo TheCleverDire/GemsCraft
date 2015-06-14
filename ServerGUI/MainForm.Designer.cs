@@ -134,33 +134,33 @@
             this.Rank,
             this.PM});
             this.PlayerOptions.Name = "contextMenuStrip1";
-            this.PlayerOptions.Size = new System.Drawing.Size(101, 92);
+            this.PlayerOptions.Size = new System.Drawing.Size(99, 92);
             this.PlayerOptions.Tag = "Player Options";
             this.PlayerOptions.Text = "Player Options";
             // 
             // Ban
             // 
             this.Ban.Name = "Ban";
-            this.Ban.Size = new System.Drawing.Size(100, 22);
+            this.Ban.Size = new System.Drawing.Size(98, 22);
             this.Ban.Text = "Ban";
             this.Ban.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
             // 
             // Kick
             // 
             this.Kick.Name = "Kick";
-            this.Kick.Size = new System.Drawing.Size(100, 22);
+            this.Kick.Size = new System.Drawing.Size(98, 22);
             this.Kick.Text = "Kick";
             // 
             // Rank
             // 
             this.Rank.Name = "Rank";
-            this.Rank.Size = new System.Drawing.Size(100, 22);
+            this.Rank.Size = new System.Drawing.Size(98, 22);
             this.Rank.Text = "Rank";
             // 
             // PM
             // 
             this.PM.Name = "PM";
-            this.PM.Size = new System.Drawing.Size(100, 22);
+            this.PM.Size = new System.Drawing.Size(98, 22);
             this.PM.Text = "PM";
             // 
             // logBox

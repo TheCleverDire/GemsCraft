@@ -2610,6 +2610,20 @@
   <metadata name="dgvcBlockDB.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="bVoice.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        /9j/4AAQSkZJRgABAQEAAAAAAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYa
+        HSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgo
+        KCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAYABgDASIAAhEBAxEB/8QA
+        FgABAQEAAAAAAAAAAAAAAAAAAAgG/8QAKxAAAAUDAgQGAwEAAAAAAAAAAQIDBBEABRITFQYUFiEHFyJB
+        QlEyM1Jh/8QAFAEBAAAAAAAAAAAAAAAAAAAAAP/EABQRAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhED
+        EQA/AKWvF5aW1Rs2XWAjx4CoNUxKI6hiJmOYJAICClEe8VBPUdz3veOfcbpq63M5jnnMzNWF4tuC2y78
+        G3d36La3fqtnK/xR10DpEOb6KBjBI1J/lbxxvm19O3DPU0+Z0TctH960YY+8zQXJZ7y0uSjlsgsB3jME
+        gdJgUQ0zHTKcoSIQMlMA9ppWL8JHBbnd+Mru09dtcP0mzZf4raCBEjnL9lExRgaUG8u7JlcrW6Z3VBFw
+        wWTEqySxZIYvvNRB17w15gbfzXE3ltlo7duS2GM/lhl+ue+MzH+9qUoLftDJlbbW1Z2pBFuwRTAqKSJY
+        IUvtFKUoP//Z
+</value>
+  </data>
   <metadata name="toolTip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>204, 13</value>
   </metadata>
