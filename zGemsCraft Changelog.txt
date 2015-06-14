@@ -1,0 +1,4 @@
+Changes in GemsCraft Beta 1.0:
+-Brand new GUI for both Server and Config
+-Removed ServerGUI and ConfigGUI
+-Cleaned up some code with Resharper

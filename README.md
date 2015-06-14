@@ -1,41 +1,37 @@
-﻿2.4.0
+﻿Beta 1.0
 
-All bugs and glitches randomly found in the game are meant to happen, they add to the fun :D
+#GemsCraft
+![LegendCraft](http://i.imgur.com/pbO5NDl.png "Ya it's a logo deal with it")<br />
 
-#LegendCraft
-![LegendCraft](http://i.imgur.com/YNPR6p0.png "Ya it's a logo deal with it")<br />
+Dowload the latest GemsCraft release here: 
+https://gemscraft.net/
 
-Dowload the latest LegendCraft release here: 
-https://github.com/LeChosenOne/LegendCraft/releases/tag/2.4.0
-
-View all LegendCraft releases:
-https://github.com/LeChosenOne/LegendCraft/releases
-
-Thank you for downloading LegendCraft, a custom Minecraft/ClassiCube server based on fCraft and 800craft.
+Thank you for downloading GemsCraft, a custom Minecraft/ClassiCube server based on fCraft, 800craft, and LegendCraft.
 
 Special thanks to fragmer, for creating fCraft! Special thanks to Jonty800, GlennMR and LaoTszy for their hard 
-
 work with
-800Craft! LegendCraft is a modified version of 800Craft. 
+800Craft! 
+Also thank you to DingusBungus and LeChosenOne for your dedication to LegendCraft! I would have never gotten into this 
+mess if I had never joined Rising Embers. 
 
 
 ##Installation 
 ####(Windows) 
 
-LegendCraft requires Microsoft .NET Framework 4.0. Your system may already have it
+GemsCraft requires Microsoft .NET Framework 4.0. Your system may already have it
 installed, and you can download it from  http://www.microsoft.com/en-us/download/details.aspx?id=17851
 Plugins not working? Getting plugin errors?
 Go to your plugins folder and right click on all the plugin.dll's. Select unblock for all of them.
 
 ####(Linux, Unix, MacOS X)
 
-LegendCraft requires Mono 2.10 (recommended). You can
+GemsCraft requires Mono 2.10 (recommended). You can
 download it from www.mono-project.org, or (on some Linux distributions) install
 it through your package manager.
 
-To be able to use graphical LegendCraft components (ServerGUI and ConfigGUI) you
-will also need GDI+ library (libgdiplus). Before starting LegendCraft, make sure
-that it has read/write permissions in the LegendCraft directory.
+To be able to use the GemsCraftGUI you
+will also need GDI+ library (libgdiplus). Before starting GemsCraft, make sure
+that it has read/write permissions in the GemsCraft directory.
 
 To run ".exe" files with Mono, use the following syntax:
 Mono 2.6.4: "mono SomeFile.exe"
@@ -43,13 +39,37 @@ Mono 2.8+:  "mono --gc=sgen SomeFile.exe"
 
 If you're intending to run a public server that appears on minecraft.net's server list, 	
 you need to import https certificates to tell mono you trust them, this can be done by 
-running "sudo mozroots --import --ask-remove" as the LegendCraft user on your system.
+running "sudo mozroots --import --ask-remove" as the GemsCraft user on your system.
 
 You may also have to run "sudo certmgr -ssl -m https://minecraft.net" in order for heartbeats to work 
 properly.
 
 ##Licensing 
 
+####GemsCraft license
+LegendCraft code and binaries are licensed and distributed under the permissive MIT License, reproduced here: <br />
+
+Copyright < 2013- 2015 > apotter96
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+--------------------------------------------------------------
 ####LegendCraft license
 LegendCraft code and binaries are licensed and distributed under the permissive MIT License, reproduced here: <br />
 
@@ -133,10 +153,9 @@ or any other files from Minecraft... neither does 800Craft or LegendCraft.
 
 ##Credits 
 
-LegendCraft was developed by LeChosenOne, and DingusBungus <br />
--With code contribution by fragmer (the great), Jonty800 (who lifts) and Eeyle (who dissappeared randomly).
-
-LegendCraft webend was developed by Liam Stanley <br />
+GemsCraft was developed by apotter96 <br />
+Thanks to the LegendCraft developers: <br />
+-DingusBungus and LeChosenOne (With code contribution by fragmer (the great), Jonty800 (who lifts) and Eeyle (who dissappeared randomly)
 
 Thanks to 800Craft code contributers:<br />
 -Rebelliousdude, boblol0909, WaterGod469 and Maicke98 for trying. 
@@ -159,7 +178,6 @@ Thanks to Minecraft servers that helped test and improve fCraft:<br />
 Thanks to Minecraft servers and players that helped test and improve LegendCraft:<br />
 -Ascending Blackout, Pure2k12, ThunderCraft, Jonty800, Un1CraftFreebuild, and Rising Embers 
 
-Special Thanks to Pure2K12 for inspiration and getting me started in this mess!<br />
-Special Thanks to Jonty800 being exceptionally awesome!
+Thanks to the amazing staff at Green Emeralds who inspired me to do this project!
 
-And thank You for using LegendCraft!
+And thank You for using GemsCraft!
