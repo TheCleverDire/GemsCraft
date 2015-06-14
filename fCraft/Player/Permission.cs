@@ -279,6 +279,11 @@ namespace fCraft {
         /// <summary>
         /// Permission to completely undo a target player's block modifications.
         /// </summary>
-        UndoAll
+        UndoAll,
+
+        /// <summary>
+        /// Permission to use the dragon command
+        /// </summary>
+        Dragon
     }
 }

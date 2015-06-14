@@ -524,29 +524,25 @@ namespace fCraft {
                 case ConfigKey.BandwidthUseMode:
                     Player[] playerListCache = Server.Players;
                     if( playerListCache != null ) {
-                        foreach( Player p in playerListCache ) {
-                            if( p.BandwidthUseMode == BandwidthUseMode.Default ) {
-                                // resets the use tweaks
-                                p.BandwidthUseMode = BandwidthUseMode.Default;
-                            }
+                        foreach (Player p in playerListCache.Where(p => p.BandwidthUseMode == BandwidthUseMode.Default))
+                        {
+                            // resets the use tweaks
+                            p.BandwidthUseMode = BandwidthUseMode.Default;
                         }
                     }
                     break;
 
                 case ConfigKey.BlockDBAutoEnableRank:
                     RankManager.BlockDBAutoEnableRank = Rank.Parse( key.GetString() );
-                    if( BlockDB.IsEnabledGlobally ) {
+                    if( BlockDB.IsEnabledGlobally )
+                    {
                         World[] worldListCache = WorldManager.Worlds;
-                        foreach( World world in worldListCache ) {
-                            if( world.BlockDB.AutoToggleIfNeeded() ) {
-                                if( world.BlockDB.IsEnabled ) {
-                                    Logger.Log( LogType.SystemActivity,
-                                                "BlockDB is now auto-enabled on world {0}", world.Name );
-                                } else {
-                                    Logger.Log( LogType.SystemActivity,
-                                                "BlockDB is now auto-disabled on world {0}", world.Name );
-                                }
-                            }
+                        foreach (World world in worldListCache.Where(world => world.BlockDB.AutoToggleIfNeeded()))
+                        {
+                            Logger.Log(LogType.SystemActivity,
+                                world.BlockDB.IsEnabled
+                                    ? "BlockDB is now auto-enabled on world {0}"
+                                    : "BlockDB is now auto-disabled on world {0}", world.Name);
                         }
                     }
                     break;
@@ -603,11 +599,7 @@ namespace fCraft {
                     break;
 
                 case ConfigKey.NoPartialPositionUpdates:
-                    if( key.Enabled() ) {
-                        Player.FullPositionUpdateInterval = 0;
-                    } else {
-                        Player.FullPositionUpdateInterval = Player.FullPositionUpdateIntervalDefault;
-                    }
+                    Player.FullPositionUpdateInterval = key.Enabled() ? 0 : Player.FullPositionUpdateIntervalDefault;
                     break;
 
                 case ConfigKey.PatrolledRank:

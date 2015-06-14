@@ -317,13 +317,14 @@ namespace fCraft {
             // delete the old updater, if exists
             File.Delete( Paths.UpdaterFileName );
             File.Delete( "fCraftUpdater.exe" ); // pre-0.600 (supar legacy)
+            //TODO - Include ServerGUI.exe and ConfigGUI.exe in these as well
 #endif
-
+            
             // try to load the config
-            if( !Config.Load( false, false ) ) {
+            RankManager.RanksAlreadyLoaded = true;
+           if( !Config.Load( false, false ) ) {
                 throw new Exception( "GemsCraft Config failed to initialize" );
             }
-
             if( ConfigKey.VerifyNames.GetEnum<NameVerificationMode>() == NameVerificationMode.Never ) {
                 Logger.Log( LogType.Warning,
                             "Name verification is currently OFF. Your server is at risk of being hacked. " +
@@ -331,7 +332,9 @@ namespace fCraft {
             }
 
             // load player DB
+            
             PlayerDB.Load();
+            
             IPBanList.Load();
 
             //define fallbacks
@@ -1087,7 +1090,7 @@ namespace fCraft {
         [CanBeNull]
         static IPAddress CheckExternalIP() {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create( IPCheckUri );
-            request.ServicePoint.BindIPEndPointDelegate = new BindIPEndPoint( BindIPEndPointCallback );
+            request.ServicePoint.BindIPEndPointDelegate = BindIPEndPointCallback;
             request.Timeout = IPCheckTimeout;
             request.CachePolicy = new RequestCachePolicy( RequestCacheLevel.NoCacheNoStore );
 

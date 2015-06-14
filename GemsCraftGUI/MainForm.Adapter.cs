@@ -4,6 +4,7 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using fCraft;
@@ -123,13 +124,10 @@ namespace GemsCraftGUI
                 XAttribute mainWorldAttr = root.Attribute("main");
                 if (mainWorldAttr != null)
                 {
-                    foreach (WorldListEntry world in Worlds)
+                    foreach (WorldListEntry world in Worlds.Where(world => String.Equals(world.Name, mainWorldAttr.Value, StringComparison.CurrentCultureIgnoreCase)))
                     {
-                        if (world.Name.ToLower() == mainWorldAttr.Value.ToLower())
-                        {
-                            cMainWorld.SelectedItem = world.Name;
-                            break;
-                        }
+                        cMainWorld.SelectedItem = world.Name;
+                        break;
                     }
                 }
 
@@ -158,14 +156,7 @@ namespace GemsCraftGUI
             CheckMaxPlayersPerWorldValue();
             nMaxPlayersPerWorld.Value = ConfigKey.MaxPlayersPerWorld.GetInt();
 
-            if (ConfigKey.CheckForUpdates.GetString() == "True")
-            {
-                checkUpdate.Checked = true;
-            }
-            else
-            {
-                checkUpdate.Checked = false;
-            }
+            checkUpdate.Checked = ConfigKey.CheckForUpdates.GetString() == "True";
 
 
 
@@ -188,14 +179,7 @@ namespace GemsCraftGUI
             int interval = 0;
             xAnnouncements.Checked = ConfigKey.AnnouncementInterval.TryGetInt(out interval) && interval > 0;
 
-            if (xAnnouncements.Checked)
-            {
-                nAnnouncements.Value = ConfigKey.AnnouncementInterval.GetInt();
-            }
-            else
-            {
-                nAnnouncements.Value = 1;
-            }
+            nAnnouncements.Value = xAnnouncements.Checked ? ConfigKey.AnnouncementInterval.GetInt() : 1;
 
             // UpdaterSettingsWindow
             updaterWindow.BackupBeforeUpdate = ConfigKey.BackupBeforeUpdate.Enabled();
@@ -531,9 +515,43 @@ namespace GemsCraftGUI
                 xIP.Checked = true;
             }
 
+            //Dragon stuffs
+            var dragonString = ConfigKey.DragonDefault.GetString();
+            if (dragonString == null || dragonString.Equals("Fire"))
+            {
+                cboDragonDefault.SelectedIndex = 0;
+            }
+            else
+            {
+                cboDragonDefault.SelectedIndex = cboDragonDefault.FindStringExact(dragonString);
+            }
+
+            for (int x = 0; x <= 3; x++)
+            {
+                clbDragonPermits.SetItemCheckState(x, CheckStateS(x));
+            }
         }
 
-
+        static CheckState CheckStateS(int dragblock)
+        {
+            var desBool = false;
+            switch (dragblock)
+            {
+                case 0:
+                    desBool = ConfigKey.DragonFire.Enabled();
+                    break;
+                case 1:
+                    desBool = ConfigKey.DragonMagma.Enabled();
+                    break;
+                case 2:
+                    desBool = ConfigKey.DragonLava.Enabled();
+                    break;
+                case 3:
+                    desBool = ConfigKey.DragonRed.Enabled();
+                    break;
+            }
+            return desBool ? CheckState.Checked : CheckState.Unchecked;
+        }
         static void ApplyEnum<TEnum>([NotNull] ComboBox box, ConfigKey key, TEnum def) where TEnum : struct
         {
             if (box == null) throw new ArgumentNullException("box");
@@ -574,14 +592,7 @@ namespace GemsCraftGUI
             ConfigKey.MOTD.TrySetValue(tMOTD.Text);
             ConfigKey.MaxPlayers.TrySetValue(nMaxPlayers.Value);
             ConfigKey.MaxPlayersPerWorld.TrySetValue(nMaxPlayersPerWorld.Value);
-            if (cDefaultRank.SelectedIndex == 0)
-            {
-                ConfigKey.DefaultRank.TrySetValue("");
-            }
-            else
-            {
-                ConfigKey.DefaultRank.TrySetValue(RankManager.DefaultRank.FullName);
-            }
+            ConfigKey.DefaultRank.TrySetValue(cDefaultRank.SelectedIndex == 0 ? "" : RankManager.DefaultRank.FullName);
             ConfigKey.IsPublic.TrySetValue(cPublic.SelectedIndex == 0);
             ConfigKey.Port.TrySetValue(nPort.Value);
             ConfigKey.MaxCaps.TrySetValue(MaxCapsValue.Value);
@@ -596,8 +607,7 @@ namespace GemsCraftGUI
 
             ConfigKey.UploadBandwidth.TrySetValue(nUploadBandwidth.Value);
 
-            if (xAnnouncements.Checked) ConfigKey.AnnouncementInterval.TrySetValue(nAnnouncements.Value);
-            else ConfigKey.AnnouncementInterval.TrySetValue(0);
+            ConfigKey.AnnouncementInterval.TrySetValue(xAnnouncements.Checked ? nAnnouncements.Value : 0);
 
             // UpdaterSettingsWindow
             ConfigKey.UpdaterMode.TrySetValue(updaterWindow.UpdaterMode);
@@ -625,17 +635,11 @@ namespace GemsCraftGUI
 
 
             // Worlds
-            if (cDefaultBuildRank.SelectedIndex == 0)
-            {
-                ConfigKey.DefaultBuildRank.TrySetValue("");
-            }
-            else
-            {
-                ConfigKey.DefaultBuildRank.TrySetValue(RankManager.DefaultBuildRank.FullName);
-            }
+            ConfigKey.DefaultBuildRank.TrySetValue(cDefaultBuildRank.SelectedIndex == 0
+                ? ""
+                : RankManager.DefaultBuildRank.FullName);
 
-            if (xMapPath.Checked) ConfigKey.MapPath.TrySetValue(tMapPath.Text);
-            else ConfigKey.MapPath.TrySetValue(ConfigKey.MapPath.GetDefault());
+            ConfigKey.MapPath.TrySetValue(xMapPath.Checked ? tMapPath.Text : ConfigKey.MapPath.GetDefault());
 
             ConfigKey.WoMEnableEnvExtensions.TrySetValue(xWoMEnableEnvExtensions.Checked);
 
@@ -643,22 +647,14 @@ namespace GemsCraftGUI
             // Security
             WriteEnum<NameVerificationMode>(cVerifyNames, ConfigKey.VerifyNames);
 
-            if (xMaxConnectionsPerIP.Checked)
-            {
-                ConfigKey.MaxConnectionsPerIP.TrySetValue(nMaxConnectionsPerIP.Value);
-            }
-            else
-            {
-                ConfigKey.MaxConnectionsPerIP.TrySetValue(0);
-            }
+            ConfigKey.MaxConnectionsPerIP.TrySetValue(xMaxConnectionsPerIP.Checked ? nMaxConnectionsPerIP.Value : 0);
             ConfigKey.AllowUnverifiedLAN.TrySetValue(xAllowUnverifiedLAN.Checked);
 
             ConfigKey.AntispamMessageCount.TrySetValue(nAntispamMessageCount.Value);
             ConfigKey.AntispamInterval.TrySetValue(nAntispamInterval.Value);
             ConfigKey.AntispamMuteDuration.TrySetValue(nSpamMute.Value);
 
-            if (xAntispamKicks.Checked) ConfigKey.AntispamMaxWarnings.TrySetValue(nAntispamMaxWarnings.Value);
-            else ConfigKey.AntispamMaxWarnings.TrySetValue(0);
+            ConfigKey.AntispamMaxWarnings.TrySetValue(xAntispamKicks.Checked ? nAntispamMaxWarnings.Value : 0);
 
             ConfigKey.RequireKickReason.TrySetValue(xRequireKickReason.Checked);
             ConfigKey.RequireBanReason.TrySetValue(xRequireBanReason.Checked);
@@ -667,40 +663,26 @@ namespace GemsCraftGUI
             ConfigKey.AnnounceRankChanges.TrySetValue(xAnnounceRankChanges.Checked);
             ConfigKey.AnnounceRankChangeReasons.TrySetValue(xAnnounceRankChangeReasons.Checked);
 
-            if (cPatrolledRank.SelectedIndex == 0)
-            {
-                ConfigKey.PatrolledRank.TrySetValue("");
-            }
-            else
-            {
-                ConfigKey.PatrolledRank.TrySetValue(RankManager.PatrolledRank.FullName);
-            }
+            ConfigKey.PatrolledRank.TrySetValue(cPatrolledRank.SelectedIndex == 0
+                ? ""
+                : RankManager.PatrolledRank.FullName);
 
             ConfigKey.BlockDBEnabled.TrySetValue(xBlockDBEnabled.Checked);
             ConfigKey.BlockDBAutoEnable.TrySetValue(xBlockDBAutoEnable.Checked);
-            if (cBlockDBAutoEnableRank.SelectedIndex == 0)
-            {
-                ConfigKey.BlockDBAutoEnableRank.TrySetValue("");
-            }
-            else
-            {
-                ConfigKey.BlockDBAutoEnableRank.TrySetValue(RankManager.BlockDBAutoEnableRank.FullName);
-            }
+            ConfigKey.BlockDBAutoEnableRank.TrySetValue(cBlockDBAutoEnableRank.SelectedIndex == 0
+                ? ""
+                : RankManager.BlockDBAutoEnableRank.FullName);
 
 
             // Saving & Backups
-            if (xSaveInterval.Checked) ConfigKey.SaveInterval.TrySetValue(nSaveInterval.Value);
-            else ConfigKey.SaveInterval.TrySetValue(0);
+            ConfigKey.SaveInterval.TrySetValue(xSaveInterval.Checked ? nSaveInterval.Value : 0);
             ConfigKey.BackupOnStartup.TrySetValue(xBackupOnStartup.Checked);
             ConfigKey.BackupOnJoin.TrySetValue(xBackupOnJoin.Checked);
             ConfigKey.BackupOnlyWhenChanged.TrySetValue(xBackupOnlyWhenChanged.Checked);
 
-            if (xBackupInterval.Checked) ConfigKey.DefaultBackupInterval.TrySetValue(nBackupInterval.Value);
-            else ConfigKey.DefaultBackupInterval.TrySetValue(0);
-            if (xMaxBackups.Checked) ConfigKey.MaxBackups.TrySetValue(nMaxBackups.Value);
-            else ConfigKey.MaxBackups.TrySetValue(0);
-            if (xMaxBackupSize.Checked) ConfigKey.MaxBackupSize.TrySetValue(nMaxBackupSize.Value);
-            else ConfigKey.MaxBackupSize.TrySetValue(0);
+            ConfigKey.DefaultBackupInterval.TrySetValue(xBackupInterval.Checked ? nBackupInterval.Value : 0);
+            ConfigKey.MaxBackups.TrySetValue(xMaxBackups.Checked ? nMaxBackups.Value : 0);
+            ConfigKey.MaxBackupSize.TrySetValue(xMaxBackupSize.Checked ? nMaxBackupSize.Value : 0);
 
             ConfigKey.BackupDataOnStartup.TrySetValue(xBackupDataOnStartup.Checked);
 
@@ -775,12 +757,17 @@ namespace GemsCraftGUI
 
             ConfigKey.AutoRankEnabled.TrySetValue(xAutoRank.Checked);
 
-            if (xMaxUndo.Checked) ConfigKey.MaxUndo.TrySetValue(Convert.ToInt32(nMaxUndo.Value));
-            else ConfigKey.MaxUndo.TrySetValue(0);
+            ConfigKey.MaxUndo.TrySetValue(xMaxUndo.Checked ? Convert.ToInt32(nMaxUndo.Value) : 0);
             ConfigKey.MaxUndoStates.TrySetValue(Convert.ToInt32(nMaxUndoStates.Value));
 
             ConfigKey.ConsoleName.TrySetValue(tConsoleName.Text);
 
+            //Dragon stuff
+            ConfigKey.DragonDefault.TrySetValue(cboDragonDefault.SelectedItem.ToString());
+            ConfigKey.DragonFire.TrySetValue(clbDragonPermits.GetItemChecked(0));
+            ConfigKey.DragonMagma.TrySetValue(clbDragonPermits.GetItemChecked(1));
+            ConfigKey.DragonLava.TrySetValue(clbDragonPermits.GetItemChecked(2));
+            ConfigKey.DragonRed.TrySetValue(clbDragonPermits.GetItemChecked(3));
             SaveWorldList();
         }
 

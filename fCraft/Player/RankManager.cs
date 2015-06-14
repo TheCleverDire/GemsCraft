@@ -39,8 +39,10 @@ namespace fCraft {
             DefaultBuildRank = null;
             BlockDBAutoEnableRank = null;
         }
-
-
+        /// <summary>
+        /// Used by the GemsCraft combined GUI to keep the "Duplicate rank defintion" message from showing
+        /// </summary>
+        public static bool RanksAlreadyLoaded = false;
         /// <summary> Adds a new rank to the list. Checks for duplicates. </summary>
         public static void AddRank( [NotNull] Rank rank ) {
             if( rank == null ) throw new ArgumentNullException( "rank" );
@@ -48,13 +50,13 @@ namespace fCraft {
                 throw new InvalidOperationException( "You may not add ranks after PlayerDB has already been loaded." );
             }
             // check for duplicate rank names
-            if( RanksByName.ContainsKey( rank.Name.ToLower() ) ) {
+            if( RanksByName.ContainsKey( rank.Name.ToLower() ) && !RanksAlreadyLoaded) {
                 throw new RankDefinitionException( rank.Name,
                                                    "Duplicate definition for rank \"{0}\" (by Name) was ignored.",
                                                    rank.Name );
             }
 
-            if( RanksByID.ContainsKey( rank.ID ) ) {
+            if( RanksByID.ContainsKey( rank.ID ) && !RanksAlreadyLoaded ) {
                 throw new RankDefinitionException( rank.Name,
                                                    "Duplicate definition for rank \"{0}\" (by ID) was ignored.",
                                                    rank.Name );

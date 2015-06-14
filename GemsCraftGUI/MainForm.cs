@@ -2076,6 +2076,10 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         bool _listening;
         private void bStart_Click(object sender, EventArgs e)
         {
+            MessageBox.Show("Please note that once the server is started, you cannot modify " +
+                            "the Ranks or World Tabs in the Config");
+            tabWorlds.Enabled = false;
+            tabRanks.Enabled = false;
             StartUp(sender, e);
             console.OnCommand += console_Enter;
             logBox.LinkClicked += Link_Clicked;
@@ -2105,6 +2109,10 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         void StartupThread()
         {
+            // Mark start of logging
+            Logger.Log(LogType.SystemActivity, "------ Log Starts {0} ({1}) ------",
+                 DateTime.Now.ToLongDateString(), DateTime.Now.ToShortDateString()); // localized
+            Logger.Log(LogType.SystemActivity, "Attempting to start server based on " + Updater.UserAgent);
 #if !DEBUG
             try
             {
@@ -2797,6 +2805,17 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         private void pStop_Click(object sender, EventArgs e)
         {
             //TODO - Stop server
+        }
+
+        private void bWeb_Click_1(object sender, EventArgs e)
+        {
+            Process.Start("http://gemscraft.net");
+        }
+
+        private void bOK_Click(object sender, EventArgs e)
+        {
+            SaveEverything();
+            Application.Exit();
         }
 
 

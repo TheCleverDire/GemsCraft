@@ -592,6 +592,25 @@ but will reduce bandwidth use." )]
 @"If enabled, allows the server to respond to connect to online WebPanel at http://gemscraft.net")]
         WebPanelEnabled,
 
+        [StringKey(ConfigSection.Advanced, "Fire",
+            @"The default dragon block type")]
+        DragonDefault,
+
+        [BoolKey(ConfigSection.Advanced, true,
+            @"If Fire is allowed for Dragon")]
+        DragonFire,
+
+        [BoolKey(ConfigSection.Advanced, true,
+            @"If Magma is allowed for Dragon")]
+        DragonMagma,
+
+        [BoolKey(ConfigSection.Advanced, true,
+            @"If Lava is allowed for Dragon")]
+        DragonLava,
+
+        [BoolKey(ConfigSection.Advanced, true,
+            @"If Red Wool is allowed for Dragon")]
+        DragonRed
         #endregion
     }
 }

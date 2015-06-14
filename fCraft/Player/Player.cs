@@ -198,7 +198,7 @@ namespace fCraft
 
         #endregion
         public bool IsAway;
-
+        public bool IsDragonOn = false;
         public bool IsFlying = false;
         public ConcurrentDictionary<String, Vector3I> FlyCache;
         public readonly object FlyLock = new object();

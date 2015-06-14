@@ -33,6 +33,9 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -187,7 +190,9 @@
   <ItemGroup>
     <None Include="ConfigGUI\ChatBackground.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\icon.png" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\fCraftGUI\fCraftGUI.csproj">
       <Project>{afaee6cc-8b4f-40cd-9623-7ffdc8e52222}</Project>
@@ -197,6 +202,12 @@
       <Project>{7fbe7809-6f77-415c-abeb-a3f627e817b0}</Project>
       <Name>fCraft</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\main.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

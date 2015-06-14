@@ -30,9 +30,9 @@ namespace GemsCraftGUI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.bApply = new System.Windows.Forms.Button();
@@ -321,8 +321,8 @@ namespace GemsCraftGUI
             this.pStop = new System.Windows.Forms.Button();
             this.bStart = new System.Windows.Forms.Button();
             this.logBox = new System.Windows.Forms.RichTextBox();
-            this.bVoice = new System.Windows.Forms.Button();
             this.playerListLabel = new System.Windows.Forms.Label();
+            this.bVoice = new System.Windows.Forms.Button();
             this.playerList = new System.Windows.Forms.ListBox();
             this.URLLabel = new System.Windows.Forms.Label();
             this.bPlay = new System.Windows.Forms.Button();
@@ -331,6 +331,10 @@ namespace GemsCraftGUI
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.ThemeBox = new System.Windows.Forms.ComboBox();
             this.SizeBox = new System.Windows.Forms.ComboBox();
+            this.gboDragon = new System.Windows.Forms.GroupBox();
+            this.lblDefaultBlock = new System.Windows.Forms.Label();
+            this.cboDragonDefault = new System.Windows.Forms.ComboBox();
+            this.clbDragonPermits = new System.Windows.Forms.CheckedListBox();
             this.chatPreview1 = new fCraft.ConfigGUI.ChatPreview();
             this.console = new fCraft.ServerGUI.ConsoleBox();
             this.tabControl1.SuspendLayout();
@@ -403,6 +407,7 @@ namespace GemsCraftGUI
             ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.ServerTab.SuspendLayout();
+            this.gboDragon.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -417,6 +422,7 @@ namespace GemsCraftGUI
             // 
             // tabPage1
             // 
+            this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
             this.tabPage1.Controls.Add(this.bApply);
             this.tabPage1.Controls.Add(this.bResetAll);
             this.tabPage1.Controls.Add(this.bResetTab);
@@ -428,13 +434,12 @@ namespace GemsCraftGUI
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
             this.tabPage1.Size = new System.Drawing.Size(692, 572);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "tabPage1";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabPage1.Text = "Config";
             // 
             // bApply
             // 
             this.bApply.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bApply.BackColor = System.Drawing.Color.Brown;
+            this.bApply.BackColor = System.Drawing.Color.Silver;
             this.bApply.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bApply.Location = new System.Drawing.Point(576, 530);
             this.bApply.Name = "bApply";
@@ -476,7 +481,7 @@ namespace GemsCraftGUI
             // bCancel
             // 
             this.bCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bCancel.BackColor = System.Drawing.Color.Brown;
+            this.bCancel.BackColor = System.Drawing.Color.Silver;
             this.bCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.bCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bCancel.Location = new System.Drawing.Point(470, 530);
@@ -489,7 +494,7 @@ namespace GemsCraftGUI
             // bOK
             // 
             this.bOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bOK.BackColor = System.Drawing.Color.Brown;
+            this.bOK.BackColor = System.Drawing.Color.Silver;
             this.bOK.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.bOK.Location = new System.Drawing.Point(364, 530);
             this.bOK.Name = "bOK";
@@ -497,6 +502,7 @@ namespace GemsCraftGUI
             this.bOK.TabIndex = 7;
             this.bOK.Text = "OK";
             this.bOK.UseVisualStyleBackColor = false;
+            this.bOK.Click += new System.EventHandler(this.bOK_Click);
             // 
             // tabs
             // 
@@ -522,7 +528,7 @@ namespace GemsCraftGUI
             // 
             // tabGeneral
             // 
-            this.tabGeneral.BackColor = System.Drawing.Color.IndianRed;
+            this.tabGeneral.BackColor = System.Drawing.Color.Gray;
             this.tabGeneral.Controls.Add(this.gBasic);
             this.tabGeneral.Controls.Add(this.groupBox4);
             this.tabGeneral.Controls.Add(this.pictureBox1);
@@ -857,10 +863,11 @@ namespace GemsCraftGUI
             this.bWeb.TabIndex = 1;
             this.bWeb.Text = "Website";
             this.bWeb.UseVisualStyleBackColor = false;
+            this.bWeb.Click += new System.EventHandler(this.bWeb_Click_1);
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Image = global::GemsCraftGUI.Properties.Resources.icon;
             this.pictureBox1.Location = new System.Drawing.Point(212, 294);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(213, 175);
@@ -1028,7 +1035,7 @@ namespace GemsCraftGUI
             // 
             // tabChat
             // 
-            this.tabChat.BackColor = System.Drawing.Color.IndianRed;
+            this.tabChat.BackColor = System.Drawing.Color.Gray;
             this.tabChat.Controls.Add(this.chatPreview1);
             this.tabChat.Controls.Add(this.gAppearence);
             this.tabChat.Controls.Add(this.gChatColors);
@@ -1116,7 +1123,7 @@ namespace GemsCraftGUI
             // 
             // gChatColors
             // 
-            this.gChatColors.BackColor = System.Drawing.Color.IndianRed;
+            this.gChatColors.BackColor = System.Drawing.Color.Gray;
             this.gChatColors.Controls.Add(this.lColorMe);
             this.gChatColors.Controls.Add(this.bColorGlobal);
             this.gChatColors.Controls.Add(this.bColorMe);
@@ -1286,7 +1293,7 @@ namespace GemsCraftGUI
             // 
             // tabWorlds
             // 
-            this.tabWorlds.BackColor = System.Drawing.Color.IndianRed;
+            this.tabWorlds.BackColor = System.Drawing.Color.Gray;
             this.tabWorlds.Controls.Add(this.xWoMEnableEnvExtensions);
             this.tabWorlds.Controls.Add(this.bMapPath);
             this.tabWorlds.Controls.Add(this.xMapPath);
@@ -1525,7 +1532,7 @@ namespace GemsCraftGUI
             // 
             // tabRanks
             // 
-            this.tabRanks.BackColor = System.Drawing.Color.IndianRed;
+            this.tabRanks.BackColor = System.Drawing.Color.Gray;
             this.tabRanks.Controls.Add(this.gPermissionLimits);
             this.tabRanks.Controls.Add(this.lRankList);
             this.tabRanks.Controls.Add(this.bLowerRank);
@@ -1973,7 +1980,7 @@ namespace GemsCraftGUI
             // 
             // tabSecurity
             // 
-            this.tabSecurity.BackColor = System.Drawing.Color.IndianRed;
+            this.tabSecurity.BackColor = System.Drawing.Color.Gray;
             this.tabSecurity.Controls.Add(this.gBlockDB);
             this.tabSecurity.Controls.Add(this.gSecurityMisc);
             this.tabSecurity.Controls.Add(this.gSpamChat);
@@ -2280,7 +2287,7 @@ namespace GemsCraftGUI
             // 
             // gVerify
             // 
-            this.gVerify.BackColor = System.Drawing.Color.IndianRed;
+            this.gVerify.BackColor = System.Drawing.Color.Gray;
             this.gVerify.Controls.Add(this.nMaxConnectionsPerIP);
             this.gVerify.Controls.Add(this.xAllowUnverifiedLAN);
             this.gVerify.Controls.Add(this.xMaxConnectionsPerIP);
@@ -2356,7 +2363,7 @@ namespace GemsCraftGUI
             // 
             // gUpdate
             // 
-            this.gUpdate.BackColor = System.Drawing.Color.IndianRed;
+            this.gUpdate.BackColor = System.Drawing.Color.Gray;
             this.gUpdate.Controls.Add(this.groupBox5);
             this.gUpdate.Controls.Add(this.gDataBackup);
             this.gUpdate.Controls.Add(this.gSaving);
@@ -2602,7 +2609,7 @@ namespace GemsCraftGUI
             // 
             // tabLogging
             // 
-            this.tabLogging.BackColor = System.Drawing.Color.IndianRed;
+            this.tabLogging.BackColor = System.Drawing.Color.Gray;
             this.tabLogging.Controls.Add(this.gLogFile);
             this.tabLogging.Controls.Add(this.gConsole);
             this.tabLogging.Location = new System.Drawing.Point(4, 22);
@@ -2614,7 +2621,7 @@ namespace GemsCraftGUI
             // 
             // gLogFile
             // 
-            this.gLogFile.BackColor = System.Drawing.Color.IndianRed;
+            this.gLogFile.BackColor = System.Drawing.Color.Gray;
             this.gLogFile.Controls.Add(this.lLogFileOptionsDescription);
             this.gLogFile.Controls.Add(this.xLogLimit);
             this.gLogFile.Controls.Add(this.vLogFileOptions);
@@ -2754,7 +2761,7 @@ namespace GemsCraftGUI
             // 
             // tabIRC
             // 
-            this.tabIRC.BackColor = System.Drawing.Color.IndianRed;
+            this.tabIRC.BackColor = System.Drawing.Color.Gray;
             this.tabIRC.Controls.Add(this.gIRCAdv);
             this.tabIRC.Controls.Add(this.xIRCListShowNonEnglish);
             this.tabIRC.Controls.Add(this.gIRCOptions);
@@ -3188,7 +3195,7 @@ namespace GemsCraftGUI
             // 
             // tabAdvanced
             // 
-            this.tabAdvanced.BackColor = System.Drawing.Color.IndianRed;
+            this.tabAdvanced.BackColor = System.Drawing.Color.Gray;
             this.tabAdvanced.Controls.Add(this.gPerformance);
             this.tabAdvanced.Controls.Add(this.gAdvancedMisc);
             this.tabAdvanced.Controls.Add(this.gCrashReport);
@@ -3564,7 +3571,8 @@ namespace GemsCraftGUI
             // 
             // Misc
             // 
-            this.Misc.BackColor = System.Drawing.Color.IndianRed;
+            this.Misc.BackColor = System.Drawing.Color.Gray;
+            this.Misc.Controls.Add(this.gboDragon);
             this.Misc.Controls.Add(this.groupBox3);
             this.Misc.Controls.Add(this.groupBox1);
             this.Misc.Location = new System.Drawing.Point(4, 22);
@@ -3584,7 +3592,7 @@ namespace GemsCraftGUI
             this.groupBox3.Controls.Add(this.MaxCaps);
             this.groupBox3.Controls.Add(this.SwearBox);
             this.groupBox3.Controls.Add(this.label3);
-            this.groupBox3.Location = new System.Drawing.Point(31, 199);
+            this.groupBox3.Location = new System.Drawing.Point(31, 179);
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(595, 142);
             this.groupBox3.TabIndex = 27;
@@ -3775,10 +3783,10 @@ namespace GemsCraftGUI
             // 
             this.ServerTab.Controls.Add(this.pStop);
             this.ServerTab.Controls.Add(this.bStart);
-            this.ServerTab.Controls.Add(this.console);
             this.ServerTab.Controls.Add(this.logBox);
-            this.ServerTab.Controls.Add(this.bVoice);
             this.ServerTab.Controls.Add(this.playerListLabel);
+            this.ServerTab.Controls.Add(this.bVoice);
+            this.ServerTab.Controls.Add(this.console);
             this.ServerTab.Controls.Add(this.playerList);
             this.ServerTab.Controls.Add(this.URLLabel);
             this.ServerTab.Controls.Add(this.bPlay);
@@ -3788,7 +3796,7 @@ namespace GemsCraftGUI
             this.ServerTab.Padding = new System.Windows.Forms.Padding(3);
             this.ServerTab.Size = new System.Drawing.Size(692, 572);
             this.ServerTab.TabIndex = 1;
-            this.ServerTab.Text = "tabPage2";
+            this.ServerTab.Text = "Server";
             this.ServerTab.UseVisualStyleBackColor = true;
             this.ServerTab.Click += new System.EventHandler(this.tabPage2_Click);
             // 
@@ -3827,6 +3835,19 @@ namespace GemsCraftGUI
             this.logBox.TabIndex = 14;
             this.logBox.Text = "";
             // 
+            // playerListLabel
+            // 
+            this.playerListLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.playerListLabel.AutoSize = true;
+            this.playerListLabel.BackColor = System.Drawing.Color.Transparent;
+            this.playerListLabel.Font = new System.Drawing.Font("Lucida Sans", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.playerListLabel.ForeColor = System.Drawing.Color.Black;
+            this.playerListLabel.Location = new System.Drawing.Point(540, 88);
+            this.playerListLabel.Name = "playerListLabel";
+            this.playerListLabel.Size = new System.Drawing.Size(65, 12);
+            this.playerListLabel.TabIndex = 12;
+            this.playerListLabel.Text = "Player list";
+            // 
             // bVoice
             // 
             this.bVoice.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -3841,19 +3862,6 @@ namespace GemsCraftGUI
             this.bVoice.Size = new System.Drawing.Size(37, 29);
             this.bVoice.TabIndex = 13;
             this.bVoice.UseVisualStyleBackColor = false;
-            // 
-            // playerListLabel
-            // 
-            this.playerListLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.playerListLabel.AutoSize = true;
-            this.playerListLabel.BackColor = System.Drawing.Color.Transparent;
-            this.playerListLabel.Font = new System.Drawing.Font("Lucida Sans", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.playerListLabel.ForeColor = System.Drawing.Color.Black;
-            this.playerListLabel.Location = new System.Drawing.Point(540, 88);
-            this.playerListLabel.Name = "playerListLabel";
-            this.playerListLabel.Size = new System.Drawing.Size(65, 12);
-            this.playerListLabel.TabIndex = 12;
-            this.playerListLabel.Text = "Player list";
             // 
             // playerList
             // 
@@ -3943,6 +3951,53 @@ namespace GemsCraftGUI
             this.SizeBox.Text = "Size";
             this.SizeBox.Visible = false;
             // 
+            // gboDragon
+            // 
+            this.gboDragon.Controls.Add(this.clbDragonPermits);
+            this.gboDragon.Controls.Add(this.cboDragonDefault);
+            this.gboDragon.Controls.Add(this.lblDefaultBlock);
+            this.gboDragon.Location = new System.Drawing.Point(31, 327);
+            this.gboDragon.Name = "gboDragon";
+            this.gboDragon.Size = new System.Drawing.Size(200, 138);
+            this.gboDragon.TabIndex = 28;
+            this.gboDragon.TabStop = false;
+            this.gboDragon.Text = "Dragon";
+            // 
+            // lblDefaultBlock
+            // 
+            this.lblDefaultBlock.AutoSize = true;
+            this.lblDefaultBlock.Location = new System.Drawing.Point(13, 21);
+            this.lblDefaultBlock.Name = "lblDefaultBlock";
+            this.lblDefaultBlock.Size = new System.Drawing.Size(79, 15);
+            this.lblDefaultBlock.TabIndex = 0;
+            this.lblDefaultBlock.Text = "Default Block";
+            // 
+            // cboDragonDefault
+            // 
+            this.cboDragonDefault.FormattingEnabled = true;
+            this.cboDragonDefault.Items.AddRange(new object[] {
+            "Fire",
+            "Magma",
+            "Lava",
+            "Red"});
+            this.cboDragonDefault.Location = new System.Drawing.Point(99, 18);
+            this.cboDragonDefault.Name = "cboDragonDefault";
+            this.cboDragonDefault.Size = new System.Drawing.Size(86, 23);
+            this.cboDragonDefault.TabIndex = 1;
+            // 
+            // clbDragonPermits
+            // 
+            this.clbDragonPermits.FormattingEnabled = true;
+            this.clbDragonPermits.Items.AddRange(new object[] {
+            "Fire",
+            "Magma",
+            "Lava",
+            "Red"});
+            this.clbDragonPermits.Location = new System.Drawing.Point(13, 51);
+            this.clbDragonPermits.Name = "clbDragonPermits";
+            this.clbDragonPermits.Size = new System.Drawing.Size(76, 68);
+            this.clbDragonPermits.TabIndex = 2;
+            // 
             // chatPreview1
             // 
             this.chatPreview1.Location = new System.Drawing.Point(7, 257);
@@ -3961,10 +4016,12 @@ namespace GemsCraftGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.Black;
             this.ClientSize = new System.Drawing.Size(724, 616);
             this.Controls.Add(this.ThemeBox);
             this.Controls.Add(this.SizeBox);
             this.Controls.Add(this.tabControl1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.Text = "MainForm";
             this.tabControl1.ResumeLayout(false);
@@ -4064,6 +4121,8 @@ namespace GemsCraftGUI
             this.groupBox1.PerformLayout();
             this.ServerTab.ResumeLayout(false);
             this.ServerTab.PerformLayout();
+            this.gboDragon.ResumeLayout(false);
+            this.gboDragon.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -4370,5 +4429,9 @@ namespace GemsCraftGUI
         private System.Windows.Forms.Button pStop;
         private System.Windows.Forms.ComboBox ThemeBox;
         private System.Windows.Forms.ComboBox SizeBox;
+        private System.Windows.Forms.GroupBox gboDragon;
+        private System.Windows.Forms.Label lblDefaultBlock;
+        private System.Windows.Forms.ComboBox cboDragonDefault;
+        private System.Windows.Forms.CheckedListBox clbDragonPermits;
     }
 }

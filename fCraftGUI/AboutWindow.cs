@@ -34,5 +34,18 @@ namespace fCraft.GUI {
 
         }
 
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                Process.Start("http://gemscraft.net");
+            }
+            catch
+            {
+            }
+        }
+
+
+
     }
 }

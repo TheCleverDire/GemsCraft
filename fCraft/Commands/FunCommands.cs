@@ -19,6 +19,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using RandomMaze;
+using fCraft.Events;
 
 namespace fCraft
 {
@@ -44,10 +45,157 @@ namespace fCraft
             CommandManager.RegisterCommand(CdSetModel);
             CommandManager.RegisterCommand(CdBot);
             CommandManager.RegisterCommand(CdCTF);
-
+            CommandManager.RegisterCommand(CdDragon);
+            Player.Moving += startDragon;
             Player.Moving += PlayerMoved;
         }
+        #region Dragon
 
+        static readonly CommandDescriptor CdDragon = new CommandDescriptor
+        {
+            Name = "Dragon",
+            Aliases = new[] { "drag", "firebreather", "fireborn", "dragonborn" },
+            Category = CommandCategory.Fun,
+            Permissions = new[] { Permission.Dragon },
+            IsConsoleSafe = false,
+            Usage = "/Dragon [On/Off] [Fire/Lava/Magma/Red]",
+            Help = "Run with a trail of fire or lava behind you. Default is Fire.",
+            Handler = DragonHandler
+        };
+
+        static Player _playerForInit = null;
+        static Block _blockType = Block.Air;
+        static Block DefaultBlock()
+        {
+            var def = ConfigKey.DragonDefault.GetString().ToLower();
+            switch (def)
+            {
+                case "fire":
+                    return Block.Fire;
+                case "lava":
+                    return Block.StillLava;
+                case "magma":
+                    return Block.Magma;
+                case "red":
+                    return Block.Red;
+                default:
+                    return Block.Fire;
+            }
+        }
+        static void MessagePlayer(Player p, String b)
+        {
+            p.Message("&4Sorry&f, but " + b + " is disabled for dragon");
+        }
+
+        static bool IsEnabledDrag(int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return ConfigKey.DragonFire.Enabled();
+                case 1:
+                    return ConfigKey.DragonMagma.Enabled();
+                case 2:
+                    return ConfigKey.DragonLava.Enabled();
+                case 3:
+                    return ConfigKey.DragonRed.Enabled();
+                default:
+                    return false;
+            }
+        }
+        static void DragonHandler(Player player, Command cmd)
+        {
+            String cmdBlock = null;
+            try
+            {
+                var cmdNext = cmd.Next();
+                try
+                {
+                    cmdBlock = cmd.Next();
+                    switch (cmdBlock.ToLower())
+                    {
+                        case "fire":
+                            if (!ConfigKey.DragonFire.Enabled()) cmdBlock = ConfigKey.DragonDefault.GetString();
+                            if (!IsEnabledDrag(0)) MessagePlayer(player, ConfigKey.DragonDefault.GetString());
+                            break;
+                        case "lava":
+                            if (!ConfigKey.DragonLava.Enabled()) cmdBlock = ConfigKey.DragonDefault.GetString();
+                            if (!IsEnabledDrag(2)) MessagePlayer(player, ConfigKey.DragonDefault.GetString());
+                            break;
+                        case "magma":
+                            if (!ConfigKey.DragonMagma.Enabled()) cmdBlock = ConfigKey.DragonDefault.GetString();
+                            if (!IsEnabledDrag(1)) MessagePlayer(player, ConfigKey.DragonDefault.GetString());
+                            break;
+                        case "red":
+                            if (!ConfigKey.DragonRed.Enabled()) cmdBlock = ConfigKey.DragonDefault.GetString();
+                            if (!IsEnabledDrag(3)) MessagePlayer(player, ConfigKey.DragonDefault.GetString());
+                            break;
+                    }
+                }
+                catch (NullReferenceException exc)
+                {
+                    _blockType = DefaultBlock();
+                }
+                if (cmdNext.ToLower().Equals("off"))
+                {
+                    if (!player.IsDragonOn) player.Message("Dragon is already off!");
+                    else
+                    {
+                        player.IsDragonOn = false;
+                        player.Message("Turned Dragon Off");
+                    }
+                }
+                else if (cmdNext.ToLower().Equals("on"))
+                {
+                    if (player.IsDragonOn) player.Message("Dragon is already on!");
+                    else
+                    {
+                        _playerForInit = player;
+                        if (cmdBlock.ToLower().Equals("fire") || cmdBlock.ToLower().Equals("lava") || cmdBlock.ToLower().Equals("magma") || cmdBlock.ToLower().Equals("red"))
+                        {
+                            player.IsDragonOn = true;
+                            player.Message("Dragon is now on!");
+                            switch (cmdBlock.ToLower())
+                            {
+                                case "fire":
+                                    _blockType = Block.Fire;
+                                    break;
+                                case "lava":
+                                    _blockType = Block.StillLava;
+                                    break;
+                                case "magma":
+                                    _blockType = Block.Magma;
+                                    break;
+                                case "red":
+                                    _blockType = Block.Red;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            CdDragon.PrintUsage(player);
+                        }
+                    }
+                }
+            }
+            catch (NullReferenceException ep)
+            {
+                CdDragon.PrintUsage(player);
+            }
+        }
+
+        public static void startDragon(object sender, PlayerMovingEventArgs e)
+        {
+            if (!e.Player.IsDragonOn) return;
+            Player player = _playerForInit;
+            Vector3I vi = player.Position.ToBlockCoords();
+            vi.X--;
+            vi.Z--;
+            if (player.World == null) return;
+            if (player.World.Map != null)
+                player.World.Map.QueueUpdate(new BlockUpdate(null, vi, _blockType)); //Thanks to Jonty800. He provided this line
+        }
+        #endregion
             public static string[] validEntities = 
             {
                 "chicken",

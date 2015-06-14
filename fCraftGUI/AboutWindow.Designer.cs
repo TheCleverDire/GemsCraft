@@ -35,6 +35,7 @@
             this.label7 = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -43,12 +44,12 @@
             this.lHeader.AutoSize = true;
             this.lHeader.BackColor = System.Drawing.Color.Transparent;
             this.lHeader.Font = new System.Drawing.Font("Consolas", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lHeader.ForeColor = System.Drawing.Color.SlateGray;
+            this.lHeader.ForeColor = System.Drawing.Color.Blue;
             this.lHeader.Location = new System.Drawing.Point(6, 53);
             this.lHeader.Name = "lHeader";
-            this.lHeader.Size = new System.Drawing.Size(180, 56);
+            this.lHeader.Size = new System.Drawing.Size(128, 56);
             this.lHeader.TabIndex = 1;
-            this.lHeader.Text = "Legend";
+            this.lHeader.Text = "Gems";
             // 
             // lSubheader
             // 
@@ -58,11 +59,11 @@
             this.lSubheader.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.lSubheader.Location = new System.Drawing.Point(13, 160);
             this.lSubheader.Name = "lSubheader";
-            this.lSubheader.Size = new System.Drawing.Size(321, 91);
+            this.lSubheader.Size = new System.Drawing.Size(321, 104);
             this.lSubheader.TabIndex = 2;
-            this.lSubheader.Text = "Free, open-source Minecraft/ClassiCube game software\r\nBased on fCraft and 800Craf" +
-    "t\r\nDeveloped by LeChosenOne and DingusBungus\r\n\r\n800Craft:\r\nfCraft:\r\nLegendCraft:" +
-    "\r\n";
+            this.lSubheader.Text = "Free, open-source Minecraft/ClassiCube game software\r\nBased on fCraft, 800Craft, " +
+    "and LegendCraft\r\nDeveloped by apotter96\r\n\r\n800Craft:\r\nfCraft:\r\nLegendCraft:\r\nGem" +
+    "sCraft:";
             // 
             // lfCraft
             // 
@@ -91,7 +92,7 @@
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Transparent;
             this.label1.Font = new System.Drawing.Font("Consolas", 36F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.Firebrick;
+            this.label1.ForeColor = System.Drawing.Color.Green;
             this.label1.Location = new System.Drawing.Point(174, 53);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(154, 56);
@@ -106,9 +107,9 @@
             this.label3.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.label3.Location = new System.Drawing.Point(6, 16);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(279, 26);
+            this.label3.Size = new System.Drawing.Size(171, 26);
             this.label3.TabIndex = 6;
-            this.label3.Text = "A MineCraft Classic Software\r\nDeveloped By LeChosenOne and DingusBungus";
+            this.label3.Text = "A MineCraft Classic Software\r\nDeveloped By apotter96";
             // 
             // lThank
             // 
@@ -118,9 +119,9 @@
             this.lThank.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.lThank.Location = new System.Drawing.Point(13, 284);
             this.lThank.Name = "lThank";
-            this.lThank.Size = new System.Drawing.Size(219, 13);
+            this.lThank.Size = new System.Drawing.Size(208, 13);
             this.lThank.TabIndex = 8;
-            this.lThank.Text = "And thank you for using LegendCraft!\r\n";
+            this.lThank.Text = "And thank you for using GemsCraft!\r\n";
             this.lThank.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             // 
             // lLegendCraft
@@ -162,6 +163,7 @@
             // 
             this.groupBox1.BackColor = System.Drawing.Color.DimGray;
             this.groupBox1.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("groupBox1.BackgroundImage")));
+            this.groupBox1.Controls.Add(this.linkLabel1);
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.lThank);
             this.groupBox1.Controls.Add(this.lLegendCraft);
@@ -178,6 +180,18 @@
             this.groupBox1.TabIndex = 14;
             this.groupBox1.TabStop = false;
             // 
+            // linkLabel1
+            // 
+            this.linkLabel1.AutoSize = true;
+            this.linkLabel1.BackColor = System.Drawing.Color.Transparent;
+            this.linkLabel1.Location = new System.Drawing.Point(98, 251);
+            this.linkLabel1.Name = "linkLabel1";
+            this.linkLabel1.Size = new System.Drawing.Size(56, 13);
+            this.linkLabel1.TabIndex = 14;
+            this.linkLabel1.TabStop = true;
+            this.linkLabel1.Text = "GemsCraft";
+            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
+            // 
             // AboutWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -192,7 +206,7 @@
             this.MinimumSize = new System.Drawing.Size(200, 200);
             this.Name = "AboutWindow";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "LegendCraft";
+            this.Text = "GemsCraft";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -212,5 +226,6 @@
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.LinkLabel linkLabel1;
     }
 }
