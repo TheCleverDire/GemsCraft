@@ -46,8 +46,77 @@ namespace fCraft
             CommandManager.RegisterCommand(CdBot);
             CommandManager.RegisterCommand(CdCTF);
             CommandManager.RegisterCommand(CdDragon);
+            CommandManager.RegisterCommand(CdJoke);
             Player.Moving += startDragon;
             Player.Moving += PlayerMoved;
+        }
+
+        static readonly CommandDescriptor CdJoke = new CommandDescriptor
+        {
+            Name = "Joke",
+
+            Category = CommandCategory.Chat | CommandCategory.Fun,
+            Permissions = new Permission[] { Permission.HighFive },
+            IsConsoleSafe = false,
+            Usage = "/joke",
+            Help = "Takes a random joke from a list.",
+            NotRepeatable = true,
+            Handler = JokeHandler,
+        };
+
+        static void JokeHandler(Player player, Command cmd)
+        {
+            List<String> joke;
+            string name = cmd.Next();
+            Random randomizer = new Random();
+
+            joke = new List<String>()
+            {
+                "Dyslexic man walks into a bra",
+                "There is 3 types of people in this world, those who can count and those who can't",
+                "Pinnochio enteres a lying contest but loses to Obama",
+                "Congres.sys is corrupted. Reboot? [Y/N]",
+                "Evening news is when they start off with Good Evening and then proceed to telling you why it isn't.",
+                "Energizer bunny arrested-charged with battery",
+                "There are 3 men. 2 Walk into a bar. The other one ducks.",
+                "I totally understand how batteries feel because I'm rarely ever included in things either.",
+                "The midget fortune teller who kills his customers is a small medium at large.",
+                "What does a nosey pepper do? Get jalapeno business",
+                "Why can't you hear a pterodactyl go the bathroom? Because the \"P\" is silent",
+                "DO NOT READ \nYou rebel.",
+                "CNN says the world is 40 trillion in debt. Who the heck do we owe? Jupiter?",
+                "Programmers are a race of people trying to make smarter people. The universe tries to make more stupid people. So far, the universe is winning",
+                "Patient: Doctor Doctor! Everyone keeps copying me! \nDoctor: Doctor Doctor! Everyone keeps copying me!",
+                "A blonde walks into a bar OUCH!",
+                "My boss is so unpopular even his own shadow refuses to follow him",
+                "Two peanuts walk into a bar. One was a salted",
+                "What do you call a fish with no eyes? A fsh",
+                "Why don't aliens eat clowns? Because they taste funny",
+                "Congressional Virus: Corrups your computer",
+                "Why did the Roman Chicken Cross the Road? To take over the other side",
+                "Adam and Eve Virus: Takes a byte out of your apple computer",
+                "Superman and Chuck Norris had an arm wrestling match. The loser had to wear his underwear on the outside",
+                "Darth Vadar leaves his toast in the toaster for a little longer. He likes it on the Dark Side",
+                "Why did the cow cross the raod? To get to the utter side!",
+                "I'm Sofa King Happy",
+                "The only right way to listen to Justin Beiber is turned completely down"
+            };
+
+            int index = randomizer.Next(0, joke.Count);
+            double time = (DateTime.Now - player.Info.LastUsedJoke).TotalSeconds;
+            double timeLeft = Math.Round(20 - time);
+            if (time < 20)
+            {
+                player.Message("You cannot use this command for another " + timeLeft + " second(s).");
+                return;
+            }
+            else
+            {
+                Server.Message(joke[index]);
+                player.Info.LastUsedJoke = DateTime.Now;
+                return;
+            }
+
         }
         #region Dragon
 

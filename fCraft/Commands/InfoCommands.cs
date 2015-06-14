@@ -69,11 +69,126 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdMoneyMessages);
             CommandManager.RegisterCommand(CdGameStats);
 
+            CommandManager.RegisterCommand(CdGetUsage);
+            CommandManager.RegisterCommand(CdGemsVersion);
+
 #if DEBUG_SCHEDULER
             CommandManager.RegisterCommand( cdTaskDebug );
 #endif
         }
-        
+        static readonly CommandDescriptor CdGetUsage = new CommandDescriptor
+        {
+            Name = "GetUsage",
+            IsConsoleSafe = true,
+            Category = CommandCategory.Info,
+            Usage = "/GetUsage Command",
+            Help = "Displays the Usage of any given command",
+            Handler = GetUsageHandler
+        };
+        static void GetUsageHandler(Player player, Command cmd)
+        {
+            String desiredCommand = null;
+            try
+            {
+                desiredCommand = cmd.Next().ToLower();
+                foreach (CommandDescriptor c in CommandManager.GetCommands())
+                {
+                    if (c.Name.ToLower().Equals(desiredCommand))
+                    {
+                        c.PrintUsage(player);
+                        return;
+                    }
+                    try
+                    {
+                        foreach (string a in c.Aliases.Where(a => a.ToLower().Equals(desiredCommand)))
+                        {
+                            c.PrintUsage(player);
+                        }
+                    }
+                    catch (NullReferenceException)
+                    {
+                        //No aliases found
+                    }
+                }
+                player.Message("&cThat command does not exist");
+            }
+            catch (NullReferenceException)
+            {
+                CdGetUsage.PrintUsage(player);
+            }
+        }
+        static readonly CommandDescriptor CdGemsVersion = new CommandDescriptor
+        {
+            Name = "GemsVersion",
+            Aliases = new[] { "gv" },
+            IsConsoleSafe = true,
+            Category = CommandCategory.Info,
+            Usage = "/GemsVersion",
+            Help = "Displays the current GemsCraft version",
+            Handler = GetUsageHandler
+        };
+        static void GemsHandler(Player player, Command cmd)
+        {
+            player.Message(ConfigKey.ServerName + " is running &1Gems&2Craft&r Version " + Updater.LatestStable);
+        }
+        static readonly CommandDescriptor CdName = new CommandDescriptor
+        {
+            Name = "Name",
+            Category = CommandCategory.Chat | CommandCategory.Info,
+            IsConsoleSafe = false,
+            Permissions = new[] { Permission.Name },
+            Usage = "/Name (NewName|revert)",
+            Help = "Allows you to edit your name. Doing /Name revert makes your nick your last used nickname. Do just /Name to reset your nick.",
+            NotRepeatable = true,
+            Handler = NameHandler,
+        };
+
+        static void NameHandler(Player p, Command cmd)
+        {
+            var displayedname = cmd.NextAll();
+            var nameBuffer = p.Info.DisplayedName;
+
+            if (string.IsNullOrEmpty(displayedname) || displayedname.Length < 1)
+            {
+                p.Info.oldDisplayedName = p.Info.DisplayedName;
+                p.Info.DisplayedName = p.Name;
+                p.Message("Your name has been reset.");
+                p.Info.isJelly = false;
+                p.Info.isMad = false;
+                return;
+            }
+            switch (displayedname.ToLower())
+            {
+                case "revert":
+                    if (p.Info.oldDisplayedName == null)
+                    {
+                        p.Message("You do not have an old Nick-Name to revert to.");
+                        return;
+                    }
+                    p.Info.DisplayedName = p.Info.oldDisplayedName;
+                    p.Info.oldDisplayedName = nameBuffer;
+                    p.Message("Your name has been reverted.");
+                    return;
+                case "blank":
+                    p.Info.oldDisplayedName = nameBuffer;
+                    p.Info.DisplayedName = p.Info.oldDisplayedName;
+                    p.Info.DisplayedName = "";
+                    p.Message("Name: DisplayedName was set to blank", p.Info.DisplayedName);
+                    return;
+                default:
+                    p.Info.oldDisplayedName = p.Info.DisplayedName;
+                    p.Info.DisplayedName = displayedname;
+                    if (p.Info.oldDisplayedName == null)
+                    {
+                        p.Message("Name: DisplayedName was set to \"{0}&S\"", p.Info.DisplayedName);
+                        p.Info.isMad = false;
+                        p.Info.isJelly = false;
+                        return;
+                    }
+                    p.Message("Name: DisplayedName changed from \"{0}&S\" to \"{1}&S\"", p.Info.oldDisplayedName, p.Info.DisplayedName);
+                    return;
+            }
+        }
         #region LegendCraft
         /* Copyright (c) <2012-2014> <LeChosenOne, DingusBungus, Eeyle>
 Permission is hereby granted, free of charge, to any person obtaining a copy

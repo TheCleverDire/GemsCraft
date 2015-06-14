@@ -11,8 +11,111 @@ using System.IO;
 
 namespace fCraft
 {
+    public enum Models
+    {
+        Chicken,
+        Block,
+        Creeper,
+        Crocodile,
+        Humanoid,
+        Pig,
+        Printer,
+        Sheep,
+        SkeletonArcher,
+        Spider,
+        Zombie
+    }
+    public class ChangeModel
+    {
+
+        //ChangeModel is a CPE Extension
+        public String ToClientString;
+
+        /// <summary>
+        /// Gets the appropiate change model by enum
+        /// </summary>
+        /// <param name="m">Which Model?</param>
+        /// <param name="blockChange">Leave as Block.Air if model isn't block Model</param>
+        /// <param name="playerStart">The Player who started the command</param>
+        /// <param name="playerReceiving">The Player who initiated the command</param>
+        public ChangeModel(Models m, Block blockChange, Player playerStart, Player playerReceiving)
+        {
+            switch (m)
+            {
+                case Models.Chicken:
+                    ToClientString = "chicken";
+                    break;
+                case Models.Block:
+                    ToClientString = ((byte)Block.Stone).ToString();
+                    break;
+                case Models.Creeper:
+                    ToClientString = "creeper";
+                    break;
+                case Models.Crocodile:
+                    ToClientString = "croc";
+                    break;
+                case Models.Pig:
+                    ToClientString = "pig";
+                    break;
+                case Models.Printer:
+                    ToClientString = "printer";
+                    break;
+                case Models.Sheep:
+                    ToClientString = "sheep";
+                    break;
+                case Models.SkeletonArcher:
+                    ToClientString = "skeleton";
+                    break;
+                case Models.Spider:
+                    ToClientString = "spider";
+                    break;
+                case Models.Zombie:
+                    ToClientString = "zombie";
+                    break;
+                default:
+                    ToClientString = "humanoid";
+                    break;
+
+            }
+            playerReceiving.Send(PacketWriter.MakeAddEntity(new Random().Next(127), ToClientString, playerReceiving.Position));
+        }
+
+    }
+    public class MessageTypeDefaults
+    {
+        public static String status1()
+        {
+            return ConfigKey.ServerName.GetString();
+        }
+        public static String status2(Player player)
+        {
+            return "Map: " + player.World.Name;
+        }
+        public static String status3(Player player)
+        {
+            return "Rank: " + player.Info.Rank.Name;
+        }
+        public static String BR3()
+        {
+            return "&1Gems&2Craft &f" + Updater.LatestStable;
+        }
+        public static String BR2()
+        {
+            return ConfigKey.WebsiteURL.GetString();
+        }
+        public static String BR1()
+        {
+            return ConfigKey.IRCBotNetwork.GetString() + " " + ConfigKey.IRCBotChannels.GetString();
+        }
+    }
     public sealed partial class Player
     {
+        public static Block[] customBlocks = new Block[] {
+            Block.CobbleSlab, Block.Rope, Block.Sandstone,
+            Block.Snow, Block.Fire, Block.LightPink, Block.DarkGreen,
+            Block.Brown, Block.DarkBlue, Block.Turquoise, Block.Ice,
+            Block.Tile, Block.Magma, Block.Pillar, Block.Crate, Block.StoneBrick
+        };
         const string SelectionBoxExtName = "SelectionBoxExt";//I don't think this is actually a packet
         const int SelectionBoxExtVersion = 1;
         const string CustomBlocksExtName = "CustomBlocks";

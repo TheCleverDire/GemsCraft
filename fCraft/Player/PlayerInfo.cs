@@ -14,6 +14,7 @@ namespace fCraft
     /// There is exactly one PlayerInfo object for each known Minecraft account. All data is stored in the PlayerDB. </summary>
     public sealed partial class PlayerInfo : IClassy
     {
+        public DateTime LastUsedJoke;
         public const int MinFieldCount = 24;
 
         ///<summary> Player's amount of bits.</summary>

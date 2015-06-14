@@ -32,7 +32,6 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdFixRealms);
 
             CommandManager.RegisterCommand(CdNick);
-            CommandManager.RegisterCommand(CdName);
             CommandManager.RegisterCommand(CdEdit);
 
 #if DEBUG
@@ -267,73 +266,6 @@ THE SOFTWARE.*/
             }
         }
 
-        static readonly CommandDescriptor CdName = new CommandDescriptor
-        {
-            Name = "Name",
-            Category = CommandCategory.Chat | CommandCategory.Fun,
-            Permissions = new[] {Permission.Name},
-            IsConsoleSafe = false,
-            Usage = "/Name (NewName|Revert|Blank)",
-            Help = "Allows you to edit your name. Doing /Name revert makes your nick your last used nickname. Do just /Name to reset your nick.",
-            NotRepeatable = true,
-            Handler = NameHandler,
-        };
-
-        static void NameHandler(Player p, Command cmd)
-        {
-                string displayedname = cmd.NextAll();
-                string nameBuffer = p.Info.DisplayedName;
-
-                if (string.IsNullOrEmpty(displayedname) || displayedname.Length < 1)
-                {
-                    p.Info.oldDisplayedName = p.Info.DisplayedName;
-                    p.Info.DisplayedName = p.Name;
-                    p.Message("Your name has been reset.");
-                    p.Info.isJelly = false;
-                    p.Info.isMad = false;
-                    return;
-                }
-                else
-                {
-                    if (displayedname.ToLower() == "revert")      //swaps the new and old names by using a buffer name for swapping.
-                    {
-                        if (p.Info.oldDisplayedName == null)
-                        {
-                            p.Message("You do not have an old Nick-Name to revert to.");
-                            return;
-                        }
-                        p.Info.DisplayedName = p.Info.oldDisplayedName;
-                        p.Info.oldDisplayedName = nameBuffer;
-                        p.Message("Your name has been reverted.");
-                        return;
-                    }
-                    if (displayedname.ToLower() == "blank")      //swaps the new and old names by using a buffer name for swapping.
-                    {
-                        p.Info.oldDisplayedName = nameBuffer;
-                        p.Info.DisplayedName = p.Info.oldDisplayedName;
-                        p.Info.DisplayedName = "";
-                        p.Message("Name: DisplayedName was set to blank", p.Info.DisplayedName);
-                        return;
-                    }
-                    else
-                    {
-                        p.Info.oldDisplayedName = p.Info.DisplayedName;
-                        p.Info.DisplayedName = displayedname;
-                        if (p.Info.oldDisplayedName == null)
-                        {
-                            p.Message("Name: DisplayedName was set to \"{0}&S\"", p.Info.DisplayedName);
-                            p.Info.isMad = false;
-                            p.Info.isJelly = false;
-                            return;
-                        }
-                        else
-                        {
-                            p.Message("Name: DisplayedName changed from \"{0}&S\" to \"{1}&S\"", p.Info.oldDisplayedName, p.Info.DisplayedName);
-                            return;
-                        }
-                    }
-                }
-        }
     #endregion 
         
         #region 800Craft

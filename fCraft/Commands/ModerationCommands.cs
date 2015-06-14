@@ -86,7 +86,73 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdForceHold);
             CommandManager.RegisterCommand(CdGetBlock);
             //CommandManager.RegisterCommand(CdTPA);
+            CommandManager.RegisterCommand(CdNuke);
 
+        }
+        static readonly CommandDescriptor CdNuke = new CommandDescriptor
+        {
+            Name = "Nuke",
+            Aliases = new[] { "boom", "kaboom" },
+            IsConsoleSafe = true,
+            Category = CommandCategory.Moderation,
+            Permissions = new[] { Permission.Demote, Permission.Ban },
+            Help = "&S\"Nukes\" a player. " + BanCommonHelp,
+            Usage = "&S/Nuke (player)",
+            Handler = NukeHandler
+        };
+
+        private static String NukedName()
+        {
+            String[] r = new string[]
+            {
+                "WimpyCreamPuff", "CheesyBeaver", "StinkCheese", "Asshat", "ChickenNugget",
+                "BigMac", "TurdFace", "AdolfHitler", "WombRaider", "DancingDragon",
+                "Nuked"
+            };
+            Random rRandom = new Random();
+            int randomName = rRandom.Next(r.Length);
+            int[] RandomInt = new int[]
+            {
+                rRandom.Next(9),  rRandom.Next(9),  rRandom.Next(9)
+            };
+            return "&4" + r[randomName] + RandomInt[0] + "" + RandomInt[1] + "" + RandomInt[2];
+        }
+        private static void NukeHandler(Player player, Command cmd)
+        {
+            String TargetPlayerStr = null;
+            try
+            {
+                TargetPlayerStr = cmd.Next();
+                Player selectedPlayer = PlayerDB.FindPlayerInfoExact(TargetPlayerStr).PlayerObject;
+                PlayerInfo pInfo = selectedPlayer.Info;
+                pInfo.DisplayedName = NukedName(); // Returns a random nuked name
+                if (!pInfo.Rank.Equals(RankManager.LowestRank))
+                {
+                    pInfo.ChangeRank(player, RankManager.LowestRank, "You have been &4NUKED", true, true, true);
+                }
+                if (!pInfo.IsBanned)
+                {
+                    pInfo.Ban(player, "You have been &4NUKED", true, true);
+                }
+                pInfo.BlocksBuilt = 0;
+                pInfo.BlocksDeleted = 0;
+                pInfo.BlocksDeleted = 0;
+            }
+            catch (NullReferenceException)
+            {
+                CdNuke.PrintUsage(player);
+            }
+            catch (PlayerOpException ex)
+            {
+                try
+                {
+                    player.Message("&c" + ex.Message);
+                }
+                catch (Exception)
+                {
+                    player.Message("&cSomething went wrong when running the command. Try again later");
+                }
+            }
         }
         #region LegendCraft
         /* Copyright (c) <2012-2014> <LeChosenOne, DingusBungus>

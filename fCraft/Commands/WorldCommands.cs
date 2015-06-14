@@ -73,6 +73,7 @@ namespace fCraft
             CommandManager.RegisterCommand(CdMapEdit);
             CommandManager.RegisterCommand(CdHax);
             CommandManager.RegisterCommand(CdMessageBlock);
+            CommandManager.RegisterCommand(CdHub);
         }
 
         #region LegendCraft
@@ -94,7 +95,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.*/
-
+        static readonly CommandDescriptor CdHub = new CommandDescriptor
+        {
+            Name = "Hub",
+            Category = CommandCategory.World,
+            IsConsoleSafe = false,
+            Help = "Teleports you to the server's spawn",
+            Handler = HubHandler
+        };
+        private static void HubHandler(Player player, Command cmd)
+        {
+            player.previousLocation = player.Position;
+            player.JoinWorld(WorldManager.MainWorld, WorldChangeReason.ManualJoin);
+        }
         static readonly CommandDescriptor CdMessageBlock = new CommandDescriptor
         {
             Name = "MessageBlock",
