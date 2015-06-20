@@ -67,7 +67,7 @@ namespace GemsCraftGUI
             ApplyTabLogging();
             ApplyTabIRC();
             ApplyTabAdvanced();
-
+            ApplyTabCpe();
             AddChangeHandler(tabs, SomethingChanged);
             AddChangeHandler(bResetTab, SomethingChanged);
             AddChangeHandler(bResetAll, SomethingChanged);
@@ -182,10 +182,10 @@ namespace GemsCraftGUI
             nAnnouncements.Value = xAnnouncements.Checked ? ConfigKey.AnnouncementInterval.GetInt() : 1;
 
             // UpdaterSettingsWindow
-            updaterWindow.BackupBeforeUpdate = ConfigKey.BackupBeforeUpdate.Enabled();
-            updaterWindow.RunBeforeUpdate = ConfigKey.RunBeforeUpdate.GetString();
-            updaterWindow.RunAfterUpdate = ConfigKey.RunAfterUpdate.GetString();
-            updaterWindow.UpdaterMode = ConfigKey.UpdaterMode.GetEnum<UpdaterMode>();
+            _updaterWindow.BackupBeforeUpdate = ConfigKey.BackupBeforeUpdate.Enabled();
+            _updaterWindow.RunBeforeUpdate = ConfigKey.RunBeforeUpdate.GetString();
+            _updaterWindow.RunAfterUpdate = ConfigKey.RunAfterUpdate.GetString();
+            _updaterWindow.UpdaterMode = ConfigKey.UpdaterMode.GetEnum<UpdaterMode>();
         }
 
 
@@ -198,41 +198,41 @@ namespace GemsCraftGUI
             xShowJoinedWorldMessages.Checked = ConfigKey.ShowJoinedWorldMessages.Enabled();
             xShowConnectionMessages.Checked = ConfigKey.ShowConnectionMessages.Enabled();
 
-            colorSys = Color.ParseToIndex(ConfigKey.SystemMessageColor.GetString());
-            ApplyColor(bColorSys, colorSys);
-            Color.Sys = Color.Parse(colorSys);
+            _colorSys = Color.ParseToIndex(ConfigKey.SystemMessageColor.GetString());
+            ApplyColor(bColorSys, _colorSys);
+            Color.Sys = Color.Parse(_colorSys);
 
-            colorCustom = Color.ParseToIndex(ConfigKey.CustomChatColor.GetString());
-            ApplyColor(CustomColor, colorCustom);
-            Color.Custom = Color.Parse(colorCustom);
+            _colorCustom = Color.ParseToIndex(ConfigKey.CustomChatColor.GetString());
+            ApplyColor(CustomColor, _colorCustom);
+            Color.Custom = Color.Parse(_colorCustom);
 
-            colorHelp = Color.ParseToIndex(ConfigKey.HelpColor.GetString());
-            ApplyColor(bColorHelp, colorHelp);
-            Color.Help = Color.Parse(colorHelp);
+            _colorHelp = Color.ParseToIndex(ConfigKey.HelpColor.GetString());
+            ApplyColor(bColorHelp, _colorHelp);
+            Color.Help = Color.Parse(_colorHelp);
 
-            colorSay = Color.ParseToIndex(ConfigKey.SayColor.GetString());
-            ApplyColor(bColorSay, colorSay);
-            Color.Say = Color.Parse(colorSay);
+            _colorSay = Color.ParseToIndex(ConfigKey.SayColor.GetString());
+            ApplyColor(bColorSay, _colorSay);
+            Color.Say = Color.Parse(_colorSay);
 
-            colorAnnouncement = Color.ParseToIndex(ConfigKey.AnnouncementColor.GetString());
-            ApplyColor(bColorAnnouncement, colorAnnouncement);
-            Color.Announcement = Color.Parse(colorAnnouncement);
+            _colorAnnouncement = Color.ParseToIndex(ConfigKey.AnnouncementColor.GetString());
+            ApplyColor(bColorAnnouncement, _colorAnnouncement);
+            Color.Announcement = Color.Parse(_colorAnnouncement);
 
-            colorPM = Color.ParseToIndex(ConfigKey.PrivateMessageColor.GetString());
-            ApplyColor(bColorPM, colorPM);
-            Color.PM = Color.Parse(colorPM);
+            _colorPm = Color.ParseToIndex(ConfigKey.PrivateMessageColor.GetString());
+            ApplyColor(bColorPM, _colorPm);
+            Color.PM = Color.Parse(_colorPm);
 
-            colorWarning = Color.ParseToIndex(ConfigKey.WarningColor.GetString());
-            ApplyColor(bColorWarning, colorWarning);
-            Color.Warning = Color.Parse(colorWarning);
+            _colorWarning = Color.ParseToIndex(ConfigKey.WarningColor.GetString());
+            ApplyColor(bColorWarning, _colorWarning);
+            Color.Warning = Color.Parse(_colorWarning);
 
-            colorMe = Color.ParseToIndex(ConfigKey.MeColor.GetString());
-            ApplyColor(bColorMe, colorMe);
-            Color.Me = Color.Parse(colorMe);
+            _colorMe = Color.ParseToIndex(ConfigKey.MeColor.GetString());
+            ApplyColor(bColorMe, _colorMe);
+            Color.Me = Color.Parse(_colorMe);
 
-            colorGlobal = Color.ParseToIndex(ConfigKey.GlobalColor.GetString());
-            ApplyColor(bColorGlobal, colorGlobal);
-            Color.Global = Color.Parse(colorGlobal);
+            _colorGlobal = Color.ParseToIndex(ConfigKey.GlobalColor.GetString());
+            ApplyColor(bColorGlobal, _colorGlobal);
+            Color.Global = Color.Parse(_colorGlobal);
 
             UpdateChatPreview();
         }
@@ -240,17 +240,17 @@ namespace GemsCraftGUI
 
         void ApplyTabWorlds()
         {
-            if (rankNameList == null)
+            if (_rankNameList == null)
             {
-                rankNameList = new BindingList<string> {
+                _rankNameList = new BindingList<string> {
                     WorldListEntry.DefaultRankOption
                 };
                 foreach (Rank rank in RankManager.Ranks)
                 {
-                    rankNameList.Add(MainForm.ToComboBoxOption(rank));
+                    _rankNameList.Add(MainForm.ToComboBoxOption(rank));
                 }
-                dgvcAccess.DataSource = rankNameList;
-                dgvcBuild.DataSource = rankNameList;
+                dgvcAccess.DataSource = _rankNameList;
+                dgvcBuild.DataSource = _rankNameList;
                 dgvcBackup.DataSource = WorldListEntry.BackupEnumNames;
 
                 LoadWorldList();
@@ -260,11 +260,11 @@ namespace GemsCraftGUI
             else
             {
                 //dgvWorlds.DataSource = null;
-                rankNameList.Clear();
-                rankNameList.Add(WorldListEntry.DefaultRankOption);
+                _rankNameList.Clear();
+                _rankNameList.Add(WorldListEntry.DefaultRankOption);
                 foreach (Rank rank in RankManager.Ranks)
                 {
-                    rankNameList.Add(MainForm.ToComboBoxOption(rank));
+                    _rankNameList.Add(MainForm.ToComboBoxOption(rank));
                 }
                 foreach (WorldListEntry world in Worlds)
                 {
@@ -302,7 +302,7 @@ namespace GemsCraftGUI
 
         void ApplyTabRanks()
         {
-            selectedRank = null;
+            _selectedRank = null;
             RebuildRankList();
             DisableRankOptions();
         }
@@ -354,8 +354,8 @@ namespace GemsCraftGUI
             }
             else
             {
-                RankManager.BlockDBAutoEnableRank = Rank.Parse(ConfigKey.BlockDBAutoEnableRank.GetString());
-                cBlockDBAutoEnableRank.SelectedIndex = RankManager.GetIndex(RankManager.BlockDBAutoEnableRank);
+                RankManager.BlockDbAutoEnableRank = Rank.Parse(ConfigKey.BlockDBAutoEnableRank.GetString());
+                cBlockDBAutoEnableRank.SelectedIndex = RankManager.GetIndex(RankManager.BlockDbAutoEnableRank);
             }
         }
 
@@ -429,9 +429,9 @@ namespace GemsCraftGUI
             xIRCBotForwardFromServer.Checked = ConfigKey.IRCBotForwardFromServer.Enabled();
 
 
-            colorIRC = Color.ParseToIndex(ConfigKey.IRCMessageColor.GetString());
-            ApplyColor(bColorIRC, colorIRC);
-            Color.IRC = Color.Parse(colorIRC);
+            _colorIrc = Color.ParseToIndex(ConfigKey.IRCMessageColor.GetString());
+            ApplyColor(bColorIRC, _colorIrc);
+            Color.IRC = Color.Parse(_colorIrc);
 
             xIRCUseColor.Checked = ConfigKey.IRCUseColor.Enabled();
             xIRCBotAnnounceServerEvents.Checked = ConfigKey.IRCBotAnnounceServerEvents.Enabled();
@@ -532,6 +532,11 @@ namespace GemsCraftGUI
             }
         }
 
+        // TODO - Insert all CPE configs here
+        void ApplyTabCpe()
+        {
+            chkClickDistanceAllowed.Checked = ConfigKey.ClickDistanceEnabled.Enabled();
+        }
         static CheckState CheckStateS(int dragblock)
         {
             var desBool = false;
@@ -610,22 +615,22 @@ namespace GemsCraftGUI
             ConfigKey.AnnouncementInterval.TrySetValue(xAnnouncements.Checked ? nAnnouncements.Value : 0);
 
             // UpdaterSettingsWindow
-            ConfigKey.UpdaterMode.TrySetValue(updaterWindow.UpdaterMode);
-            ConfigKey.BackupBeforeUpdate.TrySetValue(updaterWindow.BackupBeforeUpdate);
-            ConfigKey.RunBeforeUpdate.TrySetValue(updaterWindow.RunBeforeUpdate);
-            ConfigKey.RunAfterUpdate.TrySetValue(updaterWindow.RunAfterUpdate);
+            ConfigKey.UpdaterMode.TrySetValue(_updaterWindow.UpdaterMode);
+            ConfigKey.BackupBeforeUpdate.TrySetValue(_updaterWindow.BackupBeforeUpdate);
+            ConfigKey.RunBeforeUpdate.TrySetValue(_updaterWindow.RunBeforeUpdate);
+            ConfigKey.RunAfterUpdate.TrySetValue(_updaterWindow.RunAfterUpdate);
 
 
             // Chat
-            ConfigKey.SystemMessageColor.TrySetValue(Color.GetName(colorSys));
-            ConfigKey.CustomChatColor.TrySetValue(Color.GetName(colorCustom));
-            ConfigKey.HelpColor.TrySetValue(Color.GetName(colorHelp));
-            ConfigKey.SayColor.TrySetValue(Color.GetName(colorSay));
-            ConfigKey.AnnouncementColor.TrySetValue(Color.GetName(colorAnnouncement));
-            ConfigKey.PrivateMessageColor.TrySetValue(Color.GetName(colorPM));
-            ConfigKey.WarningColor.TrySetValue(Color.GetName(colorWarning));
-            ConfigKey.MeColor.TrySetValue(Color.GetName(colorMe));
-            ConfigKey.GlobalColor.TrySetValue(Color.GetName(colorGlobal));
+            ConfigKey.SystemMessageColor.TrySetValue(Color.GetName(_colorSys));
+            ConfigKey.CustomChatColor.TrySetValue(Color.GetName(_colorCustom));
+            ConfigKey.HelpColor.TrySetValue(Color.GetName(_colorHelp));
+            ConfigKey.SayColor.TrySetValue(Color.GetName(_colorSay));
+            ConfigKey.AnnouncementColor.TrySetValue(Color.GetName(_colorAnnouncement));
+            ConfigKey.PrivateMessageColor.TrySetValue(Color.GetName(_colorPm));
+            ConfigKey.WarningColor.TrySetValue(Color.GetName(_colorWarning));
+            ConfigKey.MeColor.TrySetValue(Color.GetName(_colorMe));
+            ConfigKey.GlobalColor.TrySetValue(Color.GetName(_colorGlobal));
             ConfigKey.ShowJoinedWorldMessages.TrySetValue(xShowJoinedWorldMessages.Checked);
             ConfigKey.RankColorsInWorldNames.TrySetValue(xRankColorsInWorldNames.Checked);
             ConfigKey.RankColorsInChat.TrySetValue(xRankColorsInChat.Checked);
@@ -671,7 +676,7 @@ namespace GemsCraftGUI
             ConfigKey.BlockDBAutoEnable.TrySetValue(xBlockDBAutoEnable.Checked);
             ConfigKey.BlockDBAutoEnableRank.TrySetValue(cBlockDBAutoEnableRank.SelectedIndex == 0
                 ? ""
-                : RankManager.BlockDBAutoEnableRank.FullName);
+                : RankManager.BlockDbAutoEnableRank.FullName);
 
 
             // Saving & Backups
@@ -721,7 +726,7 @@ namespace GemsCraftGUI
             ConfigKey.IRCBotForwardFromIRC.TrySetValue(xIRCBotForwardFromIRC.Checked);
             ConfigKey.IRCBotForwardFromServer.TrySetValue(xIRCBotForwardFromServer.Checked);
 
-            ConfigKey.IRCMessageColor.TrySetValue(Color.GetName(colorIRC));
+            ConfigKey.IRCMessageColor.TrySetValue(Color.GetName(_colorIrc));
             ConfigKey.IRCUseColor.TrySetValue(xIRCUseColor.Checked);
 
             ConfigKey.IRCBotNetworkPass.TrySetValue(tServPass.Text);
@@ -769,6 +774,10 @@ namespace GemsCraftGUI
             ConfigKey.DragonLava.TrySetValue(clbDragonPermits.GetItemChecked(2));
             ConfigKey.DragonRed.TrySetValue(clbDragonPermits.GetItemChecked(3));
             SaveWorldList();
+
+            //CPE
+            //TODO insert all CPE configs
+            ConfigKey.ClickDistanceEnabled.TrySetValue(chkClickDistanceAllowed.Checked);
         }
 
 

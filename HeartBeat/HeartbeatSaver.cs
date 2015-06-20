@@ -1,12 +1,14 @@
 // Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
-// Modified 2012-2013 LegendCraft Team
+// Modified 2012-2013 GemsCraft Team
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Cache;
 using System.Text;
 using System.Threading;
-
+using fCraft;
 
 namespace fCraft.HeartbeatSaver
 {
@@ -14,8 +16,10 @@ namespace fCraft.HeartbeatSaver
     {
 
         const int ProtocolVersion = 7;
-        static readonly Uri MinecraftNetUri = new Uri("https://minecraft.net/heartbeat.jsp");
-
+        static Uri MinecraftNetUri;
+        static readonly Uri MCUri = new Uri("https://minecraft.net/heartbeat.jsp");
+        static readonly Uri ClassicubeURI = new Uri("http://classicube.net/heartbeat.jsp");
+        static String clientName;
         static readonly TimeSpan Delay = TimeSpan.FromSeconds(10),
                                  Timeout = TimeSpan.FromSeconds(10),
                                  ErrorDelay = TimeSpan.FromSeconds(30),
@@ -30,9 +34,38 @@ namespace fCraft.HeartbeatSaver
         static string heartbeatDataFileName;
         static HeartbeatData data;
 
-
+        static void ProcessKill()
+        {
+            foreach (Process p in System.Diagnostics.Process.GetProcessesByName("HeartbeatSaver"))
+            {
+                try
+                {
+                    p.Kill();
+                    p.WaitForExit(); // possibly with a timeout
+                }
+                catch (Win32Exception winException)
+                {
+                    // process was terminating or can't be terminated - deal with it
+                }
+                catch (InvalidOperationException invalidException)
+                {
+                    // process has already exited - might be able to let this one go
+                }
+            }
+        }
         static int Main(string[] args)
         {
+            Config.Load(true, false);
+            if (Heartbeat.ClassiCube())
+            {
+                MinecraftNetUri = ClassicubeURI;
+                clientName = "ClassiCube";
+            }
+            else
+            {
+                MinecraftNetUri = MCUri;
+                clientName = "Minecraft";
+            }
             if (args.Length == 0)
             {
                 heartbeatDataFileName = DefaultDataFileName;
@@ -113,8 +146,8 @@ namespace fCraft.HeartbeatSaver
         {
             UriBuilder ub = new UriBuilder(MinecraftNetUri);
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(" ***Welcome to LegendCraft HeartbeatSaver***\n");
-            Console.WriteLine(" ...:: The program is designed to send ::...\n .:: a Heartbeat to Minecraft/ClassiCube!::. \n");
+            Console.WriteLine(" ***Welcome to GemsCraft HeartbeatSaver***\n");
+            Console.WriteLine(" ...:: The program is designed to send ::...\n ....:: a Heartbeat to " + clientName + ".net! ::.... \n");
             Console.WriteLine(" .::.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.:.::.\n");
             Console.ResetColor();
             Console.ForegroundColor = ConsoleColor.White;
@@ -139,7 +172,7 @@ namespace fCraft.HeartbeatSaver
                 {
                     if (ex is WebException)
                     {
-                        Console.Error.WriteLine("{0}: Minecraft.net is probably down :( ({1})", Timestamp(), ex.Message);
+                        Console.Error.WriteLine("{0}: " + clientName + ".net is probably down :( ({1})", Timestamp(), ex.Message);
                     }
                     else
                     {
@@ -174,11 +207,7 @@ namespace fCraft.HeartbeatSaver
                 {
                     string responseText = responseReader.ReadToEnd();
                     File.WriteAllText(UrlFileName, responseText.Trim(), Encoding.ASCII);
-                    if (count == 69)
-                    {
-                        Console.WriteLine("{0}: Sending HeartBeat... Count 69...Lol, I said 69...hehe", Timestamp());
-                    }
-                    else if (count == 9001)
+                    if (count == 9001)
                     {
                         Console.WriteLine("{0}: Sending HeartBeat... Count 9001...ITS OVAR 9000!", Timestamp());
                     }
@@ -187,7 +216,6 @@ namespace fCraft.HeartbeatSaver
                         Console.WriteLine("{0}: Sending HeartBeat... Count {1}", Timestamp(), count);
                     }
                     count++;
-                    
                 }
             }
         }

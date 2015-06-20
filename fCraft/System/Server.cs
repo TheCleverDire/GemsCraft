@@ -269,7 +269,7 @@ namespace fCraft {
         /// Raises Server.Initializing and Server.Initialized events, and possibly Logger.Logged events.
         /// Throws exceptions on failure. </summary>
         /// <exception cref="System.InvalidOperationException"> Library is not initialized, or server is already initialzied. </exception>
-        public static void InitServer() {
+        public static void InitServer(bool IsCli) {
             if( serverInitialized ) {
                 throw new InvalidOperationException( "Server is already initialized" );
             }
@@ -317,11 +317,12 @@ namespace fCraft {
             // delete the old updater, if exists
             File.Delete( Paths.UpdaterFileName );
             File.Delete( "fCraftUpdater.exe" ); // pre-0.600 (supar legacy)
-            //TODO - Include ServerGUI.exe and ConfigGUI.exe in these as well
+            File.Delete("ConfigGUI.exe"); // Alpha - Legacy
+            File.Delete("ServerGUI.exe"); // Alpha - Legacy
 #endif
             
             // try to load the config
-            RankManager.RanksAlreadyLoaded = true;
+            if (!IsCli) RankManager.RanksAlreadyLoaded = true;
            if( !Config.Load( false, false ) ) {
                 throw new Exception( "GemsCraft Config failed to initialize" );
             }
@@ -634,7 +635,12 @@ namespace fCraft {
 #endif
         }
 
-
+        private static bool _desiredToKeepWindow = false;
+        public static void Shutdown([NotNull] ShutdownParams shutdownParams, bool waitForShutdown, bool closeProgram)
+        {
+            _desiredToKeepWindow = closeProgram;
+            Shutdown(shutdownParams, waitForShutdown);
+        }
         /// <summary> Initiates the server shutdown with given parameters. </summary>
         /// <param name="shutdownParams"> Shutdown parameters </param>
         /// <param name="waitForShutdown"> If true, blocks the calling thread until shutdown is complete or cancelled. </param>
@@ -649,12 +655,9 @@ namespace fCraft {
                     string timerMsg = String.Format( "Server {0} ({1})",
                                                      shutdownParams.Restart ? "restart" : "shutdown",
                                                      shutdownParams.ReasonString );
-                    string nameOnTimer;
-                    if( shutdownParams.InitiatedBy == null ) {
-                        nameOnTimer = Player.Console.Name;
-                    } else {
-                        nameOnTimer = shutdownParams.InitiatedBy.Name;
-                    }
+                    var nameOnTimer = shutdownParams.InitiatedBy == null 
+                        ? Player.Console.Name 
+                        : shutdownParams.InitiatedBy.Name;
                     shutdownTimer = ChatTimer.Start( shutdownParams.Delay, timerMsg, nameOnTimer );
                 }
                 shutdownThread.Start( shutdownParams );
@@ -670,22 +673,21 @@ namespace fCraft {
         /// Also returns false if it's too late to cancel (shutdown has begun). </returns>
         public static bool CancelShutdown() {
             lock( ShutdownLock ) {
-                if( shutdownThread != null ) {
-                    if( IsShuttingDown || shutdownThread.ThreadState != ThreadState.WaitSleepJoin ) {
-                        return false;
-                    }
-                    if( shutdownTimer != null ) {
-                        shutdownTimer.Stop();
-                        shutdownTimer = null;
-                    }
-                    ShutdownWaiter.Set();
-                    shutdownThread.Abort();
-                    shutdownThread = null;
+                if (shutdownThread == null) return true;
+                if( IsShuttingDown || shutdownThread.ThreadState != ThreadState.WaitSleepJoin ) {
+                    return false;
                 }
+                if( shutdownTimer != null ) {
+                    shutdownTimer.Stop();
+                    shutdownTimer = null;
+                }
+                ShutdownWaiter.Set();
+                shutdownThread.Abort();
+                shutdownThread = null;
             }
             return true;
         }
-
+        
 
         static void ShutdownThread( [NotNull] object obj ) {
             if( obj == null ) throw new ArgumentNullException( "obj" );
@@ -733,7 +735,7 @@ namespace fCraft {
                 }
             }
 
-            if( param.KillProcess ) {
+            if( param.KillProcess && !_desiredToKeepWindow) {
                 Process.GetCurrentProcess().Kill();
             }
         }
@@ -1002,20 +1004,17 @@ namespace fCraft {
             {
                 try
                 {
-                    string fileComment = String.Format("Backup of 800Craft data for server \"{0}\", saved on {1}",
+                    var fileComment = string.Format("Backup of 800Craft data for server \"{0}\", saved on {1}",
                                                         ConfigKey.ServerName.GetString(),
                                                         DateTime.Now);
                     using (ZipStorer backupZip = ZipStorer.Create(fs, fileComment))
                     {
-                        foreach (string dataFileName in Paths.DataFilesToBackup)
+                        foreach (var dataFileName in Paths.DataFilesToBackup.Where(File.Exists))
                         {
-                            if (File.Exists(dataFileName))
-                            {
-                                backupZip.AddFile(ZipStorer.Compression.Deflate,
-                                                   dataFileName,
-                                                   dataFileName,
-                                                   "");
-                            }
+                            backupZip.AddFile(ZipStorer.Compression.Deflate,
+                                dataFileName,
+                                dataFileName,
+                                "");
                         }
                     }
                 }

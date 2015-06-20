@@ -87,7 +87,7 @@ namespace fCraft {
         };
         static void GetUsageHandler(Player player, Command cmd)
         {
-            String desiredCommand = null;
+            string desiredCommand;
             try
             {
                 desiredCommand = cmd.Next().ToLower();
@@ -125,7 +125,7 @@ namespace fCraft {
             Category = CommandCategory.Info,
             Usage = "/GemsVersion",
             Help = "Displays the current GemsCraft version",
-            Handler = GetUsageHandler
+            Handler = GemsHandler
         };
         static void GemsHandler(Player player, Command cmd)
         {
@@ -244,9 +244,6 @@ THE SOFTWARE.*/
 
             player.Message("&c_Player {0}&c's Game Stats_:\n&6TopLogins: {1}\n&eTopTime: {2}\n&aTopBuilders: {3}\n&2MostKicks: {4}\n&1MostBans: {5}\n&5MostPromos: {6}", target.ClassyName, indexLogins
                 , indexTime, indexBuilders, indexKicks, indexBans, indexPromos);
-            return;
-            
-
         }
         
         static readonly CommandDescriptor CdIrc = new CommandDescriptor
@@ -269,12 +266,10 @@ THE SOFTWARE.*/
                 if (ConfigKey.IRCBotEnabled.Enabled())
                 {
                     player.Message("&sThe server's &iIRC &schannel(s): &i{0}", ConfigKey.IRCBotChannels.GetString());
-                    return;
                 }
                 else
                 {
                     player.Message("&sThe server does not have IRC integration");
-                    return;
                 }
             }
             else
@@ -284,12 +279,10 @@ THE SOFTWARE.*/
                     if (ConfigKey.IRCBotEnabled.Enabled())
                     {
                         Server.Message("&sThe server's &iIRC &schannel(s): &i{0}", ConfigKey.IRCBotChannels.GetString());
-                        return;
                     }
                     else
                     {
                         Server.Message("&sThe server does not have IRC integration");
-                        return;
                     }
                 }
                 else
@@ -297,12 +290,10 @@ THE SOFTWARE.*/
                     if (ConfigKey.IRCBotEnabled.Enabled())
                     {
                         player.Message("&sThe server's &iIRC &schannel(s): &i{0}", ConfigKey.IRCBotChannels.GetString());
-                        return;
                     }
                     else
                     {
                         player.Message("&sThe server does not have IRC integration");
-                        return;
                     }
                 }
             }
@@ -329,12 +320,10 @@ THE SOFTWARE.*/
                 if (ConfigKey.WebsiteURL.GetString().Length < 1)
                 {
                     player.Message("&sThe server does not have a website.");
-                    return;
                 }
                 else
                 {
                     player.Message("&c{0}&s's website is &a{1}&s.", ConfigKey.ServerName.GetString(), ConfigKey.WebsiteURL.GetString());
-                    return;
                 }
             }
             else
@@ -344,12 +333,10 @@ THE SOFTWARE.*/
                     if (ConfigKey.WebsiteURL.GetString().Length < 1)
                     {
                         Server.Message("&sThe server does not have a website.");
-                        return;
                     }
                     else
                     {
                         Server.Message("&c{0}&s's website is &a{1}&s.", ConfigKey.ServerName.GetString(), ConfigKey.WebsiteURL.GetString());
-                        return;
                     }
                 }
                 else
@@ -357,12 +344,10 @@ THE SOFTWARE.*/
                     if (ConfigKey.WebsiteURL.GetString().Length < 1)
                     {
                         player.Message("&sThe server does not have a website.");
-                        return;
                     }
                     else
                     {
                         player.Message("&c{0}&s's website is &a{1}&s.", ConfigKey.ServerName.GetString(), ConfigKey.WebsiteURL.GetString());
-                        return;
                     }
                 }
             }
@@ -414,27 +399,13 @@ THE SOFTWARE.*/
                 case "requirements":
                     {
                         string reqRank = cmd.Next();
-                        if (reqRank == null)
-                        {
-                            ReqsHandler(player, new Command("/reqs"));
-                        }
-                        else
-                        {
-                            ReqsHandler(player, new Command("/reqs " + reqRank));
-                        }
+                        ReqsHandler(player, reqRank == null ? new Command("/reqs") : new Command("/reqs " + reqRank));
                         break;
                     }
                 case "rules":
                     {
                         string section = cmd.Next();
-                        if (section == null)
-                        {
-                            RulesHandler(player, new Command("/rules"));
-                        }
-                        else
-                        {
-                            RulesHandler(player, new Command("/rules " + section));
-                        }
+                        RulesHandler(player, section == null ? new Command("/rules") : new Command("/rules " + section));
                         break;
                     }
 
@@ -472,14 +443,8 @@ THE SOFTWARE.*/
                 case "winfo":
                 {
                     string world = cmd.Next();
-                    if (world == null)
-                    {
-                        WorldCommands.WorldInfoHandler(player, new Command("/winfo"));
-                    }
-                    else
-                    {
-                        WorldCommands.WorldInfoHandler(player, new Command("/winfo " + world));
-                    }
+                    WorldCommands.WorldInfoHandler(player,
+                        world == null ? new Command("/winfo") : new Command("/winfo " + world));
                     break;
                 }
                 case "irc":
@@ -1703,8 +1668,8 @@ THE SOFTWARE.*/
                 StringBuilder sb = new StringBuilder();
                 sb.AppendFormat( "Players of rank {0}&S can: ", rank.ClassyName );
                 bool first = true;
-                for( int i = 0; i < sortedPermissionNames.Length; i++ ) {
-                    Permission p = sortedPermissionNames[i];
+                foreach (Permission p in sortedPermissionNames)
+                {
                     if( !first ) sb.Append( ',' ).Append( ' ' );
                     Rank permissionLimit = rank.PermissionLimits[(int)p];
                     sb.Append( p );
@@ -1831,13 +1796,11 @@ THE SOFTWARE.*/
                 return;
             }
             player.Message( "Below is a list of ranks. For detail see &H{0}", CdRankInfo.Usage );
-            foreach( Rank rank in RankManager.Ranks ) {
-                if (!rank.IsHidden)
-                {
-                    player.Message("&S    {0}  ({1} players)",
-                                    rank.ClassyName,
-                                    rank.PlayerCount);
-                }
+            foreach (Rank rank in RankManager.Ranks.Where(rank => !rank.IsHidden))
+            {
+                player.Message("&S    {0}  ({1} players)",
+                    rank.ClassyName,
+                    rank.PlayerCount);
             }
         }
 
@@ -1889,27 +1852,28 @@ THE SOFTWARE.*/
                                                         "*.txt",
                                                         SearchOption.TopDirectoryOnly );
 
-            for( int i = 0; i < sectionFiles.Length; i++ ) {
-                string sectionFullName = Path.GetFileNameWithoutExtension( sectionFiles[i] );
+            foreach (string t in sectionFiles)
+            {
+                string sectionFullName = Path.GetFileNameWithoutExtension( t );
                 if( sectionFullName == null ) continue;
-                if( sectionFullName.StartsWith( sectionName, StringComparison.OrdinalIgnoreCase ) ) {
-                    if( sectionFullName.Equals( sectionName, StringComparison.OrdinalIgnoreCase ) ) {
-                        // if there is an exact match, break out of the loop early
-                        ruleFileName = sectionFiles[i];
-                        break;
+                if (!sectionFullName.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase)) continue;
+                if( sectionFullName.Equals( sectionName, StringComparison.OrdinalIgnoreCase ) ) {
+                    // if there is an exact match, break out of the loop early
+                    ruleFileName = t;
+                    break;
 
-                    } else if( ruleFileName == null ) {
-                        // if there is a partial match, keep going to check for multiple matches
-                        ruleFileName = sectionFiles[i];
+                }
+                if( ruleFileName == null ) {
+                    // if there is a partial match, keep going to check for multiple matches
+                    ruleFileName = t;
 
-                    } else {
-                        var matches = sectionFiles.Select( f => Path.GetFileNameWithoutExtension( f ) )
-                                                  .Where( sn => sn != null && sn.StartsWith( sectionName, StringComparison.OrdinalIgnoreCase ) );
-                        // if there are multiple matches, print a list
-                        player.Message( "Multiple rule sections matched \"{0}\": {1}",
-                                        sectionName, matches.JoinToString() );
-                        return;
-                    }
+                } else {
+                    var matches = sectionFiles.Select( Path.GetFileNameWithoutExtension )
+                        .Where( sn => sn != null && sn.StartsWith( sectionName, StringComparison.OrdinalIgnoreCase ) );
+                    // if there are multiple matches, print a list
+                    player.Message( "Multiple rule sections matched \"{0}\": {1}",
+                        sectionName, matches.JoinToString() );
+                    return;
                 }
             }
 
@@ -1934,28 +1898,25 @@ THE SOFTWARE.*/
 
         [CanBeNull]
         static string[] GetRuleSectionList() {
-            if( Directory.Exists( Paths.RulesPath ) ) {
-                string[] sections = Directory.GetFiles( Paths.RulesPath, "*.txt", SearchOption.TopDirectoryOnly )
-                                             .Select( name => Path.GetFileNameWithoutExtension( name ) )
-                                             .Where( name => !String.IsNullOrEmpty( name ) )
-                                             .ToArray();
-                if( sections.Length != 0 ) {
-                    return sections;
-                }
-            }
-            return null;
+            if (!Directory.Exists(Paths.RulesPath)) return null;
+            string[] sections = Directory.GetFiles( Paths.RulesPath, "*.txt", SearchOption.TopDirectoryOnly )
+                .Select( Path.GetFileNameWithoutExtension )
+                .Where( name => !String.IsNullOrEmpty( name ) )
+                .ToArray();
+            return sections.Length != 0 ? sections : null;
         }
 
 
         static void PrintRuleFile( Player player, FileSystemInfo ruleFile ) {
-            try {
+            try
+            {
                 string[] ruleLines = File.ReadAllLines( ruleFile.FullName );
-                foreach( string ruleLine in ruleLines ) {
-                    if( ruleLine.Trim().Length > 0 ) {
-                        player.Message( "&R{0}", Server.ReplaceTextKeywords( player, ruleLine ) );
-                    }
+                foreach (string ruleLine in ruleLines.Where(ruleLine => ruleLine.Trim().Length > 0))
+                {
+                    player.Message( "&R{0}", Server.ReplaceTextKeywords( player, ruleLine ) );
                 }
-            } catch( Exception ex ) {
+            }
+            catch( Exception ex ) {
                 Logger.Log( LogType.Error,
                             "InfoCommands.PrintRuleFile: An error occured while trying to read {0}: {1}",
                             ruleFile.FullName, ex );
@@ -2153,11 +2114,10 @@ THE SOFTWARE.*/
             if (!player.Can(Permission.ViewOthersInfo) && target != player){
                 player.Message("&WYou do not have permissions to perform this task") ;
                 return;
-            }else{
-                player.Message("Player {0}&S is on world {1}&S:",
-                                target.ClassyName,
-                                target.World.ClassyName);
             }
+            player.Message("Player {0}&S is on world {1}&S:",
+                target.ClassyName,
+                target.World.ClassyName);
 
             Vector3I targetBlockCoords = target.Position.ToBlockCoords();
             player.Message( "{0}{1} - {2}",
@@ -2225,11 +2185,9 @@ THE SOFTWARE.*/
                         sb.Append( "\n&S" );
                     }
 
-                    if( String.IsNullOrEmpty( descriptor.Help ) ) {
-                        sb.Append( "No help is available for this command." );
-                    } else {
-                        sb.Append( descriptor.Help );
-                    }
+                    sb.Append(String.IsNullOrEmpty(descriptor.Help)
+                        ? "No help is available for this command."
+                        : descriptor.Help);
 
                     player.MessagePrefixed( HelpPrefix, sb.ToString() );
 

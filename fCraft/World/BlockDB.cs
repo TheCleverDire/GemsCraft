@@ -104,7 +104,7 @@ namespace fCraft {
         }
 
         private bool ShouldBeAutoEnabled {
-            get { return ( World.BuildSecurity.MinRank <= RankManager.BlockDBAutoEnableRank ); }
+            get { return ( World.BuildSecurity.MinRank <= RankManager.BlockDbAutoEnableRank ); }
         }
 
         /// <summary> Full path to the file where BlockDB data is stored. </summary>

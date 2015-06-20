@@ -366,88 +366,88 @@ If exceeded, oldest logs will be erased first. Set this to 0 to keep all logs.",
 
         #region IRC
 
-        [BoolKey( ConfigSection.IRC, false,
+        [BoolKey( ConfigSection.Irc, false,
 @"GemsCraft includes an IRC (Internet Relay Chat) client for
 relaying messages to and from any IRC network.
 Note that encrypted IRC (via SSL) is not supported." )]
         IRCBotEnabled,
 
-        [StringKey( ConfigSection.IRC, "MinecraftBot",
+        [StringKey( ConfigSection.Irc, "MinecraftBot",
 @"IRC bot's nickname. If the nickname is taken, 800Craft will append
 an underscore (_) to the name and retry.",
             MinLength = 1, MaxLength = 32 )]
         IRCBotNick,
 
-        [StringKey( ConfigSection.IRC, "irc.esper.net",
+        [StringKey( ConfigSection.Irc, "irc.esper.net",
 @"Host or address of the IRC network." )]
         IRCBotNetwork,
 
-        [StringKey(ConfigSection.IRC, "defaultPass",
+        [StringKey(ConfigSection.Irc, "defaultPass",
 @"Optional, password of the IRC network.")]
         IRCBotNetworkPass,
 
-        [IntKey( ConfigSection.IRC, 6667,
+        [IntKey( ConfigSection.Irc, 6667,
 @"Port number of the IRC network. Most networks use port 6667.",
             MinValue = 1, MaxValue = 65535 )]
         IRCBotPort,
 
-        [StringKey( ConfigSection.IRC, "#changeme",
+        [StringKey( ConfigSection.Irc, "#changeme",
 @"Comma-separated list of channels to join. Channel names should include the hash (#).
 One some IRC networks, channel names are case-sensitive." )]
         IRCBotChannels,
 
-        [BoolKey( ConfigSection.IRC, false,
+        [BoolKey( ConfigSection.Irc, false,
 @"If checked, all chat messages on IRC are shown in the game.
 Otherwise, only IRC messages starting with a hash (#) will be relayed." )]
         IRCBotForwardFromServer,
 
-        [BoolKey( ConfigSection.IRC, false,
+        [BoolKey( ConfigSection.Irc, false,
 @"If checked, all chat messages from the server are shown on IRC.
 Otherwise, only chat messages starting with a hash (#) will be relayed." )]
         IRCBotForwardFromIRC,
 
-        [BoolKey( ConfigSection.IRC, false,
+        [BoolKey( ConfigSection.Irc, false,
 @"Show a message on IRC when someone joins or leaves the Minecraft server." )]
         IRCBotAnnounceServerJoins,
 
-        [BoolKey( ConfigSection.IRC, false,
+        [BoolKey( ConfigSection.Irc, false,
 @"Show a message in-game when someone joins or leaves the IRC channel." )]
         IRCBotAnnounceIRCJoins,
 
-        [BoolKey( ConfigSection.IRC, true,
+        [BoolKey( ConfigSection.Irc, true,
 @"Announce server events (kicks, bans, promotions, demotions) on IRC." )]
         IRCBotAnnounceServerEvents,
 
-        [BoolKey( ConfigSection.IRC, false,
+        [BoolKey( ConfigSection.Irc, false,
 @"Check this if bot's nickname is registered
 or requires identification/authentication." )]
         IRCRegisteredNick,
 
-        [StringKey( ConfigSection.IRC, "NickServ",
+        [StringKey( ConfigSection.Irc, "NickServ",
 @"Name of the nickname registration service bot
 (""Q"" on QuakeNet, ""NickServ"" on most others).",
             MinLength = 1, MaxLength = 32 )]
         IRCNickServ,
 
-        [StringKey( ConfigSection.IRC, "IDENTIFY passwordGoesHere",
+        [StringKey( ConfigSection.Irc, "IDENTIFY passwordGoesHere",
 @"Message to send to nickname registration service bot." )]
         IRCNickServMessage,
 
-        [ColorKey( ConfigSection.IRC, Color.IRCDefault,
+        [ColorKey( ConfigSection.Irc, Color.IRCDefault,
 @"Color of IRC messages and event announcements, as seen on the server/in-game." )]
         IRCMessageColor,
 
-        [BoolKey( ConfigSection.IRC, true,
+        [BoolKey( ConfigSection.Irc, true,
 @"Whether the bots should use colors and formatting on IRC." )]
         IRCUseColor,
 
-        [IntKey( ConfigSection.IRC, 750,
+        [IntKey( ConfigSection.Irc, 750,
 @"Minimum delay (in milliseconds) between IRC messages. Many networks
 have strict message rate limits, so a delay of at least 500ms is recommended.",
             MinValue = 0, MaxValue = 10000 )]
         IRCDelay,
 
-        [IntKey( ConfigSection.IRC, 1,
+        [IntKey( ConfigSection.Irc, 1,
 @"Number of IRC bots to operate simultaneously.
 Using multiple bots helps bypass message rate limits on some servers.
 Note that some networks frown upon having multiple connections from one IP.
@@ -456,7 +456,7 @@ with IRC bots falling behind on messages.",
             MinValue = 1, MaxValue=3 )]
         IRCThreads,
 
-        [StringKey(ConfigSection.IRC, "password",
+        [StringKey(ConfigSection.Irc, "password",
 @"Optional, used to connect to password-protected channels.")]
         IRCChannelPassword,
 
@@ -610,7 +610,14 @@ but will reduce bandwidth use." )]
 
         [BoolKey(ConfigSection.Advanced, true,
             @"If Red Wool is allowed for Dragon")]
-        DragonRed
+        DragonRed,
+        #endregion
+
+        #region CPE
+
+        [BoolKey(ConfigSection.Cpe, true,
+            @"If server has ClickDistance enabled or not")]
+        ClickDistanceEnabled
         #endregion
     }
 }

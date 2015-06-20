@@ -486,13 +486,13 @@ THE SOFTWARE.*/
                 player.Message("This command can only be used on ClassiCube server!");
                 return;
             }
-            string targetName = cmd.Next();
-            if (String.IsNullOrEmpty(targetName))
+            var targetName = cmd.Next();
+            if (string.IsNullOrEmpty(targetName))
             {
                 CdSetClickDistance.PrintUsage(player);
                 return;
             }
-            Player target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
+            var target = Server.FindPlayerOrPrintMatches(player, targetName, false, true);
             if (target == null)
             {
                 player.MessageNoPlayer(targetName);
@@ -501,8 +501,14 @@ THE SOFTWARE.*/
             if (!target.usesCPE)
             {
                 player.Message("You can only use /SetClickDistance on ClassiCube players!");
+                return;
             }
-            string number = cmd.Next();
+            if (!ConfigKey.ClickDistanceEnabled.Enabled())
+            {
+                player.Message("&4That CPE Extension is not enabled on this server.");
+                return;
+            }
+            var number = cmd.Next();
             if (number == "normal")
             {
                 target.Send(PacketWriter.MakeSetClickDistance(160));
@@ -511,7 +517,7 @@ THE SOFTWARE.*/
                 return;
             }
             int distance;
-            if (String.IsNullOrEmpty(number) || !Int32.TryParse(number, out distance))
+            if (string.IsNullOrEmpty(number) || !int.TryParse(number, out distance))
             {
                 CdSetClickDistance.PrintUsage(player);
                 return;
@@ -853,7 +859,7 @@ THE SOFTWARE.*/
             }
         }
         
-        static CommandDescriptor CdBanGrief = new CommandDescriptor
+        static readonly CommandDescriptor CdBanGrief = new CommandDescriptor
         {
             Name = "BanGrief",
             Category = CommandCategory.Moderation,
@@ -911,7 +917,6 @@ THE SOFTWARE.*/
         {
             string targetName = cmd.Next();
             string amount = cmd.Next();
-            int amountnum;
             //lotsa idiot proofing in this one ^.^
 
             if (targetName == null)
@@ -930,46 +935,42 @@ THE SOFTWARE.*/
             {
                 return;
             }
-            else
+            int amountnum;
+            if (!int.TryParse(amount, out amountnum))
             {
-                if (!int.TryParse(amount, out amountnum))
-                {
-                    player.Message("&eThe amount must be a positive whole number!");
-                    return;
-                }
-                if (amountnum < 1)
-                {
-                    player.Message("&eThe amount must be a positive whole number!");
-                    return;
-                }
+                player.Message("&eThe amount must be a positive whole number!");
+                return;
+            }
+            if (amountnum < 1)
+            {
+                player.Message("&eThe amount must be a positive whole number!");
+                return;
+            }
 
-                if (cmd.IsConfirmed)
+            if (cmd.IsConfirmed)
+            {
+                if (amountnum > player.Info.Money)
                 {
-                    if (amountnum > player.Info.Money)
-                    {
-                        player.Message("You don't have that many bits!");
-                        return;
-                    }
-                    else
-                    {
-                        //show him da monai
-                        int pNewMoney = player.Info.Money - amountnum;
-                        int tNewMoney = target.Info.Money + amountnum;
-                        player.Message("&eYou have paid &C{1}&e to {0}&e.", target.ClassyName, amountnum);
-                        target.Message("&e{0} &ehas paid you {1} &ebit(s).", player.ClassyName, amountnum);
-                        Server.Players.Except(target).Except(player).Message("&e{0} &ewas paid {1} &ebit(s) from {2}&e.", target.ClassyName, amountnum, player.ClassyName);
-                        player.Info.Money = pNewMoney;
-                        target.Info.Money = tNewMoney;
-                        return;
-                    }
+                    player.Message("You don't have that many bits!");
+                    return;
                 }
                 else
                 {
-                    player.Confirm(cmd, "&eAre you sure you want to pay {0}&e {1} &ebits?", target.ClassyName, amountnum);
+                    //show him da monai
+                    int pNewMoney = player.Info.Money - amountnum;
+                    int tNewMoney = target.Info.Money + amountnum;
+                    player.Message("&eYou have paid &C{1}&e to {0}&e.", target.ClassyName, amountnum);
+                    target.Message("&e{0} &ehas paid you {1} &ebit(s).", player.ClassyName, amountnum);
+                    Server.Players.Except(target).Except(player).Message("&e{0} &ewas paid {1} &ebit(s) from {2}&e.", target.ClassyName, amountnum, player.ClassyName);
+                    player.Info.Money = pNewMoney;
+                    target.Info.Money = tNewMoney;
                     return;
                 }
-
-
+            }
+            else
+            {
+                player.Confirm(cmd, "&eAre you sure you want to pay {0}&e {1} &ebits?", target.ClassyName, amountnum);
+                return;
             }
         }
 

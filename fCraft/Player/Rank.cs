@@ -105,13 +105,13 @@ namespace fCraft {
             // ID
             attr = el.Attribute( "id" );
             if( attr == null ) {
-                ID = RankManager.GenerateID();
+                ID = RankManager.GenerateId();
                 Logger.Log( LogType.Warning,
                             "Rank({0}): No ID specified; issued a new unique ID: {1}",
                             Name, ID );
 
             } else if( !IsValidID( attr.Value.Trim() ) ) {
-                ID = RankManager.GenerateID();
+                ID = RankManager.GenerateId();
                 Logger.Log( LogType.Warning,
                             "Rank({0}): Invalid ID specified (must be alphanumeric, and exactly 16 characters long); issued a new unique ID: {1}",
                             Name, ID );

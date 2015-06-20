@@ -54,7 +54,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>UpdateBuilder2.ico</ApplicationIcon>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -103,7 +103,14 @@
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="icon.ico" />
     <Content Include="UpdateBuilder2.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\fCraft\fCraft.csproj">
+      <Project>{7fbe7809-6f77-415c-abeb-a3f627e817b0}</Project>
+      <Name>fCraft</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

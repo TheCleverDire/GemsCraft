@@ -56,7 +56,7 @@ namespace fCraft.ServerCLI
                 Server.InitLibrary(args);
                 _useColor = !Server.HasArg(ArgKey.NoConsoleColor);
 
-                Server.InitServer();
+                Server.InitServer(true); // true for being Cli
 
                 if (ConfigKey.CheckForUpdates.GetString() == "True")
                 {
@@ -84,7 +84,7 @@ namespace fCraft.ServerCLI
                     while (!Server.IsShuttingDown)
                     {
                         string cmd = Console.ReadLine();
-                        if (cmd.Equals("/Clear", StringComparison.OrdinalIgnoreCase))
+                        if (cmd != null && cmd.Equals("/Clear", StringComparison.OrdinalIgnoreCase))
                         {
                             Console.Clear();
                         }
@@ -228,7 +228,7 @@ namespace fCraft.ServerCLI
                             try
                             {
                                 //download new zip in current directory
-                                Process.Start("http://gemscraft.net/Version/" + Updater.LatestStable + ".zip");
+                                Process.Start("http://gemscraft.net/Version/" + Updater.GetCurrentOnline() + ".zip");
                                 Console.WriteLine(
                                     "Downloading the latest GemsCraft Version. Please replace all the files (not folders) in your current folder with the new ones after shutting down.");
                             }

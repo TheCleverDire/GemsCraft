@@ -2,6 +2,7 @@
 // Website: zipstorer.codeplex.com
 // Version: 2.35 (March 14, 2010)
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace System.IO.Compression {
@@ -387,13 +388,12 @@ namespace System.IO.Compression {
             string tempEntryName = Path.GetTempFileName();
 
             try {
-                ZipStorer tempZip = Create( tempZipName, string.Empty );
+                var tempZip = Create( tempZipName, string.Empty );
 
-                foreach( ZipFileEntry zfe in fullList ) {
-                    if( !zfes.Contains( zfe ) ) {
-                        if( zip.ExtractFile( zfe, tempEntryName ) ) {
-                            tempZip.AddFile( zfe.Method, tempEntryName, zfe.FilenameInZip, zfe.Comment );
-                        }
+                foreach (ZipFileEntry zfe in fullList.Where(zfe => !zfes.Contains( zfe )))
+                {
+                    if( zip.ExtractFile( zfe, tempEntryName ) ) {
+                        tempZip.AddFile( zfe.Method, tempEntryName, zfe.FilenameInZip, zfe.Comment );
                     }
                 }
                 zip.Close();

@@ -177,43 +177,43 @@ The option to show prefixes in chat is on ""General"" tab.";
 
 
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.Kick],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.Kick],
 @"Limit on who can be kicked by players of this rank.
 By default, players can only kick players of same or lower rank.");
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.Ban],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.Ban],
 @"Limit on who can be banned by players of this rank.
 By default, players can only ban players of same or lower rank.");
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.Promote],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.Promote],
 @"Limit on how much can players of this rank promote others.
 By default, players can only promote up to the same or lower rank.");
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.Demote],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.Demote],
 @"Limit on whom players of this rank can demote.
 By default, players can only demote players of same or lower rank.");
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.Hide],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.Hide],
 @"Limit on whom can players of this rank hide from.
 By default, players can only hide from players of same or lower rank.");
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.Freeze],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.Freeze],
 @"Limit on who can be frozen by players of this rank.
 By default, players can only freeze players of same or lower rank.");
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.Mute],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.Mute],
 @"Limit on who can be muted by players of this rank.
 By default, players can only mute players of same or lower rank.");
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.Bring],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.Bring],
 @"Limit on who can be brought (forcibly teleported) by players of this rank.
 By default, players can only bring players of same or lower rank.");
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.Spectate],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.Spectate],
 @"Limit on who can be spectated by players of this rank.
 By default, players can only bring players of same or lower rank.");
 
-            toolTip.SetToolTip(permissionLimitBoxes[Permission.UndoOthersActions],
+            toolTip.SetToolTip(_permissionLimitBoxes[Permission.UndoOthersActions],
 @"Limit on whose actions players of this rank can undo.
 By default, players can only undo actions of players of same or lower rank.");
 

@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <ProjectGuid>{BFEA07D7-7813-4AA4-BE4F-990F6DCBB5EA}</ProjectGuid>
+    <ProjectGuid>{1A6CE637-BBAD-4DB5-B19B-59625D632E44}</ProjectGuid>
     <SchemaVersion>2</SchemaVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -35,9 +35,10 @@
     <DebugType>full</DebugType>
     <ErrorReport>prompt</ErrorReport>
     <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DebugSymbols>false</DebugSymbols>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
@@ -45,9 +46,13 @@
     <DebugType>pdbonly</DebugType>
     <ErrorReport>prompt</ErrorReport>
     <PlatformTarget>x86</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>LegendCraftLogoIcon.ico</ApplicationIcon>
+    <ApplicationIcon>icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>fCraft.HeartbeatSaver.HeartbeatSaver</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="ServiceStack.Text">
@@ -90,10 +95,18 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="icon.ico" />
     <Content Include="LegendCraftLogoIcon.ico" />
+    <Content Include="web_hi_res_512.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\GemsCraft Beta\fCraft\fCraft.csproj">
+      <Project>{7fbe7809-6f77-415c-abeb-a3f627e817b0}</Project>
+      <Name>fCraft</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

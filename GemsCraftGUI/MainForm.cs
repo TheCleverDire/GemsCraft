@@ -8,149 +8,47 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Speech.Recognition;
+using System.Speech.Synthesis;
 using System.Threading;
 using System.Windows.Forms;
-using System.Windows.Forms.VisualStyles;
 using fCraft;
 using fCraft.ConfigGUI;
 using fCraft.Events;
 using fCraft.GUI;
 using fCraft.ServerGUI;
 using GemsCraftGUI.ConfigGUI;
+using GemsCraftGUI.Properties;
+using GemsCraftGUI.ServerGUI;
 using JetBrains.Annotations;
-using Color = fCraft.Color;
+using Color = System.Drawing.Color;
 
 namespace GemsCraftGUI
 {
     public sealed partial class MainForm : Form
     {
-        static MainForm instance;
-        readonly Font bold;
-        Rank selectedRank;
-        readonly UpdaterSettingsPopup updaterWindow = new UpdaterSettingsPopup();
+        static MainForm _instance;
+        readonly Font _bold;
+        Rank _selectedRank;
+        readonly UpdaterSettingsPopup _updaterWindow = new UpdaterSettingsPopup();
         internal static readonly SortableBindingList<WorldListEntry> Worlds = new SortableBindingList<WorldListEntry>();
 
         #region Initialization
 
         public MainForm()
         {
-            instance = this;
+            _instance = this;
             InitializeComponent();
             ConfigEventHandlers();
             dgvcBlockDB.TrueValue = YesNoAuto.Yes;
             dgvcBlockDB.FalseValue = YesNoAuto.No;
             dgvcBlockDB.IndeterminateValue = YesNoAuto.Auto;
-            bold = new Font(Font, FontStyle.Bold);
+            _bold = new Font(Font, FontStyle.Bold);
             Shown += Init;
-            Text = "GemsCraft Configuration " + fCraft.Updater.LatestStable;
+            Text = "GemsCraft Configuration " + Updater.LatestStable;
         }
 
-        //DO NOT MODIFY THE HANDLERS REGION!
-        //YOU COULD POTENTIALLY MESS UP THE PROGRAM IF MODIFED AND NOT NOTICED
-        #region Handlers
-        //Fixes all event handlers that were lost on the GUI switch
-        void ConfigEventHandlers()
-        {
-            //All the Config Handlers
-            this.HeartBeatUrlComboBox.SelectedIndexChanged += new System.EventHandler(this.HeartBeatUrlComboBox_SelectedIndexChanged);
-            this.nMaxPlayersPerWorld.Validating += new System.ComponentModel.CancelEventHandler(this.nMaxPlayerPerWorld_Validating);
-            this.cDefaultRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultRank_SelectedIndexChanged);
-            this.bMeasure.Click += new System.EventHandler(this.bMeasure_Click);
-            this.nMaxPlayers.ValueChanged += new System.EventHandler(this.nMaxPlayers_ValueChanged);
-            this.bChangelog.Click += new System.EventHandler(this.bChangelog_Click);
-            this.bCredits.Click += new System.EventHandler(this.bCredits_Click);
-            this.bReadme.Click += new System.EventHandler(this.bReadme_Click);
-            this.bGreeting.Click += new System.EventHandler(this.bGreeting_Click);
-            this.xAnnouncements.CheckedChanged += new System.EventHandler(this.xAnnouncements_CheckedChanged);
-            this.bRules.Click += new System.EventHandler(this.bRules_Click);
-            this.bAnnouncements.Click += new System.EventHandler(this.bAnnouncements_Click);
-            this.xRankPrefixesInChat.CheckedChanged += new System.EventHandler(this.xRankPrefixesInChat_CheckedChanged);
-            this.bColorMe.Click += new System.EventHandler(this.bColorMe_Click);
-            this.bColorWarning.Click += new System.EventHandler(this.bColorWarning_Click);
-            this.bColorSys.Click += new System.EventHandler(this.bColorSys_Click);
-            this.bColorPM.Click += new System.EventHandler(this.bColorPM_Click);
-            this.bColorAnnouncement.Click += new System.EventHandler(this.bColorAnnouncement_Click);
-            this.bColorHelp.Click += new System.EventHandler(this.bColorHelp_Click);
-            this.bColorSay.Click += new System.EventHandler(this.bColorSay_Click);
-            this.bMapPath.Click += new System.EventHandler(this.bMapPath_Click);
-            this.xMapPath.CheckedChanged += new System.EventHandler(this.xMapPath_CheckedChanged);
-            this.cDefaultBuildRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultBuildRank_SelectedIndexChanged);
-            this.bWorldEdit.Click += new System.EventHandler(this.bWorldEdit_Click);
-            this.bAddWorld.Click += new System.EventHandler(this.bAddWorld_Click);
-            this.bWorldDelete.Click += new System.EventHandler(this.bWorldDel_Click);
-            this.dgvWorlds.SelectionChanged += new System.EventHandler(this.dgvWorlds_Click);
-            this.dgvWorlds.Click += new System.EventHandler(this.dgvWorlds_Click);
-            this.bLowerRank.Click += new System.EventHandler(this.bLowerRank_Click);
-            this.bRaiseRank.Click += new System.EventHandler(this.bRaiseRank_Click);
-            this.nFillLimit.ValueChanged += new System.EventHandler(this.nFillLimit_ValueChanged);
-            this.nCopyPasteSlots.ValueChanged += new System.EventHandler(this.nCopyPasteSlots_ValueChanged);
-            this.xAllowSecurityCircumvention.CheckedChanged += new System.EventHandler(this.xAllowSecurityCircumvention_CheckedChanged);
-            this.nAntiGriefSeconds.ValueChanged += new System.EventHandler(this.nAntiGriefSeconds_ValueChanged);
-            this.bColorRank.Click += new System.EventHandler(this.bColorRank_Click);
-            this.xDrawLimit.CheckedChanged += new System.EventHandler(this.xDrawLimit_CheckedChanged);
-            this.nDrawLimit.ValueChanged += new System.EventHandler(this.nDrawLimit_ValueChanged);
-            this.nKickIdle.ValueChanged += new System.EventHandler(this.nKickIdle_ValueChanged);
-            this.xAntiGrief.CheckedChanged += new System.EventHandler(this.xAntiGrief_CheckedChanged);
-            this.xKickIdle.CheckedChanged += new System.EventHandler(this.xKickIdle_CheckedChanged);
-            this.nAntiGriefBlocks.ValueChanged += new System.EventHandler(this.nAntiGriefBlocks_ValueChanged);
-            this.xReserveSlot.CheckedChanged += new System.EventHandler(this.xReserveSlot_CheckedChanged);
-            this.tPrefix.Validating += new System.ComponentModel.CancelEventHandler(this.tPrefix_Validating);
-            this.tRankName.Validating += new System.ComponentModel.CancelEventHandler(this.tRankName_Validating);
-            this.bDeleteRank.Click += new System.EventHandler(this.bDeleteRank_Click);
-            this.vPermissions.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.vPermissions_ItemChecked);
-            this.bAddRank.Click += new System.EventHandler(this.bAddRank_Click);
-            this.vRanks.SelectedIndexChanged += new System.EventHandler(this.vRanks_SelectedIndexChanged);
-            this.cBlockDBAutoEnableRank.SelectedIndexChanged += new System.EventHandler(this.cBlockDBAutoEnableRank_SelectedIndexChanged);
-            this.xBlockDBAutoEnable.CheckedChanged += new System.EventHandler(this.xBlockDBAutoEnable_CheckedChanged);
-            this.xBlockDBEnabled.CheckedChanged += new System.EventHandler(this.xBlockDBEnabled_CheckedChanged);
-            this.cPatrolledRank.SelectedIndexChanged += new System.EventHandler(this.cPatrolledRank_SelectedIndexChanged);
-            this.xAnnounceRankChanges.CheckedChanged += new System.EventHandler(this.xAnnounceRankChanges_CheckedChanged);
-            this.xAntispamKicks.CheckedChanged += new System.EventHandler(this.xSpamChatKick_CheckedChanged);
-            this.xMaxConnectionsPerIP.CheckedChanged += new System.EventHandler(this.xMaxConnectionsPerIP_CheckedChanged);
-            this.cVerifyNames.SelectedIndexChanged += new System.EventHandler(this.cVerifyNames_SelectedIndexChanged);
-            this.bUpdate.Click += new System.EventHandler(this.bUpdate_Click);
-            this.xSaveInterval.CheckedChanged += new System.EventHandler(this.xSaveAtInterval_CheckedChanged);
-            this.xMaxBackupSize.CheckedChanged += new System.EventHandler(this.xMaxBackupSize_CheckedChanged);
-            this.xMaxBackups.CheckedChanged += new System.EventHandler(this.xMaxBackups_CheckedChanged);
-            this.xBackupInterval.CheckedChanged += new System.EventHandler(this.xBackupAtInterval_CheckedChanged);
-            this.xLogLimit.CheckedChanged += new System.EventHandler(this.xLogLimit_CheckedChanged);
-            this.vLogFileOptions.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.vLogFileOptions_ItemChecked);
-            this.vConsoleOptions.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.vConsoleOptions_ItemChecked);
-            this.xServPass.CheckedChanged += new System.EventHandler(this.xServPass_CheckedChanged);
-            this.xChanPass.CheckedChanged += new System.EventHandler(this.xChanPass_CheckedChanged);
-            this.xIRCListShowNonEnglish.CheckedChanged += new System.EventHandler(this.xIRCListShowNonEnglish_CheckedChanged);
-            this.bColorIRC.Click += new System.EventHandler(this.bColorIRC_Click);
-            this.xIRCRegisteredNick.CheckedChanged += new System.EventHandler(this.xIRCRegisteredNick_CheckedChanged);
-            this.xIRCBotEnabled.CheckedChanged += new System.EventHandler(this.xIRC_CheckedChanged);
-            this.cIRCList.SelectedIndexChanged += new System.EventHandler(this.cIRCList_SelectedIndexChanged);
-            this.nMaxUndoStates.ValueChanged += new System.EventHandler(this.nMaxUndo_ValueChanged);
-            this.tIP.Validating += new System.ComponentModel.CancelEventHandler(this.tIP_Validating);
-            this.xIP.CheckedChanged += new System.EventHandler(this.xIP_CheckedChanged);
-            this.nMaxUndo.ValueChanged += new System.EventHandler(this.nMaxUndo_ValueChanged);
-            this.xMaxUndo.CheckedChanged += new System.EventHandler(this.xMaxUndo_CheckedChanged);
-            this.websiteURL.TextChanged += new System.EventHandler(this.websiteURL_TextChanged);
-            this.ReqsEditor.Click += new System.EventHandler(this.ReqsEditor_Click);
-            this.SwearEditor.Click += new System.EventHandler(this.SwearEditor_Click);
-            this.CustomColor.Click += new System.EventHandler(this.button1_Click);
-            this.CustomText.Click += new System.EventHandler(this.label1_Click);
-            this.bOK.Click += new System.EventHandler(this.bSave_Click);
-            this.bCancel.Click += new System.EventHandler(this.bCancel_Click);
-            this.bResetTab.Click += new System.EventHandler(this.bResetTab_Click);
-            this.bResetAll.Click += new System.EventHandler(this.bResetAll_Click);
-            this.bApply.Click += new System.EventHandler(this.bApply_Click);
-            this.bColorGlobal.Click += new System.EventHandler(this.bColorGlobal_Click);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigUI_FormClosing);
-            this.Load += new System.EventHandler(this.MainForm_Load);
-        }
-
-        void StartServerHandlers()
-        {
-            //Server Handlers
-            this.bPlay.Click += new System.EventHandler(this.bPlay_Click);
-            this.logBox.TextChanged += new System.EventHandler(this.logBox_TextChanged);
-            this.bVoice.Click += new System.EventHandler(this.bVoice_Click);
-        }
-        #endregion
+       
 
         #region Server
 
@@ -174,7 +72,7 @@ namespace GemsCraftGUI
             FillToolTipsIRC();
             FillToolTipsAdvanced();
 
-            FillIRCNetworkList(false);
+            FillIrcNetworkList(false);
 
             // Initialize fCraft's args, paths, and logging backend.
             Server.InitLibrary(Environment.GetCommandLineArgs());
@@ -196,16 +94,15 @@ namespace GemsCraftGUI
 
         void FillEnumLists()
         {
-            foreach (Permission permission in Enum.GetValues(typeof(Permission)))
+            foreach (var item in from Permission permission in 
+                                     Enum.GetValues(typeof(Permission)) 
+                                 select new ListViewItem(permission.ToString()) { Tag = permission })
             {
-                ListViewItem item = new ListViewItem(permission.ToString()) { Tag = permission };
                 vPermissions.Items.Add(item);
             }
 
-            foreach (LogType type in Enum.GetValues(typeof(LogType)))
+            foreach (var item in from LogType type in Enum.GetValues(typeof(LogType)) where type != LogType.Trace select new ListViewItem(type.ToString()) { Tag = type })
             {
-                if (type == LogType.Trace) continue;
-                ListViewItem item = new ListViewItem(type.ToString()) { Tag = type };
                 vLogFileOptions.Items.Add(item);
                 vConsoleOptions.Items.Add((ListViewItem)item.Clone());
             }
@@ -215,7 +112,7 @@ namespace GemsCraftGUI
         void FillWorldList()
         {
             cMainWorld.Items.Clear();
-            foreach (WorldListEntry world in Worlds)
+            foreach (var world in Worlds)
             {
                 cMainWorld.Items.Add(world.Name);
             }
@@ -235,7 +132,7 @@ namespace GemsCraftGUI
 
         private void bAnnouncements_Click(object sender, EventArgs e)
         {
-            TextEditorPopup popup = new TextEditorPopup(Paths.AnnouncementsFileName, "");
+            var popup = new TextEditorPopup(Paths.AnnouncementsFileName, "");
             popup.ShowDialog();
         }
 
@@ -247,14 +144,14 @@ namespace GemsCraftGUI
 
         private void tIP_Validating(object sender, CancelEventArgs e)
         {
-            IPAddress IP;
-            if (Server.IsIP(tIP.Text) && IPAddress.TryParse(tIP.Text, out IP))
+            IPAddress ip;
+            if (Server.IsIP(tIP.Text) && IPAddress.TryParse(tIP.Text, out ip))
             {
                 tIP.ForeColor = SystemColors.ControlText;
             }
             else
             {
-                tIP.ForeColor = System.Drawing.Color.Red;
+                tIP.ForeColor = Color.Red;
                 e.Cancel = true;
             }
         }
@@ -266,29 +163,13 @@ namespace GemsCraftGUI
 
         private void bGreeting_Click(object sender, EventArgs e)
         {
-            TextEditorPopup popup = new TextEditorPopup(Paths.GreetingFileName,
+            var popup = new TextEditorPopup(Paths.GreetingFileName,
 @"Welcome to {SERVER_NAME}
 Your rank is {RANK}&S. Type &H/Help&S for help.");
             popup.ShowDialog();
         }
 
-        private void bShowAdvancedUpdaterSettings_Click(object sender, EventArgs e)
-        {
-            updaterWindow.ShowDialog();
-
-        }
-
-
-        private void bOpenWiki_Click(object sender, EventArgs e)
-        {
-            Process.Start("http://www.minecraftwiki.net/wiki/Custom_servers/800Craft");
-        }
-
-        private void bReportABug_Click(object sender, EventArgs e)
-        {
-            Process.Start("http://gemscraft.net/report.html");
-        }
-
+        
         private void nMaxPlayerPerWorld_Validating(object sender, CancelEventArgs e)
         {
             CheckMaxPlayersPerWorldValue();
@@ -466,26 +347,12 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void vConsoleOptions_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            if (e.Item.Checked)
-            {
-                e.Item.Font = bold;
-            }
-            else
-            {
-                e.Item.Font = vConsoleOptions.Font;
-            }
+            e.Item.Font = e.Item.Checked ? _bold : vConsoleOptions.Font;
         }
 
         private void vLogFileOptions_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
-            if (e.Item.Checked)
-            {
-                e.Item.Font = bold;
-            }
-            else
-            {
-                e.Item.Font = vLogFileOptions.Font;
-            }
+            e.Item.Font = e.Item.Checked ? _bold : vLogFileOptions.Font;
         }
 
         private void xLogLimit_CheckedChanged(object sender, EventArgs e)
@@ -533,20 +400,15 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         }
 
 
-        struct IRCNetwork
+        struct IrcNetwork
         {
-            const int DefaultIRCPort = 6667;
+            const int DefaultIrcPort = 6667;
 
             public readonly string Name, Host;
             public readonly int Port;
             public readonly bool IsNonEnglish;
 
-            public IRCNetwork(string name, string host)
-                : this(name, host, DefaultIRCPort, false)
-            {
-            }
-
-            public IRCNetwork(string name, string host, int port, bool isNonEnglish)
+            public IrcNetwork(string name, string host, int port = DefaultIrcPort, bool isNonEnglish = false)
             {
                 Name = name;
                 Host = host;
@@ -555,112 +417,109 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             }
         }
 
-        static readonly IRCNetwork[] IRCNetworks = new[]{
-            new IRCNetwork("FreeNode", "chat.freenode.net"),
-            new IRCNetwork("QuakeNet", "irc.quakenet.org"),
-            new IRCNetwork("IRCnet", "irc.belwue.de"),
-            new IRCNetwork("Undernet", "irc.undernet.org"),
-            new IRCNetwork("EFNet", "irc.servercentral.net"),
-            new IRCNetwork("Ustream", "c.ustream.tv"),
-            new IRCNetwork("WebChat", "irc.webchat.org"),
-            new IRCNetwork("DALnet", "irc.dal.net"),
-            new IRCNetwork("Rizon","irc.rizon.net"),
-            new IRCNetwork("IRC-Hispano [ES]", "irc.irc-hispano.org", 6667, true),
-            new IRCNetwork("FCirc", "irc.friend.td.nu"),
-            new IRCNetwork("GameSurge", "irc.gamesurge.net"),
-            new IRCNetwork("LinkNet", "irc.link-net.org"),
-            new IRCNetwork("OltreIrc [IT]", "irc.oltreirc.net", 6667,true),
-            new IRCNetwork("AllNetwork", "irc.allnetwork.org"),
-            new IRCNetwork("SwiftIRC", "irc.swiftirc.net"),
-            new IRCNetwork("OpenJoke", "irc.openjoke.org"),
-            new IRCNetwork("Abjects", "irc.abjects.net"),
-            new IRCNetwork("OFTC", "irc.oftc.net"),
-            new IRCNetwork("ChatZona [ES]", "irc.chatzona.org", 6667, true ),
-            new IRCNetwork("synIRC", "irc.synirc.net"),
-            new IRCNetwork("OnlineGamesNet", "irc.OnlineGamesNet.net"),
-            new IRCNetwork("DarkSin [IT]", "irc.darksin.it", 6667,true),
-            new IRCNetwork("RusNet", "irc.run.net", 6667,true),
-            new IRCNetwork("ExplosionIRC", "irc.explosionirc.net"),
-            new IRCNetwork("IrCQ-Net", "irc.icq.com"),
-            new IRCNetwork("IRCHighWay", "irc.irchighway.net"),
-            new IRCNetwork("EsperNet", "irc.esper.net"),
-            new IRCNetwork("euIRC", "irc.euirc.net"),
-            new IRCNetwork("P2P-NET", "irc.p2p-irc.net"),
-            new IRCNetwork("Mibbit", "irc.mibbit.com"),
-            new IRCNetwork("kiss0fdeath", "irc.kiss0fdeath.net"),
-            new IRCNetwork("P2P-NET.EU", "titan.ca.p2p-net.eu"),
-            new IRCNetwork("2ch [JP]", "irc.2ch.net", 6667,true),
-            new IRCNetwork("SorceryNet", "irc.sorcery.net", 9000,false),
-            new IRCNetwork("FurNet", "irc.furnet.org"),
-            new IRCNetwork("GIMPnet", "irc.gimp.org"),
-            new IRCNetwork("Coldfront", "irc.coldfront.net"),
-            new IRCNetwork("MindForge", "irc.mindforge.org"),
-            new IRCNetwork("Zurna.Net [TR]","irc.zurna.net",6667,true),
-            new IRCNetwork("7-indonesia [ID]", "irc.7-indonesia.org", 6667,true),
-            new IRCNetwork("EpiKnet", "irc.epiknet.org"),
-            new IRCNetwork("EnterTheGame", "irc.enterthegame.com"),
-            new IRCNetwork("DalNet(ru) [RU]", "irc.chatnet.ru", 6667,true),
-            new IRCNetwork("GalaxyNet", "irc.galaxynet.org"),
-            new IRCNetwork("Omerta", "irc.barafranca.com"),
-            new IRCNetwork("SlashNET", "irc.slashnet.org"),
-            new IRCNetwork("DarkMyst", "irc2.darkmyst.org"),
-            new IRCNetwork("iZ-smart.net", "irc.iZ-smart.net"),
-            new IRCNetwork("ItaLiaN-AmiCi [IT]", "irc.italian-amici.com", 6667,true),
-            new IRCNetwork("Aitvaras [LT]", "irc.data.lt", 6667,true),
-            new IRCNetwork("V-IRC [RU]", "irc.v-irc.ru", 6667,true),
-            new IRCNetwork("ByroeNet [ID]", "irc.byroe.net", 6667,true),
-            new IRCNetwork("Azzurra [IT]", "irc.azzurra.org", 6667,true),
-            new IRCNetwork("Europa-IRC.DE [DE]", "irc.europa-irc.de", 6667,true),
-            new IRCNetwork("ByNets [BY]", "irc.bynets.org", 6667,true),
-            new IRCNetwork("GRNet [GR]", "global.irc.gr", 6667,true),
-            new IRCNetwork("OceanIRC", "irc.oceanirc.net"),
-            new IRCNetwork("UniBG [BG]", "irc.ITDNet.net", 6667,true),
-            new IRCNetwork("KampungChat.Org [MY]", "irc.kampungchat.org", 6667,true),
-            new IRCNetwork("WeNet [RU]", "ircworld.ru", 6667,true),
-            new IRCNetwork("Stratics", "irc.stratics.com"),
-            new IRCNetwork("Mozilla", "irc.mozilla.org"),
-            new IRCNetwork("bondage.com", "irc.bondage.com"),
-            new IRCNetwork("ShakeIT [BG]", "irc.index.bg", 6667,true),
-            new IRCNetwork("NetGamers.Org", "firefly.no.eu.netgamers.org"),
-            new IRCNetwork("FroZyn", "irc.Frozyn.us"),
-            new IRCNetwork("PTnet", "irc.ptnet.org"),
-            new IRCNetwork("Recycled-IRC", "yare.recycled-irc.net"),
-            new IRCNetwork("Foonetic", "irc.foonetic.net"),
-            new IRCNetwork("AlphaIRC", "irc.alphairc.com"),
-            new IRCNetwork("KreyNet", "chat.be.krey.net"),
-            new IRCNetwork("GeekShed", "irc.geekshed.net"),
-            new IRCNetwork("VirtuaLife.com.br [BR]", "irc.virtualife.com.br", 6667,true),
-            new IRCNetwork("IRCGate.it [IT]", "marte.ircgate.it", 6667,true),
-            new IRCNetwork("Worldnet", "irc.worldnet.net"),
-            new IRCNetwork("PIK [BA]", "irc.krstarica.com", 6667,true),
-            new IRCNetwork("Friend4ever [IT]", "irc.friend4ever.it", 6667,true),
-            new IRCNetwork("AustNet", "irc.austnet.org"),
-            new IRCNetwork("GamesNET","irc.GamesNET.net")
+        static readonly IrcNetwork[] IrcNetworks = new[]{
+            new IrcNetwork("FreeNode", "chat.freenode.net"),
+            new IrcNetwork("QuakeNet", "irc.quakenet.org"),
+            new IrcNetwork("IRCnet", "irc.belwue.de"),
+            new IrcNetwork("Undernet", "irc.undernet.org"),
+            new IrcNetwork("EFNet", "irc.servercentral.net"),
+            new IrcNetwork("Ustream", "c.ustream.tv"),
+            new IrcNetwork("WebChat", "irc.webchat.org"),
+            new IrcNetwork("DALnet", "irc.dal.net"),
+            new IrcNetwork("Rizon","irc.rizon.net"),
+            new IrcNetwork("IRC-Hispano [ES]", "irc.irc-hispano.org", 6667, true),
+            new IrcNetwork("FCirc", "irc.friend.td.nu"),
+            new IrcNetwork("GameSurge", "irc.gamesurge.net"),
+            new IrcNetwork("LinkNet", "irc.link-net.org"),
+            new IrcNetwork("OltreIrc [IT]", "irc.oltreirc.net", 6667,true),
+            new IrcNetwork("AllNetwork", "irc.allnetwork.org"),
+            new IrcNetwork("SwiftIRC", "irc.swiftirc.net"),
+            new IrcNetwork("OpenJoke", "irc.openjoke.org"),
+            new IrcNetwork("Abjects", "irc.abjects.net"),
+            new IrcNetwork("OFTC", "irc.oftc.net"),
+            new IrcNetwork("ChatZona [ES]", "irc.chatzona.org", 6667, true ),
+            new IrcNetwork("synIRC", "irc.synirc.net"),
+            new IrcNetwork("OnlineGamesNet", "irc.OnlineGamesNet.net"),
+            new IrcNetwork("DarkSin [IT]", "irc.darksin.it", 6667,true),
+            new IrcNetwork("RusNet", "irc.run.net", 6667,true),
+            new IrcNetwork("ExplosionIRC", "irc.explosionirc.net"),
+            new IrcNetwork("IrCQ-Net", "irc.icq.com"),
+            new IrcNetwork("IRCHighWay", "irc.irchighway.net"),
+            new IrcNetwork("EsperNet", "irc.esper.net"),
+            new IrcNetwork("euIRC", "irc.euirc.net"),
+            new IrcNetwork("P2P-NET", "irc.p2p-irc.net"),
+            new IrcNetwork("Mibbit", "irc.mibbit.com"),
+            new IrcNetwork("kiss0fdeath", "irc.kiss0fdeath.net"),
+            new IrcNetwork("P2P-NET.EU", "titan.ca.p2p-net.eu"),
+            new IrcNetwork("2ch [JP]", "irc.2ch.net", 6667,true),
+            new IrcNetwork("SorceryNet", "irc.sorcery.net", 9000),
+            new IrcNetwork("FurNet", "irc.furnet.org"),
+            new IrcNetwork("GIMPnet", "irc.gimp.org"),
+            new IrcNetwork("Coldfront", "irc.coldfront.net"),
+            new IrcNetwork("MindForge", "irc.mindforge.org"),
+            new IrcNetwork("Zurna.Net [TR]","irc.zurna.net",6667,true),
+            new IrcNetwork("7-indonesia [ID]", "irc.7-indonesia.org", 6667,true),
+            new IrcNetwork("EpiKnet", "irc.epiknet.org"),
+            new IrcNetwork("EnterTheGame", "irc.enterthegame.com"),
+            new IrcNetwork("DalNet(ru) [RU]", "irc.chatnet.ru", 6667,true),
+            new IrcNetwork("GalaxyNet", "irc.galaxynet.org"),
+            new IrcNetwork("Omerta", "irc.barafranca.com"),
+            new IrcNetwork("SlashNET", "irc.slashnet.org"),
+            new IrcNetwork("DarkMyst", "irc2.darkmyst.org"),
+            new IrcNetwork("iZ-smart.net", "irc.iZ-smart.net"),
+            new IrcNetwork("ItaLiaN-AmiCi [IT]", "irc.italian-amici.com", 6667,true),
+            new IrcNetwork("Aitvaras [LT]", "irc.data.lt", 6667,true),
+            new IrcNetwork("V-IRC [RU]", "irc.v-irc.ru", 6667,true),
+            new IrcNetwork("ByroeNet [ID]", "irc.byroe.net", 6667,true),
+            new IrcNetwork("Azzurra [IT]", "irc.azzurra.org", 6667,true),
+            new IrcNetwork("Europa-IRC.DE [DE]", "irc.europa-irc.de", 6667,true),
+            new IrcNetwork("ByNets [BY]", "irc.bynets.org", 6667,true),
+            new IrcNetwork("GRNet [GR]", "global.irc.gr", 6667,true),
+            new IrcNetwork("OceanIRC", "irc.oceanirc.net"),
+            new IrcNetwork("UniBG [BG]", "irc.ITDNet.net", 6667,true),
+            new IrcNetwork("KampungChat.Org [MY]", "irc.kampungchat.org", 6667,true),
+            new IrcNetwork("WeNet [RU]", "ircworld.ru", 6667,true),
+            new IrcNetwork("Stratics", "irc.stratics.com"),
+            new IrcNetwork("Mozilla", "irc.mozilla.org"),
+            new IrcNetwork("bondage.com", "irc.bondage.com"),
+            new IrcNetwork("ShakeIT [BG]", "irc.index.bg", 6667,true),
+            new IrcNetwork("NetGamers.Org", "firefly.no.eu.netgamers.org"),
+            new IrcNetwork("FroZyn", "irc.Frozyn.us"),
+            new IrcNetwork("PTnet", "irc.ptnet.org"),
+            new IrcNetwork("Recycled-IRC", "yare.recycled-irc.net"),
+            new IrcNetwork("Foonetic", "irc.foonetic.net"),
+            new IrcNetwork("AlphaIRC", "irc.alphairc.com"),
+            new IrcNetwork("KreyNet", "chat.be.krey.net"),
+            new IrcNetwork("GeekShed", "irc.geekshed.net"),
+            new IrcNetwork("VirtuaLife.com.br [BR]", "irc.virtualife.com.br", 6667,true),
+            new IrcNetwork("IRCGate.it [IT]", "marte.ircgate.it", 6667,true),
+            new IrcNetwork("Worldnet", "irc.worldnet.net"),
+            new IrcNetwork("PIK [BA]", "irc.krstarica.com", 6667,true),
+            new IrcNetwork("Friend4ever [IT]", "irc.friend4ever.it", 6667,true),
+            new IrcNetwork("AustNet", "irc.austnet.org"),
+            new IrcNetwork("GamesNET","irc.GamesNET.net")
         }.OrderBy(network => network.Name).ToArray();
 
         private void cIRCList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (cIRCList.SelectedIndex < 0) return;
-            string selectedNetwork = (string)cIRCList.Items[cIRCList.SelectedIndex];
-            IRCNetwork network = IRCNetworks.First(n => (n.Name == selectedNetwork));
+            var selectedNetwork = (string)cIRCList.Items[cIRCList.SelectedIndex];
+            var network = IrcNetworks.First(n => (n.Name == selectedNetwork));
             tIRCBotNetwork.Text = network.Host;
             nIRCBotPort.Value = network.Port;
         }
 
         private void xIRCListShowNonEnglish_CheckedChanged(object sender, EventArgs e)
         {
-            FillIRCNetworkList(xIRCListShowNonEnglish.Checked);
+            FillIrcNetworkList(xIRCListShowNonEnglish.Checked);
         }
 
-        void FillIRCNetworkList(bool showNonEnglishNetworks)
+        void FillIrcNetworkList(bool showNonEnglishNetworks)
         {
             cIRCList.Items.Clear();
-            foreach (IRCNetwork network in IRCNetworks)
+            foreach (var network in IrcNetworks.Where(network => showNonEnglishNetworks || !network.IsNonEnglish))
             {
-                if (showNonEnglishNetworks || !network.IsNonEnglish)
-                {
-                    cIRCList.Items.Add(network.Name);
-                }
+                cIRCList.Items.Add(network.Name);
             }
         }
 
@@ -679,8 +538,8 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         {
             if (xMaxUndo.Checked)
             {
-                decimal maxMemUsage = Math.Ceiling(nMaxUndoStates.Value * (nMaxUndo.Value * 8) / (1024 * 1024));
-                lMaxUndoUnits.Text = String.Format("blocks each (up to {0} MB of RAM per player)", maxMemUsage);
+                var maxMemUsage = Math.Ceiling(nMaxUndoStates.Value * (nMaxUndo.Value * 8) / (1024 * 1024));
+                lMaxUndoUnits.Text = string.Format("blocks each (up to {0} MB of RAM per player)", maxMemUsage);
             }
             else
             {
@@ -712,7 +571,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         #region Ranks
 
-        BindingList<string> rankNameList;
+        BindingList<string> _rankNameList;
 
         void SelectRank(Rank rank)
         {
@@ -731,14 +590,14 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                 vRanks.SelectedIndex = rank.Index;
                 return;
             }
-            selectedRank = rank;
+            _selectedRank = rank;
             tRankName.Text = rank.Name;
 
-            ApplyColor(bColorRank, Color.ParseToIndex(rank.Color));
+            ApplyColor(bColorRank, fCraft.Color.ParseToIndex(rank.Color));
 
             tPrefix.Text = rank.Prefix;
 
-            foreach (var box in permissionLimitBoxes.Values)
+            foreach (var box in _permissionLimitBoxes.Values)
             {
                 box.SelectRank(rank);
             }
@@ -761,14 +620,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             foreach (ListViewItem item in vPermissions.Items)
             {
                 item.Checked = rank.Permissions[item.Index];
-                if (item.Checked)
-                {
-                    item.Font = bold;
-                }
-                else
-                {
-                    item.Font = vPermissions.Font;
-                }
+                item.Font = item.Checked ? _bold : vPermissions.Font;
             }
 
             foreach (ListViewItem item in vPermissions.Items)
@@ -785,17 +637,17 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             vPermissions.Enabled = true;
 
             bDeleteRank.Enabled = true;
-            bRaiseRank.Enabled = (selectedRank != RankManager.HighestRank);
-            bLowerRank.Enabled = (selectedRank != RankManager.LowestRank);
+            bRaiseRank.Enabled = (_selectedRank != RankManager.HighestRank);
+            bLowerRank.Enabled = (_selectedRank != RankManager.LowestRank);
         }
 
 
         void RebuildRankList()
         {
             vRanks.Items.Clear();
-            foreach (Rank rank in RankManager.Ranks)
+            foreach (var rank in RankManager.Ranks)
             {
-                vRanks.Items.Add(MainForm.ToComboBoxOption(rank));
+                vRanks.Items.Add(ToComboBoxOption(rank));
             }
 
             FillRankList(cDefaultRank, "(lowest rank)");
@@ -805,25 +657,25 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             FillRankList(cPatrolledRank, "(default rank)");
             cPatrolledRank.SelectedIndex = RankManager.GetIndex(RankManager.PatrolledRank);
             FillRankList(cBlockDBAutoEnableRank, "(default rank)");
-            cBlockDBAutoEnableRank.SelectedIndex = RankManager.GetIndex(RankManager.BlockDBAutoEnableRank);
+            cBlockDBAutoEnableRank.SelectedIndex = RankManager.GetIndex(RankManager.BlockDbAutoEnableRank);
 
-            if (selectedRank != null)
+            if (_selectedRank != null)
             {
-                vRanks.SelectedIndex = selectedRank.Index;
+                vRanks.SelectedIndex = _selectedRank.Index;
             }
-            SelectRank(selectedRank);
+            SelectRank(_selectedRank);
 
-            foreach (var box in permissionLimitBoxes.Values)
+            foreach (var box in _permissionLimitBoxes.Values)
             {
                 box.RebuildList();
-                box.SelectRank(selectedRank);
+                box.SelectRank(_selectedRank);
             }
         }
 
 
         void DisableRankOptions()
         {
-            selectedRank = null;
+            _selectedRank = null;
             bDeleteRank.Enabled = false;
             bRaiseRank.Enabled = false;
             bLowerRank.Enabled = false;
@@ -831,7 +683,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             bColorRank.Text = "";
             tPrefix.Text = "";
 
-            foreach (var box in permissionLimitBoxes.Values)
+            foreach (var box in _permissionLimitBoxes.Values)
             {
                 box.SelectRank(null);
             }
@@ -862,9 +714,9 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             if (box == null) throw new ArgumentNullException("box");
             box.Items.Clear();
             box.Items.Add(firstItem);
-            foreach (Rank rank in RankManager.Ranks)
+            foreach (var rank in RankManager.Ranks)
             {
-                box.Items.Add(MainForm.ToComboBoxOption(rank));
+                box.Items.Add(ToComboBoxOption(rank));
             }
         }
 
@@ -873,137 +725,135 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void bAddRank_Click(object sender, EventArgs e)
         {
-            int number = 1;
+            var number = 1;
             while (RankManager.RanksByName.ContainsKey("rank" + number)) number++;
 
-            Rank rank = new Rank("rank" + number, RankManager.GenerateID());
+            var rank = new Rank("rank" + number, RankManager.GenerateId());
 
             RankManager.AddRank(rank);
-            selectedRank = null;
+            _selectedRank = null;
 
             RebuildRankList();
             SelectRank(rank);
 
-            rankNameList.Insert(rank.Index + 1, MainForm.ToComboBoxOption(rank));
+            _rankNameList.Insert(rank.Index + 1, ToComboBoxOption(rank));
         }
 
         private void bDeleteRank_Click(object sender, EventArgs e)
         {
-            if (vRanks.SelectedItem != null)
+            if (vRanks.SelectedItem == null) return;
+            _selectedRank = null;
+            var index = vRanks.SelectedIndex;
+            var deletedRank = RankManager.FindRank(index);
+            if (deletedRank == null) return;
+
+            var messages = "";
+
+            // Ask for substitute rank
+            var popup = new DeleteRankPopup(deletedRank);
+            if (popup.ShowDialog() != DialogResult.OK) return;
+
+            var replacementRank = popup.SubstituteRank;
+
+            // Update default rank
+            if (RankManager.DefaultRank == deletedRank)
             {
-                selectedRank = null;
-                int index = vRanks.SelectedIndex;
-                Rank deletedRank = RankManager.FindRank(index);
-                if (deletedRank == null) return;
+                RankManager.DefaultRank = replacementRank;
+                messages += "DefaultRank has been changed to \"" + replacementRank.Name + "\"" + Environment.NewLine;
+            }
 
-                string messages = "";
+            // Update defaultbuild rank
+            if (RankManager.DefaultBuildRank == deletedRank)
+            {
+                RankManager.DefaultBuildRank = replacementRank;
+                messages += "DefaultBuildRank has been changed to \"" + replacementRank.Name + "\"" + Environment.NewLine;
+            }
 
-                // Ask for substitute rank
-                DeleteRankPopup popup = new DeleteRankPopup(deletedRank);
-                if (popup.ShowDialog() != DialogResult.OK) return;
+            // Update patrolled rank
+            if (RankManager.PatrolledRank == deletedRank)
+            {
+                RankManager.PatrolledRank = replacementRank;
+                messages += "PatrolledRank has been changed to \"" + replacementRank.Name + "\"" + Environment.NewLine;
+            }
 
-                Rank replacementRank = popup.SubstituteRank;
+            // Update patrolled rank
+            if (RankManager.BlockDbAutoEnableRank == deletedRank)
+            {
+                RankManager.BlockDbAutoEnableRank = replacementRank;
+                messages += "BlockDBAutoEnableRank has been changed to \"" + replacementRank.Name + "\"" + Environment.NewLine;
+            }
 
-                // Update default rank
-                if (RankManager.DefaultRank == deletedRank)
+            // Delete rank
+            if (RankManager.DeleteRank(deletedRank, replacementRank))
+            {
+                messages += "Some of the rank limits for kick, ban, promote, and/or demote have been reset." + Environment.NewLine;
+            }
+            vRanks.Items.RemoveAt(index);
+
+            // Update world permissions
+            string worldUpdates = "";
+            foreach (WorldListEntry world in Worlds)
+            {
+                if (world.AccessPermission == ToComboBoxOption(deletedRank))
                 {
-                    RankManager.DefaultRank = replacementRank;
-                    messages += "DefaultRank has been changed to \"" + replacementRank.Name + "\"" + Environment.NewLine;
+                    world.AccessPermission = ToComboBoxOption(replacementRank);
+                    worldUpdates += " - " + world.Name + ": access permission changed to " + replacementRank.Name + Environment.NewLine;
                 }
-
-                // Update defaultbuild rank
-                if (RankManager.DefaultBuildRank == deletedRank)
+                if (world.BuildPermission == ToComboBoxOption(deletedRank))
                 {
-                    RankManager.DefaultBuildRank = replacementRank;
-                    messages += "DefaultBuildRank has been changed to \"" + replacementRank.Name + "\"" + Environment.NewLine;
+                    world.BuildPermission = ToComboBoxOption(replacementRank);
+                    worldUpdates += " - " + world.Name + ": build permission changed to " + replacementRank.Name + Environment.NewLine;
                 }
+            }
 
-                // Update patrolled rank
-                if (RankManager.PatrolledRank == deletedRank)
-                {
-                    RankManager.PatrolledRank = replacementRank;
-                    messages += "PatrolledRank has been changed to \"" + replacementRank.Name + "\"" + Environment.NewLine;
-                }
+            _rankNameList.RemoveAt(index + 1);
 
-                // Update patrolled rank
-                if (RankManager.BlockDBAutoEnableRank == deletedRank)
-                {
-                    RankManager.BlockDBAutoEnableRank = replacementRank;
-                    messages += "BlockDBAutoEnableRank has been changed to \"" + replacementRank.Name + "\"" + Environment.NewLine;
-                }
+            if (worldUpdates.Length > 0)
+            {
+                messages += "The following worlds were affected:" + Environment.NewLine + worldUpdates;
+            }
 
-                // Delete rank
-                if (RankManager.DeleteRank(deletedRank, replacementRank))
-                {
-                    messages += "Some of the rank limits for kick, ban, promote, and/or demote have been reset." + Environment.NewLine;
-                }
-                vRanks.Items.RemoveAt(index);
+            if (messages.Length > 0)
+            {
+                MessageBox.Show(messages, "Warning");
+            }
 
-                // Update world permissions
-                string worldUpdates = "";
-                foreach (WorldListEntry world in Worlds)
-                {
-                    if (world.AccessPermission == MainForm.ToComboBoxOption(deletedRank))
-                    {
-                        world.AccessPermission = MainForm.ToComboBoxOption(replacementRank);
-                        worldUpdates += " - " + world.Name + ": access permission changed to " + replacementRank.Name + Environment.NewLine;
-                    }
-                    if (world.BuildPermission == MainForm.ToComboBoxOption(deletedRank))
-                    {
-                        world.BuildPermission = MainForm.ToComboBoxOption(replacementRank);
-                        worldUpdates += " - " + world.Name + ": build permission changed to " + replacementRank.Name + Environment.NewLine;
-                    }
-                }
+            RebuildRankList();
 
-                rankNameList.RemoveAt(index + 1);
-
-                if (worldUpdates.Length > 0)
-                {
-                    messages += "The following worlds were affected:" + Environment.NewLine + worldUpdates;
-                }
-
-                if (messages.Length > 0)
-                {
-                    MessageBox.Show(messages, "Warning");
-                }
-
-                RebuildRankList();
-
-                if (index < vRanks.Items.Count)
-                {
-                    vRanks.SelectedIndex = index;
-                }
+            if (index < vRanks.Items.Count)
+            {
+                vRanks.SelectedIndex = index;
             }
         }
 
 
         private void tPrefix_Validating(object sender, CancelEventArgs e)
         {
-            if (selectedRank == null) return;
+            if (_selectedRank == null) return;
             tPrefix.Text = tPrefix.Text.Trim();
             if (tPrefix.Text.Length > 0 && !Rank.IsValidPrefix(tPrefix.Text))
             {
                 MessageBox.Show("Invalid prefix character!\n" +
                     "Prefixes may only contain characters that are allowed in chat (except space).", "Warning");
-                tPrefix.ForeColor = System.Drawing.Color.Red;
+                tPrefix.ForeColor = Color.Red;
                 e.Cancel = true;
             }
             else
             {
                 tPrefix.ForeColor = SystemColors.ControlText;
             }
-            if (selectedRank.Prefix == tPrefix.Text) return;
+            if (_selectedRank.Prefix == tPrefix.Text) return;
 
-            string oldName = MainForm.ToComboBoxOption(selectedRank);
+            string oldName = ToComboBoxOption(_selectedRank);
 
             // To avoid DataErrors in World tab's DataGridView while renaming a rank,
             // the new name is first added to the list of options (without removing the old name)
-            rankNameList.Insert(selectedRank.Index + 1, String.Format("{0,1}{1}", tPrefix.Text, selectedRank.Name));
+            _rankNameList.Insert(_selectedRank.Index + 1, String.Format("{0,1}{1}", tPrefix.Text, _selectedRank.Name));
 
-            selectedRank.Prefix = tPrefix.Text;
+            _selectedRank.Prefix = tPrefix.Text;
 
             // Remove the old name from the list of options
-            rankNameList.Remove(oldName);
+            _rankNameList.Remove(oldName);
 
             Worlds.ResetBindings();
             RebuildRankList();
@@ -1011,46 +861,46 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void xReserveSlot_CheckedChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null) return;
-            selectedRank.ReservedSlot = xReserveSlot.Checked;
+            if (_selectedRank == null) return;
+            _selectedRank.ReservedSlot = xReserveSlot.Checked;
         }
 
         private void nKickIdle_ValueChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null || !xKickIdle.Checked) return;
-            selectedRank.IdleKickTimer = Convert.ToInt32(nKickIdle.Value);
+            if (_selectedRank == null || !xKickIdle.Checked) return;
+            _selectedRank.IdleKickTimer = Convert.ToInt32(nKickIdle.Value);
         }
 
         private void nAntiGriefBlocks_ValueChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null || !xAntiGrief.Checked) return;
-            selectedRank.AntiGriefBlocks = Convert.ToInt32(nAntiGriefBlocks.Value);
+            if (_selectedRank == null || !xAntiGrief.Checked) return;
+            _selectedRank.AntiGriefBlocks = Convert.ToInt32(nAntiGriefBlocks.Value);
         }
 
         private void nAntiGriefSeconds_ValueChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null || !xAntiGrief.Checked) return;
-            selectedRank.AntiGriefSeconds = Convert.ToInt32(nAntiGriefSeconds.Value);
+            if (_selectedRank == null || !xAntiGrief.Checked) return;
+            _selectedRank.AntiGriefSeconds = Convert.ToInt32(nAntiGriefSeconds.Value);
         }
 
         private void nDrawLimit_ValueChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null || !xDrawLimit.Checked) return;
-            selectedRank.DrawLimit = Convert.ToInt32(nDrawLimit.Value);
+            if (_selectedRank == null || !xDrawLimit.Checked) return;
+            _selectedRank.DrawLimit = Convert.ToInt32(nDrawLimit.Value);
             double cubed = Math.Pow(Convert.ToDouble(nDrawLimit.Value), 1 / 3d);
             lDrawLimitUnits.Text = String.Format("blocks ({0:0}\u00B3)", cubed);
         }
 
         private void nCopyPasteSlots_ValueChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null) return;
-            selectedRank.CopySlots = Convert.ToInt32(nCopyPasteSlots.Value);
+            if (_selectedRank == null) return;
+            _selectedRank.CopySlots = Convert.ToInt32(nCopyPasteSlots.Value);
         }
 
         private void xAllowSecurityCircumvention_CheckedChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null) return;
-            selectedRank.AllowSecurityCircumvention = xAllowSecurityCircumvention.Checked;
+            if (_selectedRank == null) return;
+            _selectedRank.AllowSecurityCircumvention = xAllowSecurityCircumvention.Checked;
         }
 
 
@@ -1073,33 +923,33 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void xKickIdle_CheckedChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null) return;
+            if (_selectedRank == null) return;
             if (xKickIdle.Checked)
             {
-                nKickIdle.Value = selectedRank.IdleKickTimer;
+                nKickIdle.Value = _selectedRank.IdleKickTimer;
             }
             else
             {
                 nKickIdle.Value = 0;
-                selectedRank.IdleKickTimer = 0;
+                _selectedRank.IdleKickTimer = 0;
             }
             nKickIdle.Enabled = xKickIdle.Checked;
         }
 
         private void xAntiGrief_CheckedChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null) return;
+            if (_selectedRank == null) return;
             if (xAntiGrief.Checked)
             {
-                nAntiGriefBlocks.Value = selectedRank.AntiGriefBlocks;
-                nAntiGriefSeconds.Value = selectedRank.AntiGriefSeconds;
+                nAntiGriefBlocks.Value = _selectedRank.AntiGriefBlocks;
+                nAntiGriefSeconds.Value = _selectedRank.AntiGriefSeconds;
             }
             else
             {
                 nAntiGriefBlocks.Value = 0;
-                selectedRank.AntiGriefBlocks = 0;
+                _selectedRank.AntiGriefBlocks = 0;
                 nAntiGriefSeconds.Value = 0;
-                selectedRank.AntiGriefSeconds = 0;
+                _selectedRank.AntiGriefSeconds = 0;
             }
             nAntiGriefBlocks.Enabled = xAntiGrief.Checked;
             nAntiGriefSeconds.Enabled = xAntiGrief.Checked;
@@ -1107,17 +957,17 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void xDrawLimit_CheckedChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null) return;
+            if (_selectedRank == null) return;
             if (xDrawLimit.Checked)
             {
-                nDrawLimit.Value = selectedRank.DrawLimit;
+                nDrawLimit.Value = _selectedRank.DrawLimit;
                 double cubed = Math.Pow(Convert.ToDouble(nDrawLimit.Value), 1 / 3d);
                 lDrawLimitUnits.Text = String.Format("blocks ({0:0}\u00B3)", cubed);
             }
             else
             {
                 nDrawLimit.Value = 0;
-                selectedRank.DrawLimit = 0;
+                _selectedRank.DrawLimit = 0;
                 lDrawLimitUnits.Text = "blocks";
             }
             nDrawLimit.Enabled = xDrawLimit.Checked;
@@ -1126,20 +976,13 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         private void vPermissions_ItemChecked(object sender, ItemCheckedEventArgs e)
         {
             bool check = e.Item.Checked;
-            if (check)
-            {
-                e.Item.Font = bold;
-            }
-            else
-            {
-                e.Item.Font = vPermissions.Font;
-            }
-            if (selectedRank == null) return;
+            e.Item.Font = check ? _bold : vPermissions.Font;
+            if (_selectedRank == null) return;
 
             Permission permission = (Permission)e.Item.Tag;
             CheckPermissionConsistency(permission, check);
 
-            selectedRank.Permissions[(int)e.Item.Tag] = e.Item.Checked;
+            _selectedRank.Permissions[(int)e.Item.Tag] = e.Item.Checked;
         }
 
         void CheckPermissionConsistency(Permission permission, bool check)
@@ -1319,58 +1162,56 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
             }
 
-            if (permissionLimitBoxes.ContainsKey(permission))
+            if (_permissionLimitBoxes.ContainsKey(permission))
             {
-                permissionLimitBoxes[permission].PermissionToggled(check);
+                _permissionLimitBoxes[permission].PermissionToggled(check);
             }
         }
 
         private void tRankName_Validating(object sender, CancelEventArgs e)
         {
             tRankName.ForeColor = SystemColors.ControlText;
-            if (selectedRank == null) return;
+            if (_selectedRank == null) return;
 
             string newName = tRankName.Text.Trim();
 
-            if (newName == selectedRank.Name)
+            if (newName == _selectedRank.Name)
             {
-                return;
-
             }
-            else if (newName.Length == 0)
+            if (newName.Length == 0)
             {
                 MessageBox.Show("Rank name cannot be blank.");
-                tRankName.ForeColor = System.Drawing.Color.Red;
+                tRankName.ForeColor = Color.Red;
                 e.Cancel = true;
 
             }
             else if (!Rank.IsValidRankName(newName))
             {
                 MessageBox.Show("Rank name can only contain letters, digits, and underscores.");
-                tRankName.ForeColor = System.Drawing.Color.Red;
+                tRankName.ForeColor = Color.Red;
                 e.Cancel = true;
 
             }
-            else if (!RankManager.CanRenameRank(selectedRank, newName))
+            else if (!RankManager.CanRenameRank(_selectedRank, newName))
             {
                 MessageBox.Show("There is already another rank named \"" + newName + "\".\n" +
-                                 "Duplicate rank names are not allowed.");
-                tRankName.ForeColor = System.Drawing.Color.Red;
+                                "Duplicate rank names are not allowed.");
+                tRankName.ForeColor = Color.Red;
                 e.Cancel = true;
 
             }
             else
             {
-                string oldName = MainForm.ToComboBoxOption(selectedRank);
+                string oldName = ToComboBoxOption(_selectedRank);
 
                 // To avoid DataErrors in World tab's DataGridView while renaming a rank,
                 // the new name is first added to the list of options (without removing the old name)
-                rankNameList.Insert(selectedRank.Index + 1, String.Format("{0,1}{1}", selectedRank.Prefix, newName));
+                _rankNameList.Insert(_selectedRank.Index + 1, String.Format("{0,1}{1}", _selectedRank.Prefix, newName));
 
-                RankManager.RenameRank(selectedRank, newName);
+                RankManager.RenameRank(_selectedRank, newName);
 
                 // Remove the old name from the list of options
-                rankNameList.Remove(oldName);
+                _rankNameList.Remove(oldName);
 
                 Worlds.ResetBindings();
                 RebuildRankList();
@@ -1380,23 +1221,23 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void bRaiseRank_Click(object sender, EventArgs e)
         {
-            if (selectedRank == null) return;
-            if (RankManager.RaiseRank(selectedRank))
+            if (_selectedRank == null) return;
+            if (RankManager.RaiseRank(_selectedRank))
             {
                 RebuildRankList();
-                rankNameList.Insert(selectedRank.Index + 1, MainForm.ToComboBoxOption(selectedRank));
-                rankNameList.RemoveAt(selectedRank.Index + 3);
+                _rankNameList.Insert(_selectedRank.Index + 1, ToComboBoxOption(_selectedRank));
+                _rankNameList.RemoveAt(_selectedRank.Index + 3);
             }
         }
 
         private void bLowerRank_Click(object sender, EventArgs e)
         {
-            if (selectedRank == null) return;
-            if (RankManager.LowerRank(selectedRank))
+            if (_selectedRank == null) return;
+            if (RankManager.LowerRank(_selectedRank))
             {
                 RebuildRankList();
-                rankNameList.Insert(selectedRank.Index + 2, MainForm.ToComboBoxOption(selectedRank));
-                rankNameList.RemoveAt(selectedRank.Index);
+                _rankNameList.Insert(_selectedRank.Index + 2, ToComboBoxOption(_selectedRank));
+                _rankNameList.RemoveAt(_selectedRank.Index);
             }
         }
 
@@ -1509,7 +1350,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                     ApplyTabLogging();
                     break;
                 case 7:// IRC
-                    Config.LoadDefaults(ConfigSection.IRC);
+                    Config.LoadDefaults(ConfigSection.Irc);
                     ApplyTabIRC();
                     break;
                 case 8:// Advanced
@@ -1534,29 +1375,46 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         void AddChangeHandler(Control c, EventHandler handler)
         {
-            if (c is CheckBox)
+            var box = c as CheckBox;
+            if (box != null)
             {
-                ((CheckBox)c).CheckedChanged += handler;
+                box.CheckedChanged += handler;
             }
-            else if (c is ComboBox)
+            else
             {
-                ((ComboBox)c).SelectedIndexChanged += handler;
-            }
-            else if (c is ListView)
-            {
-                ((ListView)c).ItemChecked += ((o, e) => handler(o, e));
-            }
-            else if (c is NumericUpDown)
-            {
-                ((NumericUpDown)c).ValueChanged += handler;
-            }
-            else if (c is ListBox)
-            {
-                ((ListBox)c).SelectedIndexChanged += handler;
-            }
-            else if (c is TextBoxBase)
-            {
-                c.TextChanged += handler;
+                var comboBox = c as ComboBox;
+                if (comboBox != null)
+                {
+                    comboBox.SelectedIndexChanged += handler;
+                }
+                else
+                {
+                    var view = c as ListView;
+                    if (view != null)
+                    {
+                        view.ItemChecked += ((o, e) => handler(o, e));
+                    }
+                    else
+                    {
+                        var down = c as NumericUpDown;
+                        if (down != null)
+                        {
+                            down.ValueChanged += handler;
+                        }
+                        else
+                        {
+                            var listBox = c as ListBox;
+                            if (listBox != null)
+                            {
+                                listBox.SelectedIndexChanged += handler;
+                            }
+                            else if (c is TextBoxBase)
+                            {
+                                c.TextChanged += handler;
+                            }
+                        }
+                    }
+                }
             }
             foreach (Control child in c.Controls)
             {
@@ -1568,11 +1426,11 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
 
         #region Colors
-        int colorSys, colorSay, colorHelp, colorAnnouncement, colorPM, colorIRC, colorMe, colorWarning, colorCustom, colorGlobal;
+        int _colorSys, _colorSay, _colorHelp, _colorAnnouncement, _colorPm, _colorIrc, _colorMe, _colorWarning, _colorCustom, _colorGlobal;
 
         void ApplyColor(Button button, int color)
         {
-            button.Text = Color.GetName(color);
+            button.Text = fCraft.Color.GetName(color);
             button.BackColor = ColorPicker.ColorPairs[color].Background;
             button.ForeColor = ColorPicker.ColorPairs[color].Foreground;
             bApply.Enabled = true;
@@ -1580,91 +1438,91 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void bColorSys_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("System message color", colorSys);
+            ColorPicker picker = new ColorPicker("System message color", _colorSys);
             picker.ShowDialog();
-            colorSys = picker.ColorIndex;
-            ApplyColor(bColorSys, colorSys);
-            Color.Sys = Color.Parse(colorSys);
+            _colorSys = picker.ColorIndex;
+            ApplyColor(bColorSys, _colorSys);
+            fCraft.Color.Sys = fCraft.Color.Parse(_colorSys);
         }
 
         private void bColorHelp_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Help message color", colorHelp);
+            ColorPicker picker = new ColorPicker("Help message color", _colorHelp);
             picker.ShowDialog();
-            colorHelp = picker.ColorIndex;
-            ApplyColor(bColorHelp, colorHelp);
-            Color.Help = Color.Parse(colorHelp);
+            _colorHelp = picker.ColorIndex;
+            ApplyColor(bColorHelp, _colorHelp);
+            fCraft.Color.Help = fCraft.Color.Parse(_colorHelp);
         }
 
         private void bColorSay_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("/Say message color", colorSay);
+            ColorPicker picker = new ColorPicker("/Say message color", _colorSay);
             picker.ShowDialog();
-            colorSay = picker.ColorIndex;
-            ApplyColor(bColorSay, colorSay);
-            Color.Say = Color.Parse(colorSay);
+            _colorSay = picker.ColorIndex;
+            ApplyColor(bColorSay, _colorSay);
+            fCraft.Color.Say = fCraft.Color.Parse(_colorSay);
         }
 
         private void bColorAnnouncement_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Announcement color", colorAnnouncement);
+            ColorPicker picker = new ColorPicker("Announcement color", _colorAnnouncement);
             picker.ShowDialog();
-            colorAnnouncement = picker.ColorIndex;
-            ApplyColor(bColorAnnouncement, colorAnnouncement);
-            Color.Announcement = Color.Parse(colorAnnouncement);
+            _colorAnnouncement = picker.ColorIndex;
+            ApplyColor(bColorAnnouncement, _colorAnnouncement);
+            fCraft.Color.Announcement = fCraft.Color.Parse(_colorAnnouncement);
         }
 
         private void bColorPM_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Private / rank chat color", colorPM);
+            ColorPicker picker = new ColorPicker("Private / rank chat color", _colorPm);
             picker.ShowDialog();
-            colorPM = picker.ColorIndex;
-            ApplyColor(bColorPM, colorPM);
-            Color.PM = Color.Parse(colorPM);
+            _colorPm = picker.ColorIndex;
+            ApplyColor(bColorPM, _colorPm);
+            fCraft.Color.PM = fCraft.Color.Parse(_colorPm);
         }
 
         private void bColorWarning_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Warning / Error message color", colorWarning);
+            ColorPicker picker = new ColorPicker("Warning / Error message color", _colorWarning);
             picker.ShowDialog();
-            colorWarning = picker.ColorIndex;
-            ApplyColor(bColorWarning, colorWarning);
-            Color.Warning = Color.Parse(colorWarning);
+            _colorWarning = picker.ColorIndex;
+            ApplyColor(bColorWarning, _colorWarning);
+            fCraft.Color.Warning = fCraft.Color.Parse(_colorWarning);
         }
 
         private void bColorMe_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("/Me command color", colorMe);
+            ColorPicker picker = new ColorPicker("/Me command color", _colorMe);
             picker.ShowDialog();
-            colorMe = picker.ColorIndex;
-            ApplyColor(bColorMe, colorMe);
-            Color.Me = Color.Parse(colorMe);
+            _colorMe = picker.ColorIndex;
+            ApplyColor(bColorMe, _colorMe);
+            fCraft.Color.Me = fCraft.Color.Parse(_colorMe);
         }
 
         private void bColorIRC_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("IRC message color", colorIRC);
+            ColorPicker picker = new ColorPicker("IRC message color", _colorIrc);
             picker.ShowDialog();
-            colorIRC = picker.ColorIndex;
-            ApplyColor(bColorIRC, colorIRC);
-            Color.IRC = Color.Parse(colorIRC);
+            _colorIrc = picker.ColorIndex;
+            ApplyColor(bColorIRC, _colorIrc);
+            fCraft.Color.IRC = fCraft.Color.Parse(_colorIrc);
         }
 
         private void bColorGlobal_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Global message color", colorGlobal);
+            ColorPicker picker = new ColorPicker("Global message color", _colorGlobal);
             picker.ShowDialog();
-            colorGlobal = picker.ColorIndex;
-            ApplyColor(bColorGlobal, colorGlobal);
-            Color.Global = Color.Parse(colorGlobal);
+            _colorGlobal = picker.ColorIndex;
+            ApplyColor(bColorGlobal, _colorGlobal);
+            fCraft.Color.Global = fCraft.Color.Parse(_colorGlobal);
         }
 
         private void bColorRank_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Rank color for \"" + selectedRank.Name + "\"", Color.ParseToIndex(selectedRank.Color));
+            ColorPicker picker = new ColorPicker("Rank color for \"" + _selectedRank.Name + "\"", fCraft.Color.ParseToIndex(_selectedRank.Color));
             picker.ShowDialog();
             ApplyColor(bColorRank, picker.ColorIndex);
-            selectedRank.Color = Color.Parse(picker.ColorIndex);
+            _selectedRank.Color = fCraft.Color.Parse(picker.ColorIndex);
         }
 
 
@@ -1726,7 +1584,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                                           xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : ""));
             }
 
-            //chatPreview.SetText(lines.ToArray());
+            chatPreview1.SetText(lines.ToArray());
         }
 
         #endregion
@@ -1757,23 +1615,16 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         internal static void HandleWorldRename(string from, string to)
         {
-            if (instance.cMainWorld.Items.Count == 0) return;
-            if (instance.cMainWorld.SelectedItem == null)
+            if (_instance.cMainWorld.Items.Count == 0) return;
+            if (_instance.cMainWorld.SelectedItem == null)
             {
-                instance.cMainWorld.SelectedIndex = 0;
+                _instance.cMainWorld.SelectedIndex = 0;
             }
             else
             {
-                string mainWorldName = instance.cMainWorld.SelectedItem.ToString();
-                instance.FillWorldList();
-                if (mainWorldName == from)
-                {
-                    instance.cMainWorld.SelectedItem = to;
-                }
-                else
-                {
-                    instance.cMainWorld.SelectedItem = mainWorldName;
-                }
+                string mainWorldName = _instance.cMainWorld.SelectedItem.ToString();
+                _instance.FillWorldList();
+                _instance.cMainWorld.SelectedItem = mainWorldName == @from ? to : mainWorldName;
             }
         }
 
@@ -1796,29 +1647,29 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         }
 
 
-        readonly Dictionary<Permission, PermissionLimitBox> permissionLimitBoxes = new Dictionary<Permission, PermissionLimitBox>();
+        readonly Dictionary<Permission, PermissionLimitBox> _permissionLimitBoxes = new Dictionary<Permission, PermissionLimitBox>();
 
         const string DefaultPermissionLimitString = "(own rank)";
         void FillPermissionLimitBoxes()
         {
 
-            permissionLimitBoxes[Permission.Kick] = new PermissionLimitBox("Kick limit", Permission.Kick, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Ban] = new PermissionLimitBox("Ban limit", Permission.Ban, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Promote] = new PermissionLimitBox("Promote limit", Permission.Promote, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Demote] = new PermissionLimitBox("Demote limit", Permission.Demote, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Hide] = new PermissionLimitBox("Can hide from", Permission.Hide, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Freeze] = new PermissionLimitBox("Freeze limit", Permission.Freeze, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Mute] = new PermissionLimitBox("Mute limit", Permission.Mute, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Bring] = new PermissionLimitBox("Bring limit", Permission.Bring, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Spectate] = new PermissionLimitBox("Spectate limit", Permission.Spectate, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.UndoOthersActions] = new PermissionLimitBox("Undo limit", Permission.UndoOthersActions, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Slap] = new PermissionLimitBox("Slap limit", Permission.Slap, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Kill] = new PermissionLimitBox("Kill limit", Permission.Kill, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Possess] = new PermissionLimitBox("Possess limit", Permission.Possess, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Warn] = new PermissionLimitBox("Warn limit", Permission.Warn, DefaultPermissionLimitString);
-            permissionLimitBoxes[Permission.Gtfo] = new PermissionLimitBox("Gtfo limit", Permission.Gtfo, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Kick] = new PermissionLimitBox("Kick limit", Permission.Kick, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Ban] = new PermissionLimitBox("Ban limit", Permission.Ban, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Promote] = new PermissionLimitBox("Promote limit", Permission.Promote, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Demote] = new PermissionLimitBox("Demote limit", Permission.Demote, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Hide] = new PermissionLimitBox("Can hide from", Permission.Hide, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Freeze] = new PermissionLimitBox("Freeze limit", Permission.Freeze, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Mute] = new PermissionLimitBox("Mute limit", Permission.Mute, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Bring] = new PermissionLimitBox("Bring limit", Permission.Bring, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Spectate] = new PermissionLimitBox("Spectate limit", Permission.Spectate, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.UndoOthersActions] = new PermissionLimitBox("Undo limit", Permission.UndoOthersActions, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Slap] = new PermissionLimitBox("Slap limit", Permission.Slap, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Kill] = new PermissionLimitBox("Kill limit", Permission.Kill, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Possess] = new PermissionLimitBox("Possess limit", Permission.Possess, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Warn] = new PermissionLimitBox("Warn limit", Permission.Warn, DefaultPermissionLimitString);
+            _permissionLimitBoxes[Permission.Gtfo] = new PermissionLimitBox("Gtfo limit", Permission.Gtfo, DefaultPermissionLimitString);
 
-            foreach (var box in permissionLimitBoxes.Values)
+            foreach (var box in _permissionLimitBoxes.Values)
             {
                 permissionLimitBoxContainer.Controls.Add(box);
             }
@@ -1842,7 +1693,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void cBlockDBAutoEnableRank_SelectedIndexChanged(object sender, EventArgs e)
         {
-            RankManager.BlockDBAutoEnableRank = RankManager.FindRank(cBlockDBAutoEnableRank.SelectedIndex - 1);
+            RankManager.BlockDbAutoEnableRank = RankManager.FindRank(cBlockDBAutoEnableRank.SelectedIndex - 1);
         }
 
         private void xBlockDBEnabled_CheckedChanged(object sender, EventArgs e)
@@ -1858,31 +1709,24 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void nFillLimit_ValueChanged(object sender, EventArgs e)
         {
-            if (selectedRank == null) return;
-            selectedRank.FillLimit = Convert.ToInt32(nFillLimit.Value);
+            if (_selectedRank == null) return;
+            _selectedRank.FillLimit = Convert.ToInt32(nFillLimit.Value);
         }
 
 
-        public static bool usePrefixes = false;
+        public static bool UsePrefixes;
 
 
         public static string ToComboBoxOption(Rank rank)
         {
-            if (usePrefixes)
-            {
-                return String.Format("{0,1}{1}", rank.Prefix, rank.Name);
-            }
-            else
-            {
-                return rank.Name;
-            }
+            return UsePrefixes ? string.Format("{0,1}{1}", rank.Prefix, rank.Name) : rank.Name;
         }
 
         private void xRankPrefixesInChat_CheckedChanged(object sender, EventArgs e)
         {
-            usePrefixes = xRankPrefixesInChat.Checked;
-            tPrefix.Enabled = usePrefixes;
-            lPrefix.Enabled = usePrefixes;
+            UsePrefixes = xRankPrefixesInChat.Checked;
+            tPrefix.Enabled = UsePrefixes;
+            lPrefix.Enabled = UsePrefixes;
             RebuildRankList();
         }
 
@@ -1893,17 +1737,17 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void button1_Click(object sender, EventArgs e)
         {
-            ColorPicker picker = new ColorPicker("Custom Chat command color", colorCustom);
+            ColorPicker picker = new ColorPicker("Custom Chat command color", _colorCustom);
             picker.ShowDialog();
-            colorCustom = picker.ColorIndex;
-            ApplyColor(CustomColor, colorCustom);
-            Color.Custom = Color.Parse(colorCustom);
+            _colorCustom = picker.ColorIndex;
+            ApplyColor(CustomColor, _colorCustom);
+            fCraft.Color.Custom = fCraft.Color.Parse(_colorCustom);
         }
 
 
         private void SwearEditor_Click(object sender, EventArgs e)
         {
-            if (!System.IO.File.Exists(Paths.SwearWordsFileName))
+            if (!File.Exists(Paths.SwearWordsFileName))
             {
                 TextWriter tsw = new StreamWriter(Paths.SwearWordsFileName);
                 tsw.Write("//This is where you edit the swearwords on your " +
@@ -1918,10 +1762,10 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void ReqsEditor_Click(object sender, EventArgs e)
         {
-            if (!System.IO.Directory.Exists(Paths.ReqPath))
+            if (!Directory.Exists(Paths.ReqPath))
             {
-                System.IO.Directory.CreateDirectory(Paths.ReqPath);
-                System.IO.Path.Combine(Paths.ReqPath, "requirements.txt");
+                Directory.CreateDirectory(Paths.ReqPath);
+                Path.Combine(Paths.ReqPath, "requirements.txt");
                 File.WriteAllText(Path.Combine(Paths.ReqPath, "requirements.txt"), "//" +
                     "This is the requirements file, here is where you list the requirements " +
                     "for your server's ranks. You can either list all of the requirements " +
@@ -1933,12 +1777,12 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
             }
 
-            else if (!System.IO.File.Exists(Paths.ReqTextPath))
+            else if (!File.Exists(Paths.ReqTextPath))
             {
                 Process.Start(Paths.ReqDirectory);
             }
 
-            else if (System.IO.File.Exists(Paths.ReqTextPath))
+            else if (File.Exists(Paths.ReqTextPath))
             {
                 Process.Start(Paths.ReqTextPath);
             }
@@ -1949,23 +1793,6 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             websiteURL.Text = websiteURL.Text.Trim();
         }
 
-        private void bWeb_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Process.Start("http://gemscraft.net/");
-            }
-            catch { }
-        }
-
-        private void bWiki_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Process.Start("http://www.minecraftwiki.net/wiki/Custom_servers/gemscraft");
-            }
-            catch { }
-        }
 
 
         private void bReadme_Click(object sender, EventArgs e)
@@ -1974,7 +1801,10 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             {
                 Process.Start("https://github.com/apotter96/GemsCraft/blob/master/README.md");
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
 
         private void bChangelog_Click(object sender, EventArgs e)
@@ -1983,7 +1813,10 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             {
                 Process.Start("https://github.com/apotter96/GemsCraft/blob/master/zGemsCraft%20Changelog.txt");
             }
-            catch { }
+            catch
+            {
+                // ignored
+            }
         }
 
         private void bUpdate_Click(object sender, EventArgs e)
@@ -1993,25 +1826,21 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                 if (Updater.HasMostRecentVersion())
                 {
 
-                    DialogResult answer = MessageBox.Show("A GemsCraft Update is available. Would you like to download the latest GemsCraft Version?", "GemsCraft Updater", MessageBoxButtons.YesNo);
-                    if (answer == DialogResult.Yes)
+                    var answer = MessageBox.Show("A GemsCraft Update is available. Would you like to download the latest GemsCraft Version?", "GemsCraft Updater", MessageBoxButtons.YesNo);
+                    if (answer != DialogResult.Yes) return;
+                    using (new WebClient())
                     {
-                        using (var client = new WebClient())
+                        try
                         {
-                            try
-                            {
-                                //download new zip in current directory
-                                Process.Start("http://gemscraft.net/Version/" + Updater.LatestStable + ".zip");
-                            }
-                            catch (Exception ex)
-                            {
-                                MessageBox.Show("Update error: " + ex);
-                            }
-
+                            //download new zip in current directory
+                            Process.Start("http://gemscraft.net/Version/" + Updater.LatestStable + ".zip");
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show("Update error: " + ex);
                         }
 
                     }
-
                 }
                 else
                 {
@@ -2023,9 +1852,9 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             {
                 MessageBox.Show("There was an internet connection error. Server was unable to check for updates. Error: \n\r" + error);
             }
-            catch (Exception error_)
+            catch (Exception error)
             {
-                MessageBox.Show("There was an error in trying to check for updates:\n\r " + error_);
+                MessageBox.Show("There was an error in trying to check for updates:\n\r " + error);
             }
 
         }
@@ -2087,6 +1916,21 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             logBox.ContextMenu = new ContextMenu(menuItems);
             logBox.ContextMenu.Popup += CopyMenuPopupHandler;
             playerList.MouseDoubleClick += playerList_MouseDoubleClick;
+            StartEnable();
+            LoadCustomThemes();
+        }
+
+        void StartEnable()
+        {
+            bStart.Enabled = false;
+            uriDisplay.Enabled = true;
+            bPlay.Enabled = true;
+            btnRestart.Enabled = true;
+            pStop.Enabled = true;
+            playerList.Enabled = true;
+            logBox.Enabled = true;
+            bVoice.Enabled = true;
+            ThemeBox.Enabled = true;
         }
 
         #region Startup
@@ -2117,11 +1961,11 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             try
             {
 #endif
-                
+
                 //Server.InitLibrary(Environment.GetCommandLineArgs());
                 if (_shutdownPending) return;
 
-                Server.InitServer();
+                Server.InitServer(false); // False for being GUI
                 if (_shutdownPending) return;
 
                 BeginInvoke((Action)OnInitSuccess);
@@ -2199,6 +2043,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             }
             console.Enabled = true;
             console.Text = "";
+            picServerStatus.Image = Resources.server_on;
         }
 
 
@@ -2225,8 +2070,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             }
         }
 
-
-        void Shutdown(ShutdownReason reason, bool quit)
+        void Shutdown(ShutdownReason reason, bool quit, bool closeIt = true)
         {
             if (_shutdownPending) return;
             _shutdownPending = true;
@@ -2238,7 +2082,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             {
                 _startupThread.Join();
             }
-            Server.Shutdown(new ShutdownParams(reason, TimeSpan.Zero, quit, false), false);
+            Server.Shutdown(new ShutdownParams(reason, TimeSpan.Zero, quit, false), false, closeIt);
         }
 
 
@@ -2310,70 +2154,70 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                     switch (e.MessageType)
                     {
                         case LogType.PrivateChat:
-                            logBox.SelectionColor = System.Drawing.Color.Teal;
+                            logBox.SelectionColor = Color.Teal;
                             break;
                         case LogType.IRC:
                             if (ThemeBox.SelectedItem == null)
                             {
                                 // ReSharper disable once AssignNullToNotNullAttribute
-                                logBox.SelectionColor = System.Drawing.Color.FromName(Color.GetName(Color.IRC));
+                                logBox.SelectionColor = Color.FromName(fCraft.Color.GetName(fCraft.Color.IRC));
                             }
                             else
                             {
                                 switch (ThemeBox.SelectedItem.ToString())
                                 {
                                     default:
-                                        logBox.SelectionColor = System.Drawing.Color.LightSkyBlue;
+                                        logBox.SelectionColor = Color.LightSkyBlue;
                                         break;
                                     case "Default LC":
-                                        logBox.SelectionColor = System.Drawing.Color.Navy;
+                                        logBox.SelectionColor = Color.Navy;
                                         break;
                                 }
                             }
                             break;
                         case LogType.ChangedWorld:
-                            logBox.SelectionColor = System.Drawing.Color.Orange;
+                            logBox.SelectionColor = Color.Orange;
                             break;
                         case LogType.Warning:
                             if (ThemeBox.SelectedItem == null)
                             {
-                                logBox.SelectionColor = System.Drawing.Color.Yellow;
+                                logBox.SelectionColor = Color.Yellow;
                             }
                             else
                             {
                                 switch (ThemeBox.SelectedItem.ToString())
                                 {
                                     default:
-                                        logBox.SelectionColor = System.Drawing.Color.MediumOrchid;
+                                        logBox.SelectionColor = Color.MediumOrchid;
                                         break;
                                     case "Default LC":
-                                        logBox.SelectionColor = System.Drawing.Color.Yellow;
+                                        logBox.SelectionColor = Color.Yellow;
                                         break;
                                 }
                             }
                             break;
                         case LogType.Debug:
-                            logBox.SelectionColor = System.Drawing.Color.DarkGray;
+                            logBox.SelectionColor = Color.DarkGray;
                             break;
                         case LogType.Error:
                         case LogType.SeriousError:
-                            logBox.SelectionColor = System.Drawing.Color.Red;
+                            logBox.SelectionColor = Color.Red;
                             break;
                         case LogType.ConsoleInput:
                         case LogType.ConsoleOutput:
                             if (ThemeBox.SelectedItem == null)
                             {
-                                logBox.SelectionColor = System.Drawing.Color.White;
+                                logBox.SelectionColor = Color.White;
                             }
                             else
                             {
                                 switch (ThemeBox.SelectedItem.ToString())
                                 {
                                     default:
-                                        logBox.SelectionColor = System.Drawing.Color.Black;
+                                        logBox.SelectionColor = Color.Black;
                                         break;
                                     case "Default LC":
-                                        logBox.SelectionColor = System.Drawing.Color.White;
+                                        logBox.SelectionColor = Color.White;
                                         break;
                                 }
                             }
@@ -2381,17 +2225,17 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                         default:
                             if (ThemeBox.SelectedItem == null)
                             {
-                                logBox.SelectionColor = System.Drawing.Color.LightGray;
+                                logBox.SelectionColor = Color.LightGray;
                             }
                             else
                             {
                                 switch (ThemeBox.SelectedItem.ToString())
                                 {
                                     default:
-                                        logBox.SelectionColor = System.Drawing.Color.Black;
+                                        logBox.SelectionColor = Color.Black;
                                         break;
                                     case "Default LC":
-                                        logBox.SelectionColor = System.Drawing.Color.LightGray;
+                                        logBox.SelectionColor = Color.LightGray;
                                         break;
                                 }
                             }
@@ -2408,7 +2252,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                         string textToAdd = "----- cut off, see " + Logger.CurrentLogFileName + " for complete log -----" + Environment.NewLine;
                         logBox.SelectedText = textToAdd;
                         userSelectionStart += textToAdd.Length;
-                        logBox.SelectionColor = System.Drawing.Color.DarkGray;
+                        logBox.SelectionColor = Color.DarkGray;
                     }
 
                     // either restore user's selection, or scroll to end
@@ -2499,13 +2343,13 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                     }
                     else
                     {
-                       /* if (onGlobal)
-                        {
-                            fCraft.GlobalChat.GlobalThread.SendChannelMessage("[console]: " + line);
-                            Logger.Log(LogType.GlobalChat, "[console]: " + line);
-                            return;
-                        }
-                        else */
+                        /* if (onGlobal)
+                         {
+                             fCraft.GlobalChat.GlobalThread.SendChannelMessage("[console]: " + line);
+                             Logger.Log(LogType.GlobalChat, "[console]: " + line);
+                             return;
+                         }
+                         else */
                         {
                             Player.Console.ParseMessage(line, true, true);
                         }
@@ -2564,34 +2408,34 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         public void SetDefTheme()
         {
-            BackColor = System.Drawing.Color.Firebrick;
-            playerList.BackColor = System.Drawing.Color.White;
-            logBox.BackColor = System.Drawing.Color.Black;
+            BackColor = Color.Black;
+            playerList.BackColor = Color.Silver;
+            logBox.BackColor = Color.Black;
+            ServerTab.BackColor = Color.Gray;
             logBox.SelectAll();
-            logBox.SelectionColor = System.Drawing.Color.LightGray;
+            logBox.SelectionColor = Color.LightGray;
             logBox.SelectionStart = logBox.Text.Length;
             logBox.ScrollToCaret();
         }
         public void SetAltTheme()
         {
-            BackColor = System.Drawing.Color.Black;
-            playerList.BackColor = System.Drawing.Color.White;
-            logBox.BackColor = System.Drawing.Color.Firebrick;
-
+            BackColor = Color.Green;
+            playerList.BackColor = Color.White;
+            logBox.BackColor = Color.Black;
+            ServerTab.BackColor = Color.Gold;
             logBox.SelectAll();
-            logBox.SelectionColor = System.Drawing.Color.Black;
+            logBox.SelectionColor = Color.LightGray;
             logBox.SelectionStart = logBox.Text.Length;
             logBox.ScrollToCaret();
-
         }
         public void SetPinkTheme()
         {
-            BackColor = System.Drawing.Color.Pink;
-            playerList.BackColor = System.Drawing.Color.LightPink;
-            logBox.BackColor = System.Drawing.Color.LightPink;
-
+            BackColor = Color.Pink;
+            playerList.BackColor = Color.LightPink;
+            logBox.BackColor = Color.LightPink;
+            ServerTab.BackColor = Color.DeepPink;
             logBox.SelectAll();
-            logBox.SelectionColor = System.Drawing.Color.Black;
+            logBox.SelectionColor = Color.Black;
             logBox.SelectionStart = logBox.Text.Length;
             logBox.ScrollToCaret();
 
@@ -2599,12 +2443,12 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         public void SetYellowTheme()
         {
-            BackColor = System.Drawing.Color.LightGoldenrodYellow;
-            playerList.BackColor = System.Drawing.Color.LightYellow;
-            logBox.BackColor = System.Drawing.Color.LightYellow;
-
+            BackColor = Color.LightGoldenrodYellow;
+            playerList.BackColor = Color.LightYellow;
+            logBox.BackColor = Color.LightYellow;
+            ServerTab.BackColor = Color.Yellow;
             logBox.SelectAll();
-            logBox.SelectionColor = System.Drawing.Color.Black;
+            logBox.SelectionColor = Color.Black;
             logBox.SelectionStart = logBox.Text.Length;
             logBox.ScrollToCaret();
 
@@ -2612,12 +2456,12 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         public void SetGreenTheme()
         {
-            BackColor = System.Drawing.Color.SpringGreen;
-            playerList.BackColor = System.Drawing.Color.LightGreen;
-            logBox.BackColor = System.Drawing.Color.LightGreen;
-
+            BackColor = Color.SpringGreen;
+            playerList.BackColor = Color.LightGreen;
+            logBox.BackColor = Color.LightGreen;
+            ServerTab.BackColor = Color.Green;
             logBox.SelectAll();
-            logBox.SelectionColor = System.Drawing.Color.Black;
+            logBox.SelectionColor = Color.Black;
             logBox.SelectionStart = logBox.Text.Length;
             logBox.ScrollToCaret();
 
@@ -2625,12 +2469,12 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         public void SetPurpleTheme()
         {
-            BackColor = System.Drawing.Color.MediumPurple;
-            playerList.BackColor = System.Drawing.Color.Plum;
-            logBox.BackColor = System.Drawing.Color.Plum;
-
+            BackColor = Color.MediumPurple;
+            playerList.BackColor = Color.Plum;
+            logBox.BackColor = Color.Plum;
+            ServerTab.BackColor = Color.Purple;
             logBox.SelectAll();
-            logBox.SelectionColor = System.Drawing.Color.Black;
+            logBox.SelectionColor = Color.Black;
             logBox.SelectionStart = logBox.Text.Length;
             logBox.ScrollToCaret();
 
@@ -2638,33 +2482,45 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         public void SetGreyTheme()
         {
-            BackColor = System.Drawing.SystemColors.Control;
-            playerList.BackColor = System.Drawing.SystemColors.ControlLight;
-            logBox.BackColor = System.Drawing.SystemColors.ControlLight;
-
+            BackColor = SystemColors.Control;
+            playerList.BackColor = SystemColors.ControlLight;
+            logBox.BackColor = SystemColors.ControlLight;
+            ServerTab.BackColor = Color.Gray;
             logBox.SelectAll();
-            logBox.SelectionColor = System.Drawing.Color.Black;
+            logBox.SelectionColor = Color.Black;
             logBox.SelectionStart = logBox.Text.Length;
             logBox.ScrollToCaret();
 
         }
 
-      /*public void tabChat_tabSelected(object sender, EventArgs e)
+        public void SetCustomTheme(CustomTheme cTheme)
         {
-            if (tabChat.SelectedTab == tabServer)
-            {
-                onGlobal = false;
-                return;
-            }
-            if (tabChat.SelectedTab == tabGlobal)
-            {
-                onGlobal = true;
-                return;
-            }
-        }*/
+            BackColor = cTheme.MainBackColor;
+            playerList.BackColor = cTheme.PlayerListBackColor;
+            logBox.BackColor = cTheme.LogBackColor;
+            ServerTab.BackColor = cTheme.TabBackColor;
+            logBox.SelectAll();
+            logBox.SelectionColor = cTheme.TextColor;
+            logBox.SelectionStart = logBox.Text.Length;
+            logBox.ScrollToCaret();
+        }
+
+        /*public void tabChat_tabSelected(object sender, EventArgs e)
+          {
+              if (tabChat.SelectedTab == tabServer)
+              {
+                  onGlobal = false;
+                  return;
+              }
+              if (tabChat.SelectedTab == tabGlobal)
+              {
+                  onGlobal = true;
+                  return;
+              }
+          }*/
 
         #region PlayerViewer
-      
+
         private void playerList_MouseDoubleClick(object sender, MouseEventArgs e)
         {
             try
@@ -2685,8 +2541,8 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                 // ignored
             } //do nothing at all
         }
-        
-        
+
+
         #endregion
 
         #region VoiceCommands
@@ -2703,38 +2559,38 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             if (_listening)
             {
                 _listening = false;
-                bVoice.ForeColor = System.Drawing.Color.Black;
+                bVoice.ForeColor = Color.Black;
                 return;
             }
 
-                var engine = new System.Speech.Recognition.SpeechRecognitionEngine();
-                bVoice.ForeColor = System.Drawing.Color.Aqua;
-                var commands = new System.Speech.Recognition.Choices();
-                commands.Add("restart", "shutdown", "status report", "players", "help");
-                var gr = new System.Speech.Recognition.Grammar(new System.Speech.Recognition.GrammarBuilder(commands));
-                try
-                {
-                    _listening = true;
-                    engine.RequestRecognizerUpdate();
-                    engine.LoadGrammar(gr);
-                    engine.SpeechRecognized += engine_SpeechRecognized;
-                    engine.SetInputToDefaultAudioDevice();
-                    engine.RecognizeAsync(System.Speech.Recognition.RecognizeMode.Multiple);
-                    engine.Recognize();
-                }
-
-                catch
-                {
-                    // ignored
-                }
-        }
-        void engine_SpeechRecognized(object sender, System.Speech.Recognition.SpeechRecognizedEventArgs e)
-        {
-            System.Speech.Synthesis.SpeechSynthesizer reader = new System.Speech.Synthesis.SpeechSynthesizer();
-            System.Speech.Recognition.SpeechRecognitionEngine engine = new System.Speech.Recognition.SpeechRecognitionEngine();
+            var engine = new SpeechRecognitionEngine();
+            bVoice.ForeColor = Color.Aqua;
+            var commands = new Choices();
+            commands.Add("restart", "shutdown", "status report", "players", "help");
+            var gr = new Grammar(new GrammarBuilder(commands));
             try
             {
-                engine = new System.Speech.Recognition.SpeechRecognitionEngine();
+                _listening = true;
+                engine.RequestRecognizerUpdate();
+                engine.LoadGrammar(gr);
+                engine.SpeechRecognized += engine_SpeechRecognized;
+                engine.SetInputToDefaultAudioDevice();
+                engine.RecognizeAsync(RecognizeMode.Multiple);
+                engine.Recognize();
+            }
+
+            catch
+            {
+                // ignored
+            }
+        }
+        void engine_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            SpeechSynthesizer reader = new SpeechSynthesizer();
+            SpeechRecognitionEngine engine = new SpeechRecognitionEngine();
+            try
+            {
+                engine = new SpeechRecognitionEngine();
                 String message = "";
                 String results = e.Result.Text;
                 if (!_listening)
@@ -2746,7 +2602,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                     case "help":
                         reader.Speak("The available commands are restart, shutdown, status report, and players.");
                         Logger.Log(LogType.ConsoleOutput, "The available commands are restart, shutdown, status report, and a players.");
-                        bVoice.ForeColor = System.Drawing.Color.Black;
+                        bVoice.ForeColor = Color.Black;
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
                         _listening = false;
@@ -2755,7 +2611,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                         reader.Speak("The server is now restarting.");
                         ShutdownParams param = new ShutdownParams(ShutdownReason.Restarting, TimeSpan.FromSeconds(5), true, true, "Restarting", Player.Console);
                         Server.Shutdown(param, true);
-                        bVoice.ForeColor = System.Drawing.Color.Black;
+                        bVoice.ForeColor = Color.Black;
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
                         _listening = false;
@@ -2763,7 +2619,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                     case "shutdown":
                         reader.Speak("The server is now shutting down.");
                         Shutdown(ShutdownReason.ShuttingDown, true);
-                        bVoice.ForeColor = System.Drawing.Color.Black;
+                        bVoice.ForeColor = Color.Black;
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
                         _listening = false;
@@ -2771,7 +2627,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                     case "status report":
                         reader.Speak("Server has been up for " + Math.Round(DateTime.UtcNow.Subtract(Server.StartTime).TotalHours, 1, MidpointRounding.AwayFromZero) + " hours.");
                         Player.Console.ParseMessage("/sinfo", true, false);
-                        bVoice.ForeColor = System.Drawing.Color.Black;
+                        bVoice.ForeColor = Color.Black;
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
                         _listening = false;
@@ -2780,20 +2636,20 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                         message = Server.Players.Aggregate(message, (current, p) => current + p.Name);
                         reader.Speak(message);
                         Player.Console.ParseMessage("/players", true, false);
-                        bVoice.ForeColor = System.Drawing.Color.Black;
+                        bVoice.ForeColor = Color.Black;
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
                         _listening = false;
                         break;
                     default:
-                        bVoice.ForeColor = System.Drawing.Color.Black;
+                        bVoice.ForeColor = Color.Black;
                         engine.RecognizeAsyncStop();
                         engine.Dispose();
                         _listening = false;
                         break;
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 //Audio Device is either missing or damaged, actual Exception is System.Speech.Internal.Synthesis.AudioException
                 engine.RecognizeAsyncStop();
@@ -2804,7 +2660,13 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void pStop_Click(object sender, EventArgs e)
         {
-            //TODO - Stop server
+            var msgBoxResult = MessageBox.Show("Doing so will shutdown your server! Players will disconnect! Are you sure?",
+                "Stop Server",
+                MessageBoxButtons.YesNo);
+            if (msgBoxResult.Equals(DialogResult.Yes))
+            {
+                Shutdown(ShutdownReason.ShuttingDown, false, false);
+            }
         }
 
         private void bWeb_Click_1(object sender, EventArgs e)
@@ -2818,7 +2680,73 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             Application.Exit();
         }
 
+        private void btnRestart_Click(object sender, EventArgs e)
+        {
+            Server.IsRestarting = true;
+            ShutdownParams sp = new ShutdownParams(ShutdownReason.Restarting, TimeSpan.FromSeconds(5), true, true);
+            Server.Shutdown(sp, false);
+        }
+
+        private void playerListLabel_Click(object sender, EventArgs e)
+        {
+
+        }
 
 
+        private void ThemeBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (ThemeBox.SelectedItem.ToString().Equals("GemsCraft"))  SetDefTheme(); 
+            else if (ThemeBox.SelectedItem.ToString().Equals("Legacy GemsCraft"))  SetAltTheme(); 
+            else if (ThemeBox.SelectedItem.ToString().Equals("Pink")) SetPinkTheme(); 
+            else if (ThemeBox.SelectedItem.ToString().Equals("Yellow")) SetYellowTheme(); 
+            else if (ThemeBox.SelectedItem.ToString().Equals("Green")) SetGreenTheme();
+            else if (ThemeBox.SelectedItem.ToString().Equals("Purple")) SetPurpleTheme(); 
+            else if (ThemeBox.SelectedItem.ToString().Equals("Grey")) SetGreyTheme();
+            else
+            {
+                foreach (var theme in _customThemes.Where(theme => theme.Name.Equals(ThemeBox.SelectedItem.ToString())))
+                {
+                    SetCustomTheme(theme);
+                }
+            }
+            //if (ThemeBox.SelectedItem.ToString().Equals("800Craft")) { Set800Theme(); }
+            //if (ThemeBox.SelectedItem.ToString().Equals("fCraft")) { SetfCraftTheme(); }
+        }
+
+        private List<CustomTheme> _customThemes;
+        void LoadCustomThemes()
+        {
+            if (!Directory.Exists("Themes/")) return;
+            var fileList = Directory.GetFiles("Themes/");
+            var acceptedList = new List<CustomTheme>();
+            foreach (var str in fileList)
+            {
+                try
+                {
+                    if (!Path.GetExtension(str).ToLower().Equals(".gctheme")) continue;
+                    var seenTheme = CustomTheme.ParseTheme(str);
+                    acceptedList.Add(seenTheme);
+                }
+                catch (Exception ex)
+                {
+                    //Ignored - Theme isn't made properly or isn't a theme at all
+                    MessageBox.Show(ex.ToString());
+                }
+            }
+            foreach (var themes in acceptedList)
+            {
+                ThemeBox.Items.Add(themes.Name);
+            }
+            _customThemes = acceptedList;
+        }
+        private void picServerStatus_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MainForm_Load_1(object sender, EventArgs e)
+        {
+
+        }
     }
 }

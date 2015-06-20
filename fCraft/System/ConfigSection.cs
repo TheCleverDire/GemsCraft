@@ -23,9 +23,14 @@ namespace fCraft {
         Logging,
 
         /// <summary> IRC-related configuration (network, channel list, bot nick, etc). </summary>
-        IRC,
+        Irc,
 
         /// <summary> Advanced configuration (performance adjustments, protocol tweaks, experimental features, etc). </summary>
-        Advanced
+        Advanced,
+
+        /// <summary>
+        /// Classic-Protocal-Extension customizability
+        /// </summary>
+        Cpe
     }
 }

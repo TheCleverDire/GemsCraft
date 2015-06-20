@@ -16,7 +16,7 @@ namespace fCraft {
                            HighestRank,
                            PatrolledRank,
                            DefaultBuildRank,
-                           BlockDBAutoEnableRank;
+                           BlockDbAutoEnableRank;
 
 
         static RankManager() {
@@ -37,7 +37,7 @@ namespace fCraft {
             DefaultRank = null;
             PatrolledRank = null;
             DefaultBuildRank = null;
-            BlockDBAutoEnableRank = null;
+            BlockDbAutoEnableRank = null;
         }
         /// <summary>
         /// Used by the GemsCraft combined GUI to keep the "Duplicate rank defintion" message from showing
@@ -45,24 +45,28 @@ namespace fCraft {
         public static bool RanksAlreadyLoaded = false;
         /// <summary> Adds a new rank to the list. Checks for duplicates. </summary>
         public static void AddRank( [NotNull] Rank rank ) {
-            if( rank == null ) throw new ArgumentNullException( "rank" );
-            if( PlayerDB.IsLoaded ) {
-                throw new InvalidOperationException( "You may not add ranks after PlayerDB has already been loaded." );
+            if (RanksAlreadyLoaded) return; // This is to compinsate for the brand new GUI
+            if (rank == null) throw new ArgumentNullException("rank");
+            if (PlayerDB.IsLoaded)
+            {
+                throw new InvalidOperationException("You may not add ranks after PlayerDB has already been loaded.");
             }
             // check for duplicate rank names
-            if( RanksByName.ContainsKey( rank.Name.ToLower() ) && !RanksAlreadyLoaded) {
-                throw new RankDefinitionException( rank.Name,
-                                                   "Duplicate definition for rank \"{0}\" (by Name) was ignored.",
-                                                   rank.Name );
+            if (RanksByName.ContainsKey(rank.Name.ToLower()) && !RanksAlreadyLoaded)
+            {
+                throw new RankDefinitionException(rank.Name,
+                    "Duplicate definition for rank \"{0}\" (by Name) was ignored.",
+                    rank.Name);
             }
 
-            if( RanksByID.ContainsKey( rank.ID ) && !RanksAlreadyLoaded ) {
-                throw new RankDefinitionException( rank.Name,
-                                                   "Duplicate definition for rank \"{0}\" (by ID) was ignored.",
-                                                   rank.Name );
+            if (RanksByID.ContainsKey(rank.ID) && !RanksAlreadyLoaded)
+            {
+                throw new RankDefinitionException(rank.Name,
+                    "Duplicate definition for rank \"{0}\" (by ID) was ignored.",
+                    rank.Name);
             }
 
-            Ranks.Add( rank );
+            Ranks.Add(rank);
             RanksByName[rank.Name.ToLower()] = rank;
             RanksByFullName[rank.FullName] = rank;
             RanksByID[rank.ID] = rank;
@@ -82,12 +86,11 @@ namespace fCraft {
                 if( rankName.Equals( name, StringComparison.OrdinalIgnoreCase ) ) {
                     return RanksByName[rankName];
                 }
-                if( rankName.StartsWith( name, StringComparison.OrdinalIgnoreCase ) ) {
-                    if( result == null ) {
-                        result = RanksByName[rankName];
-                    } else {
-                        return null;
-                    }
+                if (!rankName.StartsWith(name, StringComparison.OrdinalIgnoreCase)) continue;
+                if( result == null ) {
+                    result = RanksByName[rankName];
+                } else {
+                    return null;
                 }
             }
             return result;
@@ -116,18 +119,17 @@ namespace fCraft {
             if( PlayerDB.IsLoaded ) {
                 throw new InvalidOperationException( "You may not modify ranks after PlayerDB has been loaded." );
             }
-            bool rankLimitsChanged = false;
+            var rankLimitsChanged = false;
             Ranks.Remove( deletedRank );
             RanksByName.Remove( deletedRank.Name.ToLower() );
             RanksByID.Remove( deletedRank.ID );
             RanksByFullName.Remove( deletedRank.FullName );
             LegacyRankMapping.Add( deletedRank.ID, replacementRank.ID );
-            foreach( Rank rank in Ranks ) {
-                for( int i = 0; i < rank.PermissionLimits.Length; i++ ) {
-                    if( rank.GetLimit( (Permission)i ) == deletedRank ) {
-                        rank.ResetLimit( (Permission)i );
-                        rankLimitsChanged = true;
-                    }
+            foreach( var rank in Ranks ) {
+                for( var i = 0; i < rank.PermissionLimits.Length; i++ ) {
+                    if (rank.GetLimit((Permission) i) != deletedRank) continue;
+                    rank.ResetLimit( (Permission)i );
+                    rankLimitsChanged = true;
                 }
             }
             RebuildIndex();
@@ -148,13 +150,13 @@ namespace fCraft {
             LowestRank = Ranks.Last();
 
             // assign indices
-            for( int i = 0; i < Ranks.Count; i++ ) {
+            for( var i = 0; i < Ranks.Count; i++ ) {
                 Ranks[i].Index = i;
             }
 
             // assign nextRankUp/nextRankDown
             if( Ranks.Count > 1 ) {
-                for( int i = 0; i < Ranks.Count - 1; i++ ) {
+                for( var i = 0; i < Ranks.Count - 1; i++ ) {
                     Ranks[i + 1].NextRankUp = Ranks[i];
                     Ranks[i].NextRankDown = Ranks[i + 1];
                 }
@@ -170,9 +172,8 @@ namespace fCraft {
             if( newName == null ) throw new ArgumentNullException( "newName" );
             if( rank.Name.Equals( newName, StringComparison.OrdinalIgnoreCase ) ) {
                 return true;
-            } else {
-                return !RanksByName.ContainsKey( newName.ToLower() );
             }
+            return !RanksByName.ContainsKey( newName.ToLower() );
         }
 
 
@@ -212,19 +213,19 @@ namespace fCraft {
         }
 
 
-        internal static void ParsePermissionLimits() {
-            foreach( Rank rank in Ranks ) {
-                if( !rank.ParsePermissionLimits() ) {
-                    Logger.Log( LogType.Warning,
-                                "Could not parse one of the rank-limits for kick, ban, promote, and/or demote permissions for {0}. " +
-                                "Any unrecognized limits were reset to defaults (own rank).",
-                                rank.Name );
-                }
+        internal static void ParsePermissionLimits()
+        {
+            foreach (var rank in Ranks.Where(rank => !rank.ParsePermissionLimits()))
+            {
+                Logger.Log( LogType.Warning,
+                    "Could not parse one of the rank-limits for kick, ban, promote, and/or demote permissions for {0}. " +
+                    "Any unrecognized limits were reset to defaults (own rank).",
+                    rank.Name );
             }
         }
 
 
-        public static string GenerateID() {
+        public static string GenerateId() {
             return Server.GetRandomString( 16 );
         }
 
@@ -235,8 +236,8 @@ namespace fCraft {
         [CanBeNull]
         public static Rank GetMinRankWithAllPermissions( [NotNull] params Permission[] permissions ) {
             if( permissions == null ) throw new ArgumentNullException( "permissions" );
-            for( int r = Ranks.Count - 1; r >= 0; r-- ) {
-                int r1 = r;
+            for( var r = Ranks.Count - 1; r >= 0; r-- ) {
+                var r1 = r;
                 if( permissions.All( t => Ranks[r1].Can( t ) ) ) {
                     return Ranks[r];
                 }
@@ -250,8 +251,8 @@ namespace fCraft {
         [CanBeNull]
         public static Rank GetMinRankWithAnyPermission( [NotNull] params Permission[] permissions ) {
             if( permissions == null ) throw new ArgumentNullException( "permissions" );
-            for( int r = Ranks.Count - 1; r >= 0; r-- ) {
-                int r1 = r;
+            for( var r = Ranks.Count - 1; r >= 0; r-- ) {
+                var r1 = r;
                 if( permissions.Any( t => Ranks[r1].Can( t ) ) ) {
                     return Ranks[r];
                 }

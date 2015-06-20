@@ -50,7 +50,9 @@ namespace fCraft.UpdateInstaller {
             "fCraftConsole.exe",
             "fCraftUI.exe",
             "ConfigTool.exe",
-            "fCraftWinService.exe"
+            "fCraftWinService.exe",
+            "ConfigGUI.exe",
+            "ServerGUI.exe"
         };
 
 
@@ -63,7 +65,7 @@ namespace fCraft.UpdateInstaller {
             Directory.SetCurrentDirectory( defaultPath );
 
             // Parse command-line arguments
-            List<string> argsList = new List<string>();
+            var argsList = new List<string>();
             foreach( string arg in args ) {
                 Console.WriteLine( arg );
                 if( arg.StartsWith( "--path=", StringComparison.OrdinalIgnoreCase ) ) {
@@ -189,28 +191,32 @@ namespace fCraft.UpdateInstaller {
             Console.WriteLine( "fCraft update complete." );
 
             // Restart fCraft (if requested)
-            if( restartTarget != null ) {
-                if( restartTarget == "fCraftConsole.exe" ) {
+            switch (restartTarget)
+            {
+                case null:
+                    return (int) ReturnCodes.Ok;
+                case "fCraftConsole.exe":
                     restartTarget = "ServerCLI.exe";
-                } else if( restartTarget == "fCraftUI.exe" ) {
+                    break;
+                case "fCraftUI.exe":
                     restartTarget = "ServerGUI.exe";
-                }
+                    break;
+            }
 
-                if( !File.Exists( restartTarget ) ) {
-                    Console.Error.WriteLine( "Restart target not found, quitting: {0}", restartTarget );
-                    return (int)ReturnCodes.RestartTargetNotFound;
-                }
-                string argString = String.Join( " ", argsList.ToArray() );
-                Console.WriteLine( "Starting: {0} {1}", restartTarget, argString );
-                switch( Environment.OSVersion.Platform ) {
-                    case PlatformID.MacOSX:
-                    case PlatformID.Unix:
-                        Process.Start( "mono", "\"" + restartTarget + "\" " + argString + " &" );
-                        break;
-                    default:
-                        Process.Start( restartTarget, argString );
-                        break;
-                }
+            if( !File.Exists( restartTarget ) ) {
+                Console.Error.WriteLine( "Restart target not found, quitting: {0}", restartTarget );
+                return (int)ReturnCodes.RestartTargetNotFound;
+            }
+            string argString = String.Join( " ", argsList.ToArray() );
+            Console.WriteLine( "Starting: {0} {1}", restartTarget, argString );
+            switch( Environment.OSVersion.Platform ) {
+                case PlatformID.MacOSX:
+                case PlatformID.Unix:
+                    Process.Start( "mono", "\"" + restartTarget + "\" " + argString + " &" );
+                    break;
+                default:
+                    Process.Start( restartTarget, argString );
+                    break;
             }
 
             return (int)ReturnCodes.Ok;
@@ -225,22 +231,21 @@ namespace fCraft.UpdateInstaller {
             backupFileName = Path.Combine( DataBackupDirectory, backupFileName );
             using( FileStream fs = File.Create( backupFileName ) ) {
                 using( ZipStorer backupZip = ZipStorer.Create( fs, "" ) ) {
-                    foreach( string dataFileName in FilesToBackup ) {
-                        if( File.Exists( dataFileName ) ) {
-                            backupZip.AddFile( ZipStorer.Compression.Deflate, dataFileName, dataFileName, "" );
-                        }
+                    foreach (string dataFileName in FilesToBackup.Where(File.Exists))
+                    {
+                        backupZip.AddFile( ZipStorer.Compression.Deflate, dataFileName, dataFileName, "" );
                     }
                 }
             }
         }
 
 
-        static string TrimQuotes( this string str ) {
+        static string TrimQuotes( this string str )
+        {
             if( str.StartsWith( "\"" ) && str.EndsWith( "\"" ) ) {
                 return str.Substring( 1, str.Length - 2 );
-            } else {
-                return str;
             }
+            return str;
         }
     }
 
