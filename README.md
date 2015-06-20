@@ -1,4 +1,4 @@
-﻿Beta 1.0
+﻿Beta 1.1
 
 #GemsCraft
 ![LegendCraft](http://i.imgur.com/pbO5NDl.png "Ya it's a logo deal with it")<br />
