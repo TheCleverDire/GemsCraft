@@ -16,8 +16,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using RandomMaze;
 using fCraft.Events;
 
@@ -102,19 +100,17 @@ namespace fCraft
                 "The only right way to listen to Justin Beiber is turned completely down"
             };
 
-            int index = randomizer.Next(0, joke.Count);
-            double time = (DateTime.Now - player.Info.LastUsedJoke).TotalSeconds;
-            double timeLeft = Math.Round(20 - time);
+            var index = randomizer.Next(0, joke.Count);
+            var time = (DateTime.Now - player.Info.LastUsedJoke).TotalSeconds;
+            var timeLeft = Math.Round(20 - time);
             if (time < 20)
             {
                 player.Message("You cannot use this command for another " + timeLeft + " second(s).");
-                return;
             }
             else
             {
                 Server.Message(joke[index]);
                 player.Info.LastUsedJoke = DateTime.Now;
-                return;
             }
 
         }
@@ -132,7 +128,7 @@ namespace fCraft
             Handler = DragonHandler
         };
 
-        static Player _playerForInit = null;
+        static Player _playerForInit;
         static Block _blockType = Block.Air;
         static Block DefaultBlock()
         {
@@ -174,13 +170,14 @@ namespace fCraft
         }
         static void DragonHandler(Player player, Command cmd)
         {
-            String cmdBlock = null;
+            string cmdBlock = null;
             try
             {
                 var cmdNext = cmd.Next();
                 try
                 {
                     cmdBlock = cmd.Next();
+                    // ReSharper disable once PossibleNullReferenceException
                     switch (cmdBlock.ToLower())
                     {
                         case "fire":
@@ -201,16 +198,19 @@ namespace fCraft
                             break;
                     }
                 }
-                catch (NullReferenceException exc)
+                catch (NullReferenceException)
                 {
                     _blockType = DefaultBlock();
                 }
+                // ReSharper disable once PossibleNullReferenceException
                 if (cmdNext.ToLower().Equals("off"))
                 {
                     if (!player.IsDragonOn) player.Message("Dragon is already off!");
                     else
                     {
                         player.IsDragonOn = false;
+                        _playerForInit = null;
+                        _blockType = Block.Undefined; // Don't use it!
                         player.Message("Turned Dragon Off");
                     }
                 }
@@ -256,8 +256,8 @@ namespace fCraft
         public static void startDragon(object sender, PlayerMovingEventArgs e)
         {
             if (!e.Player.IsDragonOn) return;
-            Player player = _playerForInit;
-            Vector3I vi = player.Position.ToBlockCoords();
+            var player = _playerForInit;
+            var vi = player.Position.ToBlockCoords();
             vi.X--;
             vi.Z--;
             if (player.World == null) return;
@@ -265,7 +265,7 @@ namespace fCraft
                 player.World.Map.QueueUpdate(new BlockUpdate(null, vi, _blockType)); //Thanks to Jonty800. He provided this line
         }
         #endregion
-            public static string[] validEntities = 
+        public static string[] ValidEntities = 
             {
                 "chicken",
                 "creeper",
@@ -280,40 +280,42 @@ namespace fCraft
                 "zombie"
                                      };
 
-        public static void PlayerMoved(object sender, fCraft.Events.PlayerMovingEventArgs e)
+        public static void PlayerMoved(object sender, PlayerMovingEventArgs e)
         {
             if (e.Player.Info.IsFrozen || e.Player.SpectatedPlayer != null || !e.Player.SpeedMode)
                 return;
-            Vector3I oldPos = e.OldPosition.ToBlockCoords();
-            Vector3I newPos = e.NewPosition.ToBlockCoords();
+            var oldPos = e.OldPosition.ToBlockCoords();
+            var newPos = e.NewPosition.ToBlockCoords();
             //check if has moved 1 whole block
-            if (newPos.X == oldPos.X + 1 || newPos.X == oldPos.X - 1 || newPos.Y == oldPos.Y + 1 || newPos.Y == oldPos.Y - 1)
+            if (newPos.X != oldPos.X + 1 && newPos.X != oldPos.X - 1 && newPos.Y != oldPos.Y + 1 &&
+                newPos.Y != oldPos.Y - 1) return;
+            Server.Players.Message("Old: " + newPos.ToString());
+            var move = newPos - oldPos;
+            const int accelerationFactor = 4;
+            var acceleratedNewPos = oldPos + move * accelerationFactor;
+            //do not forget to check for all the null pointers here - TODO
+            if (e.Player.World != null)
             {
-                Server.Players.Message("Old: " + newPos.ToString());
-                Vector3I move = newPos - oldPos;
-                int AccelerationFactor = 4;
-                Vector3I acceleratedNewPos = oldPos + move * AccelerationFactor;
-                //do not forget to check for all the null pointers here - TODO
-                Map m = e.Player.World.Map;
+                var m = e.Player.World.Map;
                 //check if can move through all the blocks along the path
-                Vector3F normal = move.Normalize();
-                Vector3I prevBlockPos = e.OldPosition.ToBlockCoords();
-                for (int i = 1; i <= AccelerationFactor * move.Length; ++i)
+                var normal = move.Normalize();
+                var prevBlockPos = e.OldPosition.ToBlockCoords();
+                for (var i = 1; i <= accelerationFactor * move.Length; ++i)
                 {
-                    Vector3I pos = (oldPos + i * normal).Round();
+                    var pos = (oldPos + i * normal).Round();
                     if (prevBlockPos == pos) //didnt yet hit the next block
                         continue;
-                    if (!m.InBounds(pos) || m.GetBlock(pos) != Block.Air) //got out of bounds or some solid block
+                    if (m != null && (!m.InBounds(pos) || m.GetBlock(pos) != Block.Air)) //got out of bounds or some solid block
                     {
                         acceleratedNewPos = (oldPos + normal * (i - 1)).Round();
                         break;
                     }
                     prevBlockPos = pos;
                 }
-                //teleport keeping the same orientation
-                //Server.Players.Message("New: "+ acceleratedNewPos.ToString());
-                e.Player.Send(PacketWriter.MakeSelfTeleport(new Position((short)(acceleratedNewPos.X * 32), (short)(acceleratedNewPos.Y * 32), e.Player.Position.Z, e.NewPosition.R, e.NewPosition.L)));
             }
+            //teleport keeping the same orientation
+            //Server.Players.Message("New: "+ acceleratedNewPos.ToString());
+            e.Player.Send(PacketWriter.MakeSelfTeleport(new Position((short)(acceleratedNewPos.X * 32), (short)(acceleratedNewPos.Y * 32), e.Player.Position.Z, e.NewPosition.R, e.NewPosition.L)));
         }
         #region LegendCraft
         /* Copyright (c) <2012-2014> <LeChosenOne, DingusBungus>
@@ -323,10 +325,8 @@ in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
-
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -370,7 +370,7 @@ THE SOFTWARE.*/
 
         static void BotHandler(Player player, Command cmd)
         {
-            string option = cmd.Next(); //take in the option arg
+            var option = cmd.Next(); //take in the option arg
             if (string.IsNullOrEmpty(option)) //empty? return, otherwise continue
             {
                 CdBot.PrintUsage(player);
@@ -378,116 +378,116 @@ THE SOFTWARE.*/
             }
 
             //certain options that take in specific params are in here, the rest are in the switch-case
-            if (option.ToLower() == "list")
+            switch (option.ToLower())
             {
-                player.Message("_Bots on {0}_", ConfigKey.ServerName.GetString());
-                foreach (Bot botCheck in Server.Bots)
-                {
-                    player.Message(botCheck.Name + " on " + botCheck.World.Name);
-                }
-                return;
-            }
-            else if (option.ToLower() == "removeall")
-            {
+                case "list":
+                    player.Message("_Bots on {0}_", ConfigKey.ServerName.GetString());
+                    foreach (Bot botCheck in Server.Bots)
+                    {
+                        player.Message(botCheck.Name + " on " + botCheck.World.Name);
+                    }
+                    return;
+                case "removeall":
 
-            rewipe:
-                Server.Bots.ForEach(botToRemove =>
-                {
-                    botToRemove.removeBot();
-                });
+                    rewipe:
+                    Server.Bots.ForEach(botToRemove =>
+                    {
+                        botToRemove.removeBot();
+                    });
 
-                if (Server.Bots.Count != 0)
-                {
-                    goto rewipe;
-                }
+                    if (Server.Bots.Count != 0)
+                    {
+                        goto rewipe;
+                    }
 
-                player.Message("All bots removed from the server.");
-                return;
-            }
-            else if (option.ToLower() == "move")
-            {
-                string targetBot = cmd.Next();
-                if (string.IsNullOrEmpty(targetBot))
+                    player.Message("All bots removed from the server.");
+                    return;
+                case "move":
                 {
-                    CdBot.PrintUsage(player);
+                    var targetBot = cmd.Next();
+                    if (string.IsNullOrEmpty(targetBot))
+                    {
+                        CdBot.PrintUsage(player);
+                        return;
+                    }
+                    var targetPlayer = cmd.Next();
+                    if (string.IsNullOrEmpty(targetPlayer))
+                    {
+                        CdBot.PrintUsage(player);
+                        return;
+                    }
+
+                    if (player.World == null) return;
+                    var targetB = player.World.FindBot(targetBot);
+                    var targetP = player.World.FindPlayerExact(targetPlayer);
+
+                    if (targetP == null)
+                    {
+                        player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetPlayer, player.World);
+                        return;
+                    }
+                    if (targetB == null)
+                    {
+                        player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetBot, player.World);
+                        return;
+                    }
+
+                    player.Message("{0} is now moving!", targetB.Name);
+                    targetB.isMoving = true;
+                    targetB.NewPosition = targetP.Position;
+                    targetB.OldPosition = targetB.Position;
+                    targetB.timeCheck.Start();
                     return;
                 }
-                string targetPlayer = cmd.Next();
-                if (string.IsNullOrEmpty(targetPlayer))
+                case "follow":
                 {
-                    CdBot.PrintUsage(player);
+                    return; // not used for now
+
+                    var targetBot = cmd.Next();
+                    if (string.IsNullOrEmpty(targetBot))
+                    {
+                        CdBot.PrintUsage(player);
+                        return;
+                    }
+                    var targetPlayer = cmd.Next();
+                    if (string.IsNullOrEmpty(targetPlayer))
+                    {
+                        CdBot.PrintUsage(player);
+                        return;
+                    }
+
+                    var targetB = player.World.FindBot(targetBot);
+                    var targetP = player.World.FindPlayerExact(targetPlayer);
+
+                    if (targetP == null)
+                    {
+                        player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetPlayer, player.World);
+                        return;
+                    }
+                    if (targetB == null)
+                    {
+                        player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetBot, player.World);
+                        return;
+                    }
+
+                    player.Message("{0} is now following {1}!", targetB.Name, targetP.Name);
+                    targetB.isMoving = true;
+                    targetB.followTarget = targetP;
+                    targetB.OldPosition = targetB.Position;
+                    targetB.timeCheck.Start();
                     return;
                 }
-
-                Bot targetB = player.World.FindBot(targetBot);
-                Player targetP = player.World.FindPlayerExact(targetPlayer);
-
-                if (targetP == null)
-                {
-                    player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetPlayer, player.World);
-                    return;
-                }
-                if (targetB == null)
-                {
-                    player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetBot, player.World);
-                    return;
-                }
-
-                player.Message("{0} is now moving!", targetB.Name);
-                targetB.isMoving = true;
-                targetB.NewPosition = targetP.Position;
-                targetB.OldPosition = targetB.Position;
-                targetB.timeCheck.Start();
-                return;
-            }
-            else if (option.ToLower() == "follow")
-            {
-                return; // not used for now
-
-                string targetBot = cmd.Next();
-                if (string.IsNullOrEmpty(targetBot))
-                {
-                    CdBot.PrintUsage(player);
-                    return;
-                }
-                string targetPlayer = cmd.Next();
-                if (string.IsNullOrEmpty(targetPlayer))
-                {
-                    CdBot.PrintUsage(player);
-                    return;
-                }
-
-                Bot targetB = player.World.FindBot(targetBot);
-                Player targetP = player.World.FindPlayerExact(targetPlayer);
-
-                if (targetP == null)
-                {
-                    player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetPlayer, player.World);
-                    return;
-                }
-                if (targetB == null)
-                {
-                    player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetBot, player.World);
-                    return;
-                }
-
-                player.Message("{0} is now following {1}!", targetB.Name, targetP.Name);
-                targetB.isMoving = true;
-                targetB.followTarget = targetP;
-                targetB.OldPosition = targetB.Position;
-                targetB.timeCheck.Start();
-                return;
             }
 
             //finally away from the special cases
-            string botName = cmd.Next(); //take in bot name arg
+            var botName = cmd.Next(); //take in bot name arg
             if (string.IsNullOrEmpty(botName)) //null check
             {
                 CdBot.PrintUsage(player);
                 return;
             }
 
-            Bot bot = new Bot(); 
+            var bot = new Bot();
             if (option != "create")//since the bot wouldn't exist for "create", we must check the bot for all cases other than "create"
             {
                 bot = Server.FindBot(botName.ToLower()); //Find the bot and assign to bot var
@@ -503,14 +503,14 @@ THE SOFTWARE.*/
             switch (option.ToLower())
             {
                 case "create":
-                    string requestedModel = cmd.Next();
+                    var requestedModel = cmd.Next();
                     if (string.IsNullOrEmpty(requestedModel))
                     {
                         player.Message("Usage is /Bot create <bot name> <bot model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, or zombie.");
                         return;
                     }
 
-                    if (!validEntities.Contains(requestedModel))
+                    if (!ValidEntities.Contains(requestedModel))
                     {
                         player.Message("That wasn't a valid bot model! Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, or zombie.");
                         return;
@@ -518,17 +518,17 @@ THE SOFTWARE.*/
 
                     //if a botname has already been chosen, ask player for a new name
                     var matchingNames = from b in Server.Bots
-                                   where b.Name.ToLower() == botName.ToLower()
-                                   select b;
+                                        where b.Name.ToLower() == botName.ToLower()
+                                        select b;
 
-                    if (matchingNames.Count() > 0)
+                    if (matchingNames.Any())
                     {
                         player.Message("A bot with that name already exists! To view all bots, type /bot list.");
                         return;
                     }
 
                     player.Message("Successfully created a bot.");
-                    Bot botCreate = new Bot();
+                    var botCreate = new Bot();
                     botCreate.setBot(botName, player.World, player.Position, LegendCraft.getNewID());
                     botCreate.createBot();
                     botCreate.changeBotModel(requestedModel);
@@ -550,25 +550,25 @@ THE SOFTWARE.*/
                     bot.isFlying = true;
                     break;
                 case "model":
-                    
+
                     if (bot.Skin != "steve")
                     {
                         player.Message("Bots cannot change model with a skin! Use '/bot clone' to reset a bot's skin.");
                         return;
                     }
 
-                    string model = cmd.Next();
+                    var model = cmd.Next();
                     if (string.IsNullOrEmpty(model))
                     {
                         player.Message("Usage is /Bot model <bot> <model>. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, or zombie.");
                         break;
                     }
 
-                    if(model == "human")//lazy parse
+                    if (model == "human")//lazy parse
                     {
                         model = "humanoid";
                     }
-                    if (!validEntities.Contains(model))
+                    if (!ValidEntities.Contains(model))
                     {
                         player.Message("Please use a valid model name! Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, or zombie.");
                         break;
@@ -649,7 +649,7 @@ THE SOFTWARE.*/
         static readonly CommandDescriptor CdSetModel = new CommandDescriptor
         {
             Name = "SetModel",
-            Permissions = new Permission[] { Permission.Troll },
+            Permissions = new[] { Permission.Troll },
             Category = CommandCategory.Fun,
             IsConsoleSafe = false,
             Usage = "/SetModel [Player] [Model]",
@@ -660,7 +660,7 @@ THE SOFTWARE.*/
         static void ModelHandler(Player player, Command cmd)
         {
             string target = cmd.Next();
-            if(string.IsNullOrEmpty(target))
+            if (string.IsNullOrEmpty(target))
             {
                 CdSetModel.PrintUsage(player);
                 return;
@@ -684,7 +684,7 @@ THE SOFTWARE.*/
             {
                 model = "humanoid";
             }
-            if (!validEntities.Contains(model))
+            if (!ValidEntities.Contains(model))
             {
                 player.Message("Please choose a valid model! Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, or zombie.");
                 return;
@@ -692,13 +692,12 @@ THE SOFTWARE.*/
 
             player.Message("{0} has been changed into a {1}!", targetPlayer.Name, model);
             targetPlayer.Model = model;
-            return;
         }
 
         static readonly CommandDescriptor CdTroll = new CommandDescriptor //Troll is an old command from 800craft that i have rehashed because of its popularity
         {                                                                 //The original command and the idea for the command were done by Jonty800 and Rebelliousdude.
             Name = "Troll",
-            Permissions = new Permission[] { Permission.Moderation },
+            Permissions = new[] { Permission.Moderation },
             Category = CommandCategory.Chat | CommandCategory.Fun,
             IsConsoleSafe = true,
             Usage = "/Troll (playername) (message-type) (message)",
@@ -2235,16 +2234,16 @@ THE SOFTWARE.*/
 
             insults = new List<String>()
             {
-                "{0}&s shit on {1}&s's mom's face.",
+                "{0}&s pooped on {1}&s's mom's face.",
                 "{0}&s spit in {1}&s's drink.",
                 "{0}&s threw a chair at {1}&s.",
-                "{0}&s rubbed their ass on {1}&s",
+                "{0}&s rubbed their butt on {1}&s",
                 "{0}&s flicked off {1}&s.",
                 "{0}&s pulled down their pants and flashed {1}&s.",
                 "{0}&s went into {1}&s's house on their birthday, locked them in the closet, and ate their birthday dinner.",
                 "{0}&s went up to {1}&s and said 'mama, mama, mama, mama, mommy, mommy, mommy, mommy, ma, ma, ma, ma, mum, mum, mum, mum. Hi! hehehehe'",
                 "{0}&s asked {1}&s if they were single, just to hear them say a painful 'yes'...",
-                "{0}&s shoved a pineapple up {1}&s's ass",
+                "{0}&s shoved a pineapple up {1}&s's butt",
                 "{0}&s beat {1}&s with a cane.",
                 "{0}&s put {1}&s in a boiling pot and started chanting.",
                 "{0}&s ate cheetos then wiped their hands all over {1}&s's white clothes",
@@ -2253,7 +2252,7 @@ THE SOFTWARE.*/
                 "{0}&s gave {1}&s a wet willy.",
                 "{0}&s gave {1}&s a wedgie.",
                 "{0}&s gave {1}&s counterfeit money and then called the Secret Service on them.",
-                "{0}&s beats {1}&s with a statue of Dingus.",
+                "{0}&s beats {1}&s with a statue of Alex.",
                 "{0}&s shot {1}&s in the knee with an arrow.",
                 "{0}&s called {1}&s a disfigured, bearded clam.",
                 "{0}&s flipped a table onto {1}&s.",
@@ -2266,7 +2265,7 @@ THE SOFTWARE.*/
             int index = randomizer.Next(0, insults.Count);
             double time = (DateTime.Now - player.Info.LastUsedInsult).TotalSeconds;
 
-            if (name == null || name.Length < 1)
+            if (string.IsNullOrEmpty(name))
             {
                 player.Message("/Insult (PlayerName)");
                 return;
@@ -2608,5 +2607,3 @@ THE SOFTWARE.*/
 
     }
 }
-
-

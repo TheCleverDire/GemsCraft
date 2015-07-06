@@ -182,6 +182,7 @@
     <Compile Include="Games\Spell.cs" />
     <Compile Include="Games\Infection.cs" />
     <Compile Include="Games\TeamDeathMatch.cs" />
+    <Compile Include="IsoCat.cs" />
     <Compile Include="MapConversion\MapFCMv3.cs" />
     <Compile Include="Network\CPE.cs" />
     <Compile Include="Network\GlobalChat.cs" />
@@ -238,6 +239,11 @@
     <Compile Include="Portals\PortalException.cs" />
     <Compile Include="Portals\PortalHandler.cs" />
     <Compile Include="Portals\PortalRange.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Utils\HeartbeatSaverUtil.cs" />
     <Compile Include="Utils\Paths.cs" />
     <Compile Include="System\Scheduler.cs" />
@@ -377,6 +383,39 @@
     <Compile Include="World\ZoneCollection.cs" />
     <Compile Include="World\World.Events.cs" />
     <Compile Include="Utils\JetBrains.Annotations.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\chatbackground.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\main.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\server_off.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\server_on.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\grayAbstract.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\grayArt.PNG" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Tileset.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\TilesetShadowed.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

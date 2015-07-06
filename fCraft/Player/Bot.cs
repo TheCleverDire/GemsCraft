@@ -176,7 +176,7 @@ namespace fCraft
         /// </summary>
         public void changeBotModel(String botModel)
         {
-            if (!FunCommands.validEntities.Contains(botModel))
+            if (!FunCommands.ValidEntities.Contains(botModel))
             {
                 return; //something went wrong, model does not exist
             }

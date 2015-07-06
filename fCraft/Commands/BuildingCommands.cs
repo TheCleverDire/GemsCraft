@@ -855,12 +855,9 @@ THE SOFTWARE.*/
                     if (world.Map != null)
                     {
                         player.World.Map.QueueUpdate(new BlockUpdate(null, player.towerOrigin, Block.Air));
-                        foreach (Vector3I block in player.TowerCache.Values)
+                        foreach (Vector3I block in player.TowerCache.Values.Where(block => world.Map != null))
                         {
-                            if (world.Map != null)
-                            {
-                                player.Send(PacketWriter.MakeSetBlock(block, player.WorldMap.GetBlock(block)));
-                            }
+                            player.Send(PacketWriter.MakeSetBlock(block, player.WorldMap.GetBlock(block)));
                         }
                     }
                     player.TowerCache.Clear();

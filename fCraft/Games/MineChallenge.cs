@@ -156,12 +156,11 @@ namespace fCraft.Games
             wait(10000);
             PositionCheck();
             scoreCounter();
-            foreach (Vector3I block in platform.Values){
-                if (world.Map != null && world.IsLoaded){
-                    world.Map.QueueUpdate(new BlockUpdate(null, block, Block.Air));
-                    Vector3I removed;
-                    platform.TryRemove(block.ToString(), out removed);
-                }
+            foreach (Vector3I block in platform.Values.Where(block => world.Map != null && world.IsLoaded))
+            {
+                world.Map.QueueUpdate(new BlockUpdate(null, block, Block.Air));
+                Vector3I removed;
+                platform.TryRemove(block.ToString(), out removed);
             }
             completed.Clear();
             interval();
@@ -173,14 +172,10 @@ namespace fCraft.Games
             world.Games.Remove(shootBlack);
             mode = GameMode.shootblack;
             GunModeOn();
-            foreach (Player p in world.Players)
+            foreach (Vector3I block in world.Players.Select(p => new Vector3I(p.Position.X / 32, p.Position.Y /32, (p.Position.Z /32) + 8)).Where(block => world.Map.InBounds(block)))
             {
-                Vector3I block = new Vector3I(p.Position.X / 32, p.Position.Y /32, (p.Position.Z /32) + 8);
-                if (world.Map.InBounds(block))
-                {
-                    randomBlocks.TryAdd(block.ToString(), block);
-                    world.Map.QueueUpdate(new BlockUpdate(null, block, Block.Black));
-                }
+                randomBlocks.TryAdd(block.ToString(), block);
+                world.Map.QueueUpdate(new BlockUpdate(null, block, Block.Black));
             }
             world.Players.Message("&WYou have 20 seconds to shoot all &8BLACK &Wblocks.... &AGO!");
             wait(10000);
@@ -188,14 +183,11 @@ namespace fCraft.Games
             wait(10000);
             GunModeOff();
             scoreCounter();
-            foreach (Vector3I block in platform.Values)
+            foreach (Vector3I block in platform.Values.Where(block => world.Map != null && world.IsLoaded))
             {
-                if (world.Map != null && world.IsLoaded)
-                {
-                    world.Map.QueueUpdate(new BlockUpdate(null, block, Block.Air));
-                    Vector3I removed;
-                    platform.TryRemove(block.ToString(), out removed);
-                }
+                world.Map.QueueUpdate(new BlockUpdate(null, block, Block.Air));
+                Vector3I removed;
+                platform.TryRemove(block.ToString(), out removed);
             }
             interval();
             gamePicker();
@@ -204,56 +196,34 @@ namespace fCraft.Games
         //events
         public static void playerClicking(object sender, PlayerClickedEventArgs e)
         {
-            if (e.Player.World.GameOn)
+            if (!e.Player.World.GameOn) return;
+            if (Games.MineChallenge.mode != Games.MineChallenge.GameMode.NULL) return;
+            if (platform.Values.Count <= 0) return;
+            foreach (Vector3I block in platform.Values.Where(block => e.Coords == block))
             {
-                if (Games.MineChallenge.mode == Games.MineChallenge.GameMode.NULL)
-                {
-                    if (platform.Values.Count > 0)
-                    {
-                        foreach (Vector3I block in platform.Values)
-                        {
-                            if (e.Coords == block)
-                            {
-                                Player.RaisePlayerPlacedBlockEvent(e.Player, world.Map, block, world.Map.GetBlock(e.Coords), world.Map.GetBlock(e.Coords), BlockChangeContext.Manual);
-                                world.Map.QueueUpdate(new BlockUpdate(null, block, Block.Pink));
-                            }
-                        }
-                    }
-                }
+                Player.RaisePlayerPlacedBlockEvent(e.Player, world.Map, block, world.Map.GetBlock(e.Coords), world.Map.GetBlock(e.Coords), BlockChangeContext.Manual);
+                world.Map.QueueUpdate(new BlockUpdate(null, block, Block.Pink));
             }
         }
 
         public static void PositionCheck()
         {
-            foreach (Player player in world.Players)
+            foreach (Player player in from player in world.Players from platBlock in platform.Values where (player.Position.X / 32) == platBlock.X where (player.Position.Y / 32) == platBlock.Y where (player.Position.Z / 32 - 2) == platBlock.Z || (player.Position.Z / 32 - 1) == platBlock.Z select player)
             {
-                foreach (Vector3I platBlock in platform.Values)
+                player.Message("&8You did it!");
+                if (world.blueTeam.Contains(player) && !completed.Contains(player))
                 {
-                    if ((player.Position.X / 32) == platBlock.X)
-                    {
-                        if ((player.Position.Y / 32) == platBlock.Y)
-                        {
-                            if ((player.Position.Z / 32 - 2) == platBlock.Z || (player.Position.Z / 32 - 1) == platBlock.Z)
-                            {
-                                player.Message("&8You did it!");
-                                if (world.blueTeam.Contains(player) && !completed.Contains(player))
-                                {
-                                    world.blueScore++;
-                                    completed.Add(player);
-                                }
-                                else
-                                {
-                                    world.redScore++;
-                                    completed.Add(player);
-                                }
-                            }
-                        }
-                    }
+                    world.blueScore++;
+                    completed.Add(player);
+                }
+                else
+                {
+                    world.redScore++;
+                    completed.Add(player);
                 }
             }
         }
 
-        
 
         public static void WorldChanging(object sender, PlayerJoinedWorldEventArgs e)
         {

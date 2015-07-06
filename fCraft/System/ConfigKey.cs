@@ -571,7 +571,7 @@ If disabled, heartbeat data is written to heartbeatdata.txt." )]
 @"If enabled, allows changing worlds' environment settings for WoM clients via /Env or /MapEdit" )]
         WoMEnableEnvExtensions,
 
-        [IPKey( ConfigSection.Advanced, IPKeyAttribute.BlankValueMeaning.Any,
+        [IpKey( ConfigSection.Advanced, IpKeyAttribute.BlankValueMeaning.Any,
 @"If the machine has more than one available IP address (for example
 if you have more than one NIC) you can use this setting to make
 GemsCraft bind to the same IP every time." )]
@@ -616,8 +616,78 @@ but will reduce bandwidth use." )]
         #region CPE
 
         [BoolKey(ConfigSection.Cpe, true,
-            @"If server has ClickDistance enabled or not")]
-        ClickDistanceEnabled
+            @"ClickDistance is the CPE extension that enables 
+ability to change a user's click distance. If enabled, 
+all users can use the command if they have the permssion. 
+If disabled, no users, even with the permission, can use 
+the command.")]
+        ClickDistanceEnabled,
+
+        #region CustomBlockConfigs
+        [BoolKey(ConfigSection.Cpe, true,
+            @"CustomBlocks is the CPE extension that enables the 
+new kind of blocks provided. In this config, you can either
+disable all blocks, enable all, or only enable
+specific ones.")]
+        CustomBlocksEnabled,
+
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        CobbleSlabEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        RopeEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        SandstoneEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        FireEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        SnowEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        LightPinkEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        DarkGreenEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        BrownEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        DarkBlueEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        TurquoiseEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        IceEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        TileEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        MagmaEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        PillarEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        CrateEnabled,
+        [BoolKey(ConfigSection.Cpe, true, @"")]
+        StoneBrickEnabled,
+        #endregion
+
+        [BoolKey(ConfigSection.Cpe, true,
+            @"HeldBlock is the CPE extension that
+enables the ability to see of force other player's blocks.")]
+        HeldBlockEnabled,
+
+        #region MessageTypeConfigs
+        [BoolKey(ConfigSection.Cpe, true,
+            @"MessageType is the CPE extensions that enables
+the different text positions in game")]
+        MessageTypeEnabled,
+
+        [BoolKey(ConfigSection.Cpe, true,
+            @"If true, displays annoucements as Announcement
+message type if character count is less than 64")]
+        AnnouncementsAtTop,
+
+        [BoolKey(ConfigSection.Cpe, true,
+            @"Status1 MessageType")]
+        Status1Enabled,
+        [StringKey(ConfigSection.Cpe, "GemsCraft " + Updater.LatestStable,
+            @"")]
+        Status1Text
+        #endregion
         #endregion
     }
 }

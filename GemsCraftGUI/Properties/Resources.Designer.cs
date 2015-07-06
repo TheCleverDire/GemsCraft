@@ -73,6 +73,26 @@ namespace GemsCraftGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap grayAbstract {
+            get {
+                object obj = ResourceManager.GetObject("grayAbstract", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap grayArt {
+            get {
+                object obj = ResourceManager.GetObject("grayArt", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icon {
             get {
                 object obj = ResourceManager.GetObject("icon", resourceCulture);
@@ -116,6 +136,26 @@ namespace GemsCraftGUI.Properties {
         internal static System.Drawing.Bitmap server_on {
             get {
                 object obj = ResourceManager.GetObject("server_on", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Tileset {
+            get {
+                object obj = ResourceManager.GetObject("Tileset", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TilesetShadowed {
+            get {
+                object obj = ResourceManager.GetObject("TilesetShadowed", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

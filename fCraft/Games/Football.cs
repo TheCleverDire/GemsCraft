@@ -44,17 +44,15 @@ namespace fCraft
                 _startPos.Y = _world.Map.Bounds.YMax - _world.Map.Bounds.YMin;
                 for (int z = _world.Map.Bounds.ZMax; z > 0; z--)
                 {
-                    if (_world.Map.GetBlock(_startPos.X, _startPos.Y, z) != Block.Air)
-                    {
-                        _startPos.Z = z + 1;
-                        break;
-                    }
+                    if (_world.Map.GetBlock(_startPos.X, _startPos.Y, z) == Block.Air) continue;
+                    _startPos.Z = z + 1;
+                    break;
                 }
             }
             _world.Map.QueueUpdate(new BlockUpdate(null, _startPos, Block.White));
         }
 
-        private FootballBehavior _footballBehavior = new FootballBehavior();
+        private readonly FootballBehavior _footballBehavior = new FootballBehavior();
         public void ClickedFootball(object sender, PlayerClickedEventArgs e)
         {
             //replace e.coords with player.Pos.toblock() (moving event)

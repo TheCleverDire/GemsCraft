@@ -3,10 +3,10 @@ using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
-using fCraftGUI.Properties;
+using fCraft.Properties;
 using JetBrains.Annotations;
 
-namespace fCraft.GUI {
+namespace fCraft {
 
     /// <summary> Drawing/clipping mode of IsoCat map renderer. </summary>
     public enum IsoCatMode {

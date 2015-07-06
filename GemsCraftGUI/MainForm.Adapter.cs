@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using fCraft;
 using fCraft.ConfigGUI;
 using JetBrains.Annotations;
+using System.Collections.Generic;
 
 namespace GemsCraftGUI
 {
@@ -65,7 +66,7 @@ namespace GemsCraftGUI
             ApplyTabSecurity();
             ApplyTabSavingAndBackup();
             ApplyTabLogging();
-            ApplyTabIRC();
+            ApplyTabIrc();
             ApplyTabAdvanced();
             ApplyTabCpe();
             AddChangeHandler(tabs, SomethingChanged);
@@ -405,7 +406,7 @@ namespace GemsCraftGUI
         }
 
 
-        void ApplyTabIRC()
+        void ApplyTabIrc()
         {
             xIRCBotEnabled.Checked = ConfigKey.IRCBotEnabled.Enabled();
             gIRCNetwork.Enabled = xIRCBotEnabled.Checked;
@@ -536,6 +537,30 @@ namespace GemsCraftGUI
         void ApplyTabCpe()
         {
             chkClickDistanceAllowed.Checked = ConfigKey.ClickDistanceEnabled.Enabled();
+            #region CB
+            chkCustomBlocksAllowed.Checked = ConfigKey.CustomBlocksEnabled.Enabled();
+            //var newItemList = clbBlocks.Items.Cast<bool>().ToList();
+            clbBlocks.SetItemChecked(0, Bk(ConfigKey.CobbleSlabEnabled));
+            clbBlocks.SetItemChecked(1, Bk(ConfigKey.RopeEnabled));
+            clbBlocks.SetItemChecked(2, Bk(ConfigKey.SandstoneEnabled));
+            clbBlocks.SetItemChecked(3, Bk(ConfigKey.SnowEnabled));
+            clbBlocks.SetItemChecked(4, Bk(ConfigKey.FireEnabled));
+            clbBlocks.SetItemChecked(5, Bk(ConfigKey.LightPinkEnabled));
+            clbBlocks.SetItemChecked(6, Bk(ConfigKey.DarkGreenEnabled));
+            clbBlocks.SetItemChecked(7, Bk(ConfigKey.BrownEnabled));
+            clbBlocks.SetItemChecked(8, Bk(ConfigKey.DarkBlueEnabled));
+            clbBlocks.SetItemChecked(9, Bk(ConfigKey.TurquoiseEnabled));
+            clbBlocks.SetItemChecked(10, Bk(ConfigKey.IceEnabled));
+            clbBlocks.SetItemChecked(11, Bk(ConfigKey.TileEnabled));
+            clbBlocks.SetItemChecked(12, Bk(ConfigKey.MagmaEnabled));
+            clbBlocks.SetItemChecked(13, Bk(ConfigKey.PillarEnabled));
+            clbBlocks.SetItemChecked(14, Bk(ConfigKey.CrateEnabled));
+            clbBlocks.SetItemChecked(15, Bk(ConfigKey.StoneBrickEnabled));
+            #endregion
+        }
+        private static bool Bk(ConfigKey cK)
+        {
+            return cK.Enabled();
         }
         static CheckState CheckStateS(int dragblock)
         {
@@ -778,8 +803,52 @@ namespace GemsCraftGUI
             //CPE
             //TODO insert all CPE configs
             ConfigKey.ClickDistanceEnabled.TrySetValue(chkClickDistanceAllowed.Checked);
+            #region CB
+            ConfigKey.CustomBlocksEnabled.TrySetValue(chkCustomBlocksAllowed.Checked);
+            ConfigKey.CobbleSlabEnabled.TrySetValue(clbBlocks.GetItemChecked(0));
+            ConfigKey.RopeEnabled.TrySetValue(clbBlocks.GetItemChecked(1));
+            ConfigKey.SandstoneEnabled.TrySetValue(clbBlocks.GetItemChecked(2));
+            ConfigKey.SnowEnabled.TrySetValue(clbBlocks.GetItemChecked(3));
+            ConfigKey.FireEnabled.TrySetValue(clbBlocks.GetItemChecked(4));
+            ConfigKey.LightPinkEnabled.TrySetValue(clbBlocks.GetItemChecked(5));
+            ConfigKey.DarkGreenEnabled.TrySetValue(clbBlocks.GetItemChecked(6));
+            ConfigKey.BrownEnabled.TrySetValue(clbBlocks.GetItemChecked(7));
+            ConfigKey.DarkBlueEnabled.TrySetValue(clbBlocks.GetItemChecked(8));
+            ConfigKey.TurquoiseEnabled.TrySetValue(clbBlocks.GetItemChecked(9));
+            ConfigKey.IceEnabled.TrySetValue(clbBlocks.GetItemChecked(10));
+            ConfigKey.TileEnabled.TrySetValue(clbBlocks.GetItemChecked(11));
+            ConfigKey.MagmaEnabled.TrySetValue(clbBlocks.GetItemChecked(12));
+            ConfigKey.PillarEnabled.TrySetValue(clbBlocks.GetItemChecked(13));
+            ConfigKey.CrateEnabled.TrySetValue(clbBlocks.GetItemChecked(14));
+            ConfigKey.StoneBrickEnabled.TrySetValue(clbBlocks.GetItemChecked(15));
+            #endregion
         }
 
+        private readonly ConfigKey[] _cbConfigs = {
+            ConfigKey.CobbleSlabEnabled, ConfigKey.RopeEnabled, ConfigKey.SandstoneEnabled,
+            ConfigKey.SnowEnabled, ConfigKey.FireEnabled, ConfigKey.LightPinkEnabled, ConfigKey.DarkGreenEnabled,
+            ConfigKey.BrownEnabled, ConfigKey.DarkBlueEnabled, ConfigKey.TurquoiseEnabled, ConfigKey.IceEnabled,
+            ConfigKey.TileEnabled, ConfigKey.MagmaEnabled, ConfigKey.PillarEnabled, ConfigKey.CrateEnabled,
+            ConfigKey.StoneBrickEnabled, ConfigKey.DefaultRank // Last item never used to protect against exception
+        };
+
+        private ConfigKey MyConfig(int i)
+        {
+            return _cbConfigs[i];
+        }
+        private int MyIntConfig(ConfigKey cK)
+        {
+            var intLoop = 0;
+            foreach (var ck in _cbConfigs)
+            {
+                if (cK.Equals(ck))
+                {
+                    return intLoop;
+                }
+                intLoop++;
+            }
+            return -1;
+        }
 
         void SaveWorldList()
         {
@@ -802,7 +871,7 @@ namespace GemsCraftGUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(String.Format("An error occured while trying to save world list ({0}): {1}{2}",
+                MessageBox.Show(string.Format("An error occured while trying to save world list ({0}): {1}{2}",
                                                 Paths.WorldListFileName,
                                                 Environment.NewLine,
                                                 ex));

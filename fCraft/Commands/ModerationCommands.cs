@@ -103,28 +103,26 @@ namespace fCraft {
 
         private static String NukedName()
         {
-            String[] r = new string[]
-            {
-                "WimpyCreamPuff", "CheesyBeaver", "StinkCheese", "Asshat", "ChickenNugget",
-                "BigMac", "TurdFace", "AdolfHitler", "WombRaider", "DancingDragon",
-                "Nuked"
-            };
-            Random rRandom = new Random();
-            int randomName = rRandom.Next(r.Length);
-            int[] RandomInt = new int[]
+            var r = new[] {"WimpyCreamPuff", "CheesyBeaver", "StinkCheese", "Butthat", "ChickenNugget", "BigMac", "TurdFace", "AdolfHitler", "WombRaider", "DancingDragon", "Nuked"};
+            var rRandom = new Random();
+            var randomName = rRandom.Next(r.Length);
+            var randomInt = new[]
             {
                 rRandom.Next(9),  rRandom.Next(9),  rRandom.Next(9)
             };
-            return "&4" + r[randomName] + RandomInt[0] + "" + RandomInt[1] + "" + RandomInt[2];
+            return "&4" + r[randomName] + randomInt[0] + "" + randomInt[1] + "" + randomInt[2];
         }
         private static void NukeHandler(Player player, Command cmd)
         {
-            String TargetPlayerStr = null;
             try
             {
-                TargetPlayerStr = cmd.Next();
-                Player selectedPlayer = PlayerDB.FindPlayerInfoExact(TargetPlayerStr).PlayerObject;
-                PlayerInfo pInfo = selectedPlayer.Info;
+                var targetPlayerStr = cmd.Next();
+                if (targetPlayerStr == null) return;
+                var findPlayerInfoExact = PlayerDB.FindPlayerInfoExact(targetPlayerStr);
+                if (findPlayerInfoExact == null) return;
+                var selectedPlayer = findPlayerInfoExact.PlayerObject;
+                if (selectedPlayer == null) return;
+                var pInfo = selectedPlayer.Info;
                 pInfo.DisplayedName = NukedName(); // Returns a random nuked name
                 if (!pInfo.Rank.Equals(RankManager.LowestRank))
                 {
@@ -174,7 +172,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.*/
 
-        public static SchedulerTask task;
+        public static SchedulerTask Task;
 
         static readonly CommandDescriptor CdGetBlock = new CommandDescriptor
         {
@@ -344,11 +342,11 @@ THE SOFTWARE.*/
                 }
             }
 
-            task.Stop();
+            Task.Stop();
 
             resetWorld = player.World;
-            task = Scheduler.NewTask(resetAnnouncement);
-            task.RunOnce(TimeSpan.FromSeconds(reset));
+            Task = Scheduler.NewTask(resetAnnouncement);
+            Task.RunOnce(TimeSpan.FromSeconds(reset));
 
         }
 
@@ -481,6 +479,10 @@ THE SOFTWARE.*/
 
         private static void SetClickHandler(Player player, Command cmd)
         {
+            if (!ConfigKey.ClickDistanceEnabled.Enabled())
+            {
+                player.Message("&eClickDistance &cis not enabled on this server.");
+            }
             if (!Heartbeat.ClassiCube())
             {
                 player.Message("This command can only be used on ClassiCube server!");

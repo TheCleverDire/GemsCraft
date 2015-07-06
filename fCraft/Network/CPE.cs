@@ -6,6 +6,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.IO;
+using System.Linq;
 
 //All of this was pretty much taken or based off of FemtoCraft by fragmer, I wrote about 5%-7% of this lol
 
@@ -110,12 +111,60 @@ namespace fCraft
     }
     public sealed partial class Player
     {
-        public static Block[] customBlocks = new Block[] {
-            Block.CobbleSlab, Block.Rope, Block.Sandstone,
+        public static Block[] CustomBlocks = {
+            Block.CobbleSlab/*0*/, Block.Rope, Block.Sandstone,
             Block.Snow, Block.Fire, Block.LightPink, Block.DarkGreen,
             Block.Brown, Block.DarkBlue, Block.Turquoise, Block.Ice,
             Block.Tile, Block.Magma, Block.Pillar, Block.Crate, Block.StoneBrick
         };
+
+        public static Block[] CustomPlusNull()
+        {
+            var returnlist = CustomBlocks.ToList();
+            returnlist.Add(Block.Undefined); // To prevent array index out of bounds
+            return returnlist.ToArray();
+        }
+        public static bool[] CustomEnabledBlocks()
+        {
+            return new[]
+            {
+                Bk(ConfigKey.CobbleSlabEnabled), Bk(ConfigKey.RopeEnabled),
+                Bk(ConfigKey.SandstoneEnabled), Bk(ConfigKey.SnowEnabled),
+                Bk(ConfigKey.FireEnabled), Bk(ConfigKey.LightPinkEnabled),
+                Bk(ConfigKey.DarkGreenEnabled), Bk(ConfigKey.BrownEnabled),
+                Bk(ConfigKey.DarkBlueEnabled), Bk(ConfigKey.TurquoiseEnabled),
+                Bk(ConfigKey.IceEnabled), Bk(ConfigKey.TileEnabled),
+                Bk(ConfigKey.MagmaEnabled), Bk(ConfigKey.PillarEnabled),
+                Bk(ConfigKey.CrateEnabled), Bk(ConfigKey.StoneBrickEnabled)
+            };
+        }
+
+        public static string DragonUsage()
+        {
+            var fullStr = "[";
+            if (Bk(ConfigKey.FireEnabled)) fullStr += "Fire/";
+            fullStr += "Lava/";
+            if (Bk(ConfigKey.MagmaEnabled)) fullStr += "Magma/";
+            return fullStr + "Red";
+        }
+        private static bool Bk(ConfigKey cK)
+        {
+            return cK.Enabled();
+        }
+
+        public static bool IsBlockEnabled(int i)
+        {
+            var newArray = CustomEnabledBlocks().ToList();
+            newArray.Add(false);
+            var finalArray = newArray.ToArray();
+            return finalArray.Where((t, x) => x == i).FirstOrDefault();
+        }
+
+        static bool CbEnabled()
+        {
+            return ConfigKey.CustomBlocksEnabled.Enabled();
+        }
+        #region Extension Info
         const string SelectionBoxExtName = "SelectionBoxExt";//I don't think this is actually a packet
         const int SelectionBoxExtVersion = 1;
         const string CustomBlocksExtName = "CustomBlocks";
@@ -141,7 +190,9 @@ namespace fCraft
         const int EnvWeatherTypeExtVersion = 1;
         const string HackControlExtName = "HackControl";
         const int HackControlExtVersion = 1;
+        #endregion
 
+        #region Extension Get/Sets
         // Note: if more levels are added, change UsesCustomBlocks from bool to int
         public bool SelectionBoxExt { get; set; }//is this even a thing?
         public bool UsesCustomBlocks { get; set; }
@@ -155,17 +206,22 @@ namespace fCraft
         public bool SupportsSelectionCuboid = false;
         public bool SupportsMessageTypes = false;
         public bool SupportsHackControl = false;
-
+        #endregion
         string ClientName { get; set; }
+
+        private static short ExtensionCount()
+        {
+            return CbEnabled() ? (short) 10 : (short) 9;
+        }
 
         bool NegotiateProtocolExtension()
         {
             this.reader = new PacketReader(this.stream);
             // Send info of how many extensions we support
-            writer.Write(Packet.MakeExtInfo(10).Data);
+            writer.Write(Packet.MakeExtInfo(ExtensionCount()).Data);
 
             //dump all my extensions here for the lels
-            writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Data);
+            if (CbEnabled()) writer.Write(Packet.MakeExtEntry(CustomBlocksExtName, CustomBlocksExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(ClickDistanceExtName, ClickDistanceExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(EnvColorsExtName, EnvColorsExtVersion).Data);
             writer.Write(Packet.MakeExtEntry(ChangeModelExtName, ChangeModelExtVersion).Data);

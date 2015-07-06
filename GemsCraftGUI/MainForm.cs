@@ -69,9 +69,9 @@ namespace GemsCraftGUI
             FillToolTipsSecurity();
             FillToolTipsSavingAndBackup();
             FillToolTipsLogging();
-            FillToolTipsIRC();
+            FillToolTipsIrc();
             FillToolTipsAdvanced();
-
+            FillToolTipsCpe();
             FillIrcNetworkList(false);
 
             // Initialize fCraft's args, paths, and logging backend.
@@ -1308,7 +1308,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             ApplyTabSecurity();
             ApplyTabSavingAndBackup();
             ApplyTabLogging();
-            ApplyTabIRC();
+            ApplyTabIrc();
             ApplyTabAdvanced();
         }
 
@@ -1351,7 +1351,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                     break;
                 case 7:// IRC
                     Config.LoadDefaults(ConfigSection.Irc);
-                    ApplyTabIRC();
+                    ApplyTabIrc();
                     break;
                 case 8:// Advanced
                     Config.LoadDefaults(ConfigSection.Logging);
@@ -2746,7 +2746,45 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void MainForm_Load_1(object sender, EventArgs e)
         {
+            foreach (var b in Player.CustomBlocks)
+            {
+                clbBlocks.Items.Add(b.ToString());
+            }
+        }
 
+        private void tabRanks_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void chStatus1_CheckedChanged(object sender, EventArgs e)
+        {
+            txtStatus1.Enabled = !chkStatus1.Checked;
+        }
+
+        private void chkStatus2_CheckedChanged(object sender, EventArgs e)
+        {
+            txtStatus2.Enabled = !chkStatus2.Checked;
+        }
+
+        private void chkStatus3_CheckedChanged(object sender, EventArgs e)
+        {
+            txtStatus3.Enabled = !chkStatus3.Checked;
+        }
+
+        private void chkBottomRight3_CheckedChanged(object sender, EventArgs e)
+        {
+            txtBottomRight3.Enabled = !chkBottomRight3.Checked;
+        }
+
+        private void chkBottomRight2_CheckedChanged(object sender, EventArgs e)
+        {
+            txtBottomRight2.Enabled = !chkBottomRight2.Checked;
+        }
+
+        private void chkBottomRight1_CheckedChanged(object sender, EventArgs e)
+        {
+            txtBottomRight1.Enabled = !chkBottomRight1.Checked;
         }
     }
 }

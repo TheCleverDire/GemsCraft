@@ -1,5 +1,7 @@
 ﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 
+using System;
+
 namespace fCraft {
     /// <summary> Enumeration of all standard Minecraft Classic block types. </summary>
     public enum Block : byte {
@@ -77,11 +79,76 @@ namespace fCraft {
         Crate = 64,
         StoneBrick = 65
     }
+
+    public class BlockConversionException : Exception
+    {
+        public BlockConversionException()
+        {
+            
+        }
+
+        public BlockConversionException(string message) : base(message)
+        {
+            
+        }
+
+        public BlockConversionException(string message, Exception inner) : base(message, inner)
+        {
+            
+        }
+    }
     /// <summary>
     /// Class for handling conversion between Blocks to Bytes and vise versa
     /// </summary>
     public class BlockConversion
     {
+        public static Block ToFallBackBlock(byte b)
+        {
+            Logger.Log(LogType.SystemActivity, "" + b);
+            switch ((int) b)
+            {
+                case 50:
+                    return Block.CobbleSlab;
+                case 51:
+                    return Block.BrownMushroom;
+                case 52:
+                    return Block.Sand;
+                case 53:
+                    return Block.Air;
+                case 54:
+                    return Block.Lava;
+                case 55:
+                    return Block.Pink;
+                case 56:
+                    return Block.Green;
+                case 57:
+                    return Block.Dirt;
+                case 58:
+                    return Block.Blue;
+                case 59:
+                    return Block.Cyan;
+                case 60:
+                    return Block.Glass;
+                case 61:
+                    return Block.Iron;
+                case 62:
+                    return Block.Obsidian;
+                case 63:
+                    return Block.White;
+                case 64:
+                    return Block.Wood;
+                case 65:
+                    return Block.Stone;
+                default:
+                    return (Block)b;
+            }
+        }
+
+        public static Block ToFallBackBlock(Block b)
+        {
+            return ToFallBackBlock(ToByte(b));
+        }
+
         /// <summary>
         /// Converts byte to block
         /// </summary>
@@ -229,6 +296,17 @@ namespace fCraft {
                     return Block.Undefined;
 
             }
+        }
+
+        public static byte ToByte(Block b)
+        {
+            if (b.Equals(Block.Undefined)) return 255;
+            for (var x = 0; x <= 65; x++)
+            {
+                var blockE = ToBlock((byte) x);
+                if (blockE.Equals(b)) return (byte) x;
+            }
+            return 255; // Couldn't figure what the block was! Test failed. Return as undefined
         }
     }
 }

@@ -766,7 +766,7 @@ Does not include IRC chatter (see IRCChat).";
         }
 
 
-        void FillToolTipsIRC()
+        void FillToolTipsIrc()
         {
             toolTip.SetToolTip(xIRCBotEnabled, ConfigKey.IRCBotEnabled.GetDescription());
 
@@ -814,7 +814,7 @@ or type in address/port manually below.";
             toolTip.SetToolTip(xIRCUseColor, ConfigKey.IRCUseColor.GetDescription());
         }
 
-
+         
         void FillToolTipsAdvanced()
         {
             toolTip.SetToolTip(xRelayAllBlockUpdates, ConfigKey.RelayAllBlockUpdates.GetDescription());
@@ -842,6 +842,13 @@ or type in address/port manually below.";
             toolTip.SetToolTip(xIP, ConfigKey.IP.GetDescription());
             toolTip.SetToolTip(tIP, ConfigKey.IP.GetDescription());
 
+        }
+
+
+        void FillToolTipsCpe()
+        {
+            toolTip.SetToolTip(gboClickDistance, ConfigKey.ClickDistanceEnabled.GetDescription());
+            toolTip.SetToolTip(gboCustomBlocks, ConfigKey.CustomBlocksEnabled.GetDescription());
         }
     }
 }

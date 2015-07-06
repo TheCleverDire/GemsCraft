@@ -1,6 +1,7 @@
 ﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using JetBrains.Annotations;
@@ -195,7 +196,16 @@ namespace fCraft {
         }
 
 
-        public static Packet MakeSetBlock( int x, int y, int z, Block type ) {
+        public static Packet MakeSetBlock( int x, int y, int z, Block typeOriginal)
+        {
+            
+            var loopCount = 0;
+            var type = typeOriginal;
+            foreach (var b in Player.CustomBlocks.Where(b => b.Equals(Player.CustomBlocks[loopCount]) && !Player.IsBlockEnabled(loopCount)))
+            {
+                type = BlockConversion.ToFallBackBlock(type);
+                loopCount++;
+            }
             Packet packet = new Packet( OpCode.SetBlockServer );
             ToNetOrder( x, packet.Data, 1 );
             ToNetOrder( z, packet.Data, 3 );
@@ -203,9 +213,16 @@ namespace fCraft {
             packet.Data[7] = (byte)type;
             return packet;
         }
+        
 
-
-        internal static Packet MakeSetBlock( Vector3I coords, Block type ) {
+        internal static Packet MakeSetBlock( Vector3I coords, Block typeOriginal ) {
+            var loopCount = 0;
+            var type = typeOriginal;
+            foreach (var b in Player.CustomBlocks.Where(b => b.Equals(Player.CustomBlocks[loopCount]) && !Player.IsBlockEnabled(loopCount)))
+            {
+                type = BlockConversion.ToFallBackBlock(type);
+                loopCount++;
+            }
             Packet packet = new Packet( OpCode.SetBlockServer );
             ToNetOrder( coords.X, packet.Data, 1 );
             ToNetOrder( coords.Z, packet.Data, 3 );

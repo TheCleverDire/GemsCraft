@@ -10,7 +10,6 @@ namespace fCraft.UpdateBuilder {
             "AStarPathFinder.dll",
             "GemsCraftGUI.exe",
             "fCraft.dll",
-            "fCraftGUI.dll",
             "ServerCLI.exe",
             "ServiceStack.Text.dll"
         };

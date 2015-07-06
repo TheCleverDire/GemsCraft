@@ -1,5 +1,6 @@
 ﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -134,10 +135,9 @@ namespace fCraft {
             if( PowerOfTwo ) {
                 bool found = false;
                 for( int i = 0; i < 31; i++ ) {
-                    if( parsedValue == (1 << i) ) {
-                        found = true;
-                        break;
-                    }
+                    if (parsedValue != (1 << i)) continue;
+                    found = true;
+                    break;
                 }
                 if( !found && parsedValue != 0 ) {
                     throw new FormatException( String.Format( "Value ({0}) is not a power of two.", parsedValue ) );
@@ -148,10 +148,9 @@ namespace fCraft {
                     throw new FormatException( String.Format( "Value ({0}) is not on the list of valid values.", parsedValue ) );
                 }
             }
-            if( InvalidValues != null ) {
-                if( !InvalidValues.All( t => parsedValue != t ) ) {
-                    throw new FormatException( String.Format( "Value ({0}) is on the list of invalid values.", parsedValue ) );
-                }
+            if (InvalidValues == null) return;
+            if( !InvalidValues.All( t => parsedValue != t ) ) {
+                throw new FormatException( String.Format( "Value ({0}) is on the list of invalid values.", parsedValue ) );
             }
         }
     }
@@ -192,17 +191,11 @@ namespace fCraft {
         }
 
 
-        public override string Process( string value ) {
-            if( value.Length == 0 ) {
-                Rank defaultRank = GetBlankValueSubstitute();
-                if( defaultRank == null ) {
-                    return "";
-                } else {
-                    return defaultRank.FullName;
-                }
-            } else {
-                return value;
-            }
+        public override string Process( string value )
+        {
+            if (value.Length != 0) return value;
+            Rank defaultRank = GetBlankValueSubstitute();
+            return defaultRank == null ? "" : defaultRank.FullName;
         }
 
 
@@ -245,18 +238,26 @@ namespace fCraft {
             }
         }
 
-        public override string Process( string value ) {
-            if( value.Length == 0 ) {
-                return DefaultValue.ToString();
-            } else {
-                return value;
-            }
+        public override string Process( string value )
+        {
+            return value.Length == 0 ? DefaultValue.ToString() : value;
         }
     }
+    /*
+    internal sealed class BoolArrayKeyAttribute : ConfigKeyAttribute
+    {
+         public BoolArrayKeyAttribute( ConfigSection section, bool defaultValue, string description )
+            : base( section, typeof( bool[] ), defaultValue, description ) {
+        }
 
-
-    internal sealed class IPKeyAttribute : ConfigKeyAttribute {
-        public IPKeyAttribute( ConfigSection section, BlankValueMeaning defaultMeaning, string description )
+        public override void Validate(string value)
+        {
+            base.Validate(value);
+            var items = new List<bool>();
+        }
+    } -> WORK IN PROGRESS */
+    internal sealed class IpKeyAttribute : ConfigKeyAttribute {
+        public IpKeyAttribute( ConfigSection section, BlankValueMeaning defaultMeaning, string description )
             : base( section, typeof( IPAddress ), "", description ) {
             BlankMeaning = defaultMeaning;
             switch( BlankMeaning ) {
@@ -274,7 +275,7 @@ namespace fCraft {
 
         public bool NotAny { get; set; }
         public bool NotNone { get; set; }
-        public bool NotLAN { get; set; }
+        public bool NotLan { get; set; }
         public bool NotLoopback { get; set; }
         public BlankValueMeaning BlankMeaning { get; set; }
 
@@ -294,7 +295,7 @@ namespace fCraft {
             if( NotNone && test.Equals( IPAddress.None ) ) {
                 throw new FormatException( String.Format( "Value cannot be {0}", IPAddress.None ) );
             }
-            if( NotLAN && test.IsLAN() ) {
+            if( NotLan && test.IsLAN() ) {
                 throw new FormatException( "Value cannot be a LAN address." );
             }
             if( NotLoopback && IPAddress.IsLoopback( test ) ) {
@@ -317,12 +318,9 @@ namespace fCraft {
         }
 
 
-        public override string Process( string value ) {
-            if( value.Length == 0 ) {
-                return GetBlankValueSubstitute().ToString();
-            } else {
-                return value;
-            }
+        public override string Process( string value )
+        {
+            return value.Length == 0 ? GetBlankValueSubstitute().ToString() : value;
         }
 
 
@@ -342,10 +340,11 @@ namespace fCraft {
 
         public override void Validate( string value ) {
             base.Validate( value );
-            string parsedValue = Color.Parse( value );
+            var parsedValue = Color.Parse( value );
             if( parsedValue == null ) {
                 throw new FormatException( "Value cannot be parsed as a color." );
-            } else if( parsedValue.Length == 0 && NotBlank ) {
+            }
+            if( parsedValue.Length == 0 && NotBlank ) {
                 throw new FormatException( "Value may not represent absence of color." );
             }
         }

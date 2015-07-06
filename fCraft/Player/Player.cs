@@ -38,6 +38,7 @@ namespace fCraft
         /// and that prevents console from calling certain commands (like /TP). </summary>
         public static Player Console, AutoRank;
 
+        public bool IsDragonOn = false;
 
         #region Properties
 
@@ -197,8 +198,18 @@ namespace fCraft
         public MetadataCollection<object> Metadata { get; private set; }
 
         #endregion
+
+        public void PrintUsage(CommandDescriptor cD)
+        {
+            cD.PrintUsage(this);
+        }
+
+        public void PrintUsage(Command userCmd)
+        {
+            userCmd.Descriptor.PrintUsage(this);
+        }
+        public List<Block> FallBackBlockMessages = new List<Block>();
         public bool IsAway;
-        public bool IsDragonOn = false;
         public bool IsFlying = false;
         public ConcurrentDictionary<String, Vector3I> FlyCache;
         public readonly object FlyLock = new object();

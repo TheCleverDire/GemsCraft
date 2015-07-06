@@ -13,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UpdateBuilder", "UpdaterBui
 		{7FBE7809-6F77-415C-ABEB-A3F627E817B0} = {7FBE7809-6F77-415C-ABEB-A3F627E817B0}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fCraftGUI", "fCraftGUI\fCraftGUI.csproj", "{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GemsCraftGUI", "GemsCraftGUI\GemsCraftGUI.csproj", "{00043365-F6E0-4F6C-90C3-15B0674A9A39}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeartbeatSaver", "Heartbeat\HeartbeatSaver.csproj", "{1A6CE637-BBAD-4DB5-B19B-59625D632E44}"
@@ -113,31 +111,6 @@ Global
 		{E5719EAF-5ECF-4BBD-842B-39DDFBCE8FE7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{E5719EAF-5ECF-4BBD-842B-39DDFBCE8FE7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{E5719EAF-5ECF-4BBD-842B-39DDFBCE8FE7}.Release|x86.ActiveCfg = Release|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Events|Any CPU.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Events|Any CPU.Build.0 = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Events|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Events|Mixed Platforms.Build.0 = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Events|x86.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_IRC|Any CPU.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_IRC|Any CPU.Build.0 = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_IRC|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_IRC|Mixed Platforms.Build.0 = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_IRC|x86.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Scheduler|Any CPU.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Scheduler|Any CPU.Build.0 = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Scheduler|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Scheduler|Mixed Platforms.Build.0 = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug_Scheduler|x86.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{AFAEE6CC-8B4F-40CD-9623-7FFDC8E52222}.Release|x86.ActiveCfg = Release|Any CPU
 		{00043365-F6E0-4F6C-90C3-15B0674A9A39}.Debug_Events|Any CPU.ActiveCfg = Debug|Any CPU
 		{00043365-F6E0-4F6C-90C3-15B0674A9A39}.Debug_Events|Any CPU.Build.0 = Debug|Any CPU
 		{00043365-F6E0-4F6C-90C3-15B0674A9A39}.Debug_Events|Mixed Platforms.ActiveCfg = Debug|Any CPU
