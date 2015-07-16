@@ -133,7 +133,7 @@ namespace fCraft
                 // to a text file instead (heartbeatdata.txt)
                 string[] data = new[]{
                     Salt,
-                    Server.InternalIP.ToString(),
+                    Server.InternalIp.ToString(),
                     Server.Port.ToString(),
                     Server.CountPlayers( false ).ToString(),
                     ConfigKey.MaxPlayers.GetString(),
@@ -176,7 +176,7 @@ namespace fCraft
         static HttpWebRequest CreateRequest(Uri uri)
         {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
-            request.ServicePoint.BindIPEndPointDelegate = new BindIPEndPoint(Server.BindIPEndPointCallback);
+            request.ServicePoint.BindIPEndPointDelegate = new BindIPEndPoint(Server.BindIpEndPointCallback);
             request.Method = "GET";
             request.Timeout = (int)Timeout.TotalMilliseconds;
             request.CachePolicy = new HttpRequestCachePolicy(HttpRequestCacheLevel.BypassCache);
@@ -203,7 +203,7 @@ namespace fCraft
                 if (Server.CountPlayers(false).ToString() == null) return;
                 string[] data = new[] {
                     Salt,
-                    Server.InternalIP.ToString(),
+                    Server.InternalIp.ToString(),
                     Server.Port.ToString(),
                     Server.CountPlayers( false ).ToString(),
                     ConfigKey.MaxPlayers.GetString(),
@@ -355,7 +355,7 @@ namespace fCraft
             IsPublic = ConfigKey.IsPublic.Enabled();
             MaxPlayers = ConfigKey.MaxPlayers.GetInt();
             PlayerCount = Server.CountPlayers(false);
-            ServerIP = Server.InternalIP;
+            ServerIP = Server.InternalIp;
             Port = Server.Port;
             ProtocolVersion = Config.ProtocolVersion;
             Salt = Heartbeat.Salt;

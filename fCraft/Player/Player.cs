@@ -12,6 +12,7 @@ using System.Timers;
 using System.Diagnostics;
 using JetBrains.Annotations;
 using System.Collections.Concurrent;
+using fCraft.fSystem;
 
 namespace fCraft
 {
@@ -84,7 +85,7 @@ namespace fCraft
 
         /// <summary>Determines whether or not a player is using a CPE compatable client.</summary>       
         public bool usesCPE = false;
-        
+
         /// <summary> Has a custom click distance set by the server </summary>
         public bool hasCustomClickDistance { get; set; }
 
@@ -533,7 +534,7 @@ namespace fCraft
                             {
                                 CommandManager.ParseCommand(this, cmd, fromConsole);
                             }
-                            catch (Exception e) 
+                            catch (Exception e)
                             {
                                 if (e is NullReferenceException)
                                 {
@@ -915,7 +916,7 @@ namespace fCraft
             }
             else
             {
-                foreach (Packet p in LineWrapper.Wrap(Color.Sys + message))
+                foreach (Packet p in LineWrapper.Wrap(Color.Sys + message, 0))
                 {
                     Send(p);
                 }
@@ -930,7 +931,30 @@ namespace fCraft
             MessageAlt(String.Format(message, args));
         }
 
+        public void Message([NotNull] string message, MessageType mT)
+        {
+            if (message == null) throw new ArgumentNullException("message");
 
+            //if is console
+            if (IsSuper)
+            {
+                Logger.LogToConsole(message);
+
+                if (sendToWebPanel)
+                {
+                    WebPanelData += message;
+                }
+
+            }
+            else
+            {
+                byte byteCode = MessageTypeManagement.TypeToByte(mT);
+                foreach (Packet p in LineWrapper.Wrap(Color.Sys + MessageTypeManagement.HandleContent(message, this), byteCode))
+                {
+                    Send(p);
+                }
+            }
+        }
         public void Message([NotNull] string message)
         {
             if (message == null) throw new ArgumentNullException("message");
@@ -948,7 +972,7 @@ namespace fCraft
             }
             else
             {
-                foreach (Packet p in LineWrapper.Wrap(Color.Sys + message))
+                foreach (Packet p in LineWrapper.Wrap(Color.Sys + message, 0))
                 {
                     Send(p);
                 }
@@ -1017,7 +1041,7 @@ namespace fCraft
                 {
                     throw new InvalidOperationException("SendNow may only be called from player's own thread.");
                 }
-                foreach (Packet p in LineWrapper.Wrap(Color.Sys + message))
+                foreach (Packet p in LineWrapper.Wrap(Color.Sys + message, 0))
                 {
                     SendNow(p);
                 }
@@ -1261,7 +1285,7 @@ namespace fCraft
 
         static void ConfirmCommandCallback([NotNull] Player player, object tag, bool fromConsole)
         {
-            
+
             if (player == null) throw new ArgumentNullException("player");
             Command cmd = (Command)tag;
             cmd.Rewind();
@@ -1820,9 +1844,9 @@ namespace fCraft
                 result = CanPlaceResult.OutOfBounds;
                 goto eventCheck;
             }
-            
+
             //check classicube blocks and convert if necessary
-            if (!usesCPE && newBlock > Block.Obsidian) 
+            if (!usesCPE && newBlock > Block.Obsidian)
             {
                 newBlock = Map.GetFallbackBlock(newBlock);
                 result = CanPlaceResult.Allowed;

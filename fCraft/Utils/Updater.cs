@@ -13,6 +13,7 @@ using fCraft.Events;
 using fCraft.Network;
 using JetBrains.Annotations;
 
+// ReSharper disable once CheckNamespace
 namespace fCraft {
     /// <summary> Checks for updates, and keeps track of current version/revision. </summary>
     public static class Updater {
@@ -37,7 +38,7 @@ namespace fCraft {
             return TitleExtractor.pageTitle(CurrentVersionUrl);
         }
         public const string CurrentVersionUrl = "http://gemscraft.net/latest.html";
-        public const string LatestStable = "Beta 1.1";
+        public const string LatestStable = "Beta 1.2";
 
         public static bool HasMostRecentVersion()
         {

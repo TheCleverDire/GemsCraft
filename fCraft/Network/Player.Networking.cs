@@ -968,7 +968,7 @@ namespace fCraft
                     }
                     else
                     {
-                        motd = "&0cfg=" + Server.ExternalIP + ":" + Server.Port + "/" + startingWorld.Name + "~motd";
+                        motd = "&0cfg=" + Server.ExternalIp + ":" + Server.Port + "/" + startingWorld.Name + "~motd";
                     }
                 }
             }
@@ -1347,7 +1347,7 @@ namespace fCraft
                 }
                 else
                 {
-                    textLine2 = "cfg=" + Server.ExternalIP + ":" + Server.Port + "/" + newWorld.Name;
+                    textLine2 = "cfg=" + Server.ExternalIp + ":" + Server.Port + "/" + newWorld.Name;
                 }
             }
             else if (usesCPE && ConfigKey.WoMEnableEnvExtensions.Enabled() && Heartbeat.ClassiCube())
@@ -1623,7 +1623,7 @@ namespace fCraft
             }
 
             // Done.
-            Server.RequestGC();
+            Server.RequestGc();
 
             return true;
         }

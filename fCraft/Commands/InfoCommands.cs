@@ -1094,7 +1094,7 @@ THE SOFTWARE.*/
                 string ipString = name.Substring( 0, name.IndexOf( '/' ) );
                 string rangeString = name.Substring( name.IndexOf( '/' ) + 1 );
                 byte range;
-                if( Server.IsIP( ipString ) && IPAddress.TryParse( ipString, out ip ) &&
+                if( Server.IsIp( ipString ) && IPAddress.TryParse( ipString, out ip ) &&
                     Byte.TryParse( rangeString, out range ) && range <= 32 ) {
                     player.Message( "Searching {0}-{1}", ip.RangeMin( range ), ip.RangeMax( range ) );
                     infos = PlayerDB.FindPlayersCidr( ip, range );
@@ -1103,7 +1103,7 @@ THE SOFTWARE.*/
                     return;
                 }
 
-            } else if( Server.IsIP( name ) && IPAddress.TryParse( name, out ip ) ) {
+            } else if( Server.IsIp( name ) && IPAddress.TryParse( name, out ip ) ) {
                 // find players by IP
                 infos = PlayerDB.FindPlayers( ip );
 
@@ -1484,7 +1484,7 @@ THE SOFTWARE.*/
                 return;
             }
 
-            if( Server.IsIP( name ) && IPAddress.TryParse( name, out address ) ) {
+            if( Server.IsIp( name ) && IPAddress.TryParse( name, out address ) ) {
                 IPBanInfo banInfo = IPBanList.Get( address );
                 if( banInfo != null ) {
                     player.Message( "{0} was banned by {1}&S on {2:dd MMM yyyy} ({3} ago)",
@@ -1726,10 +1726,10 @@ THE SOFTWARE.*/
                             DateTime.UtcNow.Subtract( Server.StartTime ).TotalHours,
                             (Process.GetCurrentProcess().PrivateMemorySize64 / (1024 * 1024)) );
 
-            if( Server.IsMonitoringCPUUsage ) {
+            if( Server.IsMonitoringCpuUsage ) {
                 player.Message( "  Averaging {0:0.0}% CPU now, {1:0.0}% overall",
-                                Server.CPUUsageLastMinute * 100,
-                                Server.CPUUsageTotal * 100 );
+                                Server.CpuUsageLastMinute * 100,
+                                Server.CpuUsageTotal * 100 );
             }
 
             if( MonoCompat.IsMono ) {

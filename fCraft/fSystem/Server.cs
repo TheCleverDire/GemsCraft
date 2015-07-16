@@ -16,14 +16,18 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using fCraft.Drawing;
 using fCraft.Events;
+using fCraft.fSystem;
 using JetBrains.Annotations;
 using ThreadState = System.Threading.ThreadState;
 using fCraft.Portals;
 
-namespace fCraft {
+// ReSharper disable once CheckNamespace
+namespace fCraft
+{
     /// <summary> Core of an fCraft server. Manages startup/shutdown, online player
     /// sessions, and global events and scheduled tasks. </summary>
-    public static partial class Server {
+    public static partial class Server
+    {
 
         /// <summary> Time when the server started (UTC). Used to check uptime. </summary>
         public static DateTime StartTime { get; private set; }
@@ -40,7 +44,7 @@ namespace fCraft {
         //order: highlight name, id, first position, second position, color, percent opaque
         public static Dictionary<string, Tuple<int, Vector3I, Vector3I, System.Drawing.Color, int>> Highlights = new Dictionary<string, Tuple<int, Vector3I, Vector3I, System.Drawing.Color, int>>();
 
-        public static bool AutoRankEnabled = false;
+        public static bool AutoRankEnabled;
 
         public static bool IsRestarting = false;
         public static bool HSaverOn = false;
@@ -55,12 +59,12 @@ namespace fCraft {
         public static List<int> EntityIDs = new List<int>();
 
         // networking
-        static TcpListener listener;
-        public static IPAddress InternalIP { get; private set; }
-        public static IPAddress ExternalIP { get; private set; }
+        static TcpListener _listener;
+        public static IPAddress InternalIp { get; private set; }
+        public static IPAddress ExternalIp { get; private set; }
         public static string VerifiedUser = "";
 
-        public static int Port { get; private set; }      
+        public static int Port { get; private set; }
 
         public static Uri Uri { get; internal set; }
 
@@ -73,10 +77,14 @@ namespace fCraft {
         /// <param name="key"> Command-line argument name (enumerated) </param>
         /// <returns> Value of the command-line argument, or null if this argument was not set or argument is a flag. </returns>
         [CanBeNull]
-        public static string GetArg( ArgKey key ) {
-            if( Args.ContainsKey( key ) ) {
+        public static string GetArg(ArgKey key)
+        {
+            if (Args.ContainsKey(key))
+            {
                 return Args[key];
-            } else {
+            }
+            else
+            {
                 return null;
             }
         }
@@ -84,41 +92,36 @@ namespace fCraft {
         /// <summary> Checks whether a command-line argument was set. </summary>
         /// <param name="key"> Command-line argument name (enumerated) </param>
         /// <returns> True if given argument was given. Otherwise false. </returns>
-        public static bool HasArg( ArgKey key ) {
-            return Args.ContainsKey( key );
+        public static bool HasArg(ArgKey key)
+        {
+            return Args.ContainsKey(key);
         }
 
 
         /// <summary> Produces a string containing all recognized arguments that wereset/passed to this instance of fCraft. </summary>
         /// <returns> A string containing all given arguments, or an empty string if none were set. </returns>
-        public static string GetArgString() {
-            return String.Join( " ", GetArgList() );
+        public static string GetArgString()
+        {
+            return String.Join(" ", GetArgList());
         }
 
 
         /// <summary> Produces a list of arguments that were passed to this instance of fCraft. </summary>
         /// <returns> An array of strings, formatted as --key="value" (or, for flag arguments, --key).
         /// Returns an empty string array if no arguments were set. </returns>
-        public static string[] GetArgList() {
-            List<string> argList = new List<string>();
-            foreach( var pair in Args ) {
-                if( pair.Value != null ) {
-                    argList.Add( String.Format( "--{0}=\"{1}\"", pair.Key.ToString().ToLower(), pair.Value ) );
-                } else {
-                    argList.Add( String.Format( "--{0}", pair.Key.ToString().ToLower() ) );
-                }
-            }
-            return argList.ToArray();
+        public static string[] GetArgList()
+        {
+            return Args.Select(pair => pair.Value != null ? string.Format("--{0}=\"{1}\"", pair.Key.ToString().ToLower(), pair.Value) : String.Format("--{0}", pair.Key.ToString().ToLower())).ToArray();
         }
 
         #endregion
 
 
-        #region Initialization and Startup        
+        #region Initialization and Startup
 
         // flags used to ensure proper initialization order
-        static bool libraryInitialized,
-                    serverInitialized;
+        static bool _libraryInitialized,
+                    _serverInitialized;
         public static bool IsRunning { get; private set; }
 
         /// <summary> Reads command-line switches and sets up paths and logging.
@@ -132,7 +135,7 @@ namespace fCraft {
         public static void InitLibrary([NotNull] IEnumerable<string> rawArgs)
         {
             if (rawArgs == null) throw new ArgumentNullException("rawArgs");
-            if (libraryInitialized)
+            if (_libraryInitialized)
             {
                 throw new InvalidOperationException("GemsCraft library is already initialized");
             }
@@ -260,7 +263,7 @@ namespace fCraft {
             Logger.Log(LogType.Debug, "Map path: {0}", Path.GetFullPath(Paths.MapPath));
             Logger.Log(LogType.Debug, "Config path: {0}", Path.GetFullPath(Paths.ConfigFileName));
 
-            libraryInitialized = true;
+            _libraryInitialized = true;
         }
 
 
@@ -269,73 +272,86 @@ namespace fCraft {
         /// Raises Server.Initializing and Server.Initialized events, and possibly Logger.Logged events.
         /// Throws exceptions on failure. </summary>
         /// <exception cref="System.InvalidOperationException"> Library is not initialized, or server is already initialzied. </exception>
-        public static void InitServer(bool IsCli) {
-            if( serverInitialized ) {
-                throw new InvalidOperationException( "Server is already initialized" );
+        public static void InitServer(bool isCli)
+        {
+            if (_serverInitialized)
+            {
+                throw new InvalidOperationException("Server is already initialized");
             }
-            if( !libraryInitialized ) {
-                throw new InvalidOperationException( "Server.InitLibrary must be called before Server.InitServer" );
+            if (!_libraryInitialized)
+            {
+                throw new InvalidOperationException("Server.InitLibrary must be called before Server.InitServer");
             }
-            RaiseEvent( Initializing );
+            RaiseEvent(Initializing);
 
             // Instantiate DeflateStream to make sure that libMonoPosix is present.
             // This allows catching misconfigured Mono installs early, and stopping the server.
-            using( var testMemStream = new MemoryStream() ) {
-                using( new DeflateStream( testMemStream, CompressionMode.Compress ) ) {
+            using (var testMemStream = new MemoryStream())
+            {
+                using (new DeflateStream(testMemStream, CompressionMode.Compress))
+                {
                 }
             }
-
+            //Sets up Message Type handler
+            MessageTypeManagement.MessageTimer = new System.Timers.Timer(1000);
+            MessageTypeManagement.MessageTimer.Elapsed += MessageTypeManagement.OnUpdateEvent;
+            MessageTypeManagement.MessageTimer.Enabled = true;
             // warnings/disclaimers
-            if( Updater.CurrentRelease.IsFlagged( ReleaseFlags.Dev ) ) {
-                Logger.Log( LogType.Warning,
+            if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
+            {
+                Logger.Log(LogType.Warning,
                             "You are using an unreleased developer version of GemsCraft. " +
                             "Do not use this version unless you are ready to deal with bugs and potential data loss. " +
-                            "Consider using the latest stable version instead, available from http://gemscraft.net/" );
+                            "Consider using the latest stable version instead, available from http://gemscraft.net/");
             }
 
-            if( Updater.CurrentRelease.IsFlagged( ReleaseFlags.Unstable ) ) {
+            if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Unstable))
+            {
                 const string unstableMessage = "This build has been marked as UNSTABLE. " +
                                                "Do not use except for debugging purposes. " +
                                                "Latest non-broken build is " + Updater.LatestStable;
 #if DEBUG
                 Logger.Log( LogType.Warning, unstableMessage );
 #else
-                throw new Exception( unstableMessage );
+                throw new Exception(unstableMessage);
 #endif
             }
 
-            if( MonoCompat.IsMono && !MonoCompat.IsSGenCapable ) {
-                Logger.Log( LogType.Warning,
+            if (MonoCompat.IsMono && !MonoCompat.IsSGenCapable)
+            {
+                Logger.Log(LogType.Warning,
                             "You are using a relatively old version of the Mono runtime ({0}). " +
                             "It is recommended that you upgrade to at least 2.8+",
-                            MonoCompat.MonoVersion );
+                            MonoCompat.MonoVersion);
             }
 
 #if DEBUG
             Config.RunSelfTest();
 #else
             // delete the old updater, if exists
-            File.Delete( Paths.UpdaterFileName );
-            File.Delete( "fCraftUpdater.exe" ); // pre-0.600 (supar legacy)
+            File.Delete(Paths.UpdaterFileName);
+            File.Delete("fCraftUpdater.exe"); // pre-0.600 (supar legacy)
             File.Delete("ConfigGUI.exe"); // Alpha - Legacy
             File.Delete("ServerGUI.exe"); // Alpha - Legacy
 #endif
-            
+
             // try to load the config
-            if (!IsCli) RankManager.RanksAlreadyLoaded = true;
-           if( !Config.Load( false, false ) ) {
-                throw new Exception( "GemsCraft Config failed to initialize" );
+            if (!isCli) RankManager.RanksAlreadyLoaded = true;
+            if (!Config.Load(false, false))
+            {
+                throw new Exception("GemsCraft Config failed to initialize");
             }
-            if( ConfigKey.VerifyNames.GetEnum<NameVerificationMode>() == NameVerificationMode.Never ) {
-                Logger.Log( LogType.Warning,
+            if (ConfigKey.VerifyNames.GetEnum<NameVerificationMode>() == NameVerificationMode.Never)
+            {
+                Logger.Log(LogType.Warning,
                             "Name verification is currently OFF. Your server is at risk of being hacked. " +
-                            "Enable name verification as soon as possible." );
+                            "Enable name verification as soon as possible.");
             }
 
             // load player DB
-            
+
             PlayerDB.Load();
-            
+
             IPBanList.Load();
 
             //define fallbacks
@@ -353,9 +369,9 @@ namespace fCraft {
             Physics.Physics.Load();
             HeartbeatSaverUtil.Init();
 
-            RaiseEvent( Initialized );
+            RaiseEvent(Initialized);
 
-            serverInitialized = true;
+            _serverInitialized = true;
         }
 
 
@@ -366,75 +382,84 @@ namespace fCraft {
         /// May throw an exception on hard failure. </summary>
         /// <returns> True if server started normally, false on soft failure. </returns>
         /// <exception cref="System.InvalidOperationException"> Server is already running, or server/library have not been initailized. </exception>
-        public static bool StartServer() 
+        public static bool StartServer()
         {
-            
-            if( IsRunning ) {
-                throw new InvalidOperationException( "Server is already running" );
+
+            if (IsRunning)
+            {
+                throw new InvalidOperationException("Server is already running");
             }
-            if( !libraryInitialized || !serverInitialized ) {
-                throw new InvalidOperationException( "Server.InitLibrary and Server.InitServer must be called before Server.StartServer" );
+            if (!_libraryInitialized || !_serverInitialized)
+            {
+                throw new InvalidOperationException("Server.InitLibrary and Server.InitServer must be called before Server.StartServer");
             }
 
             StartTime = DateTime.UtcNow;
-            cpuUsageStartingOffset = Process.GetCurrentProcess().TotalProcessorTime;
+            _cpuUsageStartingOffset = Process.GetCurrentProcess().TotalProcessorTime;
             Players = new Player[0];
 
-            RaiseEvent( Starting );
+            RaiseEvent(Starting);
 
-            if( ConfigKey.BackupDataOnStartup.Enabled() ) {
+            if (ConfigKey.BackupDataOnStartup.Enabled())
+            {
                 BackupData();
             }
 
-            Player.Console = new Player( ConfigKey.ConsoleName.GetString() );
-            Player.AutoRank = new Player( "(AutoRank)" );
+            Player.Console = new Player(ConfigKey.ConsoleName.GetString());
+            Player.AutoRank = new Player("(AutoRank)");
 
-            if( ConfigKey.BlockDBEnabled.Enabled() ) BlockDB.Init();
+            if (ConfigKey.BlockDBEnabled.Enabled()) BlockDB.Init();
 
             // try to load the world list
-            if( !WorldManager.LoadWorldList() ) return false;
+            if (!WorldManager.LoadWorldList()) return false;
             WorldManager.SaveWorldList();
 
             // open the port
             Port = ConfigKey.Port.GetInt();
-            InternalIP = IPAddress.Parse( ConfigKey.IP.GetString() );
+            InternalIp = IPAddress.Parse(ConfigKey.IP.GetString());
 
-            try {
-                listener = new TcpListener( InternalIP, Port );
-                listener.Start();
+            try
+            {
+                _listener = new TcpListener(InternalIp, Port);
+                _listener.Start();
 
-            } catch( Exception ex ) {
+            }
+            catch (Exception ex)
+            {
                 // if the port is unavailable, try next one
-                Logger.Log( LogType.Error,
+                Logger.Log(LogType.Error,
                             "Could not start listening on port {0}, stopping. ({1})",
-                            Port, ex.Message );
-                if( !ConfigKey.IP.IsDefault() ) {
-                    Logger.Log( LogType.Warning,
-                                "Do not use the \"Designated IP\" setting unless you have multiple NICs or IPs." );
+                            Port, ex.Message);
+                if (!ConfigKey.IP.IsDefault())
+                {
+                    Logger.Log(LogType.Warning,
+                                "Do not use the \"Designated IP\" setting unless you have multiple NICs or IPs.");
                 }
                 return false;
             }
 
-            InternalIP = ((IPEndPoint)listener.LocalEndpoint).Address;
-            ExternalIP = CheckExternalIP();
+            InternalIp = ((IPEndPoint)_listener.LocalEndpoint).Address;
+            ExternalIp = CheckExternalIp();
 
-            if( ExternalIP == null ) {
-                Logger.Log( LogType.SystemActivity,
-                            "Server.Run: now accepting connections on port {0}", Port );
-            } else {
-                Logger.Log( LogType.SystemActivity,
+            if (ExternalIp == null)
+            {
+                Logger.Log(LogType.SystemActivity,
+                            "Server.Run: now accepting connections on port {0}", Port);
+            }
+            else
+            {
+                Logger.Log(LogType.SystemActivity,
                             "Server.Run: now accepting connections at {0}:{1}",
-                            ExternalIP, Port );
+                            ExternalIp, Port);
             }
 
             //check for updates, updates are now checked from serverGUI/serverCLI
-            
+
             /*Logger.Log(LogType.ConsoleOutput, "Checking for LegendCraft updates...");
             try
             {
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://legendcraft.webuda.com//CurrentVersion.html");
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     using (Stream stream = response.GetResponseStream())
@@ -445,10 +470,8 @@ namespace fCraft {
                             string version = streamReader.ReadLine();
                             if (version != null && version != fCraft.Updater.LatestStable)
                             {
-
                                 Logger.Log(LogType.Warning, "Server.Run: Your LegendCraft version is out of date. A LegendCraft Update is available!");
                                 Logger.Log(LogType.Warning, "Download the latest LegendCraft at: https://github.com/LeChosenOne/LegendCraft/releases");
-
                             }
                             else
                             {
@@ -471,55 +494,60 @@ namespace fCraft {
 
             // list loaded worlds
             WorldManager.UpdateWorldList();
-            Logger.Log( LogType.SystemActivity,
+            Logger.Log(LogType.SystemActivity,
                         "All available worlds: {0}",
-                        WorldManager.Worlds.JoinToString( ", ", w => w.Name ) );
+                        WorldManager.Worlds.JoinToString(", ", w => w.Name));
 
-            Logger.Log( LogType.SystemActivity,
+            Logger.Log(LogType.SystemActivity,
                         "Main world: {0}; default rank: {1}",
-                        WorldManager.MainWorld.Name, RankManager.DefaultRank.Name );
+                        WorldManager.MainWorld.Name, RankManager.DefaultRank.Name);
 
             // Check for incoming connections (every 250ms)
-            checkConnectionsTask = Scheduler.NewTask( CheckConnections ).RunForever( CheckConnectionsInterval );
+            _checkConnectionsTask = Scheduler.NewTask(CheckConnections).RunForever(CheckConnectionsInterval);
 
             // Check for idles (every 30s)
-            checkIdlesTask = Scheduler.NewTask( CheckIdles ).RunForever( CheckIdlesInterval );
+            _checkIdlesTask = Scheduler.NewTask(CheckIdles).RunForever(CheckIdlesInterval);
 
             //Check for tempranks (every 10s)
-            checkTempRanksTask = Scheduler.NewTask(CheckTempRanks).RunForever(CheckTempRanksInterval);
+            _checkTempRanksTask = Scheduler.NewTask(CheckTempRanks).RunForever(CheckTempRanksInterval);
 
             // Monitor CPU usage (every 30s)
-            try {
-                MonitorProcessorUsage( null );
-                Scheduler.NewTask( MonitorProcessorUsage ).RunForever( MonitorProcessorUsageInterval,
-                                                                       MonitorProcessorUsageInterval );
-            } catch( Exception ex ) {
-                Logger.Log( LogType.Error,
-                            "Server.StartServer: Could not start monitoring CPU use: {0}", ex );
+            try
+            {
+                MonitorProcessorUsage(null);
+                Scheduler.NewTask(MonitorProcessorUsage).RunForever(MonitorProcessorUsageInterval,
+                                                                       MonitorProcessorUsageInterval);
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogType.Error,
+                            "Server.StartServer: Could not start monitoring CPU use: {0}", ex);
             }
 
 
             PlayerDB.StartSaveTask();
 
             // Announcements
-            if( ConfigKey.AnnouncementInterval.GetInt() > 0 ) {
-                TimeSpan announcementInterval = TimeSpan.FromMinutes( ConfigKey.AnnouncementInterval.GetInt() );
-                Scheduler.NewTask( ShowRandomAnnouncement ).RunForever( announcementInterval );
+            if (ConfigKey.AnnouncementInterval.GetInt() > 0)
+            {
+                TimeSpan announcementInterval = TimeSpan.FromMinutes(ConfigKey.AnnouncementInterval.GetInt());
+                Scheduler.NewTask(ShowRandomAnnouncement).RunForever(announcementInterval);
             }
 
             // garbage collection
-            gcTask = Scheduler.NewTask(DoGC).RunForever(GCInterval, TimeSpan.FromSeconds(45));
+            _gcTask = Scheduler.NewTask(DoGc).RunForever(GcInterval, TimeSpan.FromSeconds(45));
             Heartbeat.Start();
 
 
 
-            if( ConfigKey.RestartInterval.GetInt() > 0 ) {
-                TimeSpan restartIn = TimeSpan.FromSeconds( ConfigKey.RestartInterval.GetInt() );
-                Shutdown( new ShutdownParams( ShutdownReason.Restarting, restartIn, true, true ), false );
-                ChatTimer.Start( restartIn, "Automatic Server Restart", Player.Console.Name );
+            if (ConfigKey.RestartInterval.GetInt() > 0)
+            {
+                TimeSpan restartIn = TimeSpan.FromSeconds(ConfigKey.RestartInterval.GetInt());
+                Shutdown(new ShutdownParams(ShutdownReason.Restarting, restartIn, true, true), false);
+                ChatTimer.Start(restartIn, "Automatic Server Restart", Player.Console.Name);
             }
 
-            if( ConfigKey.IRCBotEnabled.Enabled() ) IRC.Start();
+            if (ConfigKey.IRCBotEnabled.Enabled()) IRC.Start();
 
             // start the main loop - server is now connectible
             Scheduler.Start();
@@ -527,14 +555,14 @@ namespace fCraft {
             PortalDB.Load();
 
             //enable autorank
-            Server.AutoRankEnabled = ConfigKey.AutoRankEnabled.Enabled();
+            AutoRankEnabled = ConfigKey.AutoRankEnabled.Enabled();
 
             //enable global chat
             GlobalChat.Init();
             GlobalChat.Start();
 
             //send webpanel salt (unfinished)
-           
+
             /*try
             {
                 WebRequest request = WebRequest.Create("http://legend-craft.tk/heartbeat?salt=" + Heartbeat.Salt);
@@ -556,7 +584,7 @@ namespace fCraft {
             }*/
 
             IsRunning = true;
-            RaiseEvent( Started );
+            RaiseEvent(Started);
             return true;
         }
 
@@ -567,75 +595,80 @@ namespace fCraft {
 
         static readonly object ShutdownLock = new object();
         public static bool IsShuttingDown;
-        static readonly AutoResetEvent ShutdownWaiter = new AutoResetEvent( false );
-        static Thread shutdownThread;
-        static ChatTimer shutdownTimer;
+        static readonly AutoResetEvent ShutdownWaiter = new AutoResetEvent(false);
+        static Thread _shutdownThread;
+        static ChatTimer _shutdownTimer;
 
 
-        static void ShutdownNow( [NotNull] ShutdownParams shutdownParams ) {
-            if( shutdownParams == null ) throw new ArgumentNullException( "shutdownParams" );
-            if( IsShuttingDown ) return; // to avoid starting shutdown twice
+        static void ShutdownNow([NotNull] ShutdownParams shutdownParams)
+        {
+            if (shutdownParams == null) throw new ArgumentNullException("shutdownParams");
+            if (IsShuttingDown) return; // to avoid starting shutdown twice
             IsShuttingDown = true;
 #if !DEBUG
-            try {
+            try
+            {
 #endif
                 Heartbeat.HbSave();
-                RaiseShutdownBeganEvent( shutdownParams );
+                RaiseShutdownBeganEvent(shutdownParams);
 
                 Scheduler.BeginShutdown();
 
-                Logger.Log( LogType.SystemActivity,
+                Logger.Log(LogType.SystemActivity,
                             "Server shutting down ({0})",
-                            shutdownParams.ReasonString );
+                            shutdownParams.ReasonString);
 
                 // stop accepting new players
-                if( listener != null ) {
-                    listener.Stop();
-                    listener = null;
+                if (_listener != null)
+                {
+                    _listener.Stop();
+                    _listener = null;
                 }
 
                 // kick all players
-                lock( SessionLock ) {
-                    if( Sessions.Count > 0 ) {
-                        foreach( Player p in Sessions ) {
+                lock (SessionLock)
+                {
+                    if (Sessions.Count > 0)
+                    {
+                        foreach (Player p in Sessions)
+                        {
                             // NOTE: kick packet delivery here is not currently guaranteed
-                            p.Kick( "Server shutting down (" + shutdownParams.ReasonString + Color.White + ")", LeaveReason.ServerShutdown );
+                            p.Kick("Server shutting down (" + shutdownParams.ReasonString + Color.White + ")", LeaveReason.ServerShutdown);
                         }
                         // increase the chances of kick packets being delivered
-                        Thread.Sleep( 1000 );
+                        Thread.Sleep(1000);
                     }
                 }
 
                 // kill IRC bot
                 IRC.Disconnect();
 
-                if (Server.TempBans.Count() > 0)
+                if (TempBans.Any())
                 {
-                    foreach (Player p in Server.TempBans)
+                    foreach (var p in TempBans.Where(p => p.Info.IsBanned))
                     {
-                        if (p.Info.IsBanned)
-                        {
-                            p.Info.Unban(Player.Console, "Shutdown: Tempban cancelled", false, true);
-                            Logger.Log(LogType.SystemActivity, "Unbanning {0}: Was tempbanned", p.Name);
-                        }
+                        p.Info.Unban(Player.Console, "Shutdown: Tempban cancelled", false, true);
+                        Logger.Log(LogType.SystemActivity, "Unbanning {0}: Was tempbanned", p.Name);
                     }
                 }
 
                 //Sends data to serverlist with a 0 uptime and playercount
                 //Scheduler.NewTask(t => Network.ServerList.sendLastData()).RunOnce();
 
-                if( PlayerDB.IsLoaded ) PlayerDB.Save();
-                if( IPBanList.IsLoaded ) IPBanList.Save();
+                if (PlayerDB.IsLoaded) PlayerDB.Save();
+                if (IPBanList.IsLoaded) IPBanList.Save();
 
-                RaiseShutdownEndedEvent( shutdownParams );
+                RaiseShutdownEndedEvent(shutdownParams);
 #if !DEBUG
-            } catch( Exception ex ) {
-                Logger.LogAndReportCrash( "Error in Server.Shutdown", "800Craft", ex, true );
+            }
+            catch (Exception ex)
+            {
+                Logger.LogAndReportCrash("Error in Server.Shutdown", "800Craft", ex, true);
             }
 #endif
         }
 
-        private static bool _desiredToKeepWindow = false;
+        private static bool _desiredToKeepWindow;
         public static void Shutdown([NotNull] ShutdownParams shutdownParams, bool waitForShutdown, bool closeProgram)
         {
             _desiredToKeepWindow = closeProgram;
@@ -644,25 +677,30 @@ namespace fCraft {
         /// <summary> Initiates the server shutdown with given parameters. </summary>
         /// <param name="shutdownParams"> Shutdown parameters </param>
         /// <param name="waitForShutdown"> If true, blocks the calling thread until shutdown is complete or cancelled. </param>
-        public static void Shutdown( [NotNull] ShutdownParams shutdownParams, bool waitForShutdown ) {
-            if( shutdownParams == null ) throw new ArgumentNullException( "shutdownParams" );
-            lock( ShutdownLock ) {
-                if( !CancelShutdown() ) return;
-                shutdownThread = new Thread( ShutdownThread ) {
+        public static void Shutdown([NotNull] ShutdownParams shutdownParams, bool waitForShutdown)
+        {
+            if (shutdownParams == null) throw new ArgumentNullException("shutdownParams");
+            lock (ShutdownLock)
+            {
+                if (!CancelShutdown()) return;
+                _shutdownThread = new Thread(ShutdownThread)
+                {
                     Name = "fCraft.Shutdown"
                 };
-                if( shutdownParams.Delay >= ChatTimer.MinDuration ) {
-                    string timerMsg = String.Format( "Server {0} ({1})",
+                if (shutdownParams.Delay >= ChatTimer.MinDuration)
+                {
+                    string timerMsg = String.Format("Server {0} ({1})",
                                                      shutdownParams.Restart ? "restart" : "shutdown",
-                                                     shutdownParams.ReasonString );
-                    var nameOnTimer = shutdownParams.InitiatedBy == null 
-                        ? Player.Console.Name 
+                                                     shutdownParams.ReasonString);
+                    var nameOnTimer = shutdownParams.InitiatedBy == null
+                        ? Player.Console.Name
                         : shutdownParams.InitiatedBy.Name;
-                    shutdownTimer = ChatTimer.Start( shutdownParams.Delay, timerMsg, nameOnTimer );
+                    _shutdownTimer = ChatTimer.Start(shutdownParams.Delay, timerMsg, nameOnTimer);
                 }
-                shutdownThread.Start( shutdownParams );
+                _shutdownThread.Start(shutdownParams);
             }
-            if( waitForShutdown ) {
+            if (waitForShutdown)
+            {
                 ShutdownWaiter.WaitOne();
             }
         }
@@ -671,62 +709,76 @@ namespace fCraft {
         /// <summary> Attempts to cancel the shutdown timer. </summary>
         /// <returns> True if a shutdown timer was cancelled, false if no shutdown is in progress.
         /// Also returns false if it's too late to cancel (shutdown has begun). </returns>
-        public static bool CancelShutdown() {
-            lock( ShutdownLock ) {
-                if (shutdownThread == null) return true;
-                if( IsShuttingDown || shutdownThread.ThreadState != ThreadState.WaitSleepJoin ) {
+        public static bool CancelShutdown()
+        {
+            lock (ShutdownLock)
+            {
+                if (_shutdownThread == null) return true;
+                if (IsShuttingDown || _shutdownThread.ThreadState != ThreadState.WaitSleepJoin)
+                {
                     return false;
                 }
-                if( shutdownTimer != null ) {
-                    shutdownTimer.Stop();
-                    shutdownTimer = null;
+                if (_shutdownTimer != null)
+                {
+                    _shutdownTimer.Stop();
+                    _shutdownTimer = null;
                 }
                 ShutdownWaiter.Set();
-                shutdownThread.Abort();
-                shutdownThread = null;
+                _shutdownThread.Abort();
+                _shutdownThread = null;
             }
             return true;
         }
-        
 
-        static void ShutdownThread( [NotNull] object obj ) {
-            if( obj == null ) throw new ArgumentNullException( "obj" );
-            ShutdownParams param = (ShutdownParams)obj;
-            Thread.Sleep( param.Delay );
-            ShutdownNow( param );
+
+        static void ShutdownThread([NotNull] object obj)
+        {
+            if (obj == null) throw new ArgumentNullException("obj");
+            var param = (ShutdownParams)obj;
+            Thread.Sleep(param.Delay);
+            ShutdownNow(param);
             ShutdownWaiter.Set();
 
-            bool doRestart = (param.Restart && !HasArg( ArgKey.NoRestart ));
-            string assemblyExecutable = Assembly.GetEntryAssembly().Location;
+            var doRestart = (param.Restart && !HasArg(ArgKey.NoRestart));
+            var assemblyExecutable = Assembly.GetEntryAssembly().Location;
 
-            if( Updater.RunAtShutdown && doRestart ) {
+            if (Updater.RunAtShutdown && doRestart)
+            {
                 if (MonoCompat.IsMono)
                 {
-                    ProcessStartInfo proc = new ProcessStartInfo("mono");
-                    proc.Arguments = assemblyExecutable;
-                    proc.UseShellExecute = false;
-                    proc.CreateNoWindow = true;
+                    var proc = new ProcessStartInfo("mono")
+                    {
+                        Arguments = assemblyExecutable,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
                     Process.Start(proc);
                 }
                 else
                 {
-                    string args = String.Format("--restart=\"{0}\" {1}",
+                    var args = string.Format("--restart=\"{0}\" {1}",
                                                  MonoCompat.PrependMono(assemblyExecutable),
                                                  GetArgString());
 
                     MonoCompat.StartDotNetProcess(Paths.UpdaterFileName, args, true);
                 }
-            } else if( Updater.RunAtShutdown ) {
-                MonoCompat.StartDotNetProcess( Paths.UpdaterFileName, GetArgString(), true );
+            }
+            else if (Updater.RunAtShutdown)
+            {
+                MonoCompat.StartDotNetProcess(Paths.UpdaterFileName, GetArgString(), true);
 
-            } else if( doRestart ) {
+            }
+            else if (doRestart)
+            {
 
                 if (MonoCompat.IsMono)
                 {
-                    ProcessStartInfo proc = new ProcessStartInfo("mono");
-                    proc.Arguments = assemblyExecutable;
-                    proc.UseShellExecute = false;
-                    proc.CreateNoWindow = true;
+                    var proc = new ProcessStartInfo("mono")
+                    {
+                        Arguments = assemblyExecutable,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
                     Process.Start(proc);
                 }
                 else
@@ -735,7 +787,8 @@ namespace fCraft {
                 }
             }
 
-            if( param.KillProcess && !_desiredToKeepWindow) {
+            if (param.KillProcess && !_desiredToKeepWindow)
+            {
                 Process.GetCurrentProcess().Kill();
             }
         }
@@ -747,37 +800,41 @@ namespace fCraft {
 
         /// <summary> Broadcasts a message to all online players.
         /// Shorthand for Server.Players.Message </summary>
-        public static void Message( [NotNull] string message ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            Players.Message( message );
+        public static void Message([NotNull] string message)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            Players.Message(message);
         }
 
 
         /// <summary> Broadcasts a message to all online players.
         /// Shorthand for Server.Players.Message </summary>
-        [StringFormatMethod( "message" )]
-        public static void Message( [NotNull] string message, [NotNull] params object[] formatArgs ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( formatArgs == null ) throw new ArgumentNullException( "formatArgs" );
-            Players.Message( message, formatArgs );
+        [StringFormatMethod("message")]
+        public static void Message([NotNull] string message, [NotNull] params object[] formatArgs)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            if (formatArgs == null) throw new ArgumentNullException("formatArgs");
+            Players.Message(message, formatArgs);
         }
 
 
         /// <summary> Broadcasts a message to all online players except one.
         /// Shorthand for Server.Players.Except(except).Message </summary>
-        public static void Message( [CanBeNull] Player except, [NotNull] string message ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            Players.Except( except ).Message( message );
+        public static void Message([CanBeNull] Player except, [NotNull] string message)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            Players.Except(except).Message(message);
         }
 
 
         /// <summary> Broadcasts a message to all online players except one.
         /// Shorthand for Server.Players.Except(except).Message </summary>
-        [StringFormatMethod( "message" )]
-        public static void Message( [CanBeNull] Player except, [NotNull] string message, [NotNull] params object[] formatArgs ) {
-            if( message == null ) throw new ArgumentNullException( "message" );
-            if( formatArgs == null ) throw new ArgumentNullException( "formatArgs" );
-            Players.Except( except ).Message( message, formatArgs );
+        [StringFormatMethod("message")]
+        public static void Message([CanBeNull] Player except, [NotNull] string message, [NotNull] params object[] formatArgs)
+        {
+            if (message == null) throw new ArgumentNullException("message");
+            if (formatArgs == null) throw new ArgumentNullException("formatArgs");
+            Players.Except(except).Message(message, formatArgs);
         }
 
         #endregion
@@ -786,148 +843,160 @@ namespace fCraft {
         #region Scheduled Tasks
 
         // checks for incoming connections
-        static SchedulerTask checkConnectionsTask;
-        static TimeSpan checkConnectionsInterval = TimeSpan.FromMilliseconds( 250 );
-        public static TimeSpan CheckConnectionsInterval {
-            get { return checkConnectionsInterval; }
-            set {
-                if( value.Ticks < 0 ) throw new ArgumentException( "CheckConnectionsInterval may not be negative." );
-                checkConnectionsInterval = value;
-                if( checkConnectionsTask != null ) checkConnectionsTask.Interval = value;
+        static SchedulerTask _checkConnectionsTask;
+        static TimeSpan _checkConnectionsInterval = TimeSpan.FromMilliseconds(250);
+        public static TimeSpan CheckConnectionsInterval
+        {
+            get { return _checkConnectionsInterval; }
+            set
+            {
+                if (value.Ticks < 0) throw new ArgumentException("CheckConnectionsInterval may not be negative.");
+                _checkConnectionsInterval = value;
+                if (_checkConnectionsTask != null) _checkConnectionsTask.Interval = value;
             }
         }
 
-        static void CheckConnections( SchedulerTask param ) {
-            TcpListener listenerCache = listener;
-            if( listenerCache != null && listenerCache.Pending() ) {
-                try {
-                    Player.StartSession( listenerCache.AcceptTcpClient() );
-                } catch( Exception ex ) {
-                    Logger.Log( LogType.Error,
-                                "Server.CheckConnections: Could not accept incoming connection: {0}", ex );
+        static void CheckConnections(SchedulerTask param)
+        {
+            TcpListener listenerCache = _listener;
+            if (listenerCache != null && listenerCache.Pending())
+            {
+                try
+                {
+                    Player.StartSession(listenerCache.AcceptTcpClient());
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(LogType.Error,
+                                "Server.CheckConnections: Could not accept incoming connection: {0}", ex);
                 }
             }
         }
         // checks for idle players
-        static SchedulerTask checkIdlesTask;
-        static TimeSpan checkIdlesInterval = TimeSpan.FromSeconds( 30 );
-        public static TimeSpan CheckIdlesInterval {
-            get { return checkIdlesInterval; }
-            set {
-                if( value.Ticks < 0 ) throw new ArgumentException( "CheckIdlesInterval may not be negative." );
-                checkIdlesInterval = value;
-                if( checkIdlesTask != null ) checkIdlesTask.Interval = checkIdlesInterval;
+        static SchedulerTask _checkIdlesTask;
+        static TimeSpan _checkIdlesInterval = TimeSpan.FromSeconds(30);
+        public static TimeSpan CheckIdlesInterval
+        {
+            get { return _checkIdlesInterval; }
+            set
+            {
+                if (value.Ticks < 0) throw new ArgumentException("CheckIdlesInterval may not be negative.");
+                _checkIdlesInterval = value;
+                if (_checkIdlesTask != null) _checkIdlesTask.Interval = _checkIdlesInterval;
             }
         }
 
-        static void CheckIdles( SchedulerTask task ) {
-            Player[] tempPlayerList = Players;
-            for( int i = 0; i < tempPlayerList.Length; i++ ) {
-                Player player = tempPlayerList[i];
-                if( player.Info.Rank.IdleKickTimer <= 0 ) continue;
-
-                if( player.IdleTime.TotalMinutes >= player.Info.Rank.IdleKickTimer ) {
-                    Message( "{0}&S was kicked for being idle for {1} min",
-                             player.ClassyName,
-                             player.Info.Rank.IdleKickTimer );
-                    string kickReason = "Idle for " + player.Info.Rank.IdleKickTimer + " minutes";
-                    player.Kick( Player.Console, kickReason, LeaveReason.IdleKick, false, true, false );
-                    player.ResetIdleTimer(); // to prevent kick from firing more than once
-                }
+        static void CheckIdles(SchedulerTask task)
+        {
+            var tempPlayerList = Players;
+            foreach (var player in tempPlayerList.Where(player => player.Info.Rank.IdleKickTimer > 0).Where(player => player.IdleTime.TotalMinutes >= player.Info.Rank.IdleKickTimer))
+            {
+                Message("{0}&S was kicked for being idle for {1} min",
+                    player.ClassyName,
+                    player.Info.Rank.IdleKickTimer);
+                var kickReason = "Idle for " + player.Info.Rank.IdleKickTimer + " minutes";
+                player.Kick(Player.Console, kickReason, LeaveReason.IdleKick, false, true, false);
+                player.ResetIdleTimer(); // to prevent kick from firing more than once
             }
         }
 
         //checks to re-rank tempranked players
-        static SchedulerTask checkTempRanksTask;
-        static TimeSpan checkTempRanksInterval = TimeSpan.FromSeconds(10);
+        static SchedulerTask _checkTempRanksTask;
+        static TimeSpan _checkTempRanksInterval = TimeSpan.FromSeconds(10);
         public static TimeSpan CheckTempRanksInterval
         {
-            get { return checkTempRanksInterval; }
+            get { return _checkTempRanksInterval; }
             set
             {
                 if (value.Ticks < 0) throw new ArgumentException("CheckTempRanksInterval may not be negative.");
-                checkTempRanksInterval = value;
-                if (checkTempRanksTask != null) checkTempRanksTask.Interval = checkTempRanksInterval;
+                _checkTempRanksInterval = value;
+                if (_checkTempRanksTask != null) _checkTempRanksTask.Interval = _checkTempRanksInterval;
             }
         }
         static void CheckTempRanks(SchedulerTask task)
         {
-            foreach(PlayerInfo p in PlayerDB.PlayerInfoList)
+            foreach (var p in PlayerDB.PlayerInfoList.Where(p => p.isTempRanked).Where(p => Convert.ToInt32((p.tempRankTime - p.TimeSinceRankChange).TotalSeconds) <= 0))
             {
-                if (p.isTempRanked)
-                {
-                    if (Convert.ToInt32((p.tempRankTime - p.TimeSinceRankChange).TotalSeconds) <= 0)
-                    {
-                        p.ChangeRank(Player.Console, p.PreviousRank, "TempRank Expired", true, true, false);
-                        p.isTempRanked = false;
-                        p.tempRankTime = TimeSpan.FromSeconds(0);//set timespan back to 0 for simplicity
-                    }
-                }
+                if (p.PreviousRank != null)
+                    p.ChangeRank(Player.Console, p.PreviousRank, "TempRank Expired", true, true, false);
+                p.isTempRanked = false;
+                p.tempRankTime = TimeSpan.FromSeconds(0);//set timespan back to 0 for simplicity
             }
         }
 
         // collects garbage (forced collection is necessary under Mono)
-        static SchedulerTask gcTask;
-        static TimeSpan gcInterval = TimeSpan.FromSeconds( 60 );
-        public static TimeSpan GCInterval {
-            get { return gcInterval; }
-            set {
-                if( value.Ticks < 0 ) throw new ArgumentException( "GCInterval may not be negative." );
-                gcInterval = value;
-                if( gcTask != null ) gcTask.Interval = gcInterval;
+        static SchedulerTask _gcTask;
+        static TimeSpan _gcInterval = TimeSpan.FromSeconds(60);
+        public static TimeSpan GcInterval
+        {
+            get { return _gcInterval; }
+            set
+            {
+                if (value.Ticks < 0) throw new ArgumentException("GCInterval may not be negative.");
+                _gcInterval = value;
+                if (_gcTask != null) _gcTask.Interval = _gcInterval;
             }
         }
 
-        static void DoGC( SchedulerTask task ) {
-            if( !gcRequested ) return;
-            gcRequested = false;
+        static void DoGc(SchedulerTask task)
+        {
+            if (!_gcRequested) return;
+            _gcRequested = false;
 
             Process proc = Process.GetCurrentProcess();
             proc.Refresh();
             long usageBefore = proc.PrivateMemorySize64 / (1024 * 1024);
 
-            GC.Collect( GC.MaxGeneration, GCCollectionMode.Forced );
+            GC.Collect(GC.MaxGeneration, GCCollectionMode.Forced);
 
             proc.Refresh();
             long usageAfter = proc.PrivateMemorySize64 / (1024 * 1024);
 
-            Logger.Log( LogType.Debug,
+            Logger.Log(LogType.Debug,
                         "Server.DoGC: Collected on schedule ({0}->{1} MB).",
-                        usageBefore, usageAfter );
+                        usageBefore, usageAfter);
         }
 
 
         // shows announcements
-        static void ShowRandomAnnouncement( SchedulerTask task ) {
-            if( !File.Exists( Paths.AnnouncementsFileName ) ) return;
-            string[] lines = File.ReadAllLines( Paths.AnnouncementsFileName );
-            if( lines.Length == 0 ) return;
-            string line = lines[new Random().Next( 0, lines.Length )].Trim();
-            if( line.Length == 0 ) return;
-            foreach( Player player in Players.Where( player => player.World != null ) ) {
-                player.Message( "&R" + ReplaceTextKeywords( player, line ) );
+        static void ShowRandomAnnouncement(SchedulerTask task)
+        {
+            if (!File.Exists(Paths.AnnouncementsFileName)) return;
+            var lines = File.ReadAllLines(Paths.AnnouncementsFileName);
+            if (lines.Length == 0) return;
+            var line = lines[new Random().Next(0, lines.Length)].Trim();
+            if (line.Length == 0) return;
+            foreach (var player in Players.Where(player => player.World != null))
+            {
+                var bigMessage = "&R" + ReplaceTextKeywords(player, line);
+                if (bigMessage.Length >= 64 && ConfigKey.AnnouncementsAtTop.Enabled())
+                {
+                    player.Message(bigMessage, MessageType.Chat);
+                }
+                else player.Message(bigMessage, MessageType.Announcement);
             }
         }
 
         // measures CPU usage
-        public static bool IsMonitoringCPUUsage { get; private set; }
-        static TimeSpan cpuUsageStartingOffset;
-        public static double CPUUsageTotal { get; private set; }
-        public static double CPUUsageLastMinute { get; private set; }
+        public static bool IsMonitoringCpuUsage { get; private set; }
+        static TimeSpan _cpuUsageStartingOffset;
+        public static double CpuUsageTotal { get; private set; }
+        public static double CpuUsageLastMinute { get; private set; }
 
-        static TimeSpan oldCPUTime = new TimeSpan( 0 );
-        static readonly TimeSpan MonitorProcessorUsageInterval = TimeSpan.FromSeconds( 30 );
-        static DateTime lastMonitorTime = DateTime.UtcNow;
+        static TimeSpan _oldCpuTime = new TimeSpan(0);
+        static readonly TimeSpan MonitorProcessorUsageInterval = TimeSpan.FromSeconds(30);
+        static DateTime _lastMonitorTime = DateTime.UtcNow;
 
-        static void MonitorProcessorUsage( SchedulerTask task ) {
-            TimeSpan newCPUTime = Process.GetCurrentProcess().TotalProcessorTime - cpuUsageStartingOffset;
-            CPUUsageLastMinute = (newCPUTime - oldCPUTime).TotalSeconds /
-                                 (Environment.ProcessorCount * DateTime.UtcNow.Subtract( lastMonitorTime ).TotalSeconds);
-            lastMonitorTime = DateTime.UtcNow;
-            CPUUsageTotal = newCPUTime.TotalSeconds /
-                            (Environment.ProcessorCount * DateTime.UtcNow.Subtract( StartTime ).TotalSeconds);
-            oldCPUTime = newCPUTime;
-            IsMonitoringCPUUsage = true;
+        static void MonitorProcessorUsage(SchedulerTask task)
+        {
+            var newCpuTime = Process.GetCurrentProcess().TotalProcessorTime - _cpuUsageStartingOffset;
+            CpuUsageLastMinute = (newCpuTime - _oldCpuTime).TotalSeconds /
+                                 (Environment.ProcessorCount * DateTime.UtcNow.Subtract(_lastMonitorTime).TotalSeconds);
+            _lastMonitorTime = DateTime.UtcNow;
+            CpuUsageTotal = newCpuTime.TotalSeconds /
+                            (Environment.ProcessorCount * DateTime.UtcNow.Subtract(StartTime).TotalSeconds);
+            _oldCpuTime = newCpuTime;
+            IsMonitoringCpuUsage = true;
         }
 
         #endregion
@@ -935,45 +1004,52 @@ namespace fCraft {
 
         #region Utilities
 
-        static bool gcRequested;
+        static bool _gcRequested;
 
-        public static void RequestGC() {
-            gcRequested = true;
+        public static void RequestGc()
+        {
+            _gcRequested = true;
         }
 
         /// <summary>
         /// Checks if the verification key from the player ID packet (client -> server) matches the server's salt
         /// </summary>
-        public static bool VerifyName( [NotNull] string name, [NotNull] string hash, [NotNull] string salt ) 
+        public static bool VerifyName([NotNull] string name, [NotNull] string hash, [NotNull] string salt)
         {
-            if( name == null ) throw new ArgumentNullException( "name" );
-            if( hash == null ) throw new ArgumentNullException( "hash" );
-            if( salt == null ) throw new ArgumentNullException( "salt" );
-            while( hash.Length < 32 ) {
+            if (name == null) throw new ArgumentNullException("name");
+            if (hash == null) throw new ArgumentNullException("hash");
+            if (salt == null) throw new ArgumentNullException("salt");
+            while (hash.Length < 32)
+            {
                 hash = "0" + hash;
             }
             MD5 hasher = MD5.Create();
-            StringBuilder sb = new StringBuilder( 32 );
-            foreach( byte b in hasher.ComputeHash( Encoding.ASCII.GetBytes( salt + name ) ) ) 
+            StringBuilder sb = new StringBuilder(32);
+            foreach (byte b in hasher.ComputeHash(Encoding.ASCII.GetBytes(salt + name)))
             {
-                sb.AppendFormat( "{0:x2}", b );
+                sb.AppendFormat("{0:x2}", b);
             }
-            return sb.ToString().Equals( hash, StringComparison.OrdinalIgnoreCase );
+            return sb.ToString().Equals(hash, StringComparison.OrdinalIgnoreCase);
         }
 
 
-        public static int CalculateMaxPacketsPerUpdate( [NotNull] World world ) {
-            if( world == null ) throw new ArgumentNullException( "world" );
+        public static int CalculateMaxPacketsPerUpdate([NotNull] World world)
+        {
+            if (world == null) throw new ArgumentNullException("world");
             int packetsPerTick = (int)(BlockUpdateThrottling / TicksPerSecond);
             int maxPacketsPerUpdate = (int)(MaxUploadSpeed / TicksPerSecond * 128);
 
             int playerCount = world.Players.Length;
-            if( playerCount > 0 && !world.IsFlushing ) {
+            if (playerCount > 0 && !world.IsFlushing)
+            {
                 maxPacketsPerUpdate /= playerCount;
-                if( maxPacketsPerUpdate > packetsPerTick ) {
+                if (maxPacketsPerUpdate > packetsPerTick)
+                {
                     maxPacketsPerUpdate = packetsPerTick;
                 }
-            } else {
+            }
+            else
+            {
                 maxPacketsPerUpdate = MaxBlockUpdatesPerTick;
             }
 
@@ -981,12 +1057,13 @@ namespace fCraft {
         }
 
 
-        static readonly Regex RegexIP = new Regex( @"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b",
-                                                   RegexOptions.Compiled );
+        static readonly Regex RegexIp = new Regex(@"\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b",
+                                                   RegexOptions.Compiled);
 
-        public static bool IsIP( [NotNull] string ipString ) {
-            if( ipString == null ) throw new ArgumentNullException( "ipString" );
-            return RegexIP.IsMatch( ipString );
+        public static bool IsIp([NotNull] string ipString)
+        {
+            if (ipString == null) throw new ArgumentNullException("ipString");
+            return RegexIp.IsMatch(ipString);
         }
 
 
@@ -1025,8 +1102,7 @@ namespace fCraft {
                 }
                 finally
                 {
-                    if (fs != null)
-                        fs.Close();
+                    fs.Close();
                 }
                 Logger.Log(LogType.SystemActivity,
                             "Backed up server data to \"{0}\"",
@@ -1035,90 +1111,87 @@ namespace fCraft {
         }
 
 
-        public static string ReplaceTextKeywords( [NotNull] Player player, [NotNull] string input ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( input == null ) throw new ArgumentNullException( "input" );
-            StringBuilder sb = new StringBuilder( input );
-            sb.Replace( "{SERVER_NAME}", ConfigKey.ServerName.GetString() );
-            sb.Replace( "{RANK}", player.Info.Rank.ClassyName );
-            sb.Replace( "{PLAYER_NAME}", player.ClassyName );
-            sb.Replace( "{TIME}", DateTime.Now.ToShortTimeString() ); // localized
-            if( player.World == null ) {
-                sb.Replace( "{WORLD}", "(No World)" );
-            } else {
-                sb.Replace( "{WORLD}", player.World.ClassyName );
-            }
-            sb.Replace( "{PLAYERS}", CountVisiblePlayers( player ).ToString() );
-            sb.Replace( "{WORLDS}", WorldManager.Worlds.Length.ToString() );
-            sb.Replace( "{MOTD}", ConfigKey.MOTD.GetString() );
-            sb.Replace( "{VERSION}", Updater.LatestStable );
-            if (ConfigKey.IRCBotEnabled.Enabled())
-            {
-                sb.Replace("{IRC_CHANNEL}", ConfigKey.IRCBotChannels.GetString());
-            }
-            else
-            {
-                sb.Replace("{IRC_CHANNEL}", "(No IRC)");
-            }
+        public static string ReplaceTextKeywords([NotNull] Player player, [NotNull] string input)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (input == null) throw new ArgumentNullException("input");
+            var sb = new StringBuilder(input);
+            sb.Replace("{SERVER_NAME}", ConfigKey.ServerName.GetString());
+            sb.Replace("{RANK}", player.Info.Rank.ClassyName);
+            sb.Replace("{PLAYER_NAME}", player.ClassyName);
+            sb.Replace("{TIME}", DateTime.Now.ToShortTimeString()); // localized
+            sb.Replace("{WORLD}", player.World == null ? "(No World)" : player.World.ClassyName);
+            sb.Replace("{PLAYERS}", CountVisiblePlayers(player).ToString());
+            sb.Replace("{WORLDS}", WorldManager.Worlds.Length.ToString());
+            sb.Replace("{MOTD}", ConfigKey.MOTD.GetString());
+            sb.Replace("{VERSION}", Updater.LatestStable);
+            sb.Replace("{IRC_CHANNEL}",
+                ConfigKey.IRCBotEnabled.Enabled() ? ConfigKey.IRCBotChannels.GetString() : "(No IRC)");
             sb.Replace("{WEBSITE}", ConfigKey.WebsiteURL.GetString());
             return sb.ToString();
         }
 
 
 
-        public static string GetRandomString( int chars ) {
+        public static string GetRandomString(int chars)
+        {
             RandomNumberGenerator prng = RandomNumberGenerator.Create();
-            StringBuilder sb = new StringBuilder();
-            byte[] oneChar = new byte[1];
-            while( sb.Length < chars ) {
-                prng.GetBytes( oneChar );
-                if( oneChar[0] >= 48 && oneChar[0] <= 57 ||
+            var sb = new StringBuilder();
+            var oneChar = new byte[1];
+            while (sb.Length < chars)
+            {
+                prng.GetBytes(oneChar);
+                if (oneChar[0] >= 48 && oneChar[0] <= 57 ||
                     oneChar[0] >= 65 && oneChar[0] <= 90 ||
-                    oneChar[0] >= 97 && oneChar[0] <= 122 ) {
+                    oneChar[0] >= 97 && oneChar[0] <= 122)
+                {
                     //if( oneChar[0] >= 33 && oneChar[0] <= 126 ) {
-                    sb.Append( (char)oneChar[0] );
+                    sb.Append((char)oneChar[0]);
                 }
             }
             return sb.ToString();
         }
 
-        static readonly Uri IPCheckUri = new Uri( "http://checkip.dyndns.org/" );
-        const int IPCheckTimeout = 30000;
+        static readonly Uri IpCheckUri = new Uri("http://checkip.dyndns.org/");
+        const int IpCheckTimeout = 30000;
 
         /// <summary> Checks server's external IP, as reported by checkip.dyndns.org. </summary>
         [CanBeNull]
-        static IPAddress CheckExternalIP() {
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create( IPCheckUri );
-            request.ServicePoint.BindIPEndPointDelegate = BindIPEndPointCallback;
-            request.Timeout = IPCheckTimeout;
-            request.CachePolicy = new RequestCachePolicy( RequestCacheLevel.NoCacheNoStore );
+        static IPAddress CheckExternalIp()
+        {
+            var request = (HttpWebRequest)WebRequest.Create(IpCheckUri);
+            request.ServicePoint.BindIPEndPointDelegate = BindIpEndPointCallback;
+            request.Timeout = IpCheckTimeout;
+            request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore);
 
-            try {
-                using( WebResponse response = request.GetResponse() ) {
+            try
+            {
+                using (var response = request.GetResponse())
+                {
                     // ReSharper disable AssignNullToNotNullAttribute
-                    using( StreamReader responseReader = new StreamReader( response.GetResponseStream() ) ) {
+                    using (StreamReader responseReader = new StreamReader(response.GetResponseStream()))
+                    {
                         // ReSharper restore AssignNullToNotNullAttribute
-                        string responseString = responseReader.ReadToEnd();
-                        int startIndex = responseString.IndexOf( ":" ) + 2;
-                        int endIndex = responseString.IndexOf( '<', startIndex ) - startIndex;
+                        var responseString = responseReader.ReadToEnd();
+                        var startIndex = responseString.IndexOf(":", StringComparison.Ordinal) + 2;
+                        var endIndex = responseString.IndexOf('<', startIndex) - startIndex;
                         IPAddress result;
-                        if( IPAddress.TryParse( responseString.Substring( startIndex, endIndex ), out result ) ) {
-                            return result;
-                        } else {
-                            return null;
-                        }
+                        return IPAddress.TryParse(responseString.Substring(startIndex, endIndex), out result) ? result : null;
                     }
                 }
-            } catch( WebException ex ) {
-                Logger.Log( LogType.Warning,
-                            "Could not check external IP: {0}", ex );
+            }
+            catch (WebException ex)
+            {
+                Logger.Log(LogType.Warning,
+                            "Could not check external IP: {0}", ex);
                 return null;
             }
         }
 
         // Callback for setting the local IP binding. Implements System.Net.BindIPEndPoint delegate.
-        public static IPEndPoint BindIPEndPointCallback( ServicePoint servicePoint, IPEndPoint remoteEndPoint, int retryCount ) {
-            return new IPEndPoint( InternalIP, 0 );
+        public static IPEndPoint BindIpEndPointCallback(ServicePoint servicePoint, IPEndPoint remoteEndPoint, int retryCount)
+        {
+            return new IPEndPoint(InternalIp, 0);
         }
 
         #endregion
@@ -1139,23 +1212,26 @@ namespace fCraft {
         // Registers a new session, and checks the number of connections from this IP.
         // Returns true if the session was registered succesfully.
         // Returns false if the max number of connections was reached.
-        internal static bool RegisterSession( [NotNull] Player session ) {
-            if( session == null ) throw new ArgumentNullException( "session" );
-            int maxSessions = ConfigKey.MaxConnectionsPerIP.GetInt();
-            lock( SessionLock ) {
-                if( !session.IP.Equals( IPAddress.Loopback ) && maxSessions > 0 ) {
-                    int sessionCount = 0;
-                    for( int i = 0; i < Sessions.Count; i++ ) {
-                        Player p = Sessions[i];
-                        if( p.IP.Equals( session.IP ) ) {
-                            sessionCount++;
-                            if( sessionCount >= maxSessions ) {
-                                return false;
-                            }
+        internal static bool RegisterSession([NotNull] Player session)
+        {
+            if (session == null) throw new ArgumentNullException("session");
+            var maxSessions = ConfigKey.MaxConnectionsPerIP.GetInt();
+            lock (SessionLock)
+            {
+                if (!session.IP.Equals(IPAddress.Loopback) && maxSessions > 0)
+                {
+                    var sessionCount = 0;
+                    // ReSharper disable once UnusedVariable
+                    foreach (var p in Sessions.Where(p => p.IP.Equals(session.IP)))
+                    {
+                        sessionCount++;
+                        if (sessionCount >= maxSessions)
+                        {
+                            return false;
                         }
                     }
                 }
-                Sessions.Add( session );
+                Sessions.Add(session);
             }
             return true;
         }
@@ -1165,168 +1241,179 @@ namespace fCraft {
         // Also kicks any existing connections for this player account.
         // Returns true if player was registered succesfully.
         // Returns false if the server was full.
-        internal static bool RegisterPlayer( [NotNull] Player player ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
+        internal static bool RegisterPlayer([NotNull] Player player)
+        {
+            if (player == null) throw new ArgumentNullException("player");
 
             // Kick other sessions with same player name
             List<Player> sessionsToKick = new List<Player>();
-            lock( SessionLock ) {
-                foreach( Player s in Sessions ) {
-                    if( s == player ) continue;
-                    if( s.Name.Equals( player.Name, StringComparison.OrdinalIgnoreCase ) ) {
-                        sessionsToKick.Add( s );
-                        Logger.Log( LogType.SuspiciousActivity,
+            lock (SessionLock)
+            {
+                foreach (Player s in Sessions)
+                {
+                    if (s == player) continue;
+                    if (s.Name.Equals(player.Name, StringComparison.OrdinalIgnoreCase))
+                    {
+                        sessionsToKick.Add(s);
+                        Logger.Log(LogType.SuspiciousActivity,
                                     "Server.RegisterPlayer: Player {0} logged in twice. Ghost from {1} was kicked.",
-                                    s.Name, s.IP );
-                        s.Kick( "Connected from elsewhere!", LeaveReason.ClientReconnect );
+                                    s.Name, s.IP);
+                        s.Kick("Connected from elsewhere!", LeaveReason.ClientReconnect);
                     }
                 }
             }
 
             // Wait for other sessions to exit/unregister (if any)
-            foreach( Player ses in sessionsToKick ) {
+            foreach (Player ses in sessionsToKick)
+            {
                 ses.WaitForDisconnect();
             }
 
             // Add player to the list
-            lock( PlayerListLock ) {
-                if( PlayerIndex.Count >= ConfigKey.MaxPlayers.GetInt() && !player.Info.Rank.ReservedSlot ) {
+            lock (PlayerListLock)
+            {
+                if (PlayerIndex.Count >= ConfigKey.MaxPlayers.GetInt() && !player.Info.Rank.ReservedSlot)
+                {
                     return false;
                 }
-                PlayerIndex.Add( player.Name, player );
+                PlayerIndex.Add(player.Name, player);
                 player.HasRegistered = true;
             }
             return true;
         }
 
 
-        public static string MakePlayerConnectedMessage( [NotNull] Player player, bool firstTime, [NotNull] World world ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( world == null ) throw new ArgumentNullException( "world" );
-            if (firstTime){
+        public static string MakePlayerConnectedMessage([NotNull] Player player, bool firstTime, [NotNull] World world)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (world == null) throw new ArgumentNullException("world");
+            if (firstTime)
+            {
                 return String.Format("&S{0} &Sconnected, joined {1}",
                                       player.ClassyName,
                                       world.ClassyName);
             }
             //use this if you want to show original names for people with displayednames
-            if (!firstTime && player.Info.DisplayedName != null){
+            if (player.Info.DisplayedName != null)
+            {
 
-                return String.Format("&S{0} &S({1}&S) connected again, joined {2}",
+                return string.Format("&S{0} &S({1}&S) connected again, joined {2}",
                                       player.ClassyName,
                                       player.Name,
                                       world.ClassyName);
-            }else{
-                return String.Format("&S{0} &Sconnected again, joined {1}",
-                                      player.ClassyName,
-                                      world.ClassyName);
             }
+            return string.Format("&S{0} &Sconnected again, joined {1}",
+                player.ClassyName,
+                world.ClassyName);
         }
 
 
         // Removes player from the list, and announced them leaving
-        public static void UnregisterPlayer( [NotNull] Player player ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
+        public static void UnregisterPlayer([NotNull] Player player)
+        {
+            if (player == null) throw new ArgumentNullException("player");
 
-            lock( PlayerListLock ) {
-                if( !player.HasRegistered ) return;
-                player.Info.ProcessLogout( player );
+            lock (PlayerListLock)
+            {
+                if (!player.HasRegistered) return;
+                player.Info.ProcessLogout(player);
 
-                Logger.Log( LogType.UserActivity,
-                            "{0} left the server ({1}).", player.Name, player.LeaveReason );
-                if( player.HasRegistered && ConfigKey.ShowConnectionMessages.Enabled() ) {
+                Logger.Log(LogType.UserActivity,
+                            "{0} left the server ({1}).", player.Name, player.LeaveReason);
+                if (player.HasRegistered && ConfigKey.ShowConnectionMessages.Enabled())
+                {
                     Players.CanSee(player).Message("&SPlayer {0}&S {1}.",
                                                       player.ClassyName, player.Info.LeaveMsg);
                     player.Info.LeaveMsg = "left the server";
                 }
 
-                if( player.World != null ) {
-                    player.World.ReleasePlayer( player );
+                if (player.World != null)
+                {
+                    player.World.ReleasePlayer(player);
                 }
-                PlayerIndex.Remove( player.Name );
+                PlayerIndex.Remove(player.Name);
                 UpdatePlayerList();
             }
         }
 
 
         // Removes a session from the list
-        internal static void UnregisterSession( [NotNull] Player player ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            lock( SessionLock ) {
-                Sessions.Remove( player );
+        internal static void UnregisterSession([NotNull] Player player)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            lock (SessionLock)
+            {
+                Sessions.Remove(player);
             }
         }
 
 
-        internal static void UpdatePlayerList() {
-            lock( PlayerListLock ) {
-                Players = PlayerIndex.Values.Where( p => p.IsOnline )
-                                            .OrderBy( player => player.Name )
+        internal static void UpdatePlayerList()
+        {
+            lock (PlayerListLock)
+            {
+                Players = PlayerIndex.Values.Where(p => p.IsOnline)
+                                            .OrderBy(player => player.Name)
                                             .ToArray();
-                RaiseEvent( PlayerListChanged );
+                RaiseEvent(PlayerListChanged);
             }
         }
 
         /// <summary>
         /// Find bot by name. Returns either the bot by exact name, or null.
         /// </summary>
-        public static Bot FindBot(String name)
+        public static Bot FindBot(string name)
         {
             var bot =
                from b in Bots
-               where b.Name.ToLower() == name.ToLower()
+               where string.Equals(b.Name, name, StringComparison.CurrentCultureIgnoreCase)
                select b;
 
-            if (bot.Count() != 1)
-            {
-                return null;
-            }
-
-            return bot.First();
+            var enumerable = bot as Bot[] ?? bot.ToArray();
+            return enumerable.Count() != 1 ? null : enumerable.First();
         }
 
         /// <summary>
         /// Find bot by ID. Returns either the bot by exact ID, or null.
         /// </summary>
-        public static Bot FindBot(int ID)
+        public static Bot FindBot(int id)
         {
             var bot =
                 from b in Bots
-                where b.ID == ID
+                where b.ID == id
                 select b;
 
-            if (bot.Count() != 1)
-            {
-                return null;
-            }
-
-            return bot.First();
+            var enumerable = bot as Bot[] ?? bot.ToArray();
+            return enumerable.Count() != 1 ? null : enumerable.First();
         }
 
         /// <summary> Finds a player by name, using autocompletion.
         /// Returns ALL matching players, including hidden ones. </summary>
         /// <returns> An array of matches. List length of 0 means "no matches";
         /// 1 is an exact match; over 1 for multiple matches. </returns>
-        public static Player[] FindPlayers( [NotNull] string name, bool raiseEvent ) {
-            if( name == null ) throw new ArgumentNullException( "name" );
-            Player[] tempList = Players;
-            List<Player> results = new List<Player>();
-            for( int i = 0; i < tempList.Length; i++ ) {
-                if( tempList[i] == null ) continue;
-                if( tempList[i].Name.Equals( name, StringComparison.OrdinalIgnoreCase ) ) {
+        public static Player[] FindPlayers([NotNull] string name, bool raiseEvent)
+        {
+            if (name == null) throw new ArgumentNullException("name");
+            var tempList = Players;
+            var results = new List<Player>();
+            foreach (var t in tempList.Where(t => t != null))
+            {
+                if (t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
                     results.Clear();
-                    results.Add( tempList[i] );
+                    results.Add(t);
                     break;
-                } else if( tempList[i].Name.StartsWith( name, StringComparison.OrdinalIgnoreCase ) ) {
-                    results.Add( tempList[i] );
+                }
+                if (t.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    results.Add(t);
                 }
             }
-            if( raiseEvent ) {
-                var h = SearchingForPlayer;
-                if( h != null ) {
-                    var e = new SearchingForPlayerEventArgs( null, name, results );
-                    h( null, e );
-                }
-            }
+            if (!raiseEvent) return results.ToArray();
+            var h = SearchingForPlayer;
+            if (h == null) return results.ToArray();
+            var e = new SearchingForPlayerEventArgs(null, name, results);
+            h(null, e);
             return results.ToArray();
         }
 
@@ -1338,37 +1425,51 @@ namespace fCraft {
         /// <param name="raiseEvent"> Whether to raise Server.SearchingForPlayer event. </param>
         /// <returns> An array of matches. List length of 0 means "no matches";
         /// 1 is an exact match; over 1 for multiple matches. </returns>
-        public static Player[] FindPlayers( [NotNull] Player player, [NotNull] string name, bool raiseEvent ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( name == null ) throw new ArgumentNullException( "name" );
-            if( name == "-" ) {
-                if( player.LastUsedPlayerName != null ) {
-                    name = player.LastUsedPlayerName;
-                } else {
-                    return new Player[0];
-                }
+        public static Player[] FindPlayers([NotNull] Player player, [NotNull] string name, bool raiseEvent)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            switch (name)
+            {
+                case null:
+                    throw new ArgumentNullException("name");
+                case "-":
+                    if (player.LastUsedPlayerName != null)
+                    {
+                        name = player.LastUsedPlayerName;
+                    }
+                    else
+                    {
+                        return new Player[0];
+                    }
+                    break;
             }
             player.LastUsedPlayerName = name;
-            List<Player> results = new List<Player>();
-            Player[] tempList = Players;
-            for( int i = 0; i < tempList.Length; i++ ) {
-                if( tempList[i] == null || !player.CanSee( tempList[i] ) ) continue;
-                if( tempList[i].Name.Equals( name, StringComparison.OrdinalIgnoreCase ) ) {
+            var results = new List<Player>();
+            var tempList = Players;
+            foreach (var t in tempList.Where(t => t != null && player.CanSee(t)))
+            {
+                if (t.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
                     results.Clear();
-                    results.Add( tempList[i] );
+                    results.Add(t);
                     break;
-                } else if( tempList[i].Name.StartsWith( name, StringComparison.OrdinalIgnoreCase ) ) {
-                    results.Add( tempList[i] );
+                }
+                if (t.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    results.Add(t);
                 }
             }
-            if( raiseEvent ) {
+            if (raiseEvent)
+            {
                 var h = SearchingForPlayer;
-                if( h != null ) {
-                    var e = new SearchingForPlayerEventArgs( player, name, results );
-                    h( null, e );
+                if (h != null)
+                {
+                    var e = new SearchingForPlayerEventArgs(player, name, results);
+                    h(null, e);
                 }
             }
-            if( results.Count == 1 ) {
+            if (results.Count == 1)
+            {
                 player.LastUsedPlayerName = results[0].Name;
             }
             return results.ToArray();
@@ -1384,53 +1485,61 @@ namespace fCraft {
         /// <param name="raiseEvent"> Whether to raise Server.SearchingForPlayer event. </param>
         /// <returns> Player object, or null if no player was found. </returns>
         [CanBeNull]
-        public static Player FindPlayerOrPrintMatches( [NotNull] Player player, [NotNull] string name, bool includeHidden, bool raiseEvent ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( name == null ) throw new ArgumentNullException( "name" );
-            if( name == "-" ) {
-                if( player.LastUsedPlayerName != null ) {
-                    name = player.LastUsedPlayerName;
-                } else {
-                    player.Message( "Cannot repeat player name: you haven't used any names yet." );
-                    return null;
-                }
+        public static Player FindPlayerOrPrintMatches([NotNull] Player player, [NotNull] string name, bool includeHidden, bool raiseEvent)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            switch (name)
+            {
+                case null:
+                    throw new ArgumentNullException("name");
+                case "-":
+                    if (player.LastUsedPlayerName != null)
+                    {
+                        name = player.LastUsedPlayerName;
+                    }
+                    else
+                    {
+                        player.Message("Cannot repeat player name: you haven't used any names yet.");
+                        return null;
+                    }
+                    break;
             }
-            Player[] matches;
-            if( includeHidden ) {
-                matches = FindPlayers( name, raiseEvent );
-            } else {
-                matches = FindPlayers( player, name, raiseEvent );
-            }
+            var matches = includeHidden ? FindPlayers(name, raiseEvent) : FindPlayers(player, name, raiseEvent);
 
-            if( matches.Length == 0 ) {
-                player.MessageNoPlayer( name );
+            if (matches.Length == 0)
+            {
+                player.MessageNoPlayer(name);
                 return null;
-
-            } else if( matches.Length > 1 ) {
-                player.MessageManyMatches( "player", matches );
-                return null;
-
-            } else {
-                player.LastUsedPlayerName = matches[0].Name;
-                return matches[0];
             }
+            if (matches.Length > 1)
+            {
+                player.MessageManyMatches("player", matches);
+                return null;
+            }
+            player.LastUsedPlayerName = matches[0].Name;
+            return matches[0];
         }
 
 
         /// <summary> Counts online players, optionally including hidden ones. </summary>
-        public static int CountPlayers( bool includeHiddenPlayers ) {
-            if( includeHiddenPlayers ) {
+        public static int CountPlayers(bool includeHiddenPlayers)
+        {
+            if (includeHiddenPlayers)
+            {
                 return Players.Length;
-            } else {
-                return Players.Count( player => !player.Info.IsHidden );
+            }
+            else
+            {
+                return Players.Count(player => !player.Info.IsHidden);
             }
         }
 
 
         /// <summary> Counts online players whom the given observer can see. </summary>
-        public static int CountVisiblePlayers( [NotNull] Player observer ) {
-            if( observer == null ) throw new ArgumentNullException( "observer" );
-            return Players.Count( observer.CanSee );
+        public static int CountVisiblePlayers([NotNull] Player observer)
+        {
+            if (observer == null) throw new ArgumentNullException("observer");
+            return Players.Count(observer.CanSee);
         }
 
         #endregion
@@ -1438,28 +1547,33 @@ namespace fCraft {
 
 
     /// <summary> Describes the circumstances of server shutdown. </summary>
-    public sealed class ShutdownParams {
-        public ShutdownParams( ShutdownReason reason, TimeSpan delay, bool killProcess, bool restart ) {
+    public sealed class ShutdownParams
+    {
+        public ShutdownParams(ShutdownReason reason, TimeSpan delay, bool killProcess, bool restart)
+        {
             Reason = reason;
             Delay = delay;
             KillProcess = killProcess;
             Restart = restart;
         }
 
-        public ShutdownParams( ShutdownReason reason, TimeSpan delay, bool killProcess,
-                               bool restart, [CanBeNull] string customReason, [CanBeNull] Player initiatedBy ) :
-            this( reason, delay, killProcess, restart ) {
-            customReasonString = customReason;
+        public ShutdownParams(ShutdownReason reason, TimeSpan delay, bool killProcess,
+                               bool restart, [CanBeNull] string customReason, [CanBeNull] Player initiatedBy) :
+            this(reason, delay, killProcess, restart)
+        {
+            _customReasonString = customReason;
             InitiatedBy = initiatedBy;
         }
 
         public ShutdownReason Reason { get; private set; }
 
-        readonly string customReasonString;
+        readonly string _customReasonString;
         [NotNull]
-        public string ReasonString {
-            get {
-                return customReasonString ?? Reason.ToString();
+        public string ReasonString
+        {
+            get
+            {
+                return _customReasonString ?? Reason.ToString();
             }
         }
 
@@ -1479,7 +1593,8 @@ namespace fCraft {
 
 
     /// <summary> Categorizes conditions that lead to server shutdowns. </summary>
-    public enum ShutdownReason {
+    public enum ShutdownReason
+    {
         Unknown,
 
         /// <summary> Use for mod- or plugin-triggered shutdowns. </summary>

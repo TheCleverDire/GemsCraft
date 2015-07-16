@@ -9,7 +9,7 @@ namespace fCraft
 
     /// <summary> Static class with definitions of Minecraft color codes,
     /// parsers, converters, and utilities. </summary>
-    public static class Color
+    public class Color // Renamed as to not interfere with System.Drawing.Color
     {
         public const string Black = "&0",
                             Navy = "&1",

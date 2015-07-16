@@ -30,8 +30,8 @@ namespace GemsCraftGUI
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
@@ -323,6 +323,24 @@ namespace GemsCraftGUI
             this.label2 = new System.Windows.Forms.Label();
             this.CustomAliases = new System.Windows.Forms.TextBox();
             this.CPETab = new System.Windows.Forms.TabPage();
+            this.gboMessageType = new System.Windows.Forms.GroupBox();
+            this.chkAnnouncementMT = new System.Windows.Forms.CheckBox();
+            this.lblMTNotice = new System.Windows.Forms.Label();
+            this.chkBottomRight3 = new System.Windows.Forms.CheckBox();
+            this.txtBottomRight3 = new System.Windows.Forms.TextBox();
+            this.chkBottomRight2 = new System.Windows.Forms.CheckBox();
+            this.txtBottomRight2 = new System.Windows.Forms.TextBox();
+            this.chkBottomRight1 = new System.Windows.Forms.CheckBox();
+            this.txtBottomRight1 = new System.Windows.Forms.TextBox();
+            this.chkStatus3 = new System.Windows.Forms.CheckBox();
+            this.txtStatus3 = new System.Windows.Forms.TextBox();
+            this.chkStatus2 = new System.Windows.Forms.CheckBox();
+            this.txtStatus2 = new System.Windows.Forms.TextBox();
+            this.chkStatus1 = new System.Windows.Forms.CheckBox();
+            this.txtStatus1 = new System.Windows.Forms.TextBox();
+            this.chkMessageTypeAllowed = new System.Windows.Forms.CheckBox();
+            this.gboHeldBlock = new System.Windows.Forms.GroupBox();
+            this.chkHeldBlockAllowed = new System.Windows.Forms.CheckBox();
             this.gboCustomBlocks = new System.Windows.Forms.GroupBox();
             this.clbBlocks = new System.Windows.Forms.CheckedListBox();
             this.chkCustomBlocksAllowed = new System.Windows.Forms.CheckBox();
@@ -345,24 +363,7 @@ namespace GemsCraftGUI
             this.uriDisplay = new System.Windows.Forms.TextBox();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.gboHeldBlock = new System.Windows.Forms.GroupBox();
-            this.chkHeldBlockAllowed = new System.Windows.Forms.CheckBox();
-            this.gboMessageType = new System.Windows.Forms.GroupBox();
-            this.chkMessageTypeAllowed = new System.Windows.Forms.CheckBox();
-            this.txtStatus1 = new System.Windows.Forms.TextBox();
-            this.chkStatus1 = new System.Windows.Forms.CheckBox();
-            this.chkStatus2 = new System.Windows.Forms.CheckBox();
-            this.txtStatus2 = new System.Windows.Forms.TextBox();
-            this.chkStatus3 = new System.Windows.Forms.CheckBox();
-            this.txtStatus3 = new System.Windows.Forms.TextBox();
-            this.chkBottomRight1 = new System.Windows.Forms.CheckBox();
-            this.txtBottomRight1 = new System.Windows.Forms.TextBox();
-            this.chkBottomRight2 = new System.Windows.Forms.CheckBox();
-            this.txtBottomRight2 = new System.Windows.Forms.TextBox();
-            this.chkBottomRight3 = new System.Windows.Forms.CheckBox();
-            this.txtBottomRight3 = new System.Windows.Forms.TextBox();
-            this.lblMTNotice = new System.Windows.Forms.Label();
-            this.chkAnnouncementMT = new System.Windows.Forms.CheckBox();
+            this.btnSeeKeyWords = new System.Windows.Forms.Button();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.tabs.SuspendLayout();
@@ -434,12 +435,12 @@ namespace GemsCraftGUI
             ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.CPETab.SuspendLayout();
+            this.gboMessageType.SuspendLayout();
+            this.gboHeldBlock.SuspendLayout();
             this.gboCustomBlocks.SuspendLayout();
             this.gboClickDistance.SuspendLayout();
             this.ServerTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picServerStatus)).BeginInit();
-            this.gboHeldBlock.SuspendLayout();
-            this.gboMessageType.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -461,10 +462,10 @@ namespace GemsCraftGUI
             this.tabPage1.Controls.Add(this.bCancel);
             this.tabPage1.Controls.Add(this.bOK);
             this.tabPage1.Controls.Add(this.tabs);
-            this.tabPage1.Location = new System.Drawing.Point(4, 24);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(692, 570);
+            this.tabPage1.Size = new System.Drawing.Size(692, 572);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Config";
             // 
@@ -567,10 +568,10 @@ namespace GemsCraftGUI
             this.tabGeneral.Controls.Add(this.pictureBox1);
             this.tabGeneral.Controls.Add(this.groupBox2);
             this.tabGeneral.Controls.Add(this.gInformation);
-            this.tabGeneral.Location = new System.Drawing.Point(4, 24);
+            this.tabGeneral.Location = new System.Drawing.Point(4, 22);
             this.tabGeneral.Name = "tabGeneral";
             this.tabGeneral.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.tabGeneral.Size = new System.Drawing.Size(652, 482);
+            this.tabGeneral.Size = new System.Drawing.Size(652, 484);
             this.tabGeneral.TabIndex = 0;
             this.tabGeneral.Text = "General";
             // 
@@ -914,7 +915,7 @@ namespace GemsCraftGUI
             this.groupBox2.Controls.Add(this.bChangelog);
             this.groupBox2.Controls.Add(this.bCredits);
             this.groupBox2.Controls.Add(this.bReadme);
-            this.groupBox2.Location = new System.Drawing.Point(51, 304);
+            this.groupBox2.Location = new System.Drawing.Point(51, 306);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(123, 135);
             this.groupBox2.TabIndex = 4;
@@ -1072,10 +1073,10 @@ namespace GemsCraftGUI
             this.tabChat.Controls.Add(this.chatPreview1);
             this.tabChat.Controls.Add(this.gAppearence);
             this.tabChat.Controls.Add(this.gChatColors);
-            this.tabChat.Location = new System.Drawing.Point(4, 24);
+            this.tabChat.Location = new System.Drawing.Point(4, 22);
             this.tabChat.Name = "tabChat";
             this.tabChat.Padding = new System.Windows.Forms.Padding(5, 5, 5, 10);
-            this.tabChat.Size = new System.Drawing.Size(652, 482);
+            this.tabChat.Size = new System.Drawing.Size(652, 484);
             this.tabChat.TabIndex = 10;
             this.tabChat.Text = "Chat";
             // 
@@ -1346,10 +1347,10 @@ namespace GemsCraftGUI
             this.tabWorlds.Controls.Add(this.bAddWorld);
             this.tabWorlds.Controls.Add(this.bWorldDelete);
             this.tabWorlds.Controls.Add(this.dgvWorlds);
-            this.tabWorlds.Location = new System.Drawing.Point(4, 24);
+            this.tabWorlds.Location = new System.Drawing.Point(4, 22);
             this.tabWorlds.Name = "tabWorlds";
             this.tabWorlds.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.tabWorlds.Size = new System.Drawing.Size(652, 482);
+            this.tabWorlds.Size = new System.Drawing.Size(652, 484);
             this.tabWorlds.TabIndex = 9;
             this.tabWorlds.Text = "Worlds";
             // 
@@ -1357,7 +1358,7 @@ namespace GemsCraftGUI
             // 
             this.xWoMEnableEnvExtensions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.xWoMEnableEnvExtensions.AutoSize = true;
-            this.xWoMEnableEnvExtensions.Location = new System.Drawing.Point(8, 434);
+            this.xWoMEnableEnvExtensions.Location = new System.Drawing.Point(8, 436);
             this.xWoMEnableEnvExtensions.Name = "xWoMEnableEnvExtensions";
             this.xWoMEnableEnvExtensions.Size = new System.Drawing.Size(251, 19);
             this.xWoMEnableEnvExtensions.TabIndex = 22;
@@ -1372,7 +1373,7 @@ namespace GemsCraftGUI
             this.bMapPath.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
             this.bMapPath.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Silver;
             this.bMapPath.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bMapPath.Location = new System.Drawing.Point(587, 407);
+            this.bMapPath.Location = new System.Drawing.Point(587, 409);
             this.bMapPath.Name = "bMapPath";
             this.bMapPath.Size = new System.Drawing.Size(62, 23);
             this.bMapPath.TabIndex = 10;
@@ -1383,7 +1384,7 @@ namespace GemsCraftGUI
             // 
             this.xMapPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.xMapPath.AutoSize = true;
-            this.xMapPath.Location = new System.Drawing.Point(8, 407);
+            this.xMapPath.Location = new System.Drawing.Point(8, 409);
             this.xMapPath.Name = "xMapPath";
             this.xMapPath.Size = new System.Drawing.Size(189, 19);
             this.xMapPath.TabIndex = 8;
@@ -1396,7 +1397,7 @@ namespace GemsCraftGUI
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tMapPath.Enabled = false;
             this.tMapPath.Font = new System.Drawing.Font("Lucida Console", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.tMapPath.Location = new System.Drawing.Point(203, 409);
+            this.tMapPath.Location = new System.Drawing.Point(203, 411);
             this.tMapPath.Name = "tMapPath";
             this.tMapPath.Size = new System.Drawing.Size(378, 19);
             this.tMapPath.TabIndex = 9;
@@ -1405,7 +1406,7 @@ namespace GemsCraftGUI
             // 
             this.lDefaultBuildRank.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.lDefaultBuildRank.AutoSize = true;
-            this.lDefaultBuildRank.Location = new System.Drawing.Point(24, 379);
+            this.lDefaultBuildRank.Location = new System.Drawing.Point(24, 381);
             this.lDefaultBuildRank.Name = "lDefaultBuildRank";
             this.lDefaultBuildRank.Size = new System.Drawing.Size(342, 15);
             this.lDefaultBuildRank.TabIndex = 6;
@@ -1417,7 +1418,7 @@ namespace GemsCraftGUI
             this.cDefaultBuildRank.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cDefaultBuildRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.cDefaultBuildRank.FormattingEnabled = true;
-            this.cDefaultBuildRank.Location = new System.Drawing.Point(372, 376);
+            this.cDefaultBuildRank.Location = new System.Drawing.Point(372, 378);
             this.cDefaultBuildRank.Name = "cDefaultBuildRank";
             this.cDefaultBuildRank.Size = new System.Drawing.Size(121, 23);
             this.cDefaultBuildRank.TabIndex = 7;
@@ -1505,10 +1506,10 @@ namespace GemsCraftGUI
             this.dgvWorlds.MultiSelect = false;
             this.dgvWorlds.Name = "dgvWorlds";
             this.dgvWorlds.RowHeadersVisible = false;
-            dataGridViewCellStyle10.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
-            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle10;
+            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
+            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvWorlds.Size = new System.Drawing.Size(636, 323);
+            this.dgvWorlds.Size = new System.Drawing.Size(636, 325);
             this.dgvWorlds.TabIndex = 0;
             // 
             // dgvcName
@@ -1562,8 +1563,8 @@ namespace GemsCraftGUI
             // dgvcBlockDB
             // 
             this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle1;
             this.dgvcBlockDB.HeaderText = "BlockDB";
             this.dgvcBlockDB.Name = "dgvcBlockDB";
             this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
@@ -1583,10 +1584,10 @@ namespace GemsCraftGUI
             this.tabRanks.Controls.Add(this.bAddRank);
             this.tabRanks.Controls.Add(this.lPermissions);
             this.tabRanks.Controls.Add(this.vRanks);
-            this.tabRanks.Location = new System.Drawing.Point(4, 24);
+            this.tabRanks.Location = new System.Drawing.Point(4, 22);
             this.tabRanks.Name = "tabRanks";
             this.tabRanks.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.tabRanks.Size = new System.Drawing.Size(652, 482);
+            this.tabRanks.Size = new System.Drawing.Size(652, 484);
             this.tabRanks.TabIndex = 2;
             this.tabRanks.Text = "Ranks";
             this.tabRanks.Click += new System.EventHandler(this.tabRanks_Click);
@@ -1599,7 +1600,7 @@ namespace GemsCraftGUI
             this.gPermissionLimits.Controls.Add(this.permissionLimitBoxContainer);
             this.gPermissionLimits.Location = new System.Drawing.Point(160, 292);
             this.gPermissionLimits.Name = "gPermissionLimits";
-            this.gPermissionLimits.Size = new System.Drawing.Size(307, 184);
+            this.gPermissionLimits.Size = new System.Drawing.Size(307, 186);
             this.gPermissionLimits.TabIndex = 7;
             this.gPermissionLimits.TabStop = false;
             this.gPermissionLimits.Text = "Permission Limits";
@@ -1612,7 +1613,7 @@ namespace GemsCraftGUI
             this.permissionLimitBoxContainer.Location = new System.Drawing.Point(3, 17);
             this.permissionLimitBoxContainer.Margin = new System.Windows.Forms.Padding(0);
             this.permissionLimitBoxContainer.Name = "permissionLimitBoxContainer";
-            this.permissionLimitBoxContainer.Size = new System.Drawing.Size(301, 164);
+            this.permissionLimitBoxContainer.Size = new System.Drawing.Size(301, 166);
             this.permissionLimitBoxContainer.TabIndex = 0;
             this.permissionLimitBoxContainer.WrapContents = false;
             // 
@@ -1632,7 +1633,7 @@ namespace GemsCraftGUI
             this.bLowerRank.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
             this.bLowerRank.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
             this.bLowerRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bLowerRank.Location = new System.Drawing.Point(84, 453);
+            this.bLowerRank.Location = new System.Drawing.Point(84, 455);
             this.bLowerRank.Name = "bLowerRank";
             this.bLowerRank.Size = new System.Drawing.Size(70, 23);
             this.bLowerRank.TabIndex = 5;
@@ -1646,7 +1647,7 @@ namespace GemsCraftGUI
             this.bRaiseRank.FlatAppearance.MouseDownBackColor = System.Drawing.Color.Gray;
             this.bRaiseRank.FlatAppearance.MouseOverBackColor = System.Drawing.Color.Gray;
             this.bRaiseRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.bRaiseRank.Location = new System.Drawing.Point(8, 453);
+            this.bRaiseRank.Location = new System.Drawing.Point(8, 455);
             this.bRaiseRank.Name = "bRaiseRank";
             this.bRaiseRank.Size = new System.Drawing.Size(70, 23);
             this.bRaiseRank.TabIndex = 4;
@@ -1974,7 +1975,7 @@ namespace GemsCraftGUI
             this.vPermissions.Name = "vPermissions";
             this.vPermissions.ShowGroups = false;
             this.vPermissions.ShowItemToolTips = true;
-            this.vPermissions.Size = new System.Drawing.Size(171, 448);
+            this.vPermissions.Size = new System.Drawing.Size(171, 450);
             this.vPermissions.TabIndex = 9;
             this.vPermissions.UseCompatibleStateImageBehavior = false;
             this.vPermissions.View = System.Windows.Forms.View.Details;
@@ -2016,7 +2017,7 @@ namespace GemsCraftGUI
             this.vRanks.ItemHeight = 15;
             this.vRanks.Location = new System.Drawing.Point(8, 57);
             this.vRanks.Name = "vRanks";
-            this.vRanks.Size = new System.Drawing.Size(146, 390);
+            this.vRanks.Size = new System.Drawing.Size(146, 392);
             this.vRanks.TabIndex = 1;
             // 
             // tabSecurity
@@ -2026,10 +2027,10 @@ namespace GemsCraftGUI
             this.tabSecurity.Controls.Add(this.gSecurityMisc);
             this.tabSecurity.Controls.Add(this.gSpamChat);
             this.tabSecurity.Controls.Add(this.gVerify);
-            this.tabSecurity.Location = new System.Drawing.Point(4, 24);
+            this.tabSecurity.Location = new System.Drawing.Point(4, 22);
             this.tabSecurity.Name = "tabSecurity";
             this.tabSecurity.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.tabSecurity.Size = new System.Drawing.Size(652, 482);
+            this.tabSecurity.Size = new System.Drawing.Size(652, 484);
             this.tabSecurity.TabIndex = 7;
             this.tabSecurity.Text = "Security";
             // 
@@ -2409,10 +2410,10 @@ namespace GemsCraftGUI
             this.gUpdate.Controls.Add(this.gDataBackup);
             this.gUpdate.Controls.Add(this.gSaving);
             this.gUpdate.Controls.Add(this.gBackups);
-            this.gUpdate.Location = new System.Drawing.Point(4, 24);
+            this.gUpdate.Location = new System.Drawing.Point(4, 22);
             this.gUpdate.Name = "gUpdate";
             this.gUpdate.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.gUpdate.Size = new System.Drawing.Size(652, 482);
+            this.gUpdate.Size = new System.Drawing.Size(652, 484);
             this.gUpdate.TabIndex = 4;
             this.gUpdate.Text = "Saving and Backup";
             // 
@@ -2653,10 +2654,10 @@ namespace GemsCraftGUI
             this.tabLogging.BackColor = System.Drawing.Color.Gray;
             this.tabLogging.Controls.Add(this.gLogFile);
             this.tabLogging.Controls.Add(this.gConsole);
-            this.tabLogging.Location = new System.Drawing.Point(4, 24);
+            this.tabLogging.Location = new System.Drawing.Point(4, 22);
             this.tabLogging.Name = "tabLogging";
             this.tabLogging.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.tabLogging.Size = new System.Drawing.Size(652, 482);
+            this.tabLogging.Size = new System.Drawing.Size(652, 484);
             this.tabLogging.TabIndex = 5;
             this.tabLogging.Text = "Logging";
             // 
@@ -2810,10 +2811,10 @@ namespace GemsCraftGUI
             this.tabIRC.Controls.Add(this.lIRCList);
             this.tabIRC.Controls.Add(this.xIRCBotEnabled);
             this.tabIRC.Controls.Add(this.cIRCList);
-            this.tabIRC.Location = new System.Drawing.Point(4, 24);
+            this.tabIRC.Location = new System.Drawing.Point(4, 22);
             this.tabIRC.Name = "tabIRC";
             this.tabIRC.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.tabIRC.Size = new System.Drawing.Size(652, 482);
+            this.tabIRC.Size = new System.Drawing.Size(652, 484);
             this.tabIRC.TabIndex = 8;
             this.tabIRC.Text = "IRC";
             // 
@@ -3240,10 +3241,10 @@ namespace GemsCraftGUI
             this.tabAdvanced.Controls.Add(this.gPerformance);
             this.tabAdvanced.Controls.Add(this.gAdvancedMisc);
             this.tabAdvanced.Controls.Add(this.gCrashReport);
-            this.tabAdvanced.Location = new System.Drawing.Point(4, 24);
+            this.tabAdvanced.Location = new System.Drawing.Point(4, 22);
             this.tabAdvanced.Name = "tabAdvanced";
             this.tabAdvanced.Padding = new System.Windows.Forms.Padding(5, 10, 5, 10);
-            this.tabAdvanced.Size = new System.Drawing.Size(652, 482);
+            this.tabAdvanced.Size = new System.Drawing.Size(652, 484);
             this.tabAdvanced.TabIndex = 6;
             this.tabAdvanced.Text = "Advanced";
             // 
@@ -3264,7 +3265,7 @@ namespace GemsCraftGUI
             this.gPerformance.Controls.Add(this.lThrottlingUnits);
             this.gPerformance.Location = new System.Drawing.Point(8, 318);
             this.gPerformance.Name = "gPerformance";
-            this.gPerformance.Size = new System.Drawing.Size(636, 149);
+            this.gPerformance.Size = new System.Drawing.Size(636, 151);
             this.gPerformance.TabIndex = 2;
             this.gPerformance.TabStop = false;
             this.gPerformance.Text = "Performance";
@@ -3616,10 +3617,10 @@ namespace GemsCraftGUI
             this.Misc.Controls.Add(this.gboDragon);
             this.Misc.Controls.Add(this.groupBox3);
             this.Misc.Controls.Add(this.groupBox1);
-            this.Misc.Location = new System.Drawing.Point(4, 24);
+            this.Misc.Location = new System.Drawing.Point(4, 22);
             this.Misc.Name = "Misc";
             this.Misc.Padding = new System.Windows.Forms.Padding(3);
-            this.Misc.Size = new System.Drawing.Size(652, 482);
+            this.Misc.Size = new System.Drawing.Size(652, 484);
             this.Misc.TabIndex = 11;
             this.Misc.Text = "Misc";
             // 
@@ -3875,12 +3876,187 @@ namespace GemsCraftGUI
             this.CPETab.Controls.Add(this.gboCustomBlocks);
             this.CPETab.Controls.Add(this.gboClickDistance);
             this.CPETab.Controls.Add(this.lblAboutCPE);
-            this.CPETab.Location = new System.Drawing.Point(4, 24);
+            this.CPETab.Location = new System.Drawing.Point(4, 22);
             this.CPETab.Name = "CPETab";
             this.CPETab.Padding = new System.Windows.Forms.Padding(3);
-            this.CPETab.Size = new System.Drawing.Size(652, 482);
+            this.CPETab.Size = new System.Drawing.Size(652, 484);
             this.CPETab.TabIndex = 12;
             this.CPETab.Text = "CPE";
+            // 
+            // gboMessageType
+            // 
+            this.gboMessageType.Controls.Add(this.btnSeeKeyWords);
+            this.gboMessageType.Controls.Add(this.chkAnnouncementMT);
+            this.gboMessageType.Controls.Add(this.lblMTNotice);
+            this.gboMessageType.Controls.Add(this.chkBottomRight3);
+            this.gboMessageType.Controls.Add(this.txtBottomRight3);
+            this.gboMessageType.Controls.Add(this.chkBottomRight2);
+            this.gboMessageType.Controls.Add(this.txtBottomRight2);
+            this.gboMessageType.Controls.Add(this.chkBottomRight1);
+            this.gboMessageType.Controls.Add(this.txtBottomRight1);
+            this.gboMessageType.Controls.Add(this.chkStatus3);
+            this.gboMessageType.Controls.Add(this.txtStatus3);
+            this.gboMessageType.Controls.Add(this.chkStatus2);
+            this.gboMessageType.Controls.Add(this.txtStatus2);
+            this.gboMessageType.Controls.Add(this.chkStatus1);
+            this.gboMessageType.Controls.Add(this.txtStatus1);
+            this.gboMessageType.Controls.Add(this.chkMessageTypeAllowed);
+            this.gboMessageType.Location = new System.Drawing.Point(10, 140);
+            this.gboMessageType.Name = "gboMessageType";
+            this.gboMessageType.Size = new System.Drawing.Size(322, 263);
+            this.gboMessageType.TabIndex = 3;
+            this.gboMessageType.TabStop = false;
+            this.gboMessageType.Text = "Message Type";
+            // 
+            // chkAnnouncementMT
+            // 
+            this.chkAnnouncementMT.AutoSize = true;
+            this.chkAnnouncementMT.Location = new System.Drawing.Point(7, 43);
+            this.chkAnnouncementMT.Name = "chkAnnouncementMT";
+            this.chkAnnouncementMT.Size = new System.Drawing.Size(186, 19);
+            this.chkAnnouncementMT.TabIndex = 14;
+            this.chkAnnouncementMT.Text = "Show Announcements at Top";
+            this.chkAnnouncementMT.UseVisualStyleBackColor = true;
+            // 
+            // lblMTNotice
+            // 
+            this.lblMTNotice.Location = new System.Drawing.Point(7, 75);
+            this.lblMTNotice.Name = "lblMTNotice";
+            this.lblMTNotice.Size = new System.Drawing.Size(182, 146);
+            this.lblMTNotice.TabIndex = 13;
+            this.lblMTNotice.Text = resources.GetString("lblMTNotice.Text");
+            // 
+            // chkBottomRight3
+            // 
+            this.chkBottomRight3.AutoSize = true;
+            this.chkBottomRight3.Location = new System.Drawing.Point(195, 147);
+            this.chkBottomRight3.Name = "chkBottomRight3";
+            this.chkBottomRight3.Size = new System.Drawing.Size(15, 14);
+            this.chkBottomRight3.TabIndex = 12;
+            this.chkBottomRight3.UseVisualStyleBackColor = true;
+            this.chkBottomRight3.CheckedChanged += new System.EventHandler(this.chkBottomRight3_CheckedChanged);
+            // 
+            // txtBottomRight3
+            // 
+            this.txtBottomRight3.Location = new System.Drawing.Point(216, 147);
+            this.txtBottomRight3.Name = "txtBottomRight3";
+            this.txtBottomRight3.Size = new System.Drawing.Size(100, 21);
+            this.txtBottomRight3.TabIndex = 11;
+            // 
+            // chkBottomRight2
+            // 
+            this.chkBottomRight2.AutoSize = true;
+            this.chkBottomRight2.Location = new System.Drawing.Point(195, 174);
+            this.chkBottomRight2.Name = "chkBottomRight2";
+            this.chkBottomRight2.Size = new System.Drawing.Size(15, 14);
+            this.chkBottomRight2.TabIndex = 10;
+            this.chkBottomRight2.UseVisualStyleBackColor = true;
+            this.chkBottomRight2.CheckedChanged += new System.EventHandler(this.chkBottomRight2_CheckedChanged);
+            // 
+            // txtBottomRight2
+            // 
+            this.txtBottomRight2.Location = new System.Drawing.Point(216, 174);
+            this.txtBottomRight2.Name = "txtBottomRight2";
+            this.txtBottomRight2.Size = new System.Drawing.Size(100, 21);
+            this.txtBottomRight2.TabIndex = 9;
+            // 
+            // chkBottomRight1
+            // 
+            this.chkBottomRight1.AutoSize = true;
+            this.chkBottomRight1.Location = new System.Drawing.Point(195, 201);
+            this.chkBottomRight1.Name = "chkBottomRight1";
+            this.chkBottomRight1.Size = new System.Drawing.Size(15, 14);
+            this.chkBottomRight1.TabIndex = 8;
+            this.chkBottomRight1.UseVisualStyleBackColor = true;
+            this.chkBottomRight1.CheckedChanged += new System.EventHandler(this.chkBottomRight1_CheckedChanged);
+            // 
+            // txtBottomRight1
+            // 
+            this.txtBottomRight1.Location = new System.Drawing.Point(216, 201);
+            this.txtBottomRight1.Name = "txtBottomRight1";
+            this.txtBottomRight1.Size = new System.Drawing.Size(100, 21);
+            this.txtBottomRight1.TabIndex = 7;
+            // 
+            // chkStatus3
+            // 
+            this.chkStatus3.AutoSize = true;
+            this.chkStatus3.Location = new System.Drawing.Point(195, 75);
+            this.chkStatus3.Name = "chkStatus3";
+            this.chkStatus3.Size = new System.Drawing.Size(15, 14);
+            this.chkStatus3.TabIndex = 6;
+            this.chkStatus3.UseVisualStyleBackColor = true;
+            this.chkStatus3.CheckedChanged += new System.EventHandler(this.chkStatus3_CheckedChanged);
+            // 
+            // txtStatus3
+            // 
+            this.txtStatus3.Location = new System.Drawing.Point(216, 75);
+            this.txtStatus3.Name = "txtStatus3";
+            this.txtStatus3.Size = new System.Drawing.Size(100, 21);
+            this.txtStatus3.TabIndex = 5;
+            // 
+            // chkStatus2
+            // 
+            this.chkStatus2.AutoSize = true;
+            this.chkStatus2.Location = new System.Drawing.Point(195, 48);
+            this.chkStatus2.Name = "chkStatus2";
+            this.chkStatus2.Size = new System.Drawing.Size(15, 14);
+            this.chkStatus2.TabIndex = 4;
+            this.chkStatus2.UseVisualStyleBackColor = true;
+            this.chkStatus2.CheckedChanged += new System.EventHandler(this.chkStatus2_CheckedChanged);
+            // 
+            // txtStatus2
+            // 
+            this.txtStatus2.Location = new System.Drawing.Point(216, 48);
+            this.txtStatus2.Name = "txtStatus2";
+            this.txtStatus2.Size = new System.Drawing.Size(100, 21);
+            this.txtStatus2.TabIndex = 3;
+            // 
+            // chkStatus1
+            // 
+            this.chkStatus1.AutoSize = true;
+            this.chkStatus1.Location = new System.Drawing.Point(195, 21);
+            this.chkStatus1.Name = "chkStatus1";
+            this.chkStatus1.Size = new System.Drawing.Size(15, 14);
+            this.chkStatus1.TabIndex = 2;
+            this.chkStatus1.UseVisualStyleBackColor = true;
+            this.chkStatus1.CheckedChanged += new System.EventHandler(this.chStatus1_CheckedChanged);
+            // 
+            // txtStatus1
+            // 
+            this.txtStatus1.Location = new System.Drawing.Point(216, 21);
+            this.txtStatus1.Name = "txtStatus1";
+            this.txtStatus1.Size = new System.Drawing.Size(100, 21);
+            this.txtStatus1.TabIndex = 1;
+            // 
+            // chkMessageTypeAllowed
+            // 
+            this.chkMessageTypeAllowed.AutoSize = true;
+            this.chkMessageTypeAllowed.Location = new System.Drawing.Point(7, 21);
+            this.chkMessageTypeAllowed.Name = "chkMessageTypeAllowed";
+            this.chkMessageTypeAllowed.Size = new System.Drawing.Size(72, 19);
+            this.chkMessageTypeAllowed.TabIndex = 0;
+            this.chkMessageTypeAllowed.Text = "Enabled";
+            this.chkMessageTypeAllowed.UseVisualStyleBackColor = true;
+            // 
+            // gboHeldBlock
+            // 
+            this.gboHeldBlock.Controls.Add(this.chkHeldBlockAllowed);
+            this.gboHeldBlock.Location = new System.Drawing.Point(223, 68);
+            this.gboHeldBlock.Name = "gboHeldBlock";
+            this.gboHeldBlock.Size = new System.Drawing.Size(109, 54);
+            this.gboHeldBlock.TabIndex = 2;
+            this.gboHeldBlock.TabStop = false;
+            this.gboHeldBlock.Text = "Held Block";
+            // 
+            // chkHeldBlockAllowed
+            // 
+            this.chkHeldBlockAllowed.AutoSize = true;
+            this.chkHeldBlockAllowed.Location = new System.Drawing.Point(7, 21);
+            this.chkHeldBlockAllowed.Name = "chkHeldBlockAllowed";
+            this.chkHeldBlockAllowed.Size = new System.Drawing.Size(65, 19);
+            this.chkHeldBlockAllowed.TabIndex = 0;
+            this.chkHeldBlockAllowed.Text = "Enable";
+            this.chkHeldBlockAllowed.UseVisualStyleBackColor = true;
             // 
             // gboCustomBlocks
             // 
@@ -3955,10 +4131,10 @@ namespace GemsCraftGUI
             this.ServerTab.Controls.Add(this.URLLabel);
             this.ServerTab.Controls.Add(this.bPlay);
             this.ServerTab.Controls.Add(this.uriDisplay);
-            this.ServerTab.Location = new System.Drawing.Point(4, 24);
+            this.ServerTab.Location = new System.Drawing.Point(4, 22);
             this.ServerTab.Name = "ServerTab";
             this.ServerTab.Padding = new System.Windows.Forms.Padding(3);
-            this.ServerTab.Size = new System.Drawing.Size(692, 570);
+            this.ServerTab.Size = new System.Drawing.Size(692, 572);
             this.ServerTab.TabIndex = 1;
             this.ServerTab.Text = "Server";
             this.ServerTab.Click += new System.EventHandler(this.tabPage2_Click);
@@ -4135,179 +4311,15 @@ namespace GemsCraftGUI
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
-            // gboHeldBlock
+            // btnSeeKeyWords
             // 
-            this.gboHeldBlock.Controls.Add(this.chkHeldBlockAllowed);
-            this.gboHeldBlock.Location = new System.Drawing.Point(223, 68);
-            this.gboHeldBlock.Name = "gboHeldBlock";
-            this.gboHeldBlock.Size = new System.Drawing.Size(109, 54);
-            this.gboHeldBlock.TabIndex = 2;
-            this.gboHeldBlock.TabStop = false;
-            this.gboHeldBlock.Text = "Held Block";
-            // 
-            // chkHeldBlockAllowed
-            // 
-            this.chkHeldBlockAllowed.AutoSize = true;
-            this.chkHeldBlockAllowed.Location = new System.Drawing.Point(7, 21);
-            this.chkHeldBlockAllowed.Name = "chkHeldBlockAllowed";
-            this.chkHeldBlockAllowed.Size = new System.Drawing.Size(65, 19);
-            this.chkHeldBlockAllowed.TabIndex = 0;
-            this.chkHeldBlockAllowed.Text = "Enable";
-            this.chkHeldBlockAllowed.UseVisualStyleBackColor = true;
-            // 
-            // gboMessageType
-            // 
-            this.gboMessageType.Controls.Add(this.chkAnnouncementMT);
-            this.gboMessageType.Controls.Add(this.lblMTNotice);
-            this.gboMessageType.Controls.Add(this.chkBottomRight3);
-            this.gboMessageType.Controls.Add(this.txtBottomRight3);
-            this.gboMessageType.Controls.Add(this.chkBottomRight2);
-            this.gboMessageType.Controls.Add(this.txtBottomRight2);
-            this.gboMessageType.Controls.Add(this.chkBottomRight1);
-            this.gboMessageType.Controls.Add(this.txtBottomRight1);
-            this.gboMessageType.Controls.Add(this.chkStatus3);
-            this.gboMessageType.Controls.Add(this.txtStatus3);
-            this.gboMessageType.Controls.Add(this.chkStatus2);
-            this.gboMessageType.Controls.Add(this.txtStatus2);
-            this.gboMessageType.Controls.Add(this.chkStatus1);
-            this.gboMessageType.Controls.Add(this.txtStatus1);
-            this.gboMessageType.Controls.Add(this.chkMessageTypeAllowed);
-            this.gboMessageType.Location = new System.Drawing.Point(10, 140);
-            this.gboMessageType.Name = "gboMessageType";
-            this.gboMessageType.Size = new System.Drawing.Size(322, 235);
-            this.gboMessageType.TabIndex = 3;
-            this.gboMessageType.TabStop = false;
-            this.gboMessageType.Text = "Message Type";
-            // 
-            // chkMessageTypeAllowed
-            // 
-            this.chkMessageTypeAllowed.AutoSize = true;
-            this.chkMessageTypeAllowed.Location = new System.Drawing.Point(7, 21);
-            this.chkMessageTypeAllowed.Name = "chkMessageTypeAllowed";
-            this.chkMessageTypeAllowed.Size = new System.Drawing.Size(72, 19);
-            this.chkMessageTypeAllowed.TabIndex = 0;
-            this.chkMessageTypeAllowed.Text = "Enabled";
-            this.chkMessageTypeAllowed.UseVisualStyleBackColor = true;
-            // 
-            // txtStatus1
-            // 
-            this.txtStatus1.Location = new System.Drawing.Point(216, 21);
-            this.txtStatus1.Name = "txtStatus1";
-            this.txtStatus1.Size = new System.Drawing.Size(100, 21);
-            this.txtStatus1.TabIndex = 1;
-            // 
-            // chkStatus1
-            // 
-            this.chkStatus1.AutoSize = true;
-            this.chkStatus1.Location = new System.Drawing.Point(195, 21);
-            this.chkStatus1.Name = "chkStatus1";
-            this.chkStatus1.Size = new System.Drawing.Size(15, 14);
-            this.chkStatus1.TabIndex = 2;
-            this.chkStatus1.UseVisualStyleBackColor = true;
-            this.chkStatus1.CheckedChanged += new System.EventHandler(this.chStatus1_CheckedChanged);
-            // 
-            // chkStatus2
-            // 
-            this.chkStatus2.AutoSize = true;
-            this.chkStatus2.Location = new System.Drawing.Point(195, 48);
-            this.chkStatus2.Name = "chkStatus2";
-            this.chkStatus2.Size = new System.Drawing.Size(15, 14);
-            this.chkStatus2.TabIndex = 4;
-            this.chkStatus2.UseVisualStyleBackColor = true;
-            this.chkStatus2.CheckedChanged += new System.EventHandler(this.chkStatus2_CheckedChanged);
-            // 
-            // txtStatus2
-            // 
-            this.txtStatus2.Location = new System.Drawing.Point(216, 48);
-            this.txtStatus2.Name = "txtStatus2";
-            this.txtStatus2.Size = new System.Drawing.Size(100, 21);
-            this.txtStatus2.TabIndex = 3;
-            // 
-            // chkStatus3
-            // 
-            this.chkStatus3.AutoSize = true;
-            this.chkStatus3.Location = new System.Drawing.Point(195, 75);
-            this.chkStatus3.Name = "chkStatus3";
-            this.chkStatus3.Size = new System.Drawing.Size(15, 14);
-            this.chkStatus3.TabIndex = 6;
-            this.chkStatus3.UseVisualStyleBackColor = true;
-            this.chkStatus3.CheckedChanged += new System.EventHandler(this.chkStatus3_CheckedChanged);
-            // 
-            // txtStatus3
-            // 
-            this.txtStatus3.Location = new System.Drawing.Point(216, 75);
-            this.txtStatus3.Name = "txtStatus3";
-            this.txtStatus3.Size = new System.Drawing.Size(100, 21);
-            this.txtStatus3.TabIndex = 5;
-            // 
-            // chkBottomRight1
-            // 
-            this.chkBottomRight1.AutoSize = true;
-            this.chkBottomRight1.Location = new System.Drawing.Point(195, 201);
-            this.chkBottomRight1.Name = "chkBottomRight1";
-            this.chkBottomRight1.Size = new System.Drawing.Size(15, 14);
-            this.chkBottomRight1.TabIndex = 8;
-            this.chkBottomRight1.UseVisualStyleBackColor = true;
-            this.chkBottomRight1.CheckedChanged += new System.EventHandler(this.chkBottomRight1_CheckedChanged);
-            // 
-            // txtBottomRight1
-            // 
-            this.txtBottomRight1.Location = new System.Drawing.Point(216, 201);
-            this.txtBottomRight1.Name = "txtBottomRight1";
-            this.txtBottomRight1.Size = new System.Drawing.Size(100, 21);
-            this.txtBottomRight1.TabIndex = 7;
-            // 
-            // chkBottomRight2
-            // 
-            this.chkBottomRight2.AutoSize = true;
-            this.chkBottomRight2.Location = new System.Drawing.Point(195, 174);
-            this.chkBottomRight2.Name = "chkBottomRight2";
-            this.chkBottomRight2.Size = new System.Drawing.Size(15, 14);
-            this.chkBottomRight2.TabIndex = 10;
-            this.chkBottomRight2.UseVisualStyleBackColor = true;
-            this.chkBottomRight2.CheckedChanged += new System.EventHandler(this.chkBottomRight2_CheckedChanged);
-            // 
-            // txtBottomRight2
-            // 
-            this.txtBottomRight2.Location = new System.Drawing.Point(216, 174);
-            this.txtBottomRight2.Name = "txtBottomRight2";
-            this.txtBottomRight2.Size = new System.Drawing.Size(100, 21);
-            this.txtBottomRight2.TabIndex = 9;
-            // 
-            // chkBottomRight3
-            // 
-            this.chkBottomRight3.AutoSize = true;
-            this.chkBottomRight3.Location = new System.Drawing.Point(195, 147);
-            this.chkBottomRight3.Name = "chkBottomRight3";
-            this.chkBottomRight3.Size = new System.Drawing.Size(15, 14);
-            this.chkBottomRight3.TabIndex = 12;
-            this.chkBottomRight3.UseVisualStyleBackColor = true;
-            this.chkBottomRight3.CheckedChanged += new System.EventHandler(this.chkBottomRight3_CheckedChanged);
-            // 
-            // txtBottomRight3
-            // 
-            this.txtBottomRight3.Location = new System.Drawing.Point(216, 147);
-            this.txtBottomRight3.Name = "txtBottomRight3";
-            this.txtBottomRight3.Size = new System.Drawing.Size(100, 21);
-            this.txtBottomRight3.TabIndex = 11;
-            // 
-            // lblMTNotice
-            // 
-            this.lblMTNotice.Location = new System.Drawing.Point(7, 75);
-            this.lblMTNotice.Name = "lblMTNotice";
-            this.lblMTNotice.Size = new System.Drawing.Size(182, 146);
-            this.lblMTNotice.TabIndex = 13;
-            this.lblMTNotice.Text = resources.GetString("lblMTNotice.Text");
-            // 
-            // chkAnnouncementMT
-            // 
-            this.chkAnnouncementMT.AutoSize = true;
-            this.chkAnnouncementMT.Location = new System.Drawing.Point(7, 43);
-            this.chkAnnouncementMT.Name = "chkAnnouncementMT";
-            this.chkAnnouncementMT.Size = new System.Drawing.Size(186, 19);
-            this.chkAnnouncementMT.TabIndex = 14;
-            this.chkAnnouncementMT.Text = "Show Announcements at Top";
-            this.chkAnnouncementMT.UseVisualStyleBackColor = true;
+            this.btnSeeKeyWords.Location = new System.Drawing.Point(195, 229);
+            this.btnSeeKeyWords.Name = "btnSeeKeyWords";
+            this.btnSeeKeyWords.Size = new System.Drawing.Size(120, 23);
+            this.btnSeeKeyWords.TabIndex = 15;
+            this.btnSeeKeyWords.Text = "Key Words";
+            this.btnSeeKeyWords.UseVisualStyleBackColor = true;
+            this.btnSeeKeyWords.Click += new System.EventHandler(this.btnSeeKeyWords_Click);
             // 
             // MainForm
             // 
@@ -4418,6 +4430,10 @@ namespace GemsCraftGUI
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.CPETab.ResumeLayout(false);
+            this.gboMessageType.ResumeLayout(false);
+            this.gboMessageType.PerformLayout();
+            this.gboHeldBlock.ResumeLayout(false);
+            this.gboHeldBlock.PerformLayout();
             this.gboCustomBlocks.ResumeLayout(false);
             this.gboCustomBlocks.PerformLayout();
             this.gboClickDistance.ResumeLayout(false);
@@ -4425,10 +4441,6 @@ namespace GemsCraftGUI
             this.ServerTab.ResumeLayout(false);
             this.ServerTab.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picServerStatus)).EndInit();
-            this.gboHeldBlock.ResumeLayout(false);
-            this.gboHeldBlock.PerformLayout();
-            this.gboMessageType.ResumeLayout(false);
-            this.gboMessageType.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -4872,6 +4884,7 @@ namespace GemsCraftGUI
         private System.Windows.Forms.TextBox txtStatus2;
         private System.Windows.Forms.CheckBox chkStatus1;
         private System.Windows.Forms.TextBox txtStatus1;
+        private System.Windows.Forms.Button btnSeeKeyWords;
     }
 
 

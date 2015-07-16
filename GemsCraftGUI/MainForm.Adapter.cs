@@ -557,6 +557,29 @@ namespace GemsCraftGUI
             clbBlocks.SetItemChecked(14, Bk(ConfigKey.CrateEnabled));
             clbBlocks.SetItemChecked(15, Bk(ConfigKey.StoneBrickEnabled));
             #endregion
+
+            chkHeldBlockAllowed.Checked = ConfigKey.HeldBlockEnabled.Enabled();
+
+            #region MessageTypes
+
+            chkMessageTypeAllowed.Checked = ConfigKey.MessageTypeEnabled.Enabled();
+            chkAnnouncementMT.Checked = ConfigKey.AnnouncementsAtTop.Enabled();
+
+            chkBottomRight1.Checked = ConfigKey.Br1Enabled.Enabled();
+            txtBottomRight1.Text = ConfigKey.Br1Text.GetString() ?? ConfigKey.Br1Text.GetDefault().ToString();
+            chkBottomRight2.Checked = ConfigKey.Br2Enabled.Enabled();
+            txtBottomRight2.Text = ConfigKey.Br2Text.GetString() ?? ConfigKey.Br2Text.GetDefault().ToString();
+            chkBottomRight3.Checked = ConfigKey.Br3Enabled.Enabled();
+            txtBottomRight3.Text = ConfigKey.Br3Text.GetString() ?? ConfigKey.Br3Text.GetDefault().ToString();
+
+            chkStatus1.Checked = ConfigKey.Status1Enabled.Enabled();
+            txtStatus1.Text = ConfigKey.Status1Text.GetString() ?? ConfigKey.Status1Text.GetDefault().ToString();
+            chkStatus2.Checked = ConfigKey.Status2Enabled.Enabled();
+            txtStatus2.Text = ConfigKey.Status2Text.GetString() ?? ConfigKey.Status2Text.GetDefault().ToString();
+            chkStatus3.Checked = ConfigKey.Status3Enabled.Enabled();
+            txtStatus3.Text = ConfigKey.Status3Text.GetString() ?? ConfigKey.Status3Text.GetDefault().ToString();
+            #endregion
+
         }
         private static bool Bk(ConfigKey cK)
         {
@@ -821,6 +844,26 @@ namespace GemsCraftGUI
             ConfigKey.PillarEnabled.TrySetValue(clbBlocks.GetItemChecked(13));
             ConfigKey.CrateEnabled.TrySetValue(clbBlocks.GetItemChecked(14));
             ConfigKey.StoneBrickEnabled.TrySetValue(clbBlocks.GetItemChecked(15));
+            #endregion
+
+            #region MessageTypes
+
+            ConfigKey.AnnouncementsAtTop.TrySetValue(chkAnnouncementMT.Checked);
+            ConfigKey.MessageTypeEnabled.TrySetValue(chkMessageTypeAllowed.Checked);
+
+            ConfigKey.Br1Enabled.TrySetValue(chkBottomRight1.Checked);
+            ConfigKey.Br1Text.TrySetValue(txtBottomRight1.Text ?? ConfigKey.Br1Text.GetDefault().ToString());
+            ConfigKey.Br2Enabled.TrySetValue(chkBottomRight2.Checked);
+            ConfigKey.Br2Text.TrySetValue(txtBottomRight2.Text ?? ConfigKey.Br2Text.GetDefault().ToString());
+            ConfigKey.Br3Enabled.TrySetValue(chkBottomRight3.Checked);
+            ConfigKey.Br3Text.TrySetValue(txtBottomRight3.Text ?? ConfigKey.Br3Text.GetDefault().ToString());
+
+            ConfigKey.Status1Enabled.TrySetValue(chkStatus1.Checked);
+            ConfigKey.Status1Text.TrySetValue(txtStatus1.Text ?? ConfigKey.Status1Text.GetDefault().ToString());
+            ConfigKey.Status2Enabled.TrySetValue(chkStatus2.Checked);
+            ConfigKey.Status2Text.TrySetValue(txtStatus2.Text ?? ConfigKey.Status2Text.GetDefault().ToString());
+            ConfigKey.Status3Enabled.TrySetValue(chkStatus3.Checked);
+            ConfigKey.Status3Text.TrySetValue(txtStatus3.Text ?? ConfigKey.Status3Text.GetDefault().ToString());
             #endregion
         }
 

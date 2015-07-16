@@ -684,9 +684,43 @@ message type if character count is less than 64")]
         [BoolKey(ConfigSection.Cpe, true,
             @"Status1 MessageType")]
         Status1Enabled,
-        [StringKey(ConfigSection.Cpe, "GemsCraft " + Updater.LatestStable,
+        [StringKey(ConfigSection.Cpe, "Server: {servername}",
             @"")]
-        Status1Text
+        Status1Text,
+
+        [BoolKey(ConfigSection.Cpe, true,
+            @"Status2 MessageType")]
+        Status2Enabled,
+        [StringKey(ConfigSection.Cpe, "World: {world}",
+            @"")]
+        Status2Text,
+
+        [BoolKey(ConfigSection.Cpe, true,
+            @"Status3 MessageType")]
+        Status3Enabled,
+        [StringKey(ConfigSection.Cpe, "Rank: {rank}",
+            @"")]
+        Status3Text,
+        [BoolKey(ConfigSection.Cpe, true,
+            @"BottomRight3 MessageType")]
+        Br3Enabled,
+        [StringKey(ConfigSection.Cpe, "GemsCraft {version}",
+            @"")]
+        Br3Text,
+
+        [BoolKey(ConfigSection.Cpe, true,
+            @"BottomRight2 MessageType")]
+        Br2Enabled,
+        [StringKey(ConfigSection.Cpe, "Player {player}",
+            @"")]
+        Br2Text,
+
+        [BoolKey(ConfigSection.Cpe, true,
+            @"BottomRight1 MessageType")]
+        Br1Enabled,
+        [StringKey(ConfigSection.Cpe, "Last Command: {lastcmd}",
+            @"")]
+        Br1Text,
         #endregion
         #endregion
     }

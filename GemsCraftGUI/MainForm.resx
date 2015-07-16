@@ -117,12 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="lblMTNotice.Text" xml:space="preserve">
-    <value>Message Type enables the modification of the status messages at the different types of text you see around the screen. Enabled the configurable text's checks if you want that message to show. Leave the text blank to use the default message if checked.</value>
-  </data>
-  <data name="lblAboutCPE.Text" xml:space="preserve">
-    <value>CPE is Classic-Protocal-Extension. It is a set of capabilites that are communicated between the server and the client. Note that not all clients will support the CPE features that GemsCraft provides. If your client does not support the feature, what you were doing will not work.</value>
-  </data>
   <metadata name="dgvcName.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -144,6 +138,12 @@
   <metadata name="dgvcBlockDB.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="lblMTNotice.Text" xml:space="preserve">
+    <value>Message Type enables the modification of the status messages at the different types of text you see around the screen. Enabled the configurable text's checks if you want that message to show. Leave the text blank to use the default message if checked.</value>
+  </data>
+  <data name="lblAboutCPE.Text" xml:space="preserve">
+    <value>CPE is Classic-Protocal-Extension. It is a set of capabilites that are communicated between the server and the client. Note that not all clients will support the CPE features that GemsCraft provides. If your client does not support the feature, what you were doing will not work.</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="bVoice.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

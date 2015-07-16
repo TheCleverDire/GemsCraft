@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics;
 using System.Threading;
+using fCraft.fSystem;
 
 namespace fCraft
 {
@@ -57,8 +58,83 @@ namespace fCraft
             CommandManager.RegisterCommand(CdSecret);
 
 
-            Player.Moved += new EventHandler<Events.PlayerMovedEventArgs>(Player_IsBack);
+            Player.Moved += Player_IsBack;
         }
+        static readonly CommandDescriptor CdSay = new CommandDescriptor
+        {
+            Name = "Say",
+            Category = CommandCategory.Chat,
+            IsConsoleSafe = true,
+            NotRepeatable = true,
+            DisableLogging = true,
+            Permissions = new[] { Permission.Chat, Permission.Say },
+            Usage = "/Say [Optional - Status1,2,3|BR1,2,3|Announcement|Chat] Message",
+            Help = "&SShows a message in special color, without the player name prefix. " +
+                   "Can be used for making announcements.",
+            Handler = SayHandler
+        };
+
+        static void SayHandler(Player player, Command cmd)
+        {
+            if (player.Info.IsMuted)
+            {
+                player.MessageMuted();
+                return;
+            }
+
+            if (player.DetectChatSpam()) return;
+
+            if (player.Can(Permission.Say))
+            {
+                var mType = MessageType.Chat;
+                var commandinput = cmd.Next();
+                if (commandinput != null)
+                    switch (commandinput.ToLower())
+                    {
+                        case "chat":
+                            mType = MessageType.Chat;
+                            break;
+                        case "br1":
+                            mType = MessageType.Br1;
+                            break;
+                        case "br2":
+                            mType = MessageType.Br2;
+                            break;
+                        case "br3":
+                            mType = MessageType.Br3;
+                            break;
+                        case "status1":
+                            mType = MessageType.Status1;
+                            break;
+                        case "status2":
+                            mType = MessageType.Status2;
+                            break;
+                        case "status3":
+                            mType = MessageType.Status3;
+                            break;
+                        case "announcement":
+                            mType = MessageType.Announcement;
+                            break;
+                        default:
+                            mType = MessageType.Chat;
+                            break;
+                    }
+                var msg = cmd.NextAll().Trim();
+                if (msg.Length > 0)
+                {
+                    Chat.SendSay(player, msg, mType);
+                }
+                else
+                {
+                    CdSay.PrintUsage(player);
+                }
+            }
+            else
+            {
+                player.MessageNoAccess(Permission.Say);
+            }
+        }
+
         #region LegendCraft
         /* Copyright (c) <2012-2014> <LeChosenOne, DingusBungus>
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -1430,51 +1506,7 @@ THE SOFTWARE.*/
 
         #endregion
 
-        #region Say
-
-        static readonly CommandDescriptor CdSay = new CommandDescriptor
-        {
-            Name = "Say",
-            Category = CommandCategory.Chat,
-            IsConsoleSafe = true,
-            NotRepeatable = true,
-            DisableLogging = true,
-            Permissions = new[] { Permission.Chat, Permission.Say },
-            Usage = "/Say Message",
-            Help = "&SShows a message in special color, without the player name prefix. " +
-                   "Can be used for making announcements.",
-            Handler = SayHandler
-        };
-
-        static void SayHandler(Player player, Command cmd)
-        {
-            if (player.Info.IsMuted)
-            {
-                player.MessageMuted();
-                return;
-            }
-
-            if (player.DetectChatSpam()) return;
-
-            if (player.Can(Permission.Say))
-            {
-                string msg = cmd.NextAll().Trim();
-                if (msg.Length > 0)
-                {
-                    Chat.SendSay(player, msg);
-                }
-                else
-                {
-                    CdSay.PrintUsage(player);
-                }
-            }
-            else
-            {
-                player.MessageNoAccess(Permission.Say);
-            }
-        }
-
-        #endregion
+        
 
 
         #region Staff

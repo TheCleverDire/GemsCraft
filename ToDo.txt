@@ -1,4 +1,2 @@
--Use LegendCraft last release into the next GemsCraft-
--Use old updater system from GemsCraft Alpha-
--Start Implementation of old GemsCraft Alpha commands-
--Consider new ideas for Beta 1.0 release-
+- Search for any bugs in Beta 1.2 and place them in Beta 1.2.0 and following
+- Brainstorm ideas for Beta 1.3

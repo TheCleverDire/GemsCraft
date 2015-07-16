@@ -1,4 +1,4 @@
-Changes in GemsCraft Beta 1.0:
--Brand new GUI for both Server and Config
--Removed ServerGUI and ConfigGUI
--Cleaned up some code with Resharper
+Changes in GemsCraft Beta 1.2:
+-> MessageType CPE feature added with amazing configurations to customize what your players see.
+-> Added Configurations for Previously existing CPE features (HeldBlock and CustomBlocks)
+-> Dragon has been improved

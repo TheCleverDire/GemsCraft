@@ -1,7 +1,7 @@
-﻿Beta 1.1
+﻿Beta 1.2
 
 #GemsCraft
-![LegendCraft](http://i.imgur.com/pbO5NDl.png "Ya it's a logo deal with it")<br />
+![LegendCraft](http://i.imgur.com/pbO5NDl.png "Never argue with an idiot. They will drag you down to their level and beat you with experience")<br />
 
 Dowload the latest GemsCraft release here: 
 https://gemscraft.net/
@@ -11,8 +11,8 @@ Thank you for downloading GemsCraft, a custom Minecraft/ClassiCube server based 
 Special thanks to fragmer, for creating fCraft! Special thanks to Jonty800, GlennMR and LaoTszy for their hard 
 work with
 800Craft! 
-Also thank you to DingusBungus and LeChosenOne for your dedication to LegendCraft! I would have never gotten into this 
-mess if I had never joined Rising Embers. 
+Also thank you to DingusBungus and LeChosenOne for your dedication to LegendCraft! I would have never have heard of fCraft and the related/forked
+software if I hadn't been told about Rising Embers! 
 
 
 ##Installation 

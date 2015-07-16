@@ -6,6 +6,7 @@ using fCraft.MapConversion;
 using JetBrains.Annotations;
 using System.IO;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Globalization;
 
 namespace fCraft {
@@ -1491,7 +1492,7 @@ THE SOFTWARE.*/
             }
             if( blocks > 0 ) {
                 player.Info.ProcessDrawCommand( blocks );
-                Server.RequestGC();
+                Server.RequestGc();
             }
         }
 

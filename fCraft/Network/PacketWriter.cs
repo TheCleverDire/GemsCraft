@@ -1,5 +1,6 @@
 ﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -298,7 +299,7 @@ namespace fCraft {
 
         public static Packet MakeEnvSetColor(byte selection, string colorcode)
         {
-            System.Drawing.Color col = System.Drawing.ColorTranslator.FromHtml(colorcode.ToUpper());
+            System.Drawing.Color col = ColorTranslator.FromHtml(colorcode.ToUpper());
             Packet packet = new Packet(OpCode.EnvSetColor);
             packet.Data[1] = selection;
             ToNetOrder((short)(col.R), packet.Data, 2);

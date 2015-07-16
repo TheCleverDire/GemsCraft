@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using JetBrains.Annotations;
+using fCraft.Network;
 
 namespace fCraft
 {
@@ -28,6 +29,7 @@ namespace fCraft
         const int MaxPrefixSize = 32;
         const int PacketSize = 66; // opcode + id + 64
         const byte NoColor = (byte)'f';
+        byte type = 0;
 
         public Packet Current { get; private set; }
 
@@ -41,7 +43,7 @@ namespace fCraft
         readonly byte[] input;
         int inputIndex;
 
-        byte[] output;
+        public byte[] output;
         int outputStart, outputIndex;
 
         readonly byte[] prefix;
@@ -59,6 +61,15 @@ namespace fCraft
             prefix = DefaultPrefix;
             Reset();
         }
+        LineWrapper([NotNull] string message, [NotNull] byte messageType)
+        {
+            if (message == null)
+                throw new ArgumentNullException("message");
+            type = messageType;
+            input = Encoding.ASCII.GetBytes(message);
+            prefix = DefaultPrefix;
+            Reset();
+        }
 
 
         LineWrapper([NotNull] string prefixString, [NotNull] string message)
@@ -71,7 +82,11 @@ namespace fCraft
             Reset();
         }
 
-
+        public static string ByteArrayToString(byte[] ba)
+        {
+            string hex = BitConverter.ToString(ba);
+            return hex.Replace("-", "");
+        }
         public void Reset()
         {
             color = NoColor;
@@ -92,7 +107,7 @@ namespace fCraft
 
             output = new byte[PacketSize];
             output[0] = (byte)OpCode.Message;
-
+            output[1] = type;
             outputStart = 2;
             outputIndex = outputStart;
             spaceCount = 0;
@@ -370,10 +385,6 @@ namespace fCraft
                 case (byte)'i':
                     ch = (byte)Color.IRC[1];
                     return true;
-
-                case (byte)'g':
-                    ch = (byte)Color.Global[1];
-                    return true;
             }
             return false;
         }
@@ -404,14 +415,16 @@ namespace fCraft
 
 
         /// <summary> Creates a new line wrapper for a given raw string. </summary>
-        public static LineWrapper Wrap(string message)
+        /// <exception cref="ArgumentNullException"> message is null. </exception>
+        public static IEnumerable<Packet> Wrap(string message, byte messageType)
         {
-            return new LineWrapper(message);
+            return new LineWrapper(message, messageType);
         }
 
-
         /// <summary> Creates a new line wrapper for a given raw string. </summary>
-        public static LineWrapper WrapPrefixed(string prefix, string message)
+        /// <exception cref="ArgumentNullException"> prefix or message is null. </exception>
+        /// <exception cref="ArgumentException"> prefix length exceeds maximum allowed value (48 characters). </exception>
+        public static IEnumerable<Packet> WrapPrefixed(string prefix, string message)
         {
             return new LineWrapper(prefix, message);
         }

@@ -3558,7 +3558,7 @@ THE SOFTWARE.*/
                 playerWorld.MapChangedBy = player.Name;
                 playerWorld.ChangeMap(map);
             }
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
         #endregion
@@ -5025,7 +5025,7 @@ THE SOFTWARE.*/
                 }
             }
 
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
         #endregion
@@ -5494,7 +5494,7 @@ THE SOFTWARE.*/
                         "{0} removed \"{1}\" from the world list.",
                         player.Name, worldName);
 
-            Server.RequestGC();
+            Server.RequestGc();
         }
 
         #endregion

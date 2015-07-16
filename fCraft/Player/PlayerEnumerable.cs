@@ -1,6 +1,7 @@
 ﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using JetBrains.Annotations;
 
@@ -469,7 +470,7 @@ namespace fCraft {
             if( source == null ) throw new ArgumentNullException( "source" );
             if( message == null ) throw new ArgumentNullException( "message" );
             int i = 0;
-            foreach( Packet packet in LineWrapper.Wrap( message ) ) {
+            foreach( Packet packet in LineWrapper.Wrap( message,0 ) ) {
                 foreach( Player player in source ) {
                     player.Send( packet );
                     i++;
@@ -489,7 +490,7 @@ namespace fCraft {
             if( source == null ) throw new ArgumentNullException( "source" );
             if( message == null ) throw new ArgumentNullException( "message" );
             int i = 0;
-            foreach( Packet packet in LineWrapper.Wrap( message ) ) {
+            foreach( Packet packet in LineWrapper.Wrap( message, 0 ) ) {
                 foreach( Player player in source ) {
                     if( player == except ) continue;
                     player.Send( packet );
@@ -514,9 +515,9 @@ namespace fCraft {
             if( message == null ) throw new ArgumentNullException( "message" );
             if( formatArgs == null ) throw new ArgumentNullException( "formatArgs" );
             int i = 0;
-            foreach( Packet packet in LineWrapper.Wrap( String.Format( message, formatArgs ) ) ) {
-                foreach( Player player in source ) {
-                    if( player == except ) continue;
+            foreach( Packet packet in LineWrapper.Wrap( String.Format( message, formatArgs ), 0 ) ) {
+                foreach (Player player in source.Where(player => player != except))
+                {
                     player.Send( packet );
                     i++;
                 }
@@ -538,7 +539,7 @@ namespace fCraft {
             if( message == null ) throw new ArgumentNullException( "message" );
             if( formatArgs == null ) throw new ArgumentNullException( "formatArgs" );
             int i = 0;
-            foreach( Packet packet in LineWrapper.Wrap( String.Format( message, formatArgs ) ) ) {
+            foreach( Packet packet in LineWrapper.Wrap( String.Format( message, formatArgs ) , 0 ) ) {
                 foreach( Player player in source ) {
                     player.Send( packet );
                     i++;

@@ -1220,7 +1220,7 @@ THE SOFTWARE.*/
             string reason = cmd.NextAll();
 
             IPAddress targetAddress;
-            if (Server.IsIP(targetNameOrIP) && IPAddress.TryParse(targetNameOrIP, out targetAddress))
+            if (Server.IsIp(targetNameOrIP) && IPAddress.TryParse(targetNameOrIP, out targetAddress))
             {
                 try
                 {
@@ -2202,7 +2202,7 @@ THE SOFTWARE.*/
             string reason = cmd.NextAll();
 
             IPAddress targetAddress;
-            if( Server.IsIP( targetNameOrIP ) && IPAddress.TryParse( targetNameOrIP, out targetAddress ) ) {
+            if( Server.IsIp( targetNameOrIP ) && IPAddress.TryParse( targetNameOrIP, out targetAddress ) ) {
                 try {
                     targetAddress.BanIP( player, reason, true, true );
                 } catch( PlayerOpException ex ) {
@@ -2279,7 +2279,7 @@ THE SOFTWARE.*/
 
             try {
                 IPAddress targetAddress;
-                if( Server.IsIP( targetNameOrIP ) && IPAddress.TryParse( targetNameOrIP, out targetAddress ) ) {
+                if( Server.IsIp( targetNameOrIP ) && IPAddress.TryParse( targetNameOrIP, out targetAddress ) ) {
                     targetAddress.UnbanIP( player, reason, true, true );
                 } else {
                     PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches( player, targetNameOrIP );
@@ -2319,7 +2319,7 @@ THE SOFTWARE.*/
 
             try {
                 IPAddress targetAddress;
-                if( Server.IsIP( targetNameOrIP ) && IPAddress.TryParse( targetNameOrIP, out targetAddress ) ) {
+                if( Server.IsIp( targetNameOrIP ) && IPAddress.TryParse( targetNameOrIP, out targetAddress ) ) {
                     targetAddress.UnbanAll( player, reason, true, true );
                 } else {
                     PlayerInfo target = PlayerDB.FindPlayerInfoOrPrintMatches( player, targetNameOrIP );

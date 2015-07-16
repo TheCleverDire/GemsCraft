@@ -145,7 +145,7 @@ namespace GemsCraftGUI
         private void tIP_Validating(object sender, CancelEventArgs e)
         {
             IPAddress ip;
-            if (Server.IsIP(tIP.Text) && IPAddress.TryParse(tIP.Text, out ip))
+            if (Server.IsIp(tIP.Text) && IPAddress.TryParse(tIP.Text, out ip))
             {
                 tIP.ForeColor = SystemColors.ControlText;
             }
@@ -2750,6 +2750,11 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             {
                 clbBlocks.Items.Add(b.ToString());
             }
+            if (!Updater.HasMostRecentVersion())
+            {
+                MessageBox.Show("Your GemsCraft is out of date using version " + Updater.LatestStable + "! " +
+                                "You should consider updating to " + Updater.GetCurrentOnline());
+            }
         }
 
         private void tabRanks_Click(object sender, EventArgs e)
@@ -2759,32 +2764,44 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void chStatus1_CheckedChanged(object sender, EventArgs e)
         {
-            txtStatus1.Enabled = !chkStatus1.Checked;
+            txtStatus1.Enabled = chkStatus1.Checked;
         }
 
         private void chkStatus2_CheckedChanged(object sender, EventArgs e)
         {
-            txtStatus2.Enabled = !chkStatus2.Checked;
+            txtStatus2.Enabled = chkStatus2.Checked;
         }
 
         private void chkStatus3_CheckedChanged(object sender, EventArgs e)
         {
-            txtStatus3.Enabled = !chkStatus3.Checked;
+            txtStatus3.Enabled = chkStatus3.Checked;
         }
 
         private void chkBottomRight3_CheckedChanged(object sender, EventArgs e)
         {
-            txtBottomRight3.Enabled = !chkBottomRight3.Checked;
+            txtBottomRight3.Enabled = chkBottomRight3.Checked;
         }
 
         private void chkBottomRight2_CheckedChanged(object sender, EventArgs e)
         {
-            txtBottomRight2.Enabled = !chkBottomRight2.Checked;
+            txtBottomRight2.Enabled = chkBottomRight2.Checked;
         }
 
         private void chkBottomRight1_CheckedChanged(object sender, EventArgs e)
         {
-            txtBottomRight1.Enabled = !chkBottomRight1.Checked;
+            txtBottomRight1.Enabled = chkBottomRight1.Checked;
+        }
+
+        private void btnSeeKeyWords_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("MessageType is capable of using specific keywords.\n\n" +
+                            "Insert these values (case sensitive) into your MT's to use them:\n" +
+                            "{servername} = The server's name\n" +
+                            "{rank} = The player's rank\n" +
+                            "{world} = The player's current map\n" +
+                            "{version} = The current GemsCraft version\n" +
+                            "{player} = The player's username (Do not confused with nick)\n" +
+                            "{lastcmd} = The player's last used command");
         }
     }
 }

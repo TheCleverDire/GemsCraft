@@ -1,12 +1,15 @@
 // Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using fCraft.Events;
 using JetBrains.Annotations;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
+using fCraft.fSystem;
+using fCraft.fSystem;
 
 namespace fCraft {
     /// <summary> Helper class for handling player-generated chat. </summary>
@@ -43,15 +46,8 @@ namespace fCraft {
             rawMessage = rawMessage.Replace("$website", ConfigKey.WebsiteURL.GetString());
             rawMessage = rawMessage.Replace("$ws", ConfigKey.WebsiteURL.GetString());
 
-            if (ConfigKey.IRCBotEnabled.Enabled())
-            {
-                rawMessage = rawMessage.Replace("$irc", ConfigKey.IRCBotChannels.GetString());
-            }
-            else
-            {
-                rawMessage = rawMessage.Replace("$irc", "No IRC");
-            }
-            
+            rawMessage = rawMessage.Replace("$irc", ConfigKey.IRCBotEnabled.Enabled() ? ConfigKey.IRCBotChannels.GetString() : "No IRC");
+
             if (player.Can(Permission.UseColorCodes))
             {
                 rawMessage = rawMessage.Replace("$lime", "&a");     //alternate color codes for ease if you can't remember the codes
@@ -79,18 +75,14 @@ namespace fCraft {
             
             if (!player.Can(Permission.ChatWithCaps))
             {
-                int caps = 0;
+                var caps = 0;
                 for (int i = 0; i < rawMessage.Length; i++)
                 {
-                    if (Char.IsUpper(rawMessage[i]))
-                    {
-                        caps++;
-                        if (caps > ConfigKey.MaxCaps.GetInt())
-                        {
-                            rawMessage = rawMessage.ToLower();
-                            player.Message("Your message was changed to lowercase as it exceeded the maximum amount of capital letters.");
-                        }
-                    }
+                    if (!Char.IsUpper(rawMessage[i])) continue;
+                    caps++;
+                    if (caps <= ConfigKey.MaxCaps.GetInt()) continue;
+                    rawMessage = rawMessage.ToLower();
+                    player.Message("Your message was changed to lowercase as it exceeded the maximum amount of capital letters.");
                 }
             }
 
@@ -395,6 +387,22 @@ namespace fCraft {
 
             Logger.Log( LogType.GlobalChat,
                         "(say){0}: {1}", player.Name, rawMessage );
+            return true;
+        }
+        public static bool SendSay([NotNull] Player player, [NotNull] string rawMessage, MessageType mType)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
+
+            var recepientList = Server.Players.NotIgnoring(player);
+
+            var formattedMessage = Color.Say + MessageTypeManagement.HandleContent(rawMessage, player);
+
+            foreach (var p in recepientList)
+            {
+                p.Message("(say): " + formattedMessage, mType);
+            }
+            Player.Console.Message("(say): " + rawMessage);
             return true;
         }
 
