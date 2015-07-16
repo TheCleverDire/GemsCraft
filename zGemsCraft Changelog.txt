@@ -1,4 +1,2 @@
-Changes in GemsCraft Beta 1.2:
--> MessageType CPE feature added with amazing configurations to customize what your players see.
--> Added Configurations for Previously existing CPE features (HeldBlock and CustomBlocks)
--> Dragon has been improved
+Changes in GemsCraft Beta 1.2.0:
+-> Added the /stab command

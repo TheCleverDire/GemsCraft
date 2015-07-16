@@ -45,16 +45,58 @@ namespace fCraft
             CommandManager.RegisterCommand(CdCTF);
             CommandManager.RegisterCommand(CdDragon);
             CommandManager.RegisterCommand(CdJoke);
+            CommandManager.RegisterCommand(CdStab);
             Player.Moving += startDragon;
             Player.Moving += PlayerMoved;
         }
 
+        private static readonly CommandDescriptor CdStab = new CommandDescriptor
+        {
+            Name = "Stab",
+            Category = CommandCategory.Fun | CommandCategory.Chat,
+            Permissions = new[] { Permission.Kill },
+            Usage = "/stab Player",
+            Help = "Stabs the specificed player",
+            Handler = StabHandler
+        };
+
+        static void StabHandler(Player player, Command cmd)
+        {
+            var chosenPlayer = cmd.Next();
+            if (chosenPlayer == null) player.PrintUsage(CdStab);
+            else
+            {
+                var selected = Server.FindPlayerOrPrintMatches(player, chosenPlayer, false, true);
+                if (selected == null) return;
+                ContinueStab(player, selected);
+            }
+        }
+
+        static void ContinueStab(Player player, Player selected)
+        {
+            foreach (var p in Server.Players)
+            {
+                if (p.Info.Name == selected.Info.Name)
+                {
+                    p.Kill(p.World, "&cstabbed");
+                    p.Message("You have been &4brutally&c stabbed&r by " + player.Info.Name);
+                }
+                else if (p.Info.Name == player.Info.Name)
+                {
+                    p.Message("You have &4brutally&r &cstabbed &r" + selected.Info.Name);
+                }
+                else
+                {
+                    p.Message(player.Info.Name + " has &4brutally &cstabbed&r " + selected.Info.Name);
+                }
+            }
+        }
         static readonly CommandDescriptor CdJoke = new CommandDescriptor
         {
             Name = "Joke",
 
             Category = CommandCategory.Chat | CommandCategory.Fun,
-            Permissions = new Permission[] { Permission.HighFive },
+            Permissions = new[] { Permission.HighFive },
             IsConsoleSafe = false,
             Usage = "/joke",
             Help = "Takes a random joke from a list.",

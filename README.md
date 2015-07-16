@@ -1,4 +1,4 @@
-﻿Beta 1.2
+﻿Beta 1.2.0
 
 #GemsCraft
 ![LegendCraft](http://i.imgur.com/pbO5NDl.png "Never argue with an idiot. They will drag you down to their level and beat you with experience")<br />

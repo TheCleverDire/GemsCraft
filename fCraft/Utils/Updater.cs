@@ -38,7 +38,7 @@ namespace fCraft {
             return TitleExtractor.pageTitle(CurrentVersionUrl);
         }
         public const string CurrentVersionUrl = "http://gemscraft.net/latest.html";
-        public const string LatestStable = "Beta 1.2";
+        public const string LatestStable = "Beta 1.2.0";
 
         public static bool HasMostRecentVersion()
         {
