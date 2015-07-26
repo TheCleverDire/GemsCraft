@@ -1,2 +1,9 @@
 - Search for any bugs in Beta 1.2 and place them in Beta 1.2.0 and following
-- Brainstorm ideas for Beta 1.3
+- Add Time of Day Sky Colors (DONE! - Beta 1.3)
+- Blockhunt game (Possibly Beta 1.4)
+- /rps Rock Paper Sciccors
+- Update downloader
+- Social Commands (Beta 1.4) (fpost, tweet, etc.)
+- Android Remote (Beta 1.4 or 1.5) Depends
+- Remove Legacy Rank Mappings At bottom of Config File in code. Must be done on GUI start up. This legaxy pair rankings stuff prevents GemsCraft users from starting their servers
+- CCJump (Beta 1.5)

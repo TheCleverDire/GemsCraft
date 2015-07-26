@@ -70,7 +70,7 @@ namespace fCraft
         public static void Start()
         {
             world_.Hax = false;
-            world_.gameMode = GameMode.FFA; //set the game mode
+            world_.gameMode = GameMode.Ffa; //set the game mode
             delayTask = Scheduler.NewTask(t => world_.Players.Message("&WFFA &fwill be starting in {0} seconds: &WGet ready!", (timeDelay - (DateTime.Now - startTime).ToSeconds())));
             delayTask.RunRepeating(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10), (timeDelay / 10));
         }
@@ -122,7 +122,7 @@ namespace fCraft
                 task.Stop();
                 return;
             }
-            if (world_.gameMode != GameMode.FFA) //bug checking
+            if (world_.gameMode != GameMode.Ffa) //bug checking
             {
                 task.Stop();
                 world_ = null;
@@ -258,7 +258,7 @@ namespace fCraft
         public static void RevertGame() //Reset game bools/stats and stop timers
         {
             task_.Stop();
-            world_.gameMode = GameMode.NULL;
+            world_.gameMode = GameMode.Null;
             instance = null;
             started = false;
             if (world_.gunPhysics)

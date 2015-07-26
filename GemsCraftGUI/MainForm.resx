@@ -138,9 +138,6 @@
   <metadata name="dgvcBlockDB.UserAddedColumn" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
-  <data name="lblMTNotice.Text" xml:space="preserve">
-    <value>Message Type enables the modification of the status messages at the different types of text you see around the screen. Enabled the configurable text's checks if you want that message to show. Leave the text blank to use the default message if checked.</value>
-  </data>
   <data name="lblAboutCPE.Text" xml:space="preserve">
     <value>CPE is Classic-Protocal-Extension. It is a set of capabilites that are communicated between the server and the client. Note that not all clients will support the CPE features that GemsCraft provides. If your client does not support the feature, what you were doing will not work.</value>
   </data>

@@ -299,12 +299,39 @@ namespace fCraft {
 
         public static Packet MakeEnvSetColor(byte selection, string colorcode)
         {
-            System.Drawing.Color col = ColorTranslator.FromHtml(colorcode.ToUpper());
-            Packet packet = new Packet(OpCode.EnvSetColor);
+            var col = System.Drawing.Color.AliceBlue;
+            try
+            {
+                col = ColorTranslator.FromHtml(colorcode.ToUpper());
+            }
+            catch (Exception)
+            {
+                //Logger.Log(LogType.SystemActivity, colorcode);
+            }
+            if (colorcode == "defaultcolor")
+            {
+                return MakeEnvSetColor(selection, new[] { -1, -1, -1 });
+            }
+            var packet = new Packet(OpCode.EnvSetColor);
             packet.Data[1] = selection;
             ToNetOrder((short)(col.R), packet.Data, 2);
             ToNetOrder((short)(col.G), packet.Data, 4);
             ToNetOrder((short)(col.B), packet.Data, 6);
+            return packet;
+        }
+
+        public static Packet MakeEnvSetColor(byte selection, int[] colorcode)
+        {
+
+            var packet = new Packet(OpCode.EnvSetColor);
+            packet.Data[1] = selection;
+            ToNetOrder((short)(colorcode[0]), packet.Data, 2);
+            ToNetOrder((short)(colorcode[1]), packet.Data, 4);
+            ToNetOrder((short)(colorcode[2]), packet.Data, 6);
+            foreach (var i in colorcode)
+            {
+                Console.WriteLine(i);
+            }
             return packet;
         }
         

@@ -45,7 +45,12 @@ namespace fCraft
 
         public readonly bool IsSuper;
 
+        /// <summary>
+        /// Determine whether or not the player is already in a Rock-Paper-Scissors Game
+        /// </summary>
+        public bool InRpsGame;
 
+        public Player InRpsWith;
         /// <summary> Whether the player has completed the login sequence. </summary>
         public SessionState State { get; private set; }
 

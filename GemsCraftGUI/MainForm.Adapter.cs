@@ -580,6 +580,9 @@ namespace GemsCraftGUI
             txtStatus3.Text = ConfigKey.Status3Text.GetString() ?? ConfigKey.Status3Text.GetDefault().ToString();
             #endregion
 
+            chkEnvColorsAllowed.Checked = ConfigKey.EnvColorsEnabled.Enabled();
+            chkTimeBasedSky.Checked = ConfigKey.TimeSkyEnabled.Enabled();
+            numHourLength.Value = ConfigKey.GameTimeHourMinutes.GetInt();
         }
         private static bool Bk(ConfigKey cK)
         {
@@ -865,6 +868,10 @@ namespace GemsCraftGUI
             ConfigKey.Status3Enabled.TrySetValue(chkStatus3.Checked);
             ConfigKey.Status3Text.TrySetValue(txtStatus3.Text ?? ConfigKey.Status3Text.GetDefault().ToString());
             #endregion
+
+            ConfigKey.EnvColorsEnabled.TrySetValue(chkEnvColorsAllowed.Checked);
+            ConfigKey.TimeSkyEnabled.TrySetValue(chkTimeBasedSky.Checked);
+            ConfigKey.GameTimeHourMinutes.TrySetValue(numHourLength.Value);
         }
 
         private readonly ConfigKey[] _cbConfigs = {

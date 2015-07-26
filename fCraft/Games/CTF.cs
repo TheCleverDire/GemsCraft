@@ -530,7 +530,7 @@ namespace fCraft
         public static void RevertGame() //Reset game bools/stats and stop timers
         {
             task_.Stop();
-            world_.gameMode = GameMode.NULL;
+            world_.gameMode = GameMode.Null;
             isOn = false;
             instance = null;
             started = false;

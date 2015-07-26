@@ -2803,5 +2803,33 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                             "{player} = The player's username (Do not confused with nick)\n" +
                             "{lastcmd} = The player's last used command");
         }
+
+        private void chkCustomBlocksAllowed_CheckedChanged(object sender, EventArgs e)
+        {
+            clbBlocks.Enabled = chkCustomBlocksAllowed.Checked;
+        }
+
+        private void chkMessageTypeAllowed_CheckedChanged(object sender, EventArgs e)
+        {
+            chkAnnouncementMT.Enabled = chkMessageTypeAllowed.Checked;
+            chkBottomRight1.Enabled = chkMessageTypeAllowed.Checked;
+            chkBottomRight2.Enabled = chkMessageTypeAllowed.Checked;
+            chkBottomRight3.Enabled = chkMessageTypeAllowed.Checked;
+            chkStatus1.Enabled = chkMessageTypeAllowed.Checked;
+            chkStatus2.Enabled = chkMessageTypeAllowed.Checked;
+            chkStatus3.Enabled = chkMessageTypeAllowed.Checked;
+            btnSeeKeyWords.Enabled = chkMessageTypeAllowed.Checked;
+        }
+
+        private void chkEnvColorsAllowed_CheckedChanged(object sender, EventArgs e)
+        {
+            chkTimeBasedSky.Enabled = chkEnvColorsAllowed.Checked;
+            numHourLength.Enabled = chkEnvColorsAllowed.Checked;
+        }
+
+        private void chkTimeBasedSky_CheckedChanged(object sender, EventArgs e)
+        {
+            numHourLength.Enabled = chkTimeBasedSky.Checked;
+        }
     }
 }

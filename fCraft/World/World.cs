@@ -73,7 +73,7 @@ namespace fCraft
         public int blueScore = 0;
         public List<Action> Games;
         public bool GameOn = false;
-        public GameMode gameMode = GameMode.NULL;
+        public GameMode gameMode = GameMode.Null;
         public Vector3I footballPos;
         public Player[, ,] positions;
         public Vector3I redFlag = new Vector3I(0, 0, 0);

@@ -270,7 +270,7 @@ namespace fCraft.Games
             }
 
             
-            world_.gameMode = GameMode.NULL;
+            world_.gameMode = GameMode.Null;
             task_.Stop();
             isOn = false;
             instance = null;

@@ -14,6 +14,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Timers;
 using fCraft.Drawing;
 using fCraft.Events;
 using fCraft.fSystem;
@@ -79,14 +80,7 @@ namespace fCraft
         [CanBeNull]
         public static string GetArg(ArgKey key)
         {
-            if (Args.ContainsKey(key))
-            {
-                return Args[key];
-            }
-            else
-            {
-                return null;
-            }
+            return Args.ContainsKey(key) ? Args[key] : null;
         }
 
         /// <summary> Checks whether a command-line argument was set. </summary>
@@ -102,7 +96,7 @@ namespace fCraft
         /// <returns> A string containing all given arguments, or an empty string if none were set. </returns>
         public static string GetArgString()
         {
-            return String.Join(" ", GetArgList());
+            return string.Join(" ", GetArgList());
         }
 
 
@@ -374,7 +368,18 @@ namespace fCraft
             _serverInitialized = true;
         }
 
-
+        private static System.Timers.Timer WorldSkyTimer;
+        private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+        {
+            try
+            {
+                WorldTime.UpdateWorldSky();
+            }
+            catch (Exception ex)
+            {
+                Logger.Log(LogType.Error, ex.StackTrace);
+            }
+        }
         /// <summary> Starts the server:
         /// Creates Console pseudoplayer, loads the world list, starts listening for incoming connections,
         /// sets up scheduled tasks and starts the scheduler, starts the heartbeat, and connects to IRC.
@@ -384,7 +389,8 @@ namespace fCraft
         /// <exception cref="System.InvalidOperationException"> Server is already running, or server/library have not been initailized. </exception>
         public static bool StartServer()
         {
-
+            //WorldTime.GetHourLength();
+            WorldSkyTimer = new System.Timers.Timer(WorldTime.GetDayPart());
             if (IsRunning)
             {
                 throw new InvalidOperationException("Server is already running");
@@ -561,6 +567,18 @@ namespace fCraft
             GlobalChat.Init();
             GlobalChat.Start();
 
+            //Start Sky Colors
+            Logger.Log(LogType.Debug, "Ts");
+            if (ConfigKey.EnvColorsEnabled.Enabled() && ConfigKey.TimeSkyEnabled.Enabled())
+            {
+                WorldTime.CurrentHour = 6;
+                WorldTime.UpdateWorldSky();
+                Logger.Log(LogType.SystemActivity, "Attempting to start World Sky Colors");
+                WorldSkyTimer.Elapsed += OnTimedEvent;
+                WorldSkyTimer.Enabled = true;
+                WorldSkyTimer.Start();
+                Logger.Log(LogType.SystemActivity, "Started World Sky Colors");
+            }
             //send webpanel salt (unfinished)
 
             /*try
@@ -584,6 +602,7 @@ namespace fCraft
             }*/
 
             IsRunning = true;
+            
             RaiseEvent(Started);
             return true;
         }

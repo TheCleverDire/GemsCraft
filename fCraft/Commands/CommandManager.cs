@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using fCraft.Commands;
 using fCraft.Events;
 using JetBrains.Annotations;
 
@@ -25,6 +26,7 @@ namespace fCraft {
             ChatCommands.Init();
             FunCommands.Init();
             MathCommands.Init();
+            GameCommands.Init();
             Logger.Log( LogType.Debug,
                         "CommandManager: {0} commands registered ({1} hidden, {2} aliases)",
                         Commands.Count,

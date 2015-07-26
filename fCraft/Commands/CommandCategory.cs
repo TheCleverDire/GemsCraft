@@ -35,6 +35,10 @@ namespace fCraft {
         /// <summary> Commands that are just fun. </summary>
         Fun = 256,
         /// <summary> Commands that use advanced mathematics. </summary>
-        Math = 512
+        Math = 512,
+        /// <summary>
+        /// Commands for games
+        /// </summary>
+        Games = 1024
     }
 }

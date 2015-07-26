@@ -2224,7 +2224,7 @@ THE SOFTWARE.*/
             UsableByFrozenPlayers = true,
             Usage = "/Commands [Category|@RankName]",
             Help = "Shows a list of commands, by category, permission, or rank. " +
-                   "Categories are: Building, Chat, Info, Maintenance, Moderation, World, and Zone.",
+                   "Categories are: Building, Chat, Info, Maintenance, Moderation, World, Games, and Zone.",
             Handler = CommandsHandler
         };
 
@@ -2235,17 +2235,18 @@ THE SOFTWARE.*/
 
             if (param == null)
             {
-                player.Message("&SFor &aBuilding &Scommands, type &a/Commands building" +
-                               "\n&SFor &fChat &Scommands, type &a/Commands chat" +
-                               "\n&SFor &fInfo &Scommands, type &a/Commands info" +
+                player.Message("&SFor &0Building &Scommands, type &a/Commands building" +
+                               "\n&SFor &1Chat &Scommands, type &a/Commands chat" +
+                               "\n&SFor &2Info &Scommands, type &a/Commands info" +
                                "\n&SFor &3Moderation &scommands, type &a/Commands moderation" +
-                               "\n&SFor &9World &Scommands, type &a/Commands world" +
-                               "\n&SFor &bZone &Scommands, type &a/Commands zone" +
+                               "\n&SFor &4World &Scommands, type &a/Commands world" +
+                               "\n&SFor &5Zone &Scommands, type &a/Commands zone" +
+                               "\n&SFor &6Game &Scommands, type &a/Commands games" + 
                                (CommandManager.GetCommands(CommandCategory.Math, false).Length > 0
-                                    ? "\n&SFor &cFunction drawing &Scommands, type &a/Commands math"
+                                    ? "\n&SFor &7Function drawing &Scommands, type 6a/Commands math"
                                     : "") +
                                (CommandManager.GetCommands(CommandCategory.Fun, false).Length > 0
-                                    ? "\n&SFor &dFun &Scommands, type &a/Commands fun"
+                                    ? "\n&SFor &8Fun &Scommands, type &a/Commands fun"
                                     : ""));
                 return;
             }

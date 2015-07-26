@@ -722,6 +722,16 @@ message type if character count is less than 64")]
             @"")]
         Br1Text,
         #endregion
+
+        [BoolKey(ConfigSection.Cpe, true,
+            @"Enables the environmental color extension called EnvColors.")]
+        EnvColorsEnabled,
+        [BoolKey(ConfigSection.Cpe, true,
+            @"Enables the use of different colors to represent the time in the sky")]
+        TimeSkyEnabled,
+        [IntKey(ConfigSection.Cpe, 12,
+            @"Configures how many hours are in an in-game day.")]
+        GameTimeHourMinutes
         #endregion
     }
 }

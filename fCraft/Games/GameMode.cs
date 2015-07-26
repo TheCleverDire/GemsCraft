@@ -7,7 +7,7 @@ namespace fCraft
 {
     public enum GameMode
     {
-        FFA,
+        Ffa,
         CaptureTheFlag,
         GunGame,
         ZombieSurvival,
@@ -17,6 +17,7 @@ namespace fCraft
         MineChallenge,
         TeamDeathMatch,
         Infection,
-        NULL 
+        Blockhunt,
+        Null // Needed? Maybe. IDK. 
     }
 }
