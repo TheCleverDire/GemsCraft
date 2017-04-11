@@ -25,26 +25,23 @@ namespace GemsCraftGUI
             string missingFileMsg = null;
             if (!File.Exists(Paths.WorldListFileName) && !File.Exists(Paths.ConfigFileName))
             {
-                missingFileMsg = String.Format("Configuration ({0}) and world list ({1}) were not found. Using defaults.",
-                                                Paths.ConfigFileName,
-                                                Paths.WorldListFileName);
+                missingFileMsg =
+                    $"Configuration ({Paths.ConfigFileName}) and world list ({Paths.WorldListFileName}) were not found. Using defaults.";
             }
             else if (!File.Exists(Paths.ConfigFileName))
             {
-                missingFileMsg = String.Format("Configuration ({0}) was not found. Using defaults.",
-                                                 Paths.ConfigFileName);
+                missingFileMsg = $"Configuration ({Paths.ConfigFileName}) was not found. Using defaults.";
             }
             else if (!File.Exists(Paths.WorldListFileName))
             {
-                missingFileMsg = String.Format("World list ({0}) was not found. Assuming 0 worlds.",
-                                                Paths.WorldListFileName);
+                missingFileMsg = $"World list ({Paths.WorldListFileName}) was not found. Assuming 0 worlds.";
             }
             if (missingFileMsg != null)
             {
                 MessageBox.Show(missingFileMsg);
             }
 
-            using (LogRecorder loadLogger = new LogRecorder())
+            using (var loadLogger = new LogRecorder())
             {
                 if (Config.Load(false, false))
                 {
@@ -122,13 +119,36 @@ namespace GemsCraftGUI
                 }
 
                 FillWorldList();
-                XAttribute mainWorldAttr = root.Attribute("main");
+                var mainWorldAttr = root.Attribute("main");
                 if (mainWorldAttr != null)
                 {
-                    foreach (WorldListEntry world in Worlds.Where(world => String.Equals(world.Name, mainWorldAttr.Value, StringComparison.CurrentCultureIgnoreCase)))
+                    foreach (
+                        WorldListEntry world in 
+                        Worlds.Where(
+                            world => 
+                            string.Equals(world.Name, mainWorldAttr.Value, 
+                                StringComparison.CurrentCultureIgnoreCase)))
                     {
                         cMainWorld.SelectedItem = world.Name;
                         break;
+                    }
+                }
+
+                var prisonWorldAttr = root.Attribute("prison");
+                if (prisonWorldAttr != null)
+                {
+                    if (Worlds.Any(world => string.Equals(world.Name, prisonWorldAttr.Value,
+                                StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        var loopCount = 0;
+                        foreach (var v in cboPrison.Items)
+                        {
+                            if (v.ToString().ToLower() == prisonWorldAttr.Value.ToLower())
+                            {
+                                cboPrison.SelectedIndex = loopCount;
+                            }
+                            loopCount++;
+                        }
                     }
                 }
 
@@ -151,7 +171,7 @@ namespace GemsCraftGUI
             CustomAliases.Text = ConfigKey.CustomAliasName.GetString();
             tMOTD.Text = ConfigKey.MOTD.GetString();
             websiteURL.Text = ConfigKey.WebsiteURL.GetString();
-            HeartBeatUrlComboBox.Text = ConfigKey.HeartbeatUrl.GetString();
+            //HeartBeatUrlComboBox.Text = ConfigKey.HeartbeatUrl.GetString();
 
             nMaxPlayers.Value = ConfigKey.MaxPlayers.GetInt();
             CheckMaxPlayersPerWorldValue();
@@ -298,6 +318,7 @@ namespace GemsCraftGUI
             }
 
             xWoMEnableEnvExtensions.Checked = ConfigKey.WoMEnableEnvExtensions.Enabled();
+            mcbPrison.Checked = ConfigKey.PrisonEnabled.Enabled();
         }
 
 
@@ -610,7 +631,7 @@ namespace GemsCraftGUI
         }
         static void ApplyEnum<TEnum>([NotNull] ComboBox box, ConfigKey key, TEnum def) where TEnum : struct
         {
-            if (box == null) throw new ArgumentNullException("box");
+            if (box == null) throw new ArgumentNullException(nameof(box));
             if (!typeof(TEnum).IsEnum) throw new ArgumentException("Enum type required");
             try
             {
@@ -643,7 +664,7 @@ namespace GemsCraftGUI
             ConfigKey.SwearName.TrySetValue(SwearBox.Text);
             ConfigKey.CheckForUpdates.TrySetValue(checkUpdate.Checked.ToString());
             ConfigKey.WebsiteURL.TrySetValue(websiteURL.Text);
-            ConfigKey.HeartbeatUrl.TrySetValue(HeartBeatUrlComboBox.SelectedItem);
+            ConfigKey.HeartbeatUrl.TrySetValue("ClassiCube.net");
             ConfigKey.CustomAliasName.TrySetValue(CustomAliases.Text);
             ConfigKey.MOTD.TrySetValue(tMOTD.Text);
             ConfigKey.MaxPlayers.TrySetValue(nMaxPlayers.Value);
@@ -698,7 +719,7 @@ namespace GemsCraftGUI
             ConfigKey.MapPath.TrySetValue(xMapPath.Checked ? tMapPath.Text : ConfigKey.MapPath.GetDefault());
 
             ConfigKey.WoMEnableEnvExtensions.TrySetValue(xWoMEnableEnvExtensions.Checked);
-
+            ConfigKey.PrisonEnabled.TrySetValue(mcbPrison.Checked);
 
             // Security
             WriteEnum<NameVerificationMode>(cVerifyNames, ConfigKey.VerifyNames);
@@ -914,6 +935,13 @@ namespace GemsCraftGUI
                 if (cMainWorld.SelectedItem != null)
                 {
                     root.Add(new XAttribute("main", cMainWorld.SelectedItem));
+                }
+                if (mcbPrison.Enabled)
+                {
+                    if (cboPrison.SelectedItem != null)
+                    {
+                        root.Add(new XAttribute("prison", cboPrison.SelectedItem));
+                    }
                 }
                 doc.Add(root);
                 doc.Save(worldListTempFileName);

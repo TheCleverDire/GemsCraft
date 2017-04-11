@@ -29,16 +29,14 @@ namespace fCraft {
 #endif
  );
 
-        public static string UserAgent {
-            get { return "GemsCraft " + LatestStable; }
-        }
+        public static string UserAgent => "GemsCraft " + LatestStable;
 
         public static string GetCurrentOnline()
         {
             return TitleExtractor.pageTitle(CurrentVersionUrl);
         }
         public const string CurrentVersionUrl = "http://gemscraft.net/latest.html";
-        public const string LatestStable = "Beta 1.2.0";
+        public const string LatestStable = "1.0";
 
         public static bool HasMostRecentVersion()
         {
@@ -63,9 +61,9 @@ namespace fCraft {
 
         public ReleaseFlags Flags { get; private set; }
 
-        public string FlagsString { get { return ReleaseFlagsToString( Flags ); } }
+        public string FlagsString => ReleaseFlagsToString( Flags );
 
-        public string[] FlagsList { get { return ReleaseFlagsToStringArray( Flags ); } }
+        public string[] FlagsList => ReleaseFlagsToStringArray( Flags );
 
         public int Version { get; private set; }
 
@@ -73,11 +71,7 @@ namespace fCraft {
 
         public DateTime Date { get; private set; }
 
-        public TimeSpan Age {
-            get {
-                return DateTime.UtcNow.Subtract( Date );
-            }
-        }
+        public TimeSpan Age => DateTime.UtcNow.Subtract( Date );
 
         public string Summary { get; private set; }
 

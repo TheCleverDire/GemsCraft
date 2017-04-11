@@ -52,6 +52,37 @@ namespace fCraft {
             }
         }
 
+        static World prisonWorld;
+        /// <summary> Gets or sets the default prison world.
+        /// The map of the new prison world is preloaded, and old one is unloaded, if needed. </summary>
+        /// <exception cref="System.ArgumentNullException" />
+        /// <exception cref="fCraft.WorldOpException" />
+        [NotNull]
+        public static World PrisonWorld
+        {
+            get { return prisonWorld; }
+            set
+            {
+                if (value == null) throw new ArgumentNullException("value");
+                if (value == prisonWorld) return;
+                if (RaisePrisonWorldChangingEvent(prisonWorld, value))
+                {
+                    throw new WorldOpException(value.Name, WorldOpExceptionCode.Cancelled);
+                }
+                World oldWorld;
+                lock (SyncRoot)
+                {
+                    value.NeverUnload = true;
+                    oldWorld = prisonWorld;
+                    if (oldWorld != null)
+                    {
+                        oldWorld.NeverUnload = false;
+                    }
+                    prisonWorld = value;
+                }
+                RaisePrisonWorldChangedEvent(oldWorld, value);
+            }
+        }
 
         #region World List Saving/Loading
 
@@ -833,15 +864,18 @@ namespace fCraft {
                             candidates = Paths.FindFiles( sourceFullFileName );
                         }
 
-                        if( candidates.Length == 0 ) {
-                            player.Message( "File/directory not found: {0}", fileName );
-
-                        } else if( candidates.Length == 1 ) {
-                            player.Message( "Filenames are case-sensitive! Did you mean to load \"{0}\"?", candidates[0].Name );
-
-                        } else {
-                            player.Message( "Filenames are case-sensitive! Did you mean to load one of these: {0}",
-                                            String.Join( ", ", candidates.Select( c => c.Name ).ToArray() ) );
+                        switch (candidates.Length)
+                        {
+                            case 0:
+                                player.Message( "File/directory not found: {0}", fileName );
+                                break;
+                            case 1:
+                                player.Message( "Filenames are case-sensitive! Did you mean to load \"{0}\"?", candidates[0].Name );
+                                break;
+                            default:
+                                player.Message( "Filenames are case-sensitive! Did you mean to load one of these: {0}",
+                                    string.Join( ", ", candidates.Select( c => c.Name ).ToArray() ) );
+                                break;
                         }
                     } catch( DirectoryNotFoundException ex ) {
                         player.Message( ex.Message );
@@ -856,12 +890,9 @@ namespace fCraft {
             }
 
             // Make sure that the given file is within the map directory
-            if( !Paths.Contains( Paths.MapPath, sourceFullFileName ) ) {
-                player.MessageUnsafePath();
-                return null;
-            }
-
-            return sourceFullFileName;
+            if (Paths.Contains(Paths.MapPath, sourceFullFileName)) return sourceFullFileName;
+            player.MessageUnsafePath();
+            return null;
         }
 
 
@@ -900,7 +931,24 @@ namespace fCraft {
         static void RaiseMainWorldChangedEvent( [CanBeNull] World oldWorld, [NotNull] World newWorld ) {
             if( newWorld == null ) throw new ArgumentNullException( "newWorld" );
             var h = MainWorldChanged;
-            if( h != null ) h( null, new MainWorldChangedEventArgs( oldWorld, newWorld ) );
+            h?.Invoke( null, new MainWorldChangedEventArgs( oldWorld, newWorld ) );
+        }
+
+        static bool RaisePrisonWorldChangingEvent(World oldWorld, [NotNull] World newWorld)
+        {
+            if (newWorld == null) throw new ArgumentNullException("newWorld");
+            var h = MainWorldChanging;
+            if (h == null) return false;
+            var e = new MainWorldChangingEventArgs(oldWorld, newWorld);
+            h(null, e);
+            return e.Cancel;
+        }
+
+        static void RaisePrisonWorldChangedEvent([CanBeNull] World oldWorld, [NotNull] World newWorld)
+        {
+            if (newWorld == null) throw new ArgumentNullException("newWorld");
+            var h = MainWorldChanged;
+            h?.Invoke(null, new MainWorldChangedEventArgs(oldWorld, newWorld));
         }
 
         static bool RaiseWorldCreatingEvent( [CanBeNull] Player player, [NotNull] string worldName, [CanBeNull] Map map ) {
@@ -915,7 +963,7 @@ namespace fCraft {
         static void RaiseWorldCreatedEvent( [CanBeNull] Player player, [NotNull] World world ) {
             if( world == null ) throw new ArgumentNullException( "world" );
             var h = WorldCreated;
-            if( h != null ) h( null, new WorldCreatedEventArgs( player, world ) );
+            h?.Invoke( null, new WorldCreatedEventArgs( player, world ) );
         }
 
         #endregion

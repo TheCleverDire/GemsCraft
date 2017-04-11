@@ -75,7 +75,7 @@ many powers until they prove themselves trustworthy." )]
 
 
         [BoolKey( ConfigSection.General, false,
-            @"Public servers are listed on minecraft.net server list, so expect
+            @"Public servers are listed on Classicube.net server list, so expect
 random players to join. Private servers can only be joined by players
 who already know the server port/address or URL. Note that the URL
 changes if your computer's IP or server's port change." )]
@@ -186,7 +186,10 @@ the build permission for new worlds will default to this rank." )]
 @"Custom path for storing map files. If you change this value,
 make sure to move the map files before starting the server again." )]
         MapPath,
-
+ 
+        [BoolKey( ConfigSection.Worlds, false,
+@"Allows the prison setup to be enabled" )]
+        PrisonEnabled,
         #endregion
 
 
@@ -196,7 +199,7 @@ make sure to move the map files before starting the server again." )]
 @"Name verification ensures that connecting players are not impersonating
 someone else. Strict verification uses only the main verification method.
 It can produce false negatives - for example if server has just restarted,
-or if minecraft.net heartbeats are timing out. Normal verification checks
+or if ClassiCube.net heartbeats are timing out. Normal verification checks
 player's current and on-record IP address to eliminate false negatives.
 No verification is dangerous, and may allow players to impersonate others." )]
         VerifyNames,
@@ -210,7 +213,7 @@ from joining together.",
 
         [BoolKey( ConfigSection.Security, false,
 @"Allow players from your local network (LAN) to connect without name verification.
-May be useful if minecraft.net is blocked on your LAN for some reason.
+May be useful if ClassiCube.net is blocked on your LAN for some reason.
 Warning: Unverified players can log in with ANY name - even as you!" )]
         AllowUnverifiedLAN,
 
@@ -559,7 +562,7 @@ This config key is added in case alternative login/heartbeat services arise.")]
         AutoRankEnabled,
 
         [BoolKey( ConfigSection.Advanced, true,
-@"Enable heartbeat to minecraft.net.
+@"Enable heartbeat to ClassiCube.net.
 If disabled, heartbeat data is written to heartbeatdata.txt." )]
         HeartbeatEnabled,
 

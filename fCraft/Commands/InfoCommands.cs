@@ -71,11 +71,40 @@ namespace fCraft {
 
             CommandManager.RegisterCommand(CdGetUsage);
             CommandManager.RegisterCommand(CdGemsVersion);
+            CommandManager.RegisterCommand(CdGetPosition);
 
 #if DEBUG_SCHEDULER
             CommandManager.RegisterCommand( cdTaskDebug );
 #endif
         }
+
+        private static readonly CommandDescriptor CdGetPosition = new CommandDescriptor
+        {
+            Name = "GetPosition",
+            IsConsoleSafe = false,
+            Category = CommandCategory.Info,
+            Usage = "/GetPosition player",
+            Help = "Displays the World and Position of the provided player",
+            Handler = GetPositionHandler
+        };
+
+        private static void GetPositionHandler(Player source, Command cmd)
+        {
+            var c = cmd.Next();
+            if (c != null)
+            {
+                var p = Server.FindPlayerOrPrintMatches(source, c, true, true);
+                if (p != null && p.IsOnline)
+                {
+                    source.Message("Player of name '" + p.Name + "' is in world '" + p.World.Name + "'," +
+                        "with location of: " +
+                        "\nX: " + p.Position.X +
+                        "\nY: " + p.Position.Y +
+                        "\nZ: " + p.Position.Z);
+                }
+            }
+        }
+
         static readonly CommandDescriptor CdGetUsage = new CommandDescriptor
         {
             Name = "GetUsage",

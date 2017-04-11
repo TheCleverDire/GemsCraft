@@ -205,10 +205,10 @@ THE SOFTWARE.*/
                 return; //return to stop the code
             }
             string item = cmd.Next();                               // /barf playername [item]
-            string aMessage;
             double time = (DateTime.Now - player.Info.LastUsedBarf).TotalSeconds;
             if (player.Can(Permission.HighFive) && time > 20)
             {
+                string aMessage;
                 if (string.IsNullOrEmpty(item))
                 {
                     Server.Players.CanSee(target).Union(target).Message("{0} &Swas &6Barfed &son by {1}&s.", target.ClassyName, player.ClassyName);
@@ -217,9 +217,9 @@ THE SOFTWARE.*/
                     return;
                 }
                 else if (item.ToLower() == "throwup")
-                    aMessage = String.Format("{0}&s was &6Thrown Up &Son by {1}&s.", target.ClassyName, player.ClassyName);
+                    aMessage = $"{target.ClassyName}&s was &6Thrown Up &Son by {player.ClassyName}&s.";
                 else if (item.ToLower() == "puke")
-                    aMessage = String.Format("{0}&s was &6Puked &Son by {1}&s.", target.ClassyName, player.ClassyName);
+                    aMessage = $"{target.ClassyName}&s was &6Puked &Son by {player.ClassyName}&s.";
                 else if (item.ToLower() == "blowchunks")
                     aMessage = String.Format("{1} &6Blew Chunks &son {0}&s.", target.ClassyName, player.ClassyName);
                 else
@@ -1027,19 +1027,7 @@ THE SOFTWARE.*/
 
                     if (target.Info.isMad == false | target.Info.isJelly == false)
                     {
-
-                        if (oldDisplayedName == null)
-                        {
-                            Server.Message("&W{0} = Jelly", info.Name);
-
-                        }
-
-                        else
-                        {
-                            Server.Message("&W{0] = Jelly",
-                                        info.Name);
-
-                        }
+                        Server.Message(oldDisplayedName == null ? "&W{0} = Jelly" : "&W{0] = Jelly", info.Name);
                     }
                     else
                     {
@@ -1866,8 +1854,8 @@ THE SOFTWARE.*/
                     else
                     {
                         timer.Stop();
-                        string abortMsg = String.Format("&Y(Timer) {0}&Y aborted a timer with {1} left: {2}",
-                                                         player.ClassyName, timer.TimeLeft.ToMiniString(), timer.Message);
+                        string abortMsg =
+                            $"&Y(Timer) {player.ClassyName}&Y aborted a timer with {timer.TimeLeft.ToMiniString()} left: {timer.Message}";
                         Chat.SendSay(player, abortMsg);
                     }
                 }
@@ -1902,21 +1890,10 @@ THE SOFTWARE.*/
                 return;
             }
 
-            string sayMessage;
-            string message = cmd.NextAll();
-            if (String.IsNullOrEmpty(message))
-            {
-                sayMessage = String.Format("&Y(Timer) {0}&Y started a {1} timer",
-                                            player.ClassyName,
-                                            duration.ToMiniString());
-            }
-            else
-            {
-                sayMessage = String.Format("&Y(Timer) {0}&Y started a {1} timer: {2}",
-                                            player.ClassyName,
-                                            duration.ToMiniString(),
-                                            message);
-            }
+            var message = cmd.NextAll();
+            var sayMessage = string.IsNullOrEmpty(message) 
+                ? $"&Y(Timer) {player.ClassyName}&Y started a {duration.ToMiniString()} timer" 
+                : $"&Y(Timer) {player.ClassyName}&Y started a {duration.ToMiniString()} timer: {message}";
             Chat.SendSay(player, sayMessage);
             ChatTimer.Start(duration, message, player.Name);
         }

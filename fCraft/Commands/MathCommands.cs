@@ -58,6 +58,7 @@ namespace fCraft
             "'uu' switches coords to be [-1, 1] along the corresponding cuboid axis.";
         const string copyright = "\n(C) 2012 Lao Tszy";
 
+
         #region LegendCraft
         /* Copyright (c) <2012-2014> <LeChosenOne, DingusBungus>
 Permission is hereby granted, free of charge, to any person obtaining a copy

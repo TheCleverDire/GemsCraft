@@ -252,23 +252,23 @@ namespace fCraft
         {
             if (span.TotalSeconds < 60)
             {
-                return String.Format("{0}s", span.Seconds);
+                return $"{span.Seconds}s";
             }
             else if (span.TotalMinutes < 60)
             {
-                return String.Format("{0}m{1}s", span.Minutes, span.Seconds);
+                return $"{span.Minutes}m{span.Seconds}s";
             }
             else if (span.TotalHours < 48)
             {
-                return String.Format("{0}h{1}m", (int)Math.Floor(span.TotalHours), span.Minutes);
+                return $"{(int) Math.Floor(span.TotalHours)}h{span.Minutes}m";
             }
             else if (span.TotalDays < 15)
             {
-                return String.Format("{0}d{1}h", span.Days, span.Hours);
+                return $"{span.Days}d{span.Hours}h";
             }
             else
             {
-                return String.Format("{0:0}w{1:0}d", Math.Floor(span.TotalDays / 7), Math.Floor(span.TotalDays) % 7);
+                return $"{Math.Floor(span.TotalDays / 7):0}w{Math.Floor(span.TotalDays) % 7:0}d";
             }
         }
 

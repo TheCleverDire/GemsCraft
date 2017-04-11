@@ -14,8 +14,11 @@
 //along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using RandomMaze;
 using fCraft.Events;
 
@@ -35,7 +38,7 @@ namespace fCraft
             CommandManager.RegisterCommand(CdThrow);
             CommandManager.RegisterCommand(CdInsult);
 
-            
+
             CommandManager.RegisterCommand(CdSetModel);
             CommandManager.RegisterCommand(CdBot);
             //Games moved to seperate Game Category
@@ -45,6 +48,7 @@ namespace fCraft
             Player.Moving += startDragon;
             Player.Moving += PlayerMoved;
         }
+        
 
         private static readonly CommandDescriptor CdStab = new CommandDescriptor
         {
@@ -94,7 +98,7 @@ namespace fCraft
             Category = CommandCategory.Chat | CommandCategory.Fun,
             Permissions = new[] { Permission.HighFive },
             IsConsoleSafe = false,
-            Usage = "/joke",
+            Usage = "/joke [Optional: Joke ID (28)]",
             Help = "Takes a random joke from a list.",
             NotRepeatable = true,
             Handler = JokeHandler,
@@ -103,7 +107,6 @@ namespace fCraft
         static void JokeHandler(Player player, Command cmd)
         {
             List<String> joke;
-            string name = cmd.Next();
             Random randomizer = new Random();
 
             joke = new List<String>()
@@ -135,21 +138,36 @@ namespace fCraft
                 "Darth Vadar leaves his toast in the toaster for a little longer. He likes it on the Dark Side",
                 "Why did the cow cross the raod? To get to the utter side!",
                 "I'm Sofa King Happy",
-                "The only right way to listen to Justin Beiber is turned completely down"
+                "The only right way to listen to Justin Beiber is turned completely down",
+                "&fMATH = &1M&fental &1A&fbuse &1T&fo &1H&fumans"
             };
 
             var index = randomizer.Next(0, joke.Count);
             var time = (DateTime.Now - player.Info.LastUsedJoke).TotalSeconds;
             var timeLeft = Math.Round(20 - time);
+            var usingExact = false;
+            try
+            {
+                var id = int.Parse(cmd.Next());
+                usingExact = true;
+                index = id;
+            }
+            catch (Exception ex)
+            {
+                // Ignored
+                player.Message(ex.ToString());
+            }
             if (time < 20)
             {
-                player.Message("You cannot use this command for another " + timeLeft + " second(s).");
+                if (!usingExact) player.Message("You cannot use this command for another " + timeLeft + " second(s).");
             }
             else
             {
                 Server.Message(joke[index]);
                 player.Info.LastUsedJoke = DateTime.Now;
             }
+
+
 
         }
         #region Dragon
@@ -303,11 +321,10 @@ namespace fCraft
                 player.World.Map.QueueUpdate(new BlockUpdate(null, vi, _blockType)); //Thanks to Jonty800. He provided this line
         }
         #endregion
-        public static string[] ValidEntities = 
+        public static string[] ValidEntities =
             {
                 "chicken",
                 "creeper",
-                "croc",
                 "humanoid",
                 "human",
                 "pig",
@@ -387,15 +404,15 @@ THE SOFTWARE.*/
                 { "remove", "&H/Bot remove <botname>\n&S" +
                                 "Removes the given bot." },
                 { "removeall", "&H/Bot removeAll\n&S" +
-                                "Removes all bots from the server."},  
+                                "Removes all bots from the server."},
                 { "model", "&H/Bot model <bot name> <model>\n&S" +
-                                "Changes the model of a bot to the given model. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, or zombie."},  
+                                "Changes the model of a bot to the given model. Valid models are chicken, creeper, croc, human, pig, printer, sheep, skeleton, spider, or zombie."},
                 { "clone", "&H/Bot clone <bot> <player>\n&S" +
-                                "Changes the skin of a bot to the skin of the given player. Leave the player parameter blank to reset the skin. Bot's model must be human. Use /bot changeModel to change the bot's model."},  
+                                "Changes the skin of a bot to the skin of the given player. Leave the player parameter blank to reset the skin. Bot's model must be human. Use /bot changeModel to change the bot's model."},
                 { "explode", "&H/Bot explode <bot>\n&S" +
-                                "Epically explodes a bot, removing it from the server."},  
+                                "Epically explodes a bot, removing it from the server."},
                 { "list", "&H/Bot list\n&S" +
-                                "Prints out a list of all the bots on the server."},             
+                                "Prints out a list of all the bots on the server."},
                 { "summon", "&H/Bot summon <botname>\n&S" +
                                 "Summons a bot from anywhere to your current position."},
                 { "move", "&H/Bot move <botname> <player>\n&S" +
@@ -427,7 +444,7 @@ THE SOFTWARE.*/
                     return;
                 case "removeall":
 
-                    rewipe:
+                rewipe:
                     Server.Bots.ForEach(botToRemove =>
                     {
                         botToRemove.removeBot();
@@ -441,80 +458,80 @@ THE SOFTWARE.*/
                     player.Message("All bots removed from the server.");
                     return;
                 case "move":
-                {
-                    var targetBot = cmd.Next();
-                    if (string.IsNullOrEmpty(targetBot))
                     {
-                        CdBot.PrintUsage(player);
-                        return;
-                    }
-                    var targetPlayer = cmd.Next();
-                    if (string.IsNullOrEmpty(targetPlayer))
-                    {
-                        CdBot.PrintUsage(player);
-                        return;
-                    }
+                        var targetBot = cmd.Next();
+                        if (string.IsNullOrEmpty(targetBot))
+                        {
+                            CdBot.PrintUsage(player);
+                            return;
+                        }
+                        var targetPlayer = cmd.Next();
+                        if (string.IsNullOrEmpty(targetPlayer))
+                        {
+                            CdBot.PrintUsage(player);
+                            return;
+                        }
 
-                    if (player.World == null) return;
-                    var targetB = player.World.FindBot(targetBot);
-                    var targetP = player.World.FindPlayerExact(targetPlayer);
+                        if (player.World == null) return;
+                        var targetB = player.World.FindBot(targetBot);
+                        var targetP = player.World.FindPlayerExact(targetPlayer);
 
-                    if (targetP == null)
-                    {
-                        player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetPlayer, player.World);
+                        if (targetP == null)
+                        {
+                            player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetPlayer, player.World);
+                            return;
+                        }
+                        if (targetB == null)
+                        {
+                            player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetBot, player.World);
+                            return;
+                        }
+
+                        player.Message("{0} is now moving!", targetB.Name);
+                        targetB.isMoving = true;
+                        targetB.NewPosition = targetP.Position;
+                        targetB.OldPosition = targetB.Position;
+                        targetB.timeCheck.Start();
                         return;
                     }
-                    if (targetB == null)
-                    {
-                        player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetBot, player.World);
-                        return;
-                    }
-
-                    player.Message("{0} is now moving!", targetB.Name);
-                    targetB.isMoving = true;
-                    targetB.NewPosition = targetP.Position;
-                    targetB.OldPosition = targetB.Position;
-                    targetB.timeCheck.Start();
-                    return;
-                }
                 case "follow":
-                {
-                    return; // not used for now
-
-                    var targetBot = cmd.Next();
-                    if (string.IsNullOrEmpty(targetBot))
                     {
-                        CdBot.PrintUsage(player);
+                        return; // not used for now
+
+                        var targetBot = cmd.Next();
+                        if (string.IsNullOrEmpty(targetBot))
+                        {
+                            CdBot.PrintUsage(player);
+                            return;
+                        }
+                        var targetPlayer = cmd.Next();
+                        if (string.IsNullOrEmpty(targetPlayer))
+                        {
+                            CdBot.PrintUsage(player);
+                            return;
+                        }
+
+                        var targetB = player.World.FindBot(targetBot);
+                        var targetP = player.World.FindPlayerExact(targetPlayer);
+
+                        if (targetP == null)
+                        {
+                            player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetPlayer, player.World);
+                            return;
+                        }
+                        if (targetB == null)
+                        {
+                            player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetBot, player.World);
+                            return;
+                        }
+
+                        player.Message("{0} is now following {1}!", targetB.Name, targetP.Name);
+                        targetB.isMoving = true;
+                        targetB.followTarget = targetP;
+                        targetB.OldPosition = targetB.Position;
+                        targetB.timeCheck.Start();
                         return;
                     }
-                    var targetPlayer = cmd.Next();
-                    if (string.IsNullOrEmpty(targetPlayer))
-                    {
-                        CdBot.PrintUsage(player);
-                        return;
-                    }
-
-                    var targetB = player.World.FindBot(targetBot);
-                    var targetP = player.World.FindPlayerExact(targetPlayer);
-
-                    if (targetP == null)
-                    {
-                        player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetPlayer, player.World);
-                        return;
-                    }
-                    if (targetB == null)
-                    {
-                        player.Message("Could not find {0} on {1}! Please make sure you spelled their name correctly.", targetBot, player.World);
-                        return;
-                    }
-
-                    player.Message("{0} is now following {1}!", targetB.Name, targetP.Name);
-                    targetB.isMoving = true;
-                    targetB.followTarget = targetP;
-                    targetB.OldPosition = targetB.Position;
-                    targetB.timeCheck.Start();
-                    return;
-                }
             }
 
             //finally away from the special cases
@@ -818,7 +835,7 @@ THE SOFTWARE.*/
             return;
         }
 
-     
+
 
         static readonly CommandDescriptor CdInsult = new CommandDescriptor
         {

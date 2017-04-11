@@ -1339,7 +1339,7 @@ namespace fCraft
             string textLine1 = ConfigKey.ServerName.GetString();
             string textLine2;
 
-            if (IsUsingWoM && ConfigKey.WoMEnableEnvExtensions.Enabled() && !Heartbeat.ClassiCube())
+            if (IsUsingWoM && ConfigKey.WoMEnableEnvExtensions.Enabled())
             {
                 if (IP.Equals(IPAddress.Loopback))
                 {
@@ -1350,7 +1350,7 @@ namespace fCraft
                     textLine2 = "cfg=" + Server.ExternalIp + ":" + Server.Port + "/" + newWorld.Name;
                 }
             }
-            else if (usesCPE && ConfigKey.WoMEnableEnvExtensions.Enabled() && Heartbeat.ClassiCube())
+            else if (usesCPE && ConfigKey.WoMEnableEnvExtensions.Enabled())
             {
                 if (!newWorld.Hax)
                 {
@@ -1564,7 +1564,7 @@ namespace fCraft
 
 
 
-            if (Heartbeat.ClassiCube() && usesCPE)
+            if (usesCPE)
             {
                 //update mapedit values
                 Packet sky = PacketWriter.MakeEnvSetColor((byte)0, World.SkyColorCC);
@@ -1725,7 +1725,7 @@ namespace fCraft
             {
                 throw new InvalidOperationException("KickNow may only be called from player's own thread.");
             }
-            Info.tempDisplayedName = null;
+            Info.tempDisplayedName = "Kick";
             State = SessionState.PendingDisconnect;
             LeaveReason = leaveReason;
 
@@ -1988,7 +1988,7 @@ namespace fCraft
                 var pos = new VisibleEntity(newPos, freePlayerIDs.Pop(), player.Info.Rank);
                 entities.Add(player, pos);
                 SendNow(PacketWriter.MakeAddEntity(entities[player].Id, player.Info.Rank.Color + player.Skinname, newPos));
-                if (usesCPE && Heartbeat.ClassiCube())
+                if (usesCPE)
                 {
                     SendNow(PacketWriter.MakeExtAddEntity((byte)entities[player].Id, player.ListName, player.Skinname));
                 }
@@ -2019,15 +2019,13 @@ namespace fCraft
             if (entity == null) throw new ArgumentNullException("entity");
             if (player == null) throw new ArgumentNullException("player");
             SendNow(PacketWriter.MakeRemoveEntity(entity.Id));
-            if (usesCPE && Heartbeat.ClassiCube())
+            if (usesCPE)
                 SendNow(PacketWriter.MakeExtRemovePlayerName((short)entity.Id));
-            if (usesCPE && Heartbeat.ClassiCube())
+            if (usesCPE)
             {
-                if (player.iName == null)
-                    SendNow(PacketWriter.MakeExtAddEntity((byte)entities[player].Id, player.Skinname, player.Name));
-                else
-                    SendNow(PacketWriter.MakeExtAddEntity((byte)entities[player].Id, player.Skinname, player.iName));
-               
+                SendNow(player.iName == null
+                    ? PacketWriter.MakeExtAddEntity((byte) entities[player].Id, player.Skinname, player.Name)
+                    : PacketWriter.MakeExtAddEntity((byte) entities[player].Id, player.Skinname, player.iName));
             }
             entity.LastKnownPosition = newPos;
         }

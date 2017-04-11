@@ -15,23 +15,7 @@ namespace fCraft
     /// <summary> Static class responsible for sending heartbeats. </summary>
     public static class Heartbeat
     {
-        static readonly Uri MinecraftNetUri;
         static readonly Uri ClassiCubeNetUri;
-
-        //if the server is classicube compatable
-        public static bool ClassiCube()
-        {
-            if (ConfigKey.HeartbeatUrl.GetString() == "ClassiCube.net")
-            {
-                return true;
-            }
-            {
-                return false;
-            }
-        }
-
-
-
         /// <summary> Delay between sending heartbeats. Default: 25s </summary>
         public static TimeSpan Delay { get; set; }
 
@@ -88,8 +72,6 @@ namespace fCraft
 
         static Heartbeat()
         {
-
-            MinecraftNetUri = new Uri("https://minecraft.net/heartbeat.jsp");
             ClassiCubeNetUri = new Uri("http://www.classicube.net/heartbeat.jsp");
             Delay = TimeSpan.FromSeconds(45);
             Timeout = TimeSpan.FromSeconds(10);
@@ -100,9 +82,9 @@ namespace fCraft
 
         static void OnServerShutdown(object sender, ShutdownEventArgs e)
         {
-            if (minecraftNetRequest != null)
+            if (_minecraftNetRequest != null)
             {
-                minecraftNetRequest.Abort();
+                _minecraftNetRequest.Abort();
             }
         }
 
@@ -119,10 +101,7 @@ namespace fCraft
 
             if (ConfigKey.HeartbeatEnabled.Enabled())
             {
-                if (ClassiCube())
-                    SendClassiCubeBeat();
-                else
-                    SendMinecraftNetBeat();
+                SendClassiCubeBeat();
 
 
                 HbSave();
@@ -131,7 +110,7 @@ namespace fCraft
             {
                 // If heartbeats are disabled, the server data is written
                 // to a text file instead (heartbeatdata.txt)
-                string[] data = new[]{
+                var data = new[]{
                     Salt,
                     Server.InternalIp.ToString(),
                     Server.Port.ToString(),
@@ -146,7 +125,7 @@ namespace fCraft
             }
         }
 
-        static HttpWebRequest minecraftNetRequest;
+        static HttpWebRequest _minecraftNetRequest;
 
         static void SendClassiCubeBeat()
         {
@@ -155,22 +134,11 @@ namespace fCraft
             {
                 return;
             }
-            minecraftNetRequest = CreateRequest(data.CreateUri(Salt2));
-            var state = new HeartbeatRequestState(minecraftNetRequest, data, true);
-            minecraftNetRequest.BeginGetResponse(ResponseCallback, state);
+            _minecraftNetRequest = CreateRequest(data.CreateUri(Salt2));
+            var state = new HeartbeatRequestState(_minecraftNetRequest, data, true);
+            _minecraftNetRequest.BeginGetResponse(ResponseCallback, state);
         }
-
-        static void SendMinecraftNetBeat()
-        {
-            HeartbeatData data = new HeartbeatData(MinecraftNetUri);
-            if (!RaiseHeartbeatSendingEvent(data, MinecraftNetUri, true))
-            {
-                return;
-            }
-            minecraftNetRequest = CreateRequest(data.CreateUri(Salt));
-            var state = new HeartbeatRequestState(minecraftNetRequest, data, true);
-            minecraftNetRequest.BeginGetResponse(ResponseCallback, state);
-        }
+        
 
         // Creates an asynchrnous HTTP request to the given URL
         static HttpWebRequest CreateRequest(Uri uri)

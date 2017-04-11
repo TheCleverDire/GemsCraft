@@ -29,6 +29,7 @@ namespace fCraft
     /// sessions, and global events and scheduled tasks. </summary>
     public static partial class Server
     {
+        public static Random ServerRandom = new Random();
 
         /// <summary> Time when the server started (UTC). Used to check uptime. </summary>
         public static DateTime StartTime { get; private set; }
@@ -1588,13 +1589,7 @@ namespace fCraft
 
         readonly string _customReasonString;
         [NotNull]
-        public string ReasonString
-        {
-            get
-            {
-                return _customReasonString ?? Reason.ToString();
-            }
-        }
+        public string ReasonString => _customReasonString ?? Reason.ToString();
 
         /// <summary> Delay before shutting down. </summary>
         public TimeSpan Delay { get; private set; }

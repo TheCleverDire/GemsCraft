@@ -134,7 +134,7 @@ namespace fCraft
             {
                 foreach (Player p in world_.Players)
                 {
-                    if (p.usesCPE && Heartbeat.ClassiCube())
+                    if (p.usesCPE)
                     {
                         p.Send(PacketWriter.MakeSpecialMessage((byte)100, "&f"));//super hacky way to remove announcement, simply send a color code and call it a day
                     }
@@ -299,14 +299,14 @@ namespace fCraft
         }
         public static void RevertGun()    //Reverts names for online players. Offline players get reverted upon leaving the game
         {
-            List<PlayerInfo> FFAPlayers = new List<PlayerInfo>(PlayerDB.PlayerInfoList.Where(r => (r.isPlayingFFA) && r.IsOnline).ToArray());
-            foreach (PlayerInfo pI in FFAPlayers)
+            var FFAPlayers = new List<PlayerInfo>(PlayerDB.PlayerInfoList.Where(r => (r.isPlayingFFA) && r.IsOnline).ToArray());
+            foreach (var pI in FFAPlayers)
             {               
-                Player p = pI.PlayerObject;
+                var p = pI.PlayerObject;
                 p.JoinWorld(p.World, WorldChangeReason.Rejoin);
 
                 //reset all special messages
-                if (p.usesCPE && Heartbeat.ClassiCube())
+                if (p.usesCPE)
                 {
                     p.Send(PacketWriter.MakeSpecialMessage((byte)100, "&f"));
                     p.Send(PacketWriter.MakeSpecialMessage((byte)1, "&f"));
@@ -314,55 +314,53 @@ namespace fCraft
                 }
 
                 pI.isPlayingFFA = false;
-                if (pI != null)
-                {                    
-                    //undo gunmode (taken from GunHandler.cs)
-                    p.GunMode = false;
-                    try
+                if (pI == null) continue;
+                //undo gunmode (taken from GunHandler.cs)
+                p.GunMode = false;
+                try
+                {
+                    foreach (Vector3I block in p.GunCache.Values)
                     {
-                        foreach (Vector3I block in p.GunCache.Values)
+                        p.Send(PacketWriter.MakeSetBlock(block.X, block.Y, block.Z, p.WorldMap.GetBlock(block)));
+                        Vector3I removed;
+                        p.GunCache.TryRemove(block.ToString(), out removed);
+                    }
+                    if (p.bluePortal.Count > 0)
+                    {
+                        int j = 0;
+                        foreach (Vector3I block in p.bluePortal)
                         {
-                            p.Send(PacketWriter.MakeSetBlock(block.X, block.Y, block.Z, p.WorldMap.GetBlock(block)));
-                            Vector3I removed;
-                            p.GunCache.TryRemove(block.ToString(), out removed);
-                        }
-                        if (p.bluePortal.Count > 0)
-                        {
-                            int j = 0;
-                            foreach (Vector3I block in p.bluePortal)
+                            if (p.WorldMap != null && p.World.IsLoaded)
                             {
-                                if (p.WorldMap != null && p.World.IsLoaded)
-                                {
-                                    p.WorldMap.QueueUpdate(new BlockUpdate(null, block, p.blueOld[j]));
-                                    j++;
-                                }
+                                p.WorldMap.QueueUpdate(new BlockUpdate(null, block, p.blueOld[j]));
+                                j++;
                             }
-                            p.blueOld.Clear();
-                            p.bluePortal.Clear();
                         }
-                        if (p.orangePortal.Count > 0)
+                        p.blueOld.Clear();
+                        p.bluePortal.Clear();
+                    }
+                    if (p.orangePortal.Count > 0)
+                    {
+                        int j = 0;
+                        foreach (Vector3I block in p.orangePortal)
                         {
-                            int j = 0;
-                            foreach (Vector3I block in p.orangePortal)
+                            if (p.WorldMap != null && p.World.IsLoaded)
                             {
-                                if (p.WorldMap != null && p.World.IsLoaded)
-                                {
-                                    p.WorldMap.QueueUpdate(new BlockUpdate(null, block, p.orangeOld[j]));
-                                    j++;
-                                }
+                                p.WorldMap.QueueUpdate(new BlockUpdate(null, block, p.orangeOld[j]));
+                                j++;
                             }
-                            p.orangeOld.Clear();
-                            p.orangePortal.Clear();
                         }
+                        p.orangeOld.Clear();
+                        p.orangePortal.Clear();
                     }
-                    catch (Exception ex)
-                    {
-                        Logger.Log(LogType.SeriousError, "" + ex);
-                    }
-                    if (p.IsOnline)
-                    {
-                        p.Message("Your status has been reverted.");
-                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Log(LogType.SeriousError, "" + ex);
+                }
+                if (p.IsOnline)
+                {
+                    p.Message("Your status has been reverted.");
                 }
             }
         }

@@ -25,7 +25,7 @@ namespace fCraft
         public string Name { get; internal set; }
 
         private GrassTask _plantTask = null;
-        private List<PhysScheduler> _physSchedulers = new List<PhysScheduler>();
+        private readonly List<PhysScheduler> _physSchedulers = new List<PhysScheduler>();
 
         /// <summary> Whether the world shows up on the /Worlds list.
         /// Can be assigned directly. </summary>

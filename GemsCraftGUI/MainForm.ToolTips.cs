@@ -252,7 +252,14 @@ at one time. If unchecked, there is no limit.";
             toolTip.SetToolTip(lDrawLimitUnits, tipDrawLimit);
 
 
-
+            vPermissions.Items[(int) Permission.PrisonAdd].ToolTipText =
+                @"Ability to throw people in prison";
+            vPermissions.Items[(int) Permission.PrisonBail].ToolTipText =
+                @"Ability to bail people out of prison";
+            vPermissions.Items[(int) Permission.PrisonCivilian].ToolTipText =
+                @"Ability to visit the prison as a civilian";
+            vPermissions.Items[(int) Permission.PrisonFree].ToolTipText =
+                @"Ability to free a person from prison";
 
             vPermissions.Items[(int)Permission.Ban].ToolTipText =
 @"Ability to ban/unban other players from the server.

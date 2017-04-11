@@ -328,11 +328,6 @@ THE SOFTWARE.*/
 
         static void MEditHandler(Player player, Command cmd)
         {
-            if (!Heartbeat.ClassiCube())
-            {
-                player.Message("/MapEdit only works for ClassiCube, not MineCraft! If you are playing on Minecraft.net, please use /Env.");
-                return;
-            }
             if (!ConfigKey.WoMEnableEnvExtensions.Enabled())
             {
                 player.Message("This command has been disabled for the server! Enable it in the ConfigGUI in the 'Worlds' tab!");
@@ -2159,38 +2154,26 @@ THE SOFTWARE.*/
                 {
                     if (!db.IsEnabled)
                     {
-                        if (db.EnabledState == YesNoAuto.Auto)
-                        {
-                            player.Message("BlockDB is disabled (auto) on world {0}", world.ClassyName);
-                        }
-                        else
-                        {
-                            player.Message("BlockDB is disabled on world {0}", world.ClassyName);
-                        }
+                        player.Message(
+                            db.EnabledState == YesNoAuto.Auto
+                                ? "BlockDB is disabled (auto) on world {0}"
+                                : "BlockDB is disabled on world {0}", world.ClassyName);
                     }
                     else
                     {
                         if (db.IsPreloaded)
                         {
-                            if (db.EnabledState == YesNoAuto.Auto)
-                            {
-                                player.Message("BlockDB is enabled (auto) and preloaded on world {0}", world.ClassyName);
-                            }
-                            else
-                            {
-                                player.Message("BlockDB is enabled and preloaded on world {0}", world.ClassyName);
-                            }
+                            player.Message(
+                                db.EnabledState == YesNoAuto.Auto
+                                    ? "BlockDB is enabled (auto) and preloaded on world {0}"
+                                    : "BlockDB is enabled and preloaded on world {0}", world.ClassyName);
                         }
                         else
                         {
-                            if (db.EnabledState == YesNoAuto.Auto)
-                            {
-                                player.Message("BlockDB is enabled (auto) on world {0}", world.ClassyName);
-                            }
-                            else
-                            {
-                                player.Message("BlockDB is enabled on world {0}", world.ClassyName);
-                            }
+                            player.Message(
+                                db.EnabledState == YesNoAuto.Auto
+                                    ? "BlockDB is enabled (auto) on world {0}"
+                                    : "BlockDB is enabled on world {0}", world.ClassyName);
                         }
                         player.Message("    Change limit: {0}    Time limit: {1}",
                                         db.Limit == 0 ? "none" : db.Limit.ToString(),
@@ -2264,16 +2247,11 @@ THE SOFTWARE.*/
                         {
                             db.EnabledState = YesNoAuto.Auto;
                             WorldManager.SaveWorldList();
-                            if (db.IsEnabled)
-                            {
-                                player.Message("BlockDB is now auto-enabled on world {0}",
-                                                world.ClassyName);
-                            }
-                            else
-                            {
-                                player.Message("BlockDB is now auto-disabled on world {0}",
-                                                world.ClassyName);
-                            }
+                            player.Message(
+                                db.IsEnabled
+                                    ? "BlockDB is now auto-enabled on world {0}"
+                                    : "BlockDB is now auto-disabled on world {0}",
+                                world.ClassyName);
                         }
                         break;
 
@@ -2729,11 +2707,6 @@ THE SOFTWARE.*/
 
         static void EnvHandler(Player player, Command cmd)
         {
-            if (Heartbeat.ClassiCube() || player.usesCPE)
-            {
-                player.Message("/Env is a Minecraft.net only command.");//add reference /mapedit here once it works.
-                return;
-            }
             if (!ConfigKey.WoMEnableEnvExtensions.Enabled())
             {
                 player.Message("Env command is disabled on this server.");
@@ -3054,14 +3027,9 @@ THE SOFTWARE.*/
             WorldManager.SaveWorldList();
             if (player.World == world)
             {
-                if (player.IsUsingWoM)
-                {
-                    player.Message("Rejoin the world to see the changes.");
-                }
-                else
-                {
-                    player.Message("You need WoM client to see the changes.");
-                }
+                player.Message(player.IsUsingWoM
+                    ? "Rejoin the world to see the changes."
+                    : "You need WoM client to see the changes.");
             }
         }
 
@@ -3683,13 +3651,11 @@ THE SOFTWARE.*/
                 {
                     int locked = 0;
                     World[] worldListCache = WorldManager.Worlds;
-                    for (int i = 0; i < worldListCache.Length; i++)
+                    foreach (var t in worldListCache)
                     {
-                        if (!worldListCache[i].IsLocked)
-                        {
-                            worldListCache[i].Lock(player);
-                            locked++;
-                        }
+                        if (t.IsLocked) continue;
+                        t.Lock(player);
+                        locked++;
                     }
                     player.Message("Unlocked {0} worlds.", locked);
                     return;
@@ -3746,11 +3712,11 @@ THE SOFTWARE.*/
                 {
                     World[] worldListCache = WorldManager.Worlds;
                     int unlocked = 0;
-                    for (int i = 0; i < worldListCache.Length; i++)
+                    foreach (World t in worldListCache)
                     {
-                        if (worldListCache[i].IsLocked)
+                        if (t.IsLocked)
                         {
-                            worldListCache[i].Unlock(player);
+                            t.Unlock(player);
                             unlocked++;
                         }
                     }
@@ -3884,7 +3850,7 @@ THE SOFTWARE.*/
                             player.MessageNoRank(rankName);
                             return;
                         }
-                        listName = String.Format("worlds where {0}&S+ can build", rank.ClassyName);
+                        listName = $"worlds where {rank.ClassyName}&S+ can build";
                         extraParam = "@" + rank.Name + " ";
                         worlds = WorldManager.Worlds.Where(w => (w.BuildSecurity.MinRank <= rank) && player.CanSee(w))
                                                     .ToArray();
@@ -3960,14 +3926,9 @@ THE SOFTWARE.*/
             // Print information about the current world
             if (worldName == null)
             {
-                if (player.World == null)
-                {
-                    player.Message("When calling /WAccess from console, you must specify a world name.");
-                }
-                else
-                {
-                    player.Message(player.World.AccessSecurity.GetDescription(player.World, "world", "accessed"));
-                }
+                player.Message(player.World == null
+                    ? "When calling /WAccess from console, you must specify a world name."
+                    : player.World.AccessSecurity.GetDescription(player.World, "world", "accessed"));
                 return;
             }
 
@@ -4037,23 +3998,17 @@ THE SOFTWARE.*/
                             {
                                 player.Message("{0}&S is no longer barred from accessing {1}",
                                                 info.ClassyName, world.ClassyName);
-                                if (target != null)
-                                {
-                                    target.Message("You can now access world {0}&S (removed from blacklist by {1}&S).",
-                                                    world.ClassyName, player.ClassyName);
-                                }
+                                target?.Message("You can now access world {0}&S (removed from blacklist by {1}&S).",
+                                    world.ClassyName, player.ClassyName);
                             }
                             else
                             {
                                 player.Message("{0}&S was removed from the access blacklist of {1}&S. " +
                                                 "Player is still NOT allowed to join (by rank).",
                                                 info.ClassyName, world.ClassyName);
-                                if (target != null)
-                                {
-                                    target.Message("You were removed from the access blacklist of world {0}&S by {1}&S. " +
-                                                    "You are still NOT allowed to join (by rank).",
-                                                    world.ClassyName, player.ClassyName);
-                                }
+                                target?.Message("You were removed from the access blacklist of world {0}&S by {1}&S. " +
+                                                "You are still NOT allowed to join (by rank).",
+                                    world.ClassyName, player.ClassyName);
                             }
                             Logger.Log(LogType.UserActivity,
                                         "{0} removed {1} from the access blacklist of {2}",
@@ -4064,11 +4019,8 @@ THE SOFTWARE.*/
                         case PermissionOverride.None:
                             player.Message("{0}&S is now allowed to access {1}",
                                             info.ClassyName, world.ClassyName);
-                            if (target != null)
-                            {
-                                target.Message("You can now access world {0}&S (whitelisted by {1}&S).",
-                                                world.ClassyName, player.ClassyName);
-                            }
+                            target?.Message("You can now access world {0}&S (whitelisted by {1}&S).",
+                                world.ClassyName, player.ClassyName);
                             Logger.Log(LogType.UserActivity,
                                         "{0} added {1} to the access whitelist on world {2}",
                                         player.Name, info.Name, world.Name);
@@ -4114,11 +4066,8 @@ THE SOFTWARE.*/
                         case PermissionOverride.None:
                             player.Message("{0}&S is now barred from accessing {1}",
                                             info.ClassyName, world.ClassyName);
-                            if (target != null)
-                            {
-                                target.Message("&WYou were barred by {0}&W from accessing world {1}",
-                                                player.ClassyName, world.ClassyName);
-                            }
+                            target?.Message("&WYou were barred by {0}&W from accessing world {1}",
+                                player.ClassyName, world.ClassyName);
                             Logger.Log(LogType.UserActivity,
                                         "{0} added {1} to the access blacklist on world {2}",
                                         player.Name, info.Name, world.Name);
@@ -4131,12 +4080,9 @@ THE SOFTWARE.*/
                                 player.Message("{0}&S is no longer on the access whitelist of {1}&S. " +
                                                 "Player is still allowed to join (by rank).",
                                                 info.ClassyName, world.ClassyName);
-                                if (target != null)
-                                {
-                                    target.Message("You were removed from the access whitelist of world {0}&S by {1}&S. " +
-                                                    "You are still allowed to join (by rank).",
-                                                    world.ClassyName, player.ClassyName);
-                                }
+                                target?.Message("You were removed from the access whitelist of world {0}&S by {1}&S. " +
+                                                "You are still allowed to join (by rank).",
+                                    world.ClassyName, player.ClassyName);
                             }
                             else
                             {

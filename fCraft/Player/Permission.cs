@@ -237,6 +237,28 @@ namespace fCraft {
         /// <summary> Permission to create a server-wide silence, muting all players, and to voice players while the moderation is in affect. </summary>
         Moderation,
 
+        /// <summary>
+        /// Ability to throw people in prison
+        /// </summary>
+        PrisonAdd,
+        /// <summary>
+        /// Ability to free people from prison
+        /// </summary>
+        PrisonFree,
+        /// <summary>
+        /// Ability to visit people in prison
+        /// </summary>
+        PrisonCivilian,
+        /// <summary>
+        /// Ability to bail people out of prison
+        /// </summary>
+        PrisonBail,
+
+        /// <summary>
+        /// Permission to access the prison logs
+        /// </summary>
+        PrisonLogs,
+
         /// <summary> Allows a player to become immortal, immune to all damage. </summary>
         Immortal,
         

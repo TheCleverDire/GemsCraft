@@ -22,10 +22,11 @@ using GemsCraftGUI.Properties;
 using GemsCraftGUI.ServerGUI;
 using JetBrains.Annotations;
 using Color = System.Drawing.Color;
+using MetroFramework.Forms;
 
 namespace GemsCraftGUI
 {
-    public sealed partial class MainForm : Form
+    public sealed partial class MainForm : MetroForm
     {
         static MainForm _instance;
         readonly Font _bold;
@@ -45,7 +46,7 @@ namespace GemsCraftGUI
             dgvcBlockDB.IndeterminateValue = YesNoAuto.Auto;
             _bold = new Font(Font, FontStyle.Bold);
             Shown += Init;
-            Text = "GemsCraft Configuration " + Updater.LatestStable;
+            Text = "GemsCraft " + Updater.LatestStable;
         }
 
        
@@ -85,10 +86,10 @@ namespace GemsCraftGUI
             // This ensured that changes to rank colors/prefixes are applied.
             tabChat.Enter += (o, e2) => UpdateChatPreview();
 
-            if (HeartBeatUrlComboBox.SelectedItem == null)
+            /*if (HeartBeatUrlComboBox.SelectedItem == null)
             {
                 HeartBeatUrlComboBox.Text = "ClassiCube.net";
-            }
+            }*/
         }
 
 
@@ -115,6 +116,12 @@ namespace GemsCraftGUI
             foreach (var world in Worlds)
             {
                 cMainWorld.Items.Add(world.Name);
+            }
+
+            cboPrison.Items.Clear();
+            foreach (var world in Worlds)
+            {
+                cboPrison.Items.Add(world.Name);
             }
         }
 
@@ -1719,7 +1726,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         public static string ToComboBoxOption(Rank rank)
         {
-            return UsePrefixes ? string.Format("{0,1}{1}", rank.Prefix, rank.Name) : rank.Name;
+            return UsePrefixes ? $"{rank.Prefix,1}{rank.Name}" : rank.Name;
         }
 
         private void xRankPrefixesInChat_CheckedChanged(object sender, EventArgs e)
@@ -1918,6 +1925,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             playerList.MouseDoubleClick += playerList_MouseDoubleClick;
             StartEnable();
             LoadCustomThemes();
+            PrisonData.Init();
         }
 
         void StartEnable()
@@ -2757,9 +2765,18 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             }
         }
 
-        private void tabRanks_Click(object sender, EventArgs e)
+        private void mcbPrison_CheckedChanged(object sender, EventArgs e)
         {
-
+            cboPrison.Enabled = mcbPrison.Checked;
+            //cboPrison.SelectedIndex = 0;
+        }
+        
+        private void metroButton1_Click(object sender, EventArgs e)
+        {
+            for (var x = 0; x <= vPermissions.Items.Count - 1; x++)
+            {
+                vPermissions.Items[x].Checked = true;
+            }
         }
 
         private void chStatus1_CheckedChanged(object sender, EventArgs e)

@@ -32,6 +32,8 @@ namespace fCraft
     /// For persistent state of a known player account, see PlayerInfo. </summary>
     public sealed partial class Player : IClassy
     {
+        public bool IsPrisoner;
+        public DateTime PrisonEnter;
 
         /// <summary> The godly pseudo-player for commands called from the server console.
         /// Console has all the permissions granted.
@@ -43,6 +45,7 @@ namespace fCraft
 
         #region Properties
 
+        
         public readonly bool IsSuper;
 
         /// <summary>
@@ -61,13 +64,7 @@ namespace fCraft
         public bool HasFullyConnected { get; private set; }
 
         /// <summary> Whether the client is currently connected. </summary>
-        public bool IsOnline
-        {
-            get
-            {
-                return State == SessionState.Online;
-            }
-        }
+        public bool IsOnline => State == SessionState.Online;
 
         /// <summary> Whether the player name was verified at login. </summary>
         public bool IsVerified { get; private set; }
@@ -133,10 +130,7 @@ namespace fCraft
 
         /// <summary> Plain version of the name (no formatting). </summary>      
         [NotNull]
-        public string Name
-        {
-            get { return Info.Name; }
-        }
+        public string Name => Info.Name;
 
         /// <summary>
         /// The name used when the server extracts the skin for a player
@@ -190,10 +184,7 @@ namespace fCraft
 
         /// <summary> Name formatted for display in chat. </summary>
         [NotNull]
-        public string ClassyName
-        {
-            get { return Info.ClassyName; }
-        }
+        public string ClassyName => Info.ClassyName;
 
         /// <summary> Whether the client supports advanced WoM client functionality. </summary>
         public bool IsUsingWoM { get; private set; }
@@ -253,7 +244,7 @@ namespace fCraft
 
         //general purpose state storage for plugins
         private readonly ConcurrentDictionary<string, object> _publicAuxStateObjects = new ConcurrentDictionary<string, object>();
-        public IDictionary<string, object> PublicAuxStateObjects { get { return _publicAuxStateObjects; } }
+        public IDictionary<string, object> PublicAuxStateObjects => _publicAuxStateObjects;
 
         //Portals
         public bool StandingInPortal = false;
@@ -392,11 +383,11 @@ namespace fCraft
             string kickReason;
             if (reason.Length > 0)
             {
-                kickReason = String.Format("Got blasted out of the server with the BASSCANNON executed by {0}: {1}", player.Name, reason);
+                kickReason = $"Got blasted out of the server with the BASSCANNON executed by {player.Name}: {reason}";
             }
             else
             {
-                kickReason = String.Format("Got blasted out of the server with the BASSCANNON executed by {0}", player.Name);
+                kickReason = $"Got blasted out of the server with the BASSCANNON executed by {player.Name}";
             }
             Kick(kickReason, context);
 
@@ -1654,7 +1645,7 @@ namespace fCraft
                     Zone deniedZone = WorldMap.Zones.FindDenied(coord, this);
                     if (deniedZone != null)
                     {
-                        Message(deniedZone.Message ?? string.Format("&WYou are not allowed to build in zone \"{0}\".", deniedZone.Name));
+                        Message(deniedZone.Message ?? $"&WYou are not allowed to build in zone \"{deniedZone.Name}\".");
                     }
                     else
                     {
@@ -1673,6 +1664,14 @@ namespace fCraft
             return false;
         }
 
+        public bool PlaceBlock(int x, int y, int z, Block bl)
+        {
+            return PlaceBlock(
+                new Vector3I(x, y, z),
+                ClickAction.Build,
+                bl);
+        }
+        
 
         /// <summary>  Gets the block from given location in player's world,
         /// and sends it (async) to the player.
@@ -2354,13 +2353,7 @@ namespace fCraft
 
 
         /// <summary> Time since the player was last active (moved, talked, or clicked). </summary>
-        public TimeSpan IdleTime
-        {
-            get
-            {
-                return DateTime.UtcNow.Subtract(LastActiveTime);
-            }
-        }
+        public TimeSpan IdleTime => DateTime.UtcNow.Subtract(LastActiveTime);
 
 
         /// <summary> Resets the IdleTimer to 0. </summary>
@@ -2476,14 +2469,7 @@ namespace fCraft
         /// <summary> Name formatted for the debugger. </summary>
         public override string ToString()
         {
-            if (Info != null)
-            {
-                return String.Format("Player({0})", Info.Name);
-            }
-            else
-            {
-                return String.Format("Player({0})", IP);
-            }
+            return Info != null ? $"Player({Info.Name})" : $"Player({IP})";
         }
     }
 

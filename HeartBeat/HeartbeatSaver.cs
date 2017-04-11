@@ -17,7 +17,7 @@ namespace fCraft.HeartbeatSaver
 
         const int ProtocolVersion = 7;
         static Uri MinecraftNetUri;
-        static readonly Uri MCUri = new Uri("https://minecraft.net/heartbeat.jsp");
+        static readonly Uri MCUri = new Uri("https://ClassiCube.net/heartbeat.jsp");
         static readonly Uri ClassicubeURI = new Uri("http://classicube.net/heartbeat.jsp");
         static String clientName;
         static readonly TimeSpan Delay = TimeSpan.FromSeconds(10),
@@ -56,16 +56,8 @@ namespace fCraft.HeartbeatSaver
         static int Main(string[] args)
         {
             Config.Load(true, false);
-            if (Heartbeat.ClassiCube())
-            {
-                MinecraftNetUri = ClassicubeURI;
-                clientName = "ClassiCube";
-            }
-            else
-            {
-                MinecraftNetUri = MCUri;
-                clientName = "Minecraft";
-            }
+            MinecraftNetUri = ClassicubeURI;
+            clientName = "ClassiCube";
             if (args.Length == 0)
             {
                 heartbeatDataFileName = DefaultDataFileName;
@@ -141,7 +133,7 @@ namespace fCraft.HeartbeatSaver
         }
 
 
-        // Sends a heartbeat to Minecraft.net, and saves response. Runs in its own background thread.
+        // Sends a heartbeat to ClassiCube.net, and saves response. Runs in its own background thread.
         static void BeatThreadMinecraftNet()
         {
             UriBuilder ub = new UriBuilder(MinecraftNetUri);

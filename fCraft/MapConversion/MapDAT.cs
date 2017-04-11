@@ -15,44 +15,22 @@ namespace fCraft.MapConversion
 
         static MapDat()
         {
-            if (!Heartbeat.ClassiCube()) //if using mc.net
-            {
-                Mapping[50] = (byte)Block.Air;      // torch
-                Mapping[51] = (byte)Block.Lava;     // fire
-                Mapping[52] = (byte)Block.Glass;    // spawner
-                Mapping[53] = (byte)Block.Stair;    // wood stairs
-                Mapping[54] = (byte)Block.Wood;     // chest
-                Mapping[55] = (byte)Block.Air;      // redstone wire
-                Mapping[56] = (byte)Block.IronOre;  // diamond ore
-                Mapping[57] = (byte)Block.Aqua;     // diamond block
-                Mapping[58] = (byte)Block.Log;      // workbench
-                Mapping[59] = (byte)Block.Leaves;   // crops
-                Mapping[60] = (byte)Block.Dirt;     // soil
-                Mapping[61] = (byte)Block.Stone;    // furnace
-                Mapping[62] = (byte)Block.Stone;    // burning furnance
-                Mapping[63] = (byte)Block.Air;      // sign post
-                Mapping[64] = (byte)Block.Air;      // wooden door
-                Mapping[65] = (byte)Block.Air;      // ladder
-            }
-            else     //classicube
-            {
-                Mapping[50] = (byte)Block.CobbleSlab;   // torch
-                Mapping[51] = (byte)Block.Rope;         // fire
-                Mapping[52] = (byte)Block.Sandstone;    // spawner
-                Mapping[53] = (byte)Block.Snow;         // wood stairs
-                Mapping[54] = (byte)Block.Fire;         // chest
-                Mapping[55] = (byte)Block.LightPink;    // redstone wire
-                Mapping[56] = (byte)Block.DarkGreen;    // diamond ore
-                Mapping[57] = (byte)Block.Brown;        // diamond block
-                Mapping[58] = (byte)Block.DarkBlue;     // workbench
-                Mapping[59] = (byte)Block.Turquoise;    // crops
-                Mapping[60] = (byte)Block.Ice;          // soil
-                Mapping[61] = (byte)Block.Tile;         // furnace
-                Mapping[62] = (byte)Block.Magma;        // burning furnance
-                Mapping[63] = (byte)Block.Pillar;       // sign post
-                Mapping[64] = (byte)Block.Crate;        // wooden door
-                Mapping[65] = (byte)Block.StoneBrick;   // ladder
-            }
+            Mapping[50] = (byte)Block.Air;      // torch
+            Mapping[51] = (byte)Block.Lava;     // fire
+            Mapping[52] = (byte)Block.Glass;    // spawner
+            Mapping[53] = (byte)Block.Stair;    // wood stairs
+            Mapping[54] = (byte)Block.Wood;     // chest
+            Mapping[55] = (byte)Block.Air;      // redstone wire
+            Mapping[56] = (byte)Block.IronOre;  // diamond ore
+            Mapping[57] = (byte)Block.Aqua;     // diamond block
+            Mapping[58] = (byte)Block.Log;      // workbench
+            Mapping[59] = (byte)Block.Leaves;   // crops
+            Mapping[60] = (byte)Block.Dirt;     // soil
+            Mapping[61] = (byte)Block.Stone;    // furnace
+            Mapping[62] = (byte)Block.Stone;    // burning furnance
+            Mapping[63] = (byte)Block.Air;      // sign post
+            Mapping[64] = (byte)Block.Air;      // wooden door
+            Mapping[65] = (byte)Block.Air;      // ladder
             Mapping[66] = (byte)Block.Air;      // rails
             Mapping[67] = (byte)Block.Stair;    // cobblestone stairs
             Mapping[68] = (byte)Block.Air;      // wall sign
@@ -83,25 +61,16 @@ namespace fCraft.MapConversion
         }
 
 
-        public string ServerName
-        {
-            get { return "Creative/Vanilla"; }
-        }
+        public string ServerName => "Creative/Vanilla";
 
 
-        public MapStorageType StorageType
-        {
-            get { return MapStorageType.SingleFile; }
-        }
+        public MapStorageType StorageType => MapStorageType.SingleFile;
 
 
-        public MapFormat Format
-        {
-            get { return MapFormat.Creative; }
-        }
+        public MapFormat Format => MapFormat.Creative;
 
 
-        public bool ClaimsName([NotNull] string fileName)
+        public bool ClaimsName(string fileName)
         {
             if (fileName == null) throw new ArgumentNullException("fileName");
             return fileName.EndsWith(".dat", StringComparison.OrdinalIgnoreCase) ||
@@ -109,7 +78,7 @@ namespace fCraft.MapConversion
         }
 
 
-        public bool Claims([NotNull] string fileName)
+        public bool Claims(string fileName)
         {
             if (fileName == null) throw new ArgumentNullException("fileName");
             try
@@ -144,7 +113,7 @@ namespace fCraft.MapConversion
         }
 
 
-        public Map LoadHeader([NotNull] string fileName)
+        public Map LoadHeader(string fileName)
         {
             if (fileName == null) throw new ArgumentNullException("fileName");
             Map map = Load(fileName);
@@ -295,7 +264,7 @@ namespace fCraft.MapConversion
         }
 
 
-        public bool Save([NotNull] Map mapToSave, [NotNull] string fileName)
+        public bool Save(Map mapToSave, [NotNull] string fileName)
         {
             if (mapToSave == null) throw new ArgumentNullException("mapToSave");
             if (fileName == null) throw new ArgumentNullException("fileName");

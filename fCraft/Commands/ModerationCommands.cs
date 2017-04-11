@@ -3,16 +3,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.IO;
 using fCraft.Events;
 using JetBrains.Annotations;
 
+// ReSharper disable once CheckNamespace
 namespace fCraft {
     /// <summary>
     /// Most commands for server moderation - kick, ban, rank change, etc - are here.
     /// </summary>
-    static class ModerationCommands {
-        const string BanCommonHelp = "Ban information can be viewed with &H/BanInfo";
+    internal static class ModerationCommands {
+        private const string BanCommonHelp = "Ban information can be viewed with &H/BanInfo";
 
         internal static void Init() {
             CdBan.Help += BanCommonHelp;
@@ -88,7 +88,70 @@ namespace fCraft {
             //CommandManager.RegisterCommand(CdTPA);
             CommandManager.RegisterCommand(CdNuke);
 
+            #region PrisonCommands
+
+            CommandManager.RegisterCommand(CdArrest);
+            //CommandManager.RegisterCommand(CdFree);
+            //CommandManager.RegisterCommand(CdSetPrisonEnd);
+
+            #endregion
         }
+
+        #region PrisonCommands
+
+        private static readonly CommandDescriptor CdArrest = new CommandDescriptor
+        {
+            Name = "Arrest",
+            Aliases = new[] {"prison", "popo", "police", "law"},
+            IsConsoleSafe = true,
+            Category = CommandCategory.Moderation,
+            Permissions = new[] {Permission.Demote, Permission.PrisonAdd},
+            Help = "Arrests a player and sends them to prison",
+            Usage = "/Arrest Player Length Reason",
+            Handler = ArrestHandler
+        };
+
+        private static void ArrestHandler(Player source, Command cmd)
+        {
+            try
+            {
+                var arg1 = cmd.Next();
+                var arg2 = cmd.Next();
+                var arg3 = cmd.Next() ?? "No specified reason";
+                var p = Server.FindPlayerOrPrintMatches(source, arg1, true, true);
+                if (p == null) return;
+                if (p.Info.Rank.Index <= source.Info.Rank.Index)
+                {
+                    source.Message("You cannot send someone to prison of same or higher rank.");
+                }
+                else
+                {
+                    var maxDuration = TimeSpan.FromDays(1095);
+                    if (!arg2.TryParseMiniTimespan(out var duration) || duration <= TimeSpan.Zero)
+                    {
+                        CdArrest.PrintUsage(source);
+                        return;
+                    }
+
+                    if (duration > maxDuration)
+                    {
+                        source.Message("Maximum duration is {0}.", maxDuration.ToMiniString());
+                        duration = maxDuration;
+                    }
+                    Prison.AddPlayer(p, arg3, source, DateTime.Now.Add(duration));
+                }
+            }
+            catch (ArgumentNullException ex)
+            {
+                CdArrest.PrintUsage(source);
+            }
+            catch (Exception ex)
+            {
+                source.Message("SORRY" + ex);
+            }
+        }
+
+        #endregion
         static readonly CommandDescriptor CdNuke = new CommandDescriptor
         {
             Name = "Nuke",
@@ -119,8 +182,7 @@ namespace fCraft {
                 var targetPlayerStr = cmd.Next();
                 if (targetPlayerStr == null) return;
                 var findPlayerInfoExact = PlayerDB.FindPlayerInfoExact(targetPlayerStr);
-                if (findPlayerInfoExact == null) return;
-                var selectedPlayer = findPlayerInfoExact.PlayerObject;
+                var selectedPlayer = findPlayerInfoExact?.PlayerObject;
                 if (selectedPlayer == null) return;
                 var pInfo = selectedPlayer.Info;
                 pInfo.DisplayedName = NukedName(); // Returns a random nuked name
@@ -221,9 +283,9 @@ THE SOFTWARE.*/
 
         private static void FHHandler(Player player, Command cmd)
         {
-            if (!Heartbeat.ClassiCube() || !player.usesCPE)
+            if (!player.usesCPE)
             {
-                player.Message("This is a ClassiCube only command!");
+                player.Message("This is a CPE only command");
                 return;
             }
             string target = cmd.Next();
@@ -268,23 +330,24 @@ THE SOFTWARE.*/
 
 
         }
-        static World resetWorld;
-        static readonly CommandDescriptor CdAnnounce = new CommandDescriptor //todo: make this work lol
+        static World _resetWorld;
+
+        private static readonly CommandDescriptor CdAnnounce = new CommandDescriptor 
         {
             Name = "Announce",
             IsConsoleSafe = true,
             Category = CommandCategory.Moderation,
             Permissions = new[] { Permission.Say },
-            Help = "&SAnnounces a message at the top of every player's screen on a specified world. To send a server-wide announcement, use /Announce all [message]. If duration is blank, announcement will last for 7 seconds.",
-            Usage = "&S/Announce [world] [message] [duration]",
+            Help = "&SAnnounces a message at the top of every player's screen on a specified world. To send a server-wide announcement, use /Announce all [message].",
+            Usage = "&S/Announce [world] [message] [duration (seconds, default: 7)]",
             Handler = AnnounceHandler
         };
 
         public static void AnnounceHandler(Player player, Command cmd)
         {
-            if (!Heartbeat.ClassiCube() || !player.usesCPE)
+            if (!player.usesCPE)
             {
-                player.Message("This is a ClassiCube only command!");
+                player.Message("This is a CPE only command!");
                 return;
             }
 
@@ -344,7 +407,7 @@ THE SOFTWARE.*/
 
             Task.Stop();
 
-            resetWorld = player.World;
+            _resetWorld = player.World;
             Task = Scheduler.NewTask(resetAnnouncement);
             Task.RunOnce(TimeSpan.FromSeconds(reset));
 
@@ -353,7 +416,7 @@ THE SOFTWARE.*/
         //reset announcements
         static void resetAnnouncement(SchedulerTask task)
         {
-            foreach (Player p in resetWorld.Players)
+            foreach (Player p in _resetWorld.Players)
             {
                 p.Send(PacketWriter.MakeSpecialMessage(100, "&f"));
             }
@@ -482,11 +545,6 @@ THE SOFTWARE.*/
             if (!ConfigKey.ClickDistanceEnabled.Enabled())
             {
                 player.Message("&eClickDistance &cis not enabled on this server.");
-            }
-            if (!Heartbeat.ClassiCube())
-            {
-                player.Message("This command can only be used on ClassiCube server!");
-                return;
             }
             var targetName = cmd.Next();
             if (string.IsNullOrEmpty(targetName))
@@ -889,7 +947,7 @@ THE SOFTWARE.*/
             {
                 Player targetPlayer = target.PlayerObject;
                 target.Ban(player, reason, true, true);
-                WarnIfOtherPlayersOnIP(player, target, targetPlayer);
+                WarnIfOtherPlayersOnIp(player, target, targetPlayer);
             }
             catch (PlayerOpException ex)
             {
@@ -1375,11 +1433,11 @@ THE SOFTWARE.*/
                 player.Message("&WYou can use /Punch again in " + Math.Round(10 - time) + " seconds.");
                 return;
             }
-            string aMessage;
             if (player.Can(Permission.Slap, target.Info.Rank))
             {
                 Position slap = new Position(target.Position.X, target.Position.Y, (target.World.Map.Bounds.ZMax) * 32);
                 target.TeleportTo(slap);
+                string aMessage;
                 if (string.IsNullOrEmpty(item))
                 {
                     Server.Players.CanSee(target).Union(target).Message("{0} &Swas &aPunched &Sin the &cFace &Sby {1}", target.ClassyName, player.ClassyName);
@@ -1388,13 +1446,13 @@ THE SOFTWARE.*/
                     return;
                 }
                 else if (item.ToLower() == "groin")
-                    aMessage = String.Format("{0} &Swas &aPunched &Sin the &cGroin &Sby {1}", target.ClassyName, player.ClassyName);
+                    aMessage = $"{target.ClassyName} &Swas &aPunched &Sin the &cGroin &Sby {player.ClassyName}";
                 else if (item.ToLower() == "stomach")
-                    aMessage = String.Format("{0} &Swas &aPunched &Sin the &cStomach &Sby {1}", target.ClassyName, player.ClassyName);
+                    aMessage = $"{target.ClassyName} &Swas &aPunched &Sin the &cStomach &Sby {player.ClassyName}";
                 else if (item.ToLower() == "tits")
-                    aMessage = String.Format("{0} &Swas &aPunched &Sright in the &cTits &Sby {1}", target.ClassyName, player.ClassyName);
+                    aMessage = $"{target.ClassyName} &Swas &aPunched &Sright in the &cTits &Sby {player.ClassyName}";
                 else if (item.ToLower() == "knockout")
-                    aMessage = String.Format("{0} &Swas &cKnocked Out &Sby {1}", target.ClassyName, player.ClassyName);
+                    aMessage = $"{target.ClassyName} &Swas &cKnocked Out &Sby {player.ClassyName}";
                 else
                 {
                     Server.Players.CanSee(target).Union(target).Message("{0} &Swas &aPunched &Sin the &cFace &Sby {1}", target.ClassyName, player.ClassyName);
@@ -2170,7 +2228,7 @@ THE SOFTWARE.*/
             try {
                 Player targetPlayer = target.PlayerObject;
                 target.Ban( player, reason, true, true );
-                WarnIfOtherPlayersOnIP( player, target, targetPlayer );
+                WarnIfOtherPlayersOnIp( player, target, targetPlayer );
             } catch( PlayerOpException ex ) {
                 player.Message( ex.MessageColored );
                 if( ex.ErrorCode == PlayerOpExceptionCode.ReasonRequired ) {
@@ -2360,13 +2418,11 @@ THE SOFTWARE.*/
 
             switch( target.BanStatus ) {
                 case BanStatus.Banned:
-                    if( addExemption ) {
-                        player.Message( "Player {0}&S is currently banned. Unban before adding an exemption.",
-                                        target.ClassyName );
-                    } else {
-                        player.Message( "Player {0}&S is already banned. There is no exemption to remove.",
-                                        target.ClassyName );
-                    }
+                    player.Message(
+                        addExemption
+                            ? "Player {0}&S is currently banned. Unban before adding an exemption."
+                            : "Player {0}&S is already banned. There is no exemption to remove.",
+                        target.ClassyName);
                     break;
                 case BanStatus.IPBanExempt:
                     if( addExemption ) {
@@ -2427,7 +2483,7 @@ THE SOFTWARE.*/
             try {
                 Player targetPlayer = target;
                 target.Kick( player, reason, LeaveReason.Kick, true, true, true );
-                WarnIfOtherPlayersOnIP( player, target.Info, targetPlayer );
+                WarnIfOtherPlayersOnIp( player, target.Info, targetPlayer );
 
             } catch( PlayerOpException ex ) {
                 player.Message( ex.MessageColored );
@@ -2510,12 +2566,9 @@ THE SOFTWARE.*/
                     CdRank.PrintUsage( player );
                     return;
                 }
-                if( cmd.IsConfirmed ) {
-                    if( newRank > RankManager.DefaultRank ) {
-                        targetInfo = PlayerDB.AddFakeEntry( name, RankChangeType.Promoted );
-                    } else {
-                        targetInfo = PlayerDB.AddFakeEntry( name, RankChangeType.Demoted );
-                    }
+                if( cmd.IsConfirmed )
+                {
+                    targetInfo = PlayerDB.AddFakeEntry(name, newRank > RankManager.DefaultRank ? RankChangeType.Promoted : RankChangeType.Demoted);
                 } else {
                     player.Confirm( cmd,
                                     "Warning: Player \"{0}\" is not in the database (possible typo). Type the full name or",
@@ -2856,7 +2909,7 @@ THE SOFTWARE.*/
 
                 } else {
                     // Try to guess if player typed "/TP" instead of "/Join"
-                    World[] worlds = WorldManager.FindWorlds( player, name );
+                    var worlds = WorldManager.FindWorlds( player, name );
 
                     if( worlds.Length == 1 ) {
                         player.LastUsedWorldName = worlds[0].Name;
@@ -3098,11 +3151,11 @@ THE SOFTWARE.*/
             // Remove the player him/herself
             targetPlayers.Remove( player );
 
-            int count = 0;
+            var count = 0;
 
 
             // Actually bring all the players
-            foreach( Player targetPlayer in targetPlayers.CanBeSeen( player )
+            foreach( var targetPlayer in targetPlayers.CanBeSeen( player )
                                                          .RankedAtMost( bringLimit ) ) {
                 if( targetPlayer.World == player.World ) {
                     // teleport within the same world
@@ -3114,7 +3167,7 @@ THE SOFTWARE.*/
 
                 } else {
                     // teleport to a different world
-                    BringPlayerToWorld( player, targetPlayer, player.World, false, true );
+                    fCraft.ModerationCommands.BringPlayerToWorld( player, targetPlayer, player.World, false, true );
                 }
                 count++;
             }
@@ -3128,12 +3181,11 @@ THE SOFTWARE.*/
         }
 
 
-
-        static void BringPlayerToWorld( [NotNull] Player player, [NotNull] Player target, [NotNull] World world,
+        private static void BringPlayerToWorld( [NotNull] Player player, [NotNull] Player target, [NotNull] World world,
                                         bool overridePermissions, bool usePlayerPosition ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( target == null ) throw new ArgumentNullException( "target" );
-            if( world == null ) throw new ArgumentNullException( "world" );
+            if( player == null ) throw new ArgumentNullException( nameof(player) );
+            if( target == null ) throw new ArgumentNullException( nameof(target) );
+            if( world == null ) throw new ArgumentNullException( nameof(world) );
             switch( world.AccessSecurity.CheckDetailed( target.Info ) ) {
                 case SecurityCheckResult.Allowed:
                 case SecurityCheckResult.WhiteListed:
@@ -3320,15 +3372,15 @@ THE SOFTWARE.*/
             Handler = SpectateHandler
         };
 
-        static void SpectateHandler( Player player, Command cmd ) {
-            string targetName = cmd.Next();
+        private static void SpectateHandler( Player player, Command cmd ) {
+            var targetName = cmd.Next();
             if( targetName == null ) {
-                PlayerInfo lastSpec = player.LastSpectatedPlayer;
+                var lastSpec = player.LastSpectatedPlayer;
                 if( lastSpec != null ) {
-                    Player spec = player.SpectatedPlayer;
+                    var spec = player.SpectatedPlayer;
                     if( spec != null ) 
                     {
-                        if (spec.World.Name != player.World.Name)
+                        if (player.World != null && (spec.World != null && spec.World.Name != player.World.Name))
                         {
                             player.JoinWorld(spec.World, WorldChangeReason.SpectateTargetJoined);
                             player.Message("Joined " + spec.World.Name + " to continue spectating " + spec.ClassyName);
@@ -3367,7 +3419,7 @@ THE SOFTWARE.*/
         }
 
 
-        static readonly CommandDescriptor CdUnspectate = new CommandDescriptor {
+        private static readonly CommandDescriptor CdUnspectate = new CommandDescriptor {
             Name = "Unspectate",
             Aliases = new[] { "unfollow", "unspec" },
             Category = CommandCategory.Moderation,
@@ -3376,7 +3428,7 @@ THE SOFTWARE.*/
             Handler = UnspectateHandler
         };
 
-        static void UnspectateHandler( Player player, Command cmd ) {
+        private static void UnspectateHandler( Player player, Command cmd ) {
             if( !player.StopSpectating() ) {
                 player.Message( "You are not currently spectating anyone." );
             }
@@ -3386,19 +3438,19 @@ THE SOFTWARE.*/
 
 
         // freeze target if player is allowed to do so
-        static void FreezeIfAllowed( Player player, PlayerInfo targetInfo ) {
-            if( targetInfo.IsOnline && !targetInfo.IsFrozen && player.Can( Permission.Freeze, targetInfo.Rank ) ) {
-                try {
-                    targetInfo.Freeze( player, true, true );
-                    player.Message( "Player {0}&S has been frozen while you retry.", targetInfo.ClassyName );
-                } catch( PlayerOpException ) { }
-            }
+        private static void FreezeIfAllowed( Player player, PlayerInfo targetInfo )
+        {
+            if (!targetInfo.IsOnline || targetInfo.IsFrozen || !player.Can(Permission.Freeze, targetInfo.Rank)) return;
+            try {
+                targetInfo.Freeze( player, true, true );
+                player.Message( "Player {0}&S has been frozen while you retry.", targetInfo.ClassyName );
+            } catch( PlayerOpException ) { }
         }
 
 
         // warn player if others are still online from target's IP
-        static void WarnIfOtherPlayersOnIP( Player player, PlayerInfo targetInfo, Player except ) {
-            Player[] otherPlayers = Server.Players.FromIP( targetInfo.LastIP )
+        private static void WarnIfOtherPlayersOnIp( Player player, PlayerInfo targetInfo, Player except ) {
+            var otherPlayers = Server.Players.FromIP( targetInfo.LastIP )
                                                   .Except( except )
                                                   .ToArray();
             if( otherPlayers.Length > 0 ) {

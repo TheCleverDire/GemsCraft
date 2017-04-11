@@ -15,50 +15,10 @@ namespace fCraft.Commands
             CommandManager.RegisterCommand(CdTeamDeathMatch);
             CommandManager.RegisterCommand(CdInfection);
             CommandManager.RegisterCommand(CdCTF);
-
-            CommandManager.RegisterCommand(CdRps);
+            
         }
 
-        private static readonly CommandDescriptor CdRps = new CommandDescriptor
-        {
-            Name = "RPS",
-            Aliases = new[] { "boredgame", "rockpaperscissors"},
-            Category = CommandCategory.Games,
-            Permissions = new[] { Permission.Games },
-            IsConsoleSafe = false,
-            Usage = "/rps [opponent/rock/paper/scissors/accept]",
-            Help = "Plays Rock-Paper-Scissors with a player",
-            Handler = RpsHandler
-        };
-
-        private static void RpsHandler(Player player, Command cmd)
-        {
-            var cmdStr = cmd.Next();
-            if (cmdStr == null) CdRps.PrintUsage(player);
-            else
-            {
-                switch (cmdStr.ToLower())
-                {
-                    case "rock":
-                        break;
-                    case "scissors":
-                        break;
-                    case "paper":
-                        break;
-                    case "accept":
-
-                    default:
-                        var opponentPlayer = Server.FindPlayerOrPrintMatches(player, cmdStr, false, false);
-                        if (opponentPlayer != null)
-                        {
-                            player.InRpsWith = opponentPlayer;
-                            opponentPlayer.InRpsWith = player;
-                        }
-                }
-                
-
-            }
-        }
+        
         /* Copyright (c) <2012-2014> <LeChosenOne, DingusBungus>
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
