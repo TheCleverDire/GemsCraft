@@ -10,14 +10,10 @@ using System.Text;
 using System.Threading;
 using System.Text.RegularExpressions;
 using System.Collections.Concurrent;
-using System.Xml.Linq;
-using System.Xml;
-using System.Security.Cryptography;
 using fCraft.AutoRank;
 using fCraft.Drawing;
 using fCraft.Events;
 using fCraft.MapConversion;
-using System.Runtime;
 using JetBrains.Annotations;
 
 namespace fCraft
@@ -27,11 +23,11 @@ namespace fCraft
     {
         public static int SocketTimeout { get; set; }
         public static bool RelayAllUpdates { get; set; }
-        const int SleepDelay = 5; // milliseconds
-        const int SocketPollInterval = 200; // multiples of SleepDelay, approx. 1 second
-        const int PingInterval = 3; // multiples of SocketPollInterval, approx. 3 seconds
+        private const int SleepDelay = 5; // milliseconds
+        private const int SocketPollInterval = 200; // multiples of SleepDelay, approx. 1 second
+        private const int PingInterval = 3; // multiples of SocketPollInterval, approx. 3 seconds
 
-        const string NoSmpMessage = "This server is for Minecraft Classic only.";
+        private const string NoSmpMessage = "This server is for Minecraft Classic only.";
 
         static Player()
         {
@@ -347,7 +343,7 @@ namespace fCraft
                 return false;
             }
 #if DEBUG
-                ParseMessage( message, false, true );
+            ParseMessage(message, false, true);
 #else
             try
             {
@@ -388,7 +384,7 @@ namespace fCraft
                     //check if all the requested byte exists as a block, if it does create a block
                     Info.HeldBlock = (Block)me;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Logger.LogToConsole(ex.Data + ex.Message);
                     Info.HeldBlock = Block.Stone;
@@ -537,7 +533,7 @@ namespace fCraft
         void ProcessSetBlockPacket()
         {
             BytesReceived += 9;
-            if (World == null || World.Map == null) return;
+            if (World?.Map == null) return;
             ResetIdleTimer();
             short x = IPAddress.NetworkToHostOrder(reader.ReadInt16());
             short z = IPAddress.NetworkToHostOrder(reader.ReadInt16());
@@ -626,8 +622,8 @@ namespace fCraft
 
                 //GET request, check if ServeCfg or WebPanelConfig
                 case (byte)'G':
-                   
-                    ServeCfg();         
+
+                    ServeCfg();
                     return false;
 
                 default:
@@ -656,8 +652,8 @@ namespace fCraft
 
             //verificication key found in player ID packet
             string verificationKey = ReadString();
-            ClassiCube = Server.VerifyName(givenName, verificationKey, Heartbeat.Salt2);          
-            
+            ClassiCube = Server.VerifyName(givenName, verificationKey, Heartbeat.Salt2);
+
             byte magicNum = reader.ReadByte(); //for CPE check (previously unused)
             usesCPE = (magicNum == 0x42);
             Skinname = givenName;
@@ -723,7 +719,7 @@ namespace fCraft
                     //if the name is still invalid with or without the +
                     if (!IsValidName(givenName))
                     {
-                        Logger.Log(LogType.SuspiciousActivity, "Player.LoginSequence: Unacceptable player name: {0} ({1})", givenName, IP);                                     
+                        Logger.Log(LogType.SuspiciousActivity, "Player.LoginSequence: Unacceptable player name: {0} ({1})", givenName, IP);
                         KickNow("Invalid characters in player name!", LeaveReason.ProtocolViolation);
                         return false;
                     }
@@ -764,8 +760,7 @@ namespace fCraft
 
                 NameVerificationMode nameVerificationMode = ConfigKey.VerifyNames.GetEnum<NameVerificationMode>();
 
-                string standardMessage = String.Format("Player.LoginSequence: Could not verify player name for {0} ({1}).",
-                                                        Name, IP);
+                string standardMessage = $"Player.LoginSequence: Could not verify player name for {Name} ({IP}).";
                 if (IP.Equals(IPAddress.Loopback) && nameVerificationMode != NameVerificationMode.Always)
                 {
                     Logger.Log(LogType.SuspiciousActivity,
@@ -838,33 +833,15 @@ namespace fCraft
                 string bannedMessage;
                 if (Info.BannedBy != null)
                 {
-                    if (Info.BanReason != null)
-                    {
-                        bannedMessage = String.Format("Banned {0} ago by {1}: {2}",
-                                                       Info.TimeSinceBan.ToMiniString(),
-                                                       Info.BannedBy,
-                                                       Info.BanReason);
-                    }
-                    else
-                    {
-                        bannedMessage = String.Format("Banned {0} ago by {1}",
-                                                       Info.TimeSinceBan.ToMiniString(),
-                                                       Info.BannedBy);
-                    }
+                    bannedMessage = Info.BanReason != null 
+                        ? $"Banned {Info.TimeSinceBan.ToMiniString()} ago by {Info.BannedBy}: {Info.BanReason}" 
+                        : $"Banned {Info.TimeSinceBan.ToMiniString()} ago by {Info.BannedBy}";
                 }
                 else
                 {
-                    if (Info.BanReason != null)
-                    {
-                        bannedMessage = String.Format("Banned {0} ago: {1}",
-                                                       Info.TimeSinceBan.ToMiniString(),
-                                                       Info.BanReason);
-                    }
-                    else
-                    {
-                        bannedMessage = String.Format("Banned {0} ago",
-                                                       Info.TimeSinceBan.ToMiniString());
-                    }
+                    bannedMessage = Info.BanReason != null 
+                        ? $"Banned {Info.TimeSinceBan.ToMiniString()} ago: {Info.BanReason}" 
+                        : $"Banned {Info.TimeSinceBan.ToMiniString()} ago";
                 }
                 KickNow(bannedMessage, LeaveReason.LoginFailed);
                 return false;
@@ -879,10 +856,8 @@ namespace fCraft
                 ipBanInfo.ProcessAttempt(this);
                 Logger.Log(LogType.SuspiciousActivity,
                             "{0} tried to log in from a banned IP.", Name);
-                string bannedMessage = String.Format("IP-banned {0} ago by {1}: {2}",
-                                                      DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniString(),
-                                                      ipBanInfo.BannedBy,
-                                                      ipBanInfo.BanReason);
+                string bannedMessage =
+                    $"IP-banned {DateTime.UtcNow.Subtract(ipBanInfo.BanDate).ToMiniString()} ago by {ipBanInfo.BannedBy}: {ipBanInfo.BanReason}";
                 KickNow(bannedMessage, LeaveReason.LoginFailed);
                 return false;
             }
@@ -900,7 +875,7 @@ namespace fCraft
                 Logger.Log(LogType.SuspiciousActivity,
                             "Player.LoginSequence: Denied player {0}: maximum number of connections was reached for {1}",
                             givenName, IP);
-                KickNow(String.Format("Max connections reached for {0}", IP), LeaveReason.LoginFailed);
+                KickNow($"Max connections reached for {IP}", LeaveReason.LoginFailed);
                 return false;
             }
 
@@ -927,8 +902,7 @@ namespace fCraft
             {
                 Logger.Log(LogType.SystemActivity,
                             "Player {0} was kicked because server is full.", Name);
-                string kickMessage = String.Format("Sorry, server is full ({0}/{1})",
-                                        Server.Players.Length, ConfigKey.MaxPlayers.GetInt());
+                string kickMessage = $"Sorry, server is full ({Server.Players.Length}/{ConfigKey.MaxPlayers.GetInt()})";
                 KickNow(kickMessage, LeaveReason.ServerFull);
                 return false;
             }
@@ -953,7 +927,7 @@ namespace fCraft
                 {
                     if (!startingWorld.Hax)
                     {
-                        motd =  ConfigKey.MOTD.GetString() + "-hax";
+                        motd = ConfigKey.MOTD.GetString() + "-hax";
                     }
                     else
                     {
@@ -977,7 +951,7 @@ namespace fCraft
                 motd = ConfigKey.MOTD.GetString();
             }
             SendNow(PacketWriter.MakeHandshake(this, serverName, motd));
-          
+
             bool firstTime = (Info.TimesVisited == 1);
 
             //update fallback blocks for non CPE users
@@ -1091,14 +1065,9 @@ namespace fCraft
             }
             else
             {
-                if (firstTime)
-                {
-                    MessageNow("Welcome to {0}", ConfigKey.ServerName.GetString());
-                }
-                else
-                {
-                    MessageNow("Welcome back to {0}", ConfigKey.ServerName.GetString());
-                }
+                MessageNow(firstTime 
+                    ? "Welcome to {0}" 
+                    : "Welcome back to {0}", ConfigKey.ServerName.GetString());
 
                 MessageNow("Your rank is {0}&S. Type &H/Help&S for help.",
                             Info.Rank.ClassyName);
@@ -1157,7 +1126,7 @@ namespace fCraft
         }
 
         static readonly Regex HttpFirstLine = new Regex("GET /([a-zA-Z0-9_]{1,16})(~motd)? .+", RegexOptions.Compiled);
-       
+
         void ServeCfg()
         {
             using (StreamReader textReader = new StreamReader(stream))
@@ -1411,14 +1380,7 @@ namespace fCraft
             World = newWorld;
 
             // Set spawn point
-            if (doUseWorldSpawn)
-            {
-                Position = map.Spawn;
-            }
-            else
-            {
-                Position = postJoinPosition;
-            }
+            Position = doUseWorldSpawn ? map.Spawn : postJoinPosition;
 
             // Start sending over the level copy
             if (oldWorld != null)
@@ -1437,7 +1399,7 @@ namespace fCraft
             byte[] buffer = new byte[1024];
             int mapBytesSent = 0;
             byte[] blockData;
-         
+
             using (MemoryStream mapStream = new MemoryStream())
             {
                 using (GZipStream compressor = new GZipStream(mapStream, CompressionMode.Compress))
@@ -1507,7 +1469,8 @@ namespace fCraft
                 {
                     World.VisitCount++;
                 }
-            } if (!World.IsRealm && oldWorld == newWorld)
+            }
+            if (!World.IsRealm && oldWorld == newWorld)
             {
                 Message("Rejoined world {0}", newWorld.ClassyName);
             }
@@ -1615,7 +1578,7 @@ namespace fCraft
                         Send(PacketWriter.RemoveSelectionCuboid((byte)highlightsToRemove.Value.Item1));
                     }
                 }
-                foreach(var entry in World.Highlights)
+                foreach (var entry in World.Highlights)
                 {
                     Send(PacketWriter.MakeSelectionCuboid((byte)entry.Value.Item1, entry.Key, entry.Value.Item2, entry.Value.Item3, entry.Value.Item4, entry.Value.Item5));
                 }
@@ -1886,7 +1849,7 @@ namespace fCraft
             Position pos = Position;
 
             //Loop through all players in the world
-            foreach(Player otherPlayer in World.Players)
+            foreach (Player otherPlayer in World.Players)
             {
                 if (otherPlayer == this ||
                     !CanSeeMoving(otherPlayer) ||
@@ -1900,7 +1863,7 @@ namespace fCraft
                 if (entities.TryGetValue(otherPlayer, out entity))
                 {
                     entity.MarkedForRetention = true;
-                   
+
                     //update player models
                     if (usesCPE)
                     {
@@ -1913,13 +1876,13 @@ namespace fCraft
                         entity.LastKnownRank = otherPlayer.Info.Rank;
                     }
                     //if entity changed for another player, add this player to the list pf players who have seen the update
-                    if( otherPlayer.entityChanged && !otherPlayer.playersWhoHaveSeenEntityChanges.Contains(this))
+                    if (otherPlayer.entityChanged && !otherPlayer.playersWhoHaveSeenEntityChanges.Contains(this))
                     {
-						ReAddEntity(entity, otherPlayer, otherPos);
+                        ReAddEntity(entity, otherPlayer, otherPos);
                         otherPlayer.playersWhoHaveSeenEntityChanges.Add(this);
-					}
-					//if this player is already in the list (has updated the skin), continue
-					//if the player whose skin changed has updated for everyone, clear the list and set entityChanged to false
+                    }
+                    //if this player is already in the list (has updated the skin), continue
+                    //if the player whose skin changed has updated for everyone, clear the list and set entityChanged to false
                     else if (otherPlayer.playersWhoHaveSeenEntityChanges.Count() == (World.Players.Count() - 1))
                     {
                         otherPlayer.playersWhoHaveSeenEntityChanges.Clear();
@@ -2024,8 +1987,8 @@ namespace fCraft
             if (usesCPE)
             {
                 SendNow(player.iName == null
-                    ? PacketWriter.MakeExtAddEntity((byte) entities[player].Id, player.Skinname, player.Name)
-                    : PacketWriter.MakeExtAddEntity((byte) entities[player].Id, player.Skinname, player.iName));
+                    ? PacketWriter.MakeExtAddEntity((byte)entities[player].Id, player.Skinname, player.Name)
+                    : PacketWriter.MakeExtAddEntity((byte)entities[player].Id, player.Skinname, player.iName));
             }
             entity.LastKnownPosition = newPos;
         }

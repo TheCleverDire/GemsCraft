@@ -1,10 +1,10 @@
 ﻿Cobblestone (In development)
 
 #GemsCraft
-![LegendCraft](http://i.imgur.com/pbO5NDl.png "Never argue with an idiot. They will drag you down to their level and beat you with experience")<br />
+![GemsCraft](http://i.imgur.com/pbO5NDl.png "Never argue with an idiot. They will drag you down to their level and beat you with experience")<br />
 
 Dowload the latest GemsCraft release here: 
-https://gemscraft.net/
+https://gemz.ml/ (Not ready)
 
 Thank you for downloading GemsCraft, a custom Minecraft/ClassiCube server based on fCraft, 800craft, and LegendCraft.
 
@@ -14,42 +14,24 @@ work with
 Also thank you to DingusBungus and LeChosenOne for your dedication to LegendCraft! I would have never have heard of fCraft and the related/forked
 software if I hadn't been told about Rising Embers! 
 
-
+It's weird to say that I've been developing this project for 4+ years.
 ##Installation 
 ####(Windows) 
 
-GemsCraft requires Microsoft .NET Framework 4.0. Your system may already have it
-installed, and you can download it from  http://www.microsoft.com/en-us/download/details.aspx?id=17851
+GemsCraft requires Microsoft .NET Framework 4.6.2. Your system may already have it
+
 Plugins not working? Getting plugin errors?
 Go to your plugins folder and right click on all the plugin.dll's. Select unblock for all of them.
 
 ####(Linux, Unix, MacOS X)
-
-GemsCraft requires Mono 2.10 (recommended). You can
-download it from www.mono-project.org, or (on some Linux distributions) install
-it through your package manager.
-
-To be able to use the GemsCraftGUI you
-will also need GDI+ library (libgdiplus). Before starting GemsCraft, make sure
-that it has read/write permissions in the GemsCraft directory.
-
-To run ".exe" files with Mono, use the following syntax:
-Mono 2.6.4: "mono SomeFile.exe"
-Mono 2.8+:  "mono --gc=sgen SomeFile.exe"
-
-If you're intending to run a public server that appears on minecraft.net's server list, 	
-you need to import https certificates to tell mono you trust them, this can be done by 
-running "sudo mozroots --import --ask-remove" as the GemsCraft user on your system.
-
-You may also have to run "sudo certmgr -ssl -m https://minecraft.net" in order for heartbeats to work 
-properly.
+GemsCraft is currently not supported on other systems. We are currently working on that.
 
 ##Licensing 
 
 ####GemsCraft license
 LegendCraft code and binaries are licensed and distributed under the permissive MIT License, reproduced here: <br />
 
-Copyright < 2013- 2015 > apotter96
+Copyright < 2013- 2017 > apotter96
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

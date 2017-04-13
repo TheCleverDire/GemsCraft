@@ -32,8 +32,10 @@ namespace fCraft
     /// For persistent state of a known player account, see PlayerInfo. </summary>
     public sealed partial class Player : IClassy
     {
-        public bool IsPrisoner;
-        public DateTime PrisonEnter;
+        public bool IsPrisoner()
+        {
+            return PrisonData.Obj.Prisoners.Any(p => Info.Name == p.Username);
+        }
 
         /// <summary> The godly pseudo-player for commands called from the server console.
         /// Console has all the permissions granted.

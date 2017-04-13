@@ -21,10 +21,7 @@ namespace fCraft.AutoRank
         public const string TagName = "fCraftAutoRankConfig";
 
         /// <summary> Whether any criteria are defined. </summary>
-        public static bool HasCriteria
-        {
-            get { return Criteria.Count > 0; }
-        }
+        public static bool HasCriteria => Criteria.Count > 0;
 
 
         /// <summary> Adds a new criterion to the list. Throws an ArgumentException on duplicates. </summary>
@@ -44,14 +41,14 @@ namespace fCraft.AutoRank
         {
             if (info == null) throw new ArgumentNullException("info");
             // ReSharper disable LoopCanBeConvertedToQuery
-            for (int i = 0; i < Criteria.Count; i++)
+            foreach (fCraftCriterion t in Criteria)
             {
-                if (Criteria[i].FromRank == info.Rank &&
+                if (t.FromRank == info.Rank &&
                     !info.IsBanned &&
-                    Criteria[i].Condition.Eval(info))
+                    t.Condition.Eval(info))
                 {
 
-                    return Criteria[i].ToRank;
+                    return t.ToRank;
                 }
             }
             // ReSharper restore LoopCanBeConvertedToQuery
@@ -84,16 +81,17 @@ namespace fCraft.AutoRank
             Stopwatch sw = Stopwatch.StartNew();
             int promoted = 0,
                 demoted = 0;
-            for( int i = 0; i < list.Length; i++ ) {
-                Rank newRank = Check( list[i] );
+            foreach (PlayerInfo t in list)
+            {
+                Rank newRank = Check( t );
                 if( newRank != null ) {
-                    if( newRank > list[i].Rank ) {
+                    if( newRank > t.Rank ) {
                         promoted++;
-                    } else if( newRank < list[i].Rank ) {
+                    } else if( newRank < t.Rank ) {
                         demoted++;
                     }
                     try {
-                        list[i].ChangeRank( player, newRank, message, true, true, true );
+                    t.ChangeRank( player, newRank, message, true, true, true );
                     } catch( PlayerOpException ex ) {
                         if( auto ) {
                             Logger.Log( LogType.Error, "AutoRank: Could not change player's rank: {0}", ex.Message );
@@ -104,10 +102,8 @@ namespace fCraft.AutoRank
                 }
             }
             sw.Stop();
-            String resultMsg = String.Format( "AutoRankAll: Worked for {0}ms, {1} players promoted, {2} demoted.",
-                                              sw.ElapsedMilliseconds,
-                                              promoted,
-                                              demoted );
+            String resultMsg =
+                $"AutoRankAll: Worked for {sw.ElapsedMilliseconds}ms, {promoted} players promoted, {demoted} demoted.";
             if( auto ) {
                 if( promoted > 0 || demoted > 0 ) {
                     Logger.Log( LogType.SystemActivity, resultMsg );

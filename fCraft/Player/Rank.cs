@@ -478,7 +478,7 @@ namespace fCraft {
 
 
         public override string ToString() {
-            return String.Format( "Rank({0})", Name );
+            return $"Rank({Name})";
         }
 
 
@@ -515,11 +515,7 @@ namespace fCraft {
 
         /// <summary> Shortcut to the list of all online players of this rank. </summary>
         [NotNull]
-        public IEnumerable<Player> Players {
-            get {
-                return Server.Players.Ranked( this );
-            }
-        }
+        public IEnumerable<Player> Players => Server.Players.Ranked( this );
 
         /// <summary> Total number of players of this rank (online and offline). </summary>
         public int PlayerCount {

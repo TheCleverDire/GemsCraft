@@ -82,6 +82,7 @@
     <Compile Include="ConfigGUI\ColorPicker.Designer.cs">
       <DependentUpon>ColorPicker.cs</DependentUpon>
     </Compile>
+    <Compile Include="ConfigGUI\ConfigHandler.cs" />
     <Compile Include="ConfigGUI\CustomPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -90,6 +91,30 @@
     </Compile>
     <Compile Include="ConfigGUI\DeleteRankPopup.Designer.cs">
       <DependentUpon>DeleteRankPopup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\BaseTab.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\BaseTab.Designer.cs">
+      <DependentUpon>BaseTab.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\GeneralConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\GeneralConfig.Designer.cs">
+      <DependentUpon>GeneralConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\RankConfig.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\RankConfig.Designer.cs">
+      <DependentUpon>RankConfig.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\MainScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\MainScreen.Designer.cs">
+      <DependentUpon>MainScreen.cs</DependentUpon>
     </Compile>
     <Compile Include="ConfigGUI\KeywordPicker.cs">
       <SubType>Form</SubType>
@@ -162,6 +187,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ConfigGUI\DeleteRankPopup.resx">
       <DependentUpon>DeleteRankPopup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\BaseTab.resx">
+      <DependentUpon>BaseTab.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\GeneralConfig.resx">
+      <DependentUpon>GeneralConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\RankConfig.resx">
+      <DependentUpon>RankConfig.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\MainScreen.resx">
+      <DependentUpon>MainScreen.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfigGUI\KeywordPicker.resx">
       <DependentUpon>KeywordPicker.cs</DependentUpon>

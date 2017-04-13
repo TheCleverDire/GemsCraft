@@ -73,6 +73,11 @@ It's generally a good idea not to give new players
 many powers until they prove themselves trustworthy." )]
         DefaultRank,
 
+        [RankKey( ConfigSection.General, RankKeyAttribute.BlankValueMeaning.LowestRank,
+            
+@"The rank to send players to if they are a prisoner")]
+        PrisonerRank,
+
 
         [BoolKey( ConfigSection.General, false,
             @"Public servers are listed on Classicube.net server list, so expect

@@ -106,7 +106,8 @@ namespace fCraft
         /// Returns an empty string array if no arguments were set. </returns>
         public static string[] GetArgList()
         {
-            return Args.Select(pair => pair.Value != null ? string.Format("--{0}=\"{1}\"", pair.Key.ToString().ToLower(), pair.Value) : String.Format("--{0}", pair.Key.ToString().ToLower())).ToArray();
+            return Args.Select(pair => pair.Value != null ? $"--{pair.Key.ToString().ToLower()}=\"{pair.Value}\""
+                : $"--{pair.Key.ToString().ToLower()}").ToArray();
         }
 
         #endregion
@@ -129,7 +130,7 @@ namespace fCraft
         /// <exception cref="System.IO.IOException"> Working path, log path, or map path could not be set. </exception>
         public static void InitLibrary([NotNull] IEnumerable<string> rawArgs)
         {
-            if (rawArgs == null) throw new ArgumentNullException("rawArgs");
+            if (rawArgs == null) throw new ArgumentNullException(nameof(rawArgs));
             if (_libraryInitialized)
             {
                 throw new InvalidOperationException("GemsCraft library is already initialized");
@@ -501,6 +502,7 @@ namespace fCraft
 
             // list loaded worlds
             WorldManager.UpdateWorldList();
+            PrisonData.Init(); // Because of an exisiting prison world, it must be set up AFTER the World list is ready
             Logger.Log(LogType.SystemActivity,
                         "All available worlds: {0}",
                         WorldManager.Worlds.JoinToString(", ", w => w.Name));
@@ -1101,9 +1103,8 @@ namespace fCraft
             {
                 try
                 {
-                    var fileComment = string.Format("Backup of 800Craft data for server \"{0}\", saved on {1}",
-                                                        ConfigKey.ServerName.GetString(),
-                                                        DateTime.Now);
+                    var fileComment =
+                        $"Backup of 800Craft data for server \"{ConfigKey.ServerName.GetString()}\", saved on {DateTime.Now}";
                     using (ZipStorer backupZip = ZipStorer.Create(fs, fileComment))
                     {
                         foreach (var dataFileName in Paths.DataFilesToBackup.Where(File.Exists))

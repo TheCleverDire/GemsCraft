@@ -11,6 +11,7 @@ using fCraft;
 using fCraft.ConfigGUI;
 using JetBrains.Annotations;
 using System.Collections.Generic;
+using GemsCraftGUI.ConfigGUI;
 
 namespace GemsCraftGUI
 {
@@ -56,10 +57,10 @@ namespace GemsCraftGUI
                 }
             }
 
-            ApplyTabGeneral();
+            //ApplyTabGeneral();
             ApplyTabChat();
             ApplyTabWorlds(); // also reloads world list
-            ApplyTabRanks();
+            //ApplyTabRanks();
             ApplyTabSecurity();
             ApplyTabSavingAndBackup();
             ApplyTabLogging();
@@ -134,16 +135,17 @@ namespace GemsCraftGUI
                     }
                 }
 
-                var prisonWorldAttr = root.Attribute("prison");
+                PrisonData.SetUpData();
+                var prisonWorldAttr = PrisonData.Obj.World;
                 if (prisonWorldAttr != null)
                 {
-                    if (Worlds.Any(world => string.Equals(world.Name, prisonWorldAttr.Value,
+                    if (Worlds.Any(world => string.Equals(world.Name, prisonWorldAttr,
                                 StringComparison.CurrentCultureIgnoreCase)))
                     {
                         var loopCount = 0;
                         foreach (var v in cboPrison.Items)
                         {
-                            if (v.ToString().ToLower() == prisonWorldAttr.Value.ToLower())
+                            if (v.ToString().ToLower() == prisonWorldAttr.ToLower())
                             {
                                 cboPrison.SelectedIndex = loopCount;
                             }
@@ -152,6 +154,10 @@ namespace GemsCraftGUI
                     }
                 }
 
+                if (cboPrison.SelectedIndex == -1)
+                {
+                    cboPrison.SelectedIndex = 0;
+                }
             }
             catch (Exception ex)
             {
@@ -162,45 +168,44 @@ namespace GemsCraftGUI
         }
 
 
-        void ApplyTabGeneral()
+        public void ApplyTabGeneral()
         {
 
-            tServerName.Text = ConfigKey.ServerName.GetString();
-            CustomName.Text = ConfigKey.CustomChatName.GetString();
-            SwearBox.Text = ConfigKey.SwearName.GetString();
-            CustomAliases.Text = ConfigKey.CustomAliasName.GetString();
-            tMOTD.Text = ConfigKey.MOTD.GetString();
-            websiteURL.Text = ConfigKey.WebsiteURL.GetString();
-            //HeartBeatUrlComboBox.Text = ConfigKey.HeartbeatUrl.GetString();
+            Program.GeneralConfig.tServerName.Text = ConfigKey.ServerName.GetString();
+            CustomName.Text = ConfigKey.CustomChatName.GetString(); // TODO - Move to ApplyTabMisc()
+            SwearBox.Text = ConfigKey.SwearName.GetString(); // TODO - Move to ApplyTabMisc()
+            CustomAliases.Text = ConfigKey.CustomAliasName.GetString(); // TODO - Move to ApplyTabMisc()
+            Program.GeneralConfig.tMOTD.Text = ConfigKey.MOTD.GetString();
+            websiteURL.Text = ConfigKey.WebsiteURL.GetString(); // TODO - Move to ApplyTabMisc()
 
-            nMaxPlayers.Value = ConfigKey.MaxPlayers.GetInt();
+            Program.GeneralConfig.nMaxPlayers.Value = ConfigKey.MaxPlayers.GetInt();
             CheckMaxPlayersPerWorldValue();
-            nMaxPlayersPerWorld.Value = ConfigKey.MaxPlayersPerWorld.GetInt();
+            Program.GeneralConfig.nMaxPlayersPerWorld.Value = ConfigKey.MaxPlayersPerWorld.GetInt();
 
-            checkUpdate.Checked = ConfigKey.CheckForUpdates.GetString() == "True";
+            checkUpdate.Checked = ConfigKey.CheckForUpdates.GetString() == "True"; // TODO - Move to ApplyTabSaving()
 
 
 
-            FillRankList(cDefaultRank, "(lowest rank)");
+            FillRankList(Program.GeneralConfig.cDefaultRank, "(lowest rank)");
             if (ConfigKey.DefaultRank.IsBlank())
             {
-                cDefaultRank.SelectedIndex = 0;
+                Program.GeneralConfig.cDefaultRank.SelectedIndex = 0;
             }
             else
             {
                 RankManager.DefaultRank = Rank.Parse(ConfigKey.DefaultRank.GetString());
-                cDefaultRank.SelectedIndex = RankManager.GetIndex(RankManager.DefaultRank);
+                Program.GeneralConfig.cDefaultRank.SelectedIndex = RankManager.GetIndex(RankManager.DefaultRank);
             }
 
-            cPublic.SelectedIndex = ConfigKey.IsPublic.Enabled() ? 0 : 1;
-            nPort.Value = ConfigKey.Port.GetInt();
-            MaxCapsValue.Value = ConfigKey.MaxCaps.GetInt();
-            nUploadBandwidth.Value = ConfigKey.UploadBandwidth.GetInt();
+            Program.GeneralConfig.cPublic.SelectedIndex = ConfigKey.IsPublic.Enabled() ? 0 : 1;
+            Program.GeneralConfig.nPort.Value = ConfigKey.Port.GetInt();
+            MaxCapsValue.Value = ConfigKey.MaxCaps.GetInt(); // TODO - Move to ApplyTabMisc()
+            Program.GeneralConfig.nUploadBandwidth.Value = ConfigKey.UploadBandwidth.GetInt();
 
             int interval = 0;
-            xAnnouncements.Checked = ConfigKey.AnnouncementInterval.TryGetInt(out interval) && interval > 0;
+            Program.GeneralConfig.xAnnouncements.Checked = ConfigKey.AnnouncementInterval.TryGetInt(out interval) && interval > 0;
 
-            nAnnouncements.Value = xAnnouncements.Checked ? ConfigKey.AnnouncementInterval.GetInt() : 1;
+            Program.GeneralConfig.nAnnouncements.Value = xAnnouncements.Checked ? ConfigKey.AnnouncementInterval.GetInt() : 1;
 
             // UpdaterSettingsWindow
             _updaterWindow.BackupBeforeUpdate = ConfigKey.BackupBeforeUpdate.Enabled();
@@ -322,11 +327,11 @@ namespace GemsCraftGUI
         }
 
 
-        void ApplyTabRanks()
+        public void ApplyTabRanks()
         {
-            _selectedRank = null;
-            RebuildRankList();
-            DisableRankOptions();
+            ConfigHandler._selectedRank = null;
+            ConfigHandler.RebuildRankList();
+            ConfigHandler.DisableRankOptions();
         }
 
 
@@ -655,24 +660,40 @@ namespace GemsCraftGUI
 
         #region Saving Config
 
+        public void SaveGeneral()
+        {
+            ConfigKey.ServerName.TrySetValue(Program.GeneralConfig.tServerName.Text);
+            ConfigKey.MOTD.TrySetValue(Program.GeneralConfig.tMOTD.Text);
+            ConfigKey.MaxPlayers.TrySetValue(Program.GeneralConfig.nMaxPlayers.Value);
+            ConfigKey.MaxPlayersPerWorld.TrySetValue(Program.GeneralConfig.nMaxPlayersPerWorld.Value);
+
+            ConfigKey.DefaultRank.TrySetValue(Program.GeneralConfig.cDefaultRank.SelectedIndex == 0 ? "" : RankManager.DefaultRank.FullName);
+            ConfigKey.IsPublic.TrySetValue(Program.GeneralConfig.cPublic.SelectedIndex == 0);
+            ConfigKey.Port.TrySetValue(Program.GeneralConfig.nPort.Value);
+
+            ConfigKey.UploadBandwidth.TrySetValue(Program.GeneralConfig.nUploadBandwidth.Value);
+
+            ConfigKey.AnnouncementInterval.TrySetValue(Program.GeneralConfig.xAnnouncements.Checked ? Program.GeneralConfig.nAnnouncements.Value : 0);
+
+            // UpdaterSettingsWindow
+            ConfigKey.UpdaterMode.TrySetValue(_updaterWindow.UpdaterMode);
+            ConfigKey.BackupBeforeUpdate.TrySetValue(_updaterWindow.BackupBeforeUpdate);
+            ConfigKey.RunBeforeUpdate.TrySetValue(_updaterWindow.RunBeforeUpdate);
+            ConfigKey.RunAfterUpdate.TrySetValue(_updaterWindow.RunAfterUpdate);
+        }
+
+
         void SaveConfig()
         {
             // General
-
-            ConfigKey.ServerName.TrySetValue(tServerName.Text);
-            ConfigKey.CustomChatName.TrySetValue(CustomName.Text);
+            ConfigKey.CustomChatName.TrySetValue(CustomName.Text); // TODO - Move to SaveMisc()
             ConfigKey.SwearName.TrySetValue(SwearBox.Text);
             ConfigKey.CheckForUpdates.TrySetValue(checkUpdate.Checked.ToString());
             ConfigKey.WebsiteURL.TrySetValue(websiteURL.Text);
-            ConfigKey.HeartbeatUrl.TrySetValue("ClassiCube.net");
             ConfigKey.CustomAliasName.TrySetValue(CustomAliases.Text);
-            ConfigKey.MOTD.TrySetValue(tMOTD.Text);
-            ConfigKey.MaxPlayers.TrySetValue(nMaxPlayers.Value);
-            ConfigKey.MaxPlayersPerWorld.TrySetValue(nMaxPlayersPerWorld.Value);
-            ConfigKey.DefaultRank.TrySetValue(cDefaultRank.SelectedIndex == 0 ? "" : RankManager.DefaultRank.FullName);
-            ConfigKey.IsPublic.TrySetValue(cPublic.SelectedIndex == 0);
-            ConfigKey.Port.TrySetValue(nPort.Value);
+            
             ConfigKey.MaxCaps.TrySetValue(MaxCapsValue.Value);
+
             if (xIP.Checked)
             {
                 ConfigKey.IP.TrySetValue(tIP.Text);
@@ -681,16 +702,6 @@ namespace GemsCraftGUI
             {
                 ConfigKey.IP.ResetValue();
             }
-
-            ConfigKey.UploadBandwidth.TrySetValue(nUploadBandwidth.Value);
-
-            ConfigKey.AnnouncementInterval.TrySetValue(xAnnouncements.Checked ? nAnnouncements.Value : 0);
-
-            // UpdaterSettingsWindow
-            ConfigKey.UpdaterMode.TrySetValue(_updaterWindow.UpdaterMode);
-            ConfigKey.BackupBeforeUpdate.TrySetValue(_updaterWindow.BackupBeforeUpdate);
-            ConfigKey.RunBeforeUpdate.TrySetValue(_updaterWindow.RunBeforeUpdate);
-            ConfigKey.RunAfterUpdate.TrySetValue(_updaterWindow.RunAfterUpdate);
 
 
             // Chat
@@ -938,10 +949,9 @@ namespace GemsCraftGUI
                 }
                 if (mcbPrison.Enabled)
                 {
-                    if (cboPrison.SelectedItem != null)
-                    {
-                        root.Add(new XAttribute("prison", cboPrison.SelectedItem));
-                    }
+                    PrisonData.Obj.World = cboPrison.SelectedItem.ToString();
+                    if (!Directory.Exists("Prison/")) Directory.CreateDirectory("Prison/");
+                    PrisonData.SaveData();
                 }
                 doc.Add(root);
                 doc.Save(worldListTempFileName);
@@ -949,10 +959,8 @@ namespace GemsCraftGUI
             }
             catch (Exception ex)
             {
-                MessageBox.Show(string.Format("An error occured while trying to save world list ({0}): {1}{2}",
-                                                Paths.WorldListFileName,
-                                                Environment.NewLine,
-                                                ex));
+                MessageBox.Show(
+                    $"An error occured while trying to save world list ({Paths.WorldListFileName}): {Environment.NewLine}{ex}");
             }
         }
 

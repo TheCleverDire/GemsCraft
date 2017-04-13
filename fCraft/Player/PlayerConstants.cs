@@ -193,7 +193,12 @@ namespace fCraft {
         PermissionChanged,
 
         /// <summary> Player entered a portal. </summary>
-        Portal
+        Portal,
+
+        /// <summary>
+        /// Player is a PRISONER OH NO
+        /// </summary>
+        Prisoner
     }
 
 

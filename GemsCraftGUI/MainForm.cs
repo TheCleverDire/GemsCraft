@@ -18,6 +18,7 @@ using fCraft.Events;
 using fCraft.GUI;
 using fCraft.ServerGUI;
 using GemsCraftGUI.ConfigGUI;
+using GemsCraftGUI.ConfigGUI.GUITabs;
 using GemsCraftGUI.Properties;
 using GemsCraftGUI.ServerGUI;
 using JetBrains.Annotations;
@@ -1266,7 +1267,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             Application.Exit();
         }
 
-        void SaveEverything()
+        public void SaveEverything()
         {
             using (LogRecorder applyLogger = new LogRecorder())
             {
@@ -1308,10 +1309,10 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             Config.ResetRanks();
             Config.ResetLogOptions();
 
-            ApplyTabGeneral();
+            //ApplyTabGeneral();
             ApplyTabChat();
             ApplyTabWorlds(); // also reloads world list
-            ApplyTabRanks();
+            //ApplyTabRanks();
             ApplyTabSecurity();
             ApplyTabSavingAndBackup();
             ApplyTabLogging();
@@ -1327,7 +1328,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             {
                 case 0:// General
                     Config.LoadDefaults(ConfigSection.General);
-                    ApplyTabGeneral();
+                    //ApplyTabGeneral();
                     break;
                 case 1: // Chat
                     Config.LoadDefaults(ConfigSection.Chat);
@@ -1340,7 +1341,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                 case 3:// Ranks
                     Config.ResetRanks();
                     ApplyTabWorlds();
-                    ApplyTabRanks();
+                    //ApplyTabRanks();
                     RebuildRankList();
                     break;
                 case 4:// Security
@@ -1925,7 +1926,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             playerList.MouseDoubleClick += playerList_MouseDoubleClick;
             StartEnable();
             LoadCustomThemes();
-            PrisonData.Init();
+            
         }
 
         void StartEnable()
@@ -2754,6 +2755,8 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
 
         private void MainForm_Load_1(object sender, EventArgs e)
         {
+            tabPage1.Controls.Clear();
+            tabPage1.Controls.Add(new ConfigGUI.GUITabs.MainScreen());
             foreach (var b in Player.CustomBlocks)
             {
                 clbBlocks.Items.Add(b.ToString());
@@ -2770,7 +2773,12 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             cboPrison.Enabled = mcbPrison.Checked;
             //cboPrison.SelectedIndex = 0;
         }
-        
+
+        private void bOK_Click_1(object sender, EventArgs e)
+        {
+
+        }
+
         private void metroButton1_Click(object sender, EventArgs e)
         {
             for (var x = 0; x <= vPermissions.Items.Count - 1; x++)

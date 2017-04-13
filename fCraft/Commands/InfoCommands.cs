@@ -632,14 +632,14 @@ THE SOFTWARE.*/
             if (Option == null)
             {
                 CdList.PrintUsage(player);
-                player.Message("  Sections include: Staff, DisplayedNames, Idles, Portals, Rank, Top10, HaxOff, TopBuilders, MostTime, MostKicks, MostBans, MostPromos, MostLogins, and Donators");
+                player.Message("  Sections include: Staff, DisplayedNames, Idles, Portals, Rank, Top10, HaxOff, TopBuilders, MostTime, MostKicks, MostBans, MostPromos, MostLogins, Prisoners, and Donators");
                 return;
             }
             switch (Option.ToLower())
             {
                 default:
                     CdList.PrintUsage(player);
-                    player.Message("  Sections include: Staff, DisplayedNames, Idles, Portals, Rank, Top10, TopBuilders, MostTime, MostKicks, MostBans, MostPromos, MostLogins, and Donators");
+                    player.Message("  Sections include: Staff, DisplayedNames, Idles, Portals, Rank, Top10, TopBuilders, MostTime, MostKicks, MostBans, MostPromos, MostLogins, Prisoners, and Donators");
                     break;
                 case "top10":
                     List<World> WorldNames = new List<World>(WorldManager.Worlds.Where(w => w.VisitCount > 0)
@@ -665,7 +665,7 @@ THE SOFTWARE.*/
                 case "toplogins":
                 case "topvisits":
                 case "mostvisits":
-                    if (TopLogins.Count() < 1)
+                    if (!TopLogins.Any())
                     {
                         player.Message("&WNo results found");
                         return;
@@ -825,7 +825,7 @@ THE SOFTWARE.*/
                 case "mosttime":
                 case "toptime":
                 case "mosthours":
-                    if (MostTime.Count() < 1)
+                    if (!MostTime.Any())
                     {
                         player.Message("&WNo results found");
                         return;
@@ -940,6 +940,14 @@ THE SOFTWARE.*/
                             player.Message("Showing matches {0}-{1} (out of {2}).",
                                             offset + 1, offset + DnPart.Length, DisplayedNames.Length);
                     }
+                    break;
+                case "prisoners":
+                    var text = "These players are in prison: ";
+                    foreach (var t in PrisonData.Obj.Prisoners)
+                    {
+                        text += t + ", ";
+                    }
+                    player.Message(text.Substring(text.Length - 2));
                     break;
             }
         }

@@ -106,9 +106,9 @@ namespace fCraft
                 pl.JoinWorld(world_, WorldChangeReason.Rejoin);
             }
 
-            if (p != null && world_ != null)
+            if (p != null)
             {
-                world_.Players.Message("{0}&S stopped the game of CTF early on world {1}", p.ClassyName, world_.ClassyName);               
+                world_?.Players.Message("{0}&S stopped the game of CTF early on world {1}", p.ClassyName, world_.ClassyName);               
             }
             RevertGame();
 
