@@ -82,7 +82,7 @@
     <Compile Include="ConfigGUI\ColorPicker.Designer.cs">
       <DependentUpon>ColorPicker.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConfigGUI\ConfigHandler.cs" />
+    <Compile Include="ConfigGUI\ConfigModule.cs" />
     <Compile Include="ConfigGUI\CustomPictureBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -98,17 +98,71 @@
     <Compile Include="ConfigGUI\GUITabs\BaseTab.Designer.cs">
       <DependentUpon>BaseTab.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\GeneralConfig.cs">
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Advanced.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\GeneralConfig.Designer.cs">
-      <DependentUpon>GeneralConfig.cs</DependentUpon>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Advanced.Designer.cs">
+      <DependentUpon>Advanced.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\RankConfig.cs">
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Chat.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\RankConfig.Designer.cs">
-      <DependentUpon>RankConfig.cs</DependentUpon>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Chat.Designer.cs">
+      <DependentUpon>Chat.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Cpe.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Cpe.Designer.cs">
+      <DependentUpon>Cpe.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\General.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\General.Designer.cs">
+      <DependentUpon>General.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Irc.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Irc.Designer.cs">
+      <DependentUpon>Irc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Logging.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Logging.Designer.cs">
+      <DependentUpon>Logging.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Misc.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Misc.Designer.cs">
+      <DependentUpon>Misc.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Ranks.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Ranks.Designer.cs">
+      <DependentUpon>Ranks.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\SavingBackup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\SavingBackup.Designer.cs">
+      <DependentUpon>SavingBackup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Security.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Security.Designer.cs">
+      <DependentUpon>Security.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Worlds.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ConfigGUI\GUITabs\ConfigScreens\Worlds.Designer.cs">
+      <DependentUpon>Worlds.cs</DependentUpon>
     </Compile>
     <Compile Include="ConfigGUI\GUITabs\MainScreen.cs">
       <SubType>Form</SubType>
@@ -191,11 +245,38 @@
     <EmbeddedResource Include="ConfigGUI\GUITabs\BaseTab.resx">
       <DependentUpon>BaseTab.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\GeneralConfig.resx">
-      <DependentUpon>GeneralConfig.cs</DependentUpon>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\Advanced.resx">
+      <DependentUpon>Advanced.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\RankConfig.resx">
-      <DependentUpon>RankConfig.cs</DependentUpon>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\Chat.resx">
+      <DependentUpon>Chat.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\Cpe.resx">
+      <DependentUpon>Cpe.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\General.resx">
+      <DependentUpon>General.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\Irc.resx">
+      <DependentUpon>Irc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\Logging.resx">
+      <DependentUpon>Logging.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\Misc.resx">
+      <DependentUpon>Misc.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\Ranks.resx">
+      <DependentUpon>Ranks.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\SavingBackup.resx">
+      <DependentUpon>SavingBackup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\Security.resx">
+      <DependentUpon>Security.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConfigGUI\GUITabs\ConfigScreens\Worlds.resx">
+      <DependentUpon>Worlds.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ConfigGUI\GUITabs\MainScreen.resx">
       <DependentUpon>MainScreen.cs</DependentUpon>
@@ -235,6 +316,7 @@
     <EmbeddedResource Include="ServerGUI\PlayerViewer.resx">
       <DependentUpon>PlayerViewer.cs</DependentUpon>
     </EmbeddedResource>
+    <Compile Include="ConfigGUI\ConfigModule.Adapter.cs" />
     <None Include="ConfigGUI\MinecraftFont\minecraft.ttf" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

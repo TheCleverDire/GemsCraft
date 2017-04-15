@@ -1,6 +1,6 @@
 ﻿namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
 {
-    partial class GeneralConfig
+    partial class General
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GeneralConfig));
             this.gBasic = new MetroFramework.Controls.MetroTile();
             this.nMaxPlayersPerWorld = new System.Windows.Forms.NumericUpDown();
             this.lMaxPlayersPerWorld = new MetroFramework.Controls.MetroLabel();
@@ -48,10 +47,10 @@
             this.nMaxPlayers = new System.Windows.Forms.NumericUpDown();
             this.lPublic = new MetroFramework.Controls.MetroLabel();
             this.lMaxPlayers = new MetroFramework.Controls.MetroLabel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.groupBox2 = new MetroFramework.Controls.MetroTile();
+            this.groupBox4 = new MetroFramework.Controls.MetroTile();
             this.bWiki = new MetroFramework.Controls.MetroButton();
             this.bWeb = new MetroFramework.Controls.MetroButton();
+            this.groupBox2 = new MetroFramework.Controls.MetroTile();
             this.bChangelog = new MetroFramework.Controls.MetroButton();
             this.bCredits = new MetroFramework.Controls.MetroButton();
             this.bReadme = new MetroFramework.Controls.MetroButton();
@@ -62,17 +61,17 @@
             this.xAnnouncements = new MetroFramework.Controls.MetroCheckBox();
             this.bRules = new MetroFramework.Controls.MetroButton();
             this.bAnnouncements = new MetroFramework.Controls.MetroButton();
-            this.metroButton1 = new MetroFramework.Controls.MetroButton();
-            this.metroButton2 = new MetroFramework.Controls.MetroButton();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.gBasic.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayersPerWorld)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nPort)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.groupBox4.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.gInformation.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // gBasic
@@ -379,37 +378,25 @@
             this.lMaxPlayers.TabIndex = 4;
             this.lMaxPlayers.Text = "Max players (total)";
             // 
-            // pictureBox1
+            // groupBox4
             // 
-            this.pictureBox1.Image = global::GemsCraftGUI.Properties.Resources.icon;
-            this.pictureBox1.Location = new System.Drawing.Point(23, 322);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(180, 180);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.pictureBox1.TabIndex = 9;
-            this.pictureBox1.TabStop = false;
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.ActiveControl = null;
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.groupBox2.Controls.Add(this.bWiki);
-            this.groupBox2.Controls.Add(this.bWeb);
-            this.groupBox2.Controls.Add(this.bChangelog);
-            this.groupBox2.Controls.Add(this.bCredits);
-            this.groupBox2.Controls.Add(this.bReadme);
-            this.groupBox2.Location = new System.Drawing.Point(209, 322);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(123, 180);
-            this.groupBox2.TabIndex = 8;
-            this.groupBox2.Text = "Other";
-            this.groupBox2.TextAlign = System.Drawing.ContentAlignment.TopLeft;
-            this.groupBox2.UseSelectable = true;
+            this.groupBox4.AccessibleRole = System.Windows.Forms.AccessibleRole.Window;
+            this.groupBox4.ActiveControl = null;
+            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox4.Controls.Add(this.bWiki);
+            this.groupBox4.Controls.Add(this.bWeb);
+            this.groupBox4.Location = new System.Drawing.Point(26, 473);
+            this.groupBox4.Name = "groupBox4";
+            this.groupBox4.Size = new System.Drawing.Size(126, 94);
+            this.groupBox4.TabIndex = 9;
+            this.groupBox4.TabStop = false;
+            this.groupBox4.Text = "Contact Us";
+            this.groupBox4.UseSelectable = true;
             // 
             // bWiki
             // 
             this.bWiki.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.bWiki.Location = new System.Drawing.Point(6, 147);
+            this.bWiki.Location = new System.Drawing.Point(7, 60);
             this.bWiki.Name = "bWiki";
             this.bWiki.Size = new System.Drawing.Size(111, 23);
             this.bWiki.TabIndex = 1;
@@ -419,12 +406,28 @@
             // bWeb
             // 
             this.bWeb.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.bWeb.Location = new System.Drawing.Point(6, 118);
+            this.bWeb.Location = new System.Drawing.Point(8, 31);
             this.bWeb.Name = "bWeb";
             this.bWeb.Size = new System.Drawing.Size(110, 23);
             this.bWeb.TabIndex = 1;
             this.bWeb.Text = "Website";
             this.bWeb.UseSelectable = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.ActiveControl = null;
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.groupBox2.Controls.Add(this.bChangelog);
+            this.groupBox2.Controls.Add(this.bCredits);
+            this.groupBox2.Controls.Add(this.bReadme);
+            this.groupBox2.Location = new System.Drawing.Point(26, 332);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(123, 135);
+            this.groupBox2.TabIndex = 8;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "About";
+            this.groupBox2.TextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.groupBox2.UseSelectable = true;
             // 
             // bChangelog
             // 
@@ -465,7 +468,7 @@
             this.gInformation.Controls.Add(this.xAnnouncements);
             this.gInformation.Controls.Add(this.bRules);
             this.gInformation.Controls.Add(this.bAnnouncements);
-            this.gInformation.Location = new System.Drawing.Point(23, 259);
+            this.gInformation.Location = new System.Drawing.Point(23, 269);
             this.gInformation.Name = "gInformation";
             this.gInformation.Size = new System.Drawing.Size(636, 57);
             this.gInformation.TabIndex = 7;
@@ -551,92 +554,80 @@
             this.bAnnouncements.Text = "Edit Announcements";
             this.bAnnouncements.UseSelectable = true;
             // 
-            // metroButton1
+            // pictureBox1
             // 
-            this.metroButton1.Location = new System.Drawing.Point(339, 323);
-            this.metroButton1.Name = "metroButton1";
-            this.metroButton1.Size = new System.Drawing.Size(155, 33);
-            this.metroButton1.TabIndex = 10;
-            this.metroButton1.Text = "Apply Changes";
-            this.metroButton1.UseSelectable = true;
-            this.metroButton1.Click += new System.EventHandler(this.metroButton1_Click);
+            this.pictureBox1.Image = global::GemsCraftGUI.Properties.Resources.icon;
+            this.pictureBox1.Location = new System.Drawing.Point(155, 332);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(180, 235);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox1.TabIndex = 10;
+            this.pictureBox1.TabStop = false;
+            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
-            // metroButton2
-            // 
-            this.metroButton2.Location = new System.Drawing.Point(340, 362);
-            this.metroButton2.Name = "metroButton2";
-            this.metroButton2.Size = new System.Drawing.Size(155, 33);
-            this.metroButton2.TabIndex = 11;
-            this.metroButton2.Text = "Cancel";
-            this.metroButton2.UseSelectable = true;
-            this.metroButton2.Click += new System.EventHandler(this.metroButton2_Click);
-            // 
-            // GeneralConfig
+            // General
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(668, 515);
-            this.Controls.Add(this.metroButton2);
-            this.Controls.Add(this.metroButton1);
+            this.ClientSize = new System.Drawing.Size(672, 576);
             this.Controls.Add(this.gBasic);
+            this.Controls.Add(this.groupBox4);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.gInformation);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Name = "GeneralConfig";
-            this.Text = "General Config";
-            this.Load += new System.EventHandler(this.GeneralConfig_Load);
+            this.Name = "General";
+            this.Text = "General";
             this.gBasic.ResumeLayout(false);
             this.gBasic.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayersPerWorld)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nPort)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nUploadBandwidth)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxPlayers)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.groupBox4.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
             this.gInformation.ResumeLayout(false);
             this.gInformation.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nAnnouncements)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private MetroFramework.Controls.MetroTile gBasic;
-        public System.Windows.Forms.NumericUpDown nMaxPlayersPerWorld;
-        private MetroFramework.Controls.MetroLabel lMaxPlayersPerWorld;
-        private MetroFramework.Controls.MetroLabel lPort;
-        public System.Windows.Forms.NumericUpDown nPort;
-        public MetroFramework.Controls.MetroComboBox cDefaultRank;
-        private MetroFramework.Controls.MetroLabel lDefaultRank;
-        private MetroFramework.Controls.MetroLabel lUploadBandwidth;
-        public MetroFramework.Controls.MetroButton bMeasure;
-        public MetroFramework.Controls.MetroTextBox tServerName;
-        private MetroFramework.Controls.MetroLabel lUploadBandwidthUnits;
-        private MetroFramework.Controls.MetroLabel lServerName;
-        public System.Windows.Forms.NumericUpDown nUploadBandwidth;
-        public MetroFramework.Controls.MetroTextBox tMOTD;
-        private MetroFramework.Controls.MetroLabel lMOTD;
-        public MetroFramework.Controls.MetroComboBox cPublic;
-        public System.Windows.Forms.NumericUpDown nMaxPlayers;
-        private MetroFramework.Controls.MetroLabel lPublic;
-        private MetroFramework.Controls.MetroLabel lMaxPlayers;
-        public System.Windows.Forms.PictureBox pictureBox1;
-        private MetroFramework.Controls.MetroTile groupBox2;
-        private MetroFramework.Controls.MetroButton bWiki;
-        private MetroFramework.Controls.MetroButton bWeb;
-        private MetroFramework.Controls.MetroButton bChangelog;
-        private MetroFramework.Controls.MetroButton bCredits;
-        private MetroFramework.Controls.MetroButton bReadme;
-        private MetroFramework.Controls.MetroTile gInformation;
-        private MetroFramework.Controls.MetroButton bGreeting;
-        private MetroFramework.Controls.MetroLabel lAnnouncementsUnits;
-        public System.Windows.Forms.NumericUpDown nAnnouncements;
-        public MetroFramework.Controls.MetroCheckBox xAnnouncements;
-        private MetroFramework.Controls.MetroButton bRules;
-        private MetroFramework.Controls.MetroButton bAnnouncements;
-        private MetroFramework.Controls.MetroButton metroButton1;
-        private MetroFramework.Controls.MetroButton metroButton2;
+        internal MetroFramework.Controls.MetroTile gBasic;
+        internal System.Windows.Forms.NumericUpDown nMaxPlayersPerWorld;
+        internal MetroFramework.Controls.MetroLabel lMaxPlayersPerWorld;
+        internal MetroFramework.Controls.MetroLabel lPort;
+        internal System.Windows.Forms.NumericUpDown nPort;
+        internal MetroFramework.Controls.MetroComboBox cDefaultRank;
+        internal MetroFramework.Controls.MetroLabel lDefaultRank;
+        internal MetroFramework.Controls.MetroLabel lUploadBandwidth;
+        internal MetroFramework.Controls.MetroButton bMeasure;
+        internal MetroFramework.Controls.MetroTextBox tServerName;
+        internal MetroFramework.Controls.MetroLabel lUploadBandwidthUnits;
+        internal MetroFramework.Controls.MetroLabel lServerName;
+        internal System.Windows.Forms.NumericUpDown nUploadBandwidth;
+        internal MetroFramework.Controls.MetroTextBox tMOTD;
+        internal MetroFramework.Controls.MetroLabel lMOTD;
+        internal MetroFramework.Controls.MetroComboBox cPublic;
+        internal System.Windows.Forms.NumericUpDown nMaxPlayers;
+        internal MetroFramework.Controls.MetroLabel lPublic;
+        internal MetroFramework.Controls.MetroLabel lMaxPlayers;
+        internal MetroFramework.Controls.MetroTile groupBox4;
+        internal MetroFramework.Controls.MetroButton bWiki;
+        internal MetroFramework.Controls.MetroButton bWeb;
+        internal System.Windows.Forms.PictureBox pictureBox1;
+        internal MetroFramework.Controls.MetroTile groupBox2;
+        internal MetroFramework.Controls.MetroButton bChangelog;
+        internal MetroFramework.Controls.MetroButton bCredits;
+        internal MetroFramework.Controls.MetroButton bReadme;
+        internal MetroFramework.Controls.MetroTile gInformation;
+        internal MetroFramework.Controls.MetroButton bGreeting;
+        internal MetroFramework.Controls.MetroLabel lAnnouncementsUnits;
+        internal System.Windows.Forms.NumericUpDown nAnnouncements;
+        internal MetroFramework.Controls.MetroCheckBox xAnnouncements;
+        internal MetroFramework.Controls.MetroButton bRules;
+        internal MetroFramework.Controls.MetroButton bAnnouncements;
     }
 }

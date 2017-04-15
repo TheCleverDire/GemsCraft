@@ -190,17 +190,17 @@
 
         #endregion
 
-        private MetroFramework.Controls.MetroTile tileGeneral;
-        private MetroFramework.Controls.MetroTile tileRanks;
-        private MetroFramework.Controls.MetroTile tileChat;
-        private MetroFramework.Controls.MetroTile tileWorlds;
-        private MetroFramework.Controls.MetroTile tileIrc;
-        private MetroFramework.Controls.MetroTile tileLogging;
-        private MetroFramework.Controls.MetroTile tileSavingAndBackup;
-        private MetroFramework.Controls.MetroTile tileSecurity;
-        private MetroFramework.Controls.MetroTile tileAbout;
-        private MetroFramework.Controls.MetroTile tileCpe;
-        private MetroFramework.Controls.MetroTile tileMisc;
-        private MetroFramework.Controls.MetroTile tileAdvanced;
+        internal MetroFramework.Controls.MetroTile tileGeneral;
+        internal MetroFramework.Controls.MetroTile tileRanks;
+        internal MetroFramework.Controls.MetroTile tileChat;
+        internal MetroFramework.Controls.MetroTile tileWorlds;
+        internal MetroFramework.Controls.MetroTile tileIrc;
+        internal MetroFramework.Controls.MetroTile tileLogging;
+        internal MetroFramework.Controls.MetroTile tileSavingAndBackup;
+        internal MetroFramework.Controls.MetroTile tileSecurity;
+        internal MetroFramework.Controls.MetroTile tileAbout;
+        internal MetroFramework.Controls.MetroTile tileCpe;
+        internal MetroFramework.Controls.MetroTile tileMisc;
+        internal MetroFramework.Controls.MetroTile tileAdvanced;
     }
 }
