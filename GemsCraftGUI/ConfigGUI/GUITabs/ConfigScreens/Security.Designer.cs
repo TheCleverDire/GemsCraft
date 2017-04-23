@@ -30,22 +30,22 @@
         {
             this.gBlockDB = new MetroFramework.Controls.MetroTile();
             this.cBlockDBAutoEnableRank = new MetroFramework.Controls.MetroComboBox();
-            this.xBlockDBAutoEnable = new MetroFramework.Controls.MetroCheckBox();
-            this.xBlockDBEnabled = new MetroFramework.Controls.MetroCheckBox();
+            this.xBlockDBAutoEnable = new System.Windows.Forms.CheckBox();
+            this.xBlockDBEnabled = new System.Windows.Forms.CheckBox();
             this.gSecurityMisc = new MetroFramework.Controls.MetroTile();
-            this.xAnnounceRankChangeReasons = new MetroFramework.Controls.MetroCheckBox();
-            this.xRequireKickReason = new MetroFramework.Controls.MetroCheckBox();
+            this.xAnnounceRankChangeReasons = new System.Windows.Forms.CheckBox();
+            this.xRequireKickReason = new System.Windows.Forms.CheckBox();
             this.lPatrolledRankAndBelow = new MetroFramework.Controls.MetroLabel();
             this.cPatrolledRank = new MetroFramework.Controls.MetroComboBox();
             this.lPatrolledRank = new MetroFramework.Controls.MetroLabel();
-            this.xAnnounceRankChanges = new MetroFramework.Controls.MetroCheckBox();
-            this.xAnnounceKickAndBanReasons = new MetroFramework.Controls.MetroCheckBox();
-            this.xRequireRankChangeReason = new MetroFramework.Controls.MetroCheckBox();
-            this.xRequireBanReason = new MetroFramework.Controls.MetroCheckBox();
+            this.xAnnounceRankChanges = new System.Windows.Forms.CheckBox();
+            this.xAnnounceKickAndBanReasons = new System.Windows.Forms.CheckBox();
+            this.xRequireRankChangeReason = new System.Windows.Forms.CheckBox();
+            this.xRequireBanReason = new System.Windows.Forms.CheckBox();
             this.gSpamChat = new MetroFramework.Controls.MetroTile();
             this.lAntispamMaxWarnings = new MetroFramework.Controls.MetroLabel();
             this.nAntispamMaxWarnings = new System.Windows.Forms.NumericUpDown();
-            this.xAntispamKicks = new MetroFramework.Controls.MetroCheckBox();
+            this.xAntispamKicks = new System.Windows.Forms.CheckBox();
             this.lSpamMuteSeconds = new MetroFramework.Controls.MetroLabel();
             this.lAntispamInterval = new MetroFramework.Controls.MetroLabel();
             this.nSpamMute = new System.Windows.Forms.NumericUpDown();
@@ -56,8 +56,8 @@
             this.lSpamChat = new MetroFramework.Controls.MetroLabel();
             this.gVerify = new MetroFramework.Controls.MetroTile();
             this.nMaxConnectionsPerIP = new System.Windows.Forms.NumericUpDown();
-            this.xAllowUnverifiedLAN = new MetroFramework.Controls.MetroCheckBox();
-            this.xMaxConnectionsPerIP = new MetroFramework.Controls.MetroCheckBox();
+            this.xAllowUnverifiedLAN = new System.Windows.Forms.CheckBox();
+            this.xMaxConnectionsPerIP = new System.Windows.Forms.CheckBox();
             this.lVerifyNames = new MetroFramework.Controls.MetroLabel();
             this.cVerifyNames = new MetroFramework.Controls.MetroComboBox();
             this.gBlockDB.SuspendLayout();
@@ -109,7 +109,6 @@
             this.xBlockDBAutoEnable.TabIndex = 1;
             this.xBlockDBAutoEnable.TabStop = false;
             this.xBlockDBAutoEnable.Text = "Automatically enable BlockDB on worlds that can be edited by";
-            this.xBlockDBAutoEnable.UseSelectable = true;
             // 
             // xBlockDBEnabled
             // 
@@ -119,7 +118,6 @@
             this.xBlockDBEnabled.Size = new System.Drawing.Size(239, 15);
             this.xBlockDBEnabled.TabIndex = 0;
             this.xBlockDBEnabled.Text = "Enable BlockDB (per-block edit tracking).";
-            this.xBlockDBEnabled.UseSelectable = true;
             // 
             // gSecurityMisc
             // 
@@ -149,7 +147,6 @@
             this.xAnnounceRankChangeReasons.Size = new System.Drawing.Size(249, 15);
             this.xAnnounceRankChangeReasons.TabIndex = 6;
             this.xAnnounceRankChangeReasons.Text = "Announce promotion && demotion reasons";
-            this.xAnnounceRankChangeReasons.UseSelectable = true;
             // 
             // xRequireKickReason
             // 
@@ -159,7 +156,6 @@
             this.xRequireKickReason.Size = new System.Drawing.Size(125, 15);
             this.xRequireKickReason.TabIndex = 1;
             this.xRequireKickReason.Text = "Require kick reason";
-            this.xRequireKickReason.UseSelectable = true;
             // 
             // lPatrolledRankAndBelow
             // 
@@ -198,7 +194,6 @@
             this.xAnnounceRankChanges.Size = new System.Drawing.Size(226, 15);
             this.xAnnounceRankChanges.TabIndex = 5;
             this.xAnnounceRankChanges.Text = "Announce promotions and demotions";
-            this.xAnnounceRankChanges.UseSelectable = true;
             // 
             // xAnnounceKickAndBanReasons
             // 
@@ -208,7 +203,6 @@
             this.xAnnounceKickAndBanReasons.Size = new System.Drawing.Size(234, 15);
             this.xAnnounceKickAndBanReasons.TabIndex = 4;
             this.xAnnounceKickAndBanReasons.Text = "Announce kick, ban, and unban reasons";
-            this.xAnnounceKickAndBanReasons.UseSelectable = true;
             // 
             // xRequireRankChangeReason
             // 
@@ -218,7 +212,6 @@
             this.xRequireRankChangeReason.Size = new System.Drawing.Size(229, 15);
             this.xRequireRankChangeReason.TabIndex = 3;
             this.xRequireRankChangeReason.Text = "Require promotion && demotion reason";
-            this.xRequireRankChangeReason.UseSelectable = true;
             // 
             // xRequireBanReason
             // 
@@ -228,7 +221,6 @@
             this.xRequireBanReason.Size = new System.Drawing.Size(174, 15);
             this.xRequireBanReason.TabIndex = 2;
             this.xRequireBanReason.Text = "Require ban && unban reason";
-            this.xRequireBanReason.UseSelectable = true;
             // 
             // gSpamChat
             // 
@@ -277,7 +269,6 @@
             this.xAntispamKicks.Size = new System.Drawing.Size(72, 15);
             this.xAntispamKicks.TabIndex = 8;
             this.xAntispamKicks.Text = "Kick after";
-            this.xAntispamKicks.UseSelectable = true;
             // 
             // lSpamMuteSeconds
             // 
@@ -419,7 +410,6 @@
             this.xAllowUnverifiedLAN.TabIndex = 2;
             this.xAllowUnverifiedLAN.Text = "Allow connections from LAN without name verification (192.168.0.0/16 and 10.0.0.0" +
     "/8)";
-            this.xAllowUnverifiedLAN.UseSelectable = true;
             // 
             // xMaxConnectionsPerIP
             // 
@@ -429,7 +419,6 @@
             this.xMaxConnectionsPerIP.Size = new System.Drawing.Size(224, 15);
             this.xMaxConnectionsPerIP.TabIndex = 3;
             this.xMaxConnectionsPerIP.Text = "Limit number of connections per IP to";
-            this.xMaxConnectionsPerIP.UseSelectable = true;
             // 
             // lVerifyNames
             // 
@@ -487,22 +476,22 @@
 
         internal MetroFramework.Controls.MetroTile gBlockDB;
         internal MetroFramework.Controls.MetroComboBox cBlockDBAutoEnableRank;
-        internal MetroFramework.Controls.MetroCheckBox xBlockDBAutoEnable;
-        internal MetroFramework.Controls.MetroCheckBox xBlockDBEnabled;
+        internal System.Windows.Forms.CheckBox xBlockDBAutoEnable;
+        internal System.Windows.Forms.CheckBox xBlockDBEnabled;
         internal MetroFramework.Controls.MetroTile gSecurityMisc;
-        internal MetroFramework.Controls.MetroCheckBox xAnnounceRankChangeReasons;
-        internal MetroFramework.Controls.MetroCheckBox xRequireKickReason;
+        internal System.Windows.Forms.CheckBox xAnnounceRankChangeReasons;
+        internal System.Windows.Forms.CheckBox xRequireKickReason;
         internal MetroFramework.Controls.MetroLabel lPatrolledRankAndBelow;
         internal MetroFramework.Controls.MetroComboBox cPatrolledRank;
         internal MetroFramework.Controls.MetroLabel lPatrolledRank;
-        internal MetroFramework.Controls.MetroCheckBox xAnnounceRankChanges;
-        internal MetroFramework.Controls.MetroCheckBox xAnnounceKickAndBanReasons;
-        internal MetroFramework.Controls.MetroCheckBox xRequireRankChangeReason;
-        internal MetroFramework.Controls.MetroCheckBox xRequireBanReason;
+        internal System.Windows.Forms.CheckBox xAnnounceRankChanges;
+        internal System.Windows.Forms.CheckBox xAnnounceKickAndBanReasons;
+        internal System.Windows.Forms.CheckBox xRequireRankChangeReason;
+        internal System.Windows.Forms.CheckBox xRequireBanReason;
         internal MetroFramework.Controls.MetroTile gSpamChat;
         internal MetroFramework.Controls.MetroLabel lAntispamMaxWarnings;
         internal System.Windows.Forms.NumericUpDown nAntispamMaxWarnings;
-        internal MetroFramework.Controls.MetroCheckBox xAntispamKicks;
+        internal System.Windows.Forms.CheckBox xAntispamKicks;
         internal MetroFramework.Controls.MetroLabel lSpamMuteSeconds;
         internal MetroFramework.Controls.MetroLabel lAntispamInterval;
         internal System.Windows.Forms.NumericUpDown nSpamMute;
@@ -513,8 +502,8 @@
         internal MetroFramework.Controls.MetroLabel lSpamChat;
         internal MetroFramework.Controls.MetroTile gVerify;
         internal System.Windows.Forms.NumericUpDown nMaxConnectionsPerIP;
-        internal MetroFramework.Controls.MetroCheckBox xAllowUnverifiedLAN;
-        internal MetroFramework.Controls.MetroCheckBox xMaxConnectionsPerIP;
+        internal System.Windows.Forms.CheckBox xAllowUnverifiedLAN;
+        internal System.Windows.Forms.CheckBox xMaxConnectionsPerIP;
         internal MetroFramework.Controls.MetroLabel lVerifyNames;
         internal MetroFramework.Controls.MetroComboBox cVerifyNames;
     }

@@ -332,7 +332,6 @@ namespace fCraft
 #endif
 
             // try to load the config
-            if (!isCli) RankManager.RanksAlreadyLoaded = true;
             if (!Config.Load(false, false))
             {
                 throw new Exception("GemsCraft Config failed to initialize");

@@ -30,12 +30,12 @@
         {
             this.chatPreview1 = new fCraft.ConfigGUI.ChatPreview();
             this.gAppearence = new MetroFramework.Controls.MetroTile();
-            this.xShowConnectionMessages = new MetroFramework.Controls.MetroCheckBox();
-            this.xShowJoinedWorldMessages = new MetroFramework.Controls.MetroCheckBox();
-            this.xRankColorsInWorldNames = new MetroFramework.Controls.MetroCheckBox();
-            this.xRankPrefixesInList = new MetroFramework.Controls.MetroCheckBox();
-            this.xRankPrefixesInChat = new MetroFramework.Controls.MetroCheckBox();
-            this.xRankColorsInChat = new MetroFramework.Controls.MetroCheckBox();
+            this.xShowConnectionMessages = new System.Windows.Forms.CheckBox();
+            this.xShowJoinedWorldMessages = new System.Windows.Forms.CheckBox();
+            this.xRankColorsInWorldNames = new System.Windows.Forms.CheckBox();
+            this.xRankPrefixesInList = new System.Windows.Forms.CheckBox();
+            this.xRankPrefixesInChat = new System.Windows.Forms.CheckBox();
+            this.xRankColorsInChat = new System.Windows.Forms.CheckBox();
             this.gChatColors = new MetroFramework.Controls.MetroTile();
             this.lColorMe = new MetroFramework.Controls.MetroLabel();
             this.bColorGlobal = new MetroFramework.Controls.MetroButton();
@@ -91,7 +91,6 @@
             this.xShowConnectionMessages.Size = new System.Drawing.Size(282, 15);
             this.xShowConnectionMessages.TabIndex = 4;
             this.xShowConnectionMessages.Text = "Show a message when players join/leave SERVER.";
-            this.xShowConnectionMessages.UseSelectable = true;
             // 
             // xShowJoinedWorldMessages
             // 
@@ -101,7 +100,6 @@
             this.xShowJoinedWorldMessages.Size = new System.Drawing.Size(246, 15);
             this.xShowJoinedWorldMessages.TabIndex = 3;
             this.xShowJoinedWorldMessages.Text = "Show a message when players join worlds.";
-            this.xShowJoinedWorldMessages.UseSelectable = true;
             // 
             // xRankColorsInWorldNames
             // 
@@ -111,7 +109,6 @@
             this.xRankColorsInWorldNames.Size = new System.Drawing.Size(233, 15);
             this.xRankColorsInWorldNames.TabIndex = 5;
             this.xRankColorsInWorldNames.Text = "Color world names based on build rank.";
-            this.xRankColorsInWorldNames.UseSelectable = true;
             // 
             // xRankPrefixesInList
             // 
@@ -121,7 +118,6 @@
             this.xRankPrefixesInList.Size = new System.Drawing.Size(206, 15);
             this.xRankPrefixesInList.TabIndex = 2;
             this.xRankPrefixesInList.Text = "Prefixes in player list (breaks skins).";
-            this.xRankPrefixesInList.UseSelectable = true;
             // 
             // xRankPrefixesInChat
             // 
@@ -131,7 +127,6 @@
             this.xRankPrefixesInChat.Size = new System.Drawing.Size(124, 15);
             this.xRankPrefixesInChat.TabIndex = 1;
             this.xRankPrefixesInChat.Text = "Show rank prefixes.";
-            this.xRankPrefixesInChat.UseSelectable = true;
             // 
             // xRankColorsInChat
             // 
@@ -141,7 +136,6 @@
             this.xRankColorsInChat.Size = new System.Drawing.Size(116, 15);
             this.xRankColorsInChat.TabIndex = 0;
             this.xRankColorsInChat.Text = "Show rank colors.";
-            this.xRankColorsInChat.UseSelectable = true;
             // 
             // gChatColors
             // 
@@ -338,12 +332,12 @@
 
         internal fCraft.ConfigGUI.ChatPreview chatPreview1;
         internal MetroFramework.Controls.MetroTile gAppearence;
-        internal MetroFramework.Controls.MetroCheckBox xShowConnectionMessages;
-        internal MetroFramework.Controls.MetroCheckBox xShowJoinedWorldMessages;
-        internal MetroFramework.Controls.MetroCheckBox xRankColorsInWorldNames;
-        internal MetroFramework.Controls.MetroCheckBox xRankPrefixesInList;
-        internal MetroFramework.Controls.MetroCheckBox xRankPrefixesInChat;
-        internal MetroFramework.Controls.MetroCheckBox xRankColorsInChat;
+        internal System.Windows.Forms.CheckBox xShowConnectionMessages;
+        internal System.Windows.Forms.CheckBox xShowJoinedWorldMessages;
+        internal System.Windows.Forms.CheckBox xRankColorsInWorldNames;
+        internal System.Windows.Forms.CheckBox xRankPrefixesInList;
+        internal System.Windows.Forms.CheckBox xRankPrefixesInChat;
+        internal System.Windows.Forms.CheckBox xRankColorsInChat;
         internal MetroFramework.Controls.MetroTile gChatColors;
         internal MetroFramework.Controls.MetroLabel lColorMe;
         internal MetroFramework.Controls.MetroButton bColorGlobal;

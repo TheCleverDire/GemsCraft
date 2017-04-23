@@ -32,31 +32,31 @@
             this.gboEnvColors = new MetroFramework.Controls.MetroTile();
             this.numHourLength = new System.Windows.Forms.NumericUpDown();
             this.lblHourLength = new MetroFramework.Controls.MetroLabel();
-            this.chkTimeBasedSky = new MetroFramework.Controls.MetroCheckBox();
-            this.chkEnvColorsAllowed = new MetroFramework.Controls.MetroCheckBox();
+            this.chkTimeBasedSky = new System.Windows.Forms.CheckBox();
+            this.chkEnvColorsAllowed = new System.Windows.Forms.CheckBox();
             this.gboMessageType = new MetroFramework.Controls.MetroTile();
             this.btnSeeKeyWords = new MetroFramework.Controls.MetroButton();
-            this.chkAnnouncementMT = new MetroFramework.Controls.MetroCheckBox();
-            this.chkBottomRight3 = new MetroFramework.Controls.MetroCheckBox();
+            this.chkAnnouncementMT = new System.Windows.Forms.CheckBox();
+            this.chkBottomRight3 = new System.Windows.Forms.CheckBox();
             this.txtBottomRight3 = new MetroFramework.Controls.MetroTextBox();
-            this.chkBottomRight2 = new MetroFramework.Controls.MetroCheckBox();
+            this.chkBottomRight2 = new System.Windows.Forms.CheckBox();
             this.txtBottomRight2 = new MetroFramework.Controls.MetroTextBox();
-            this.chkBottomRight1 = new MetroFramework.Controls.MetroCheckBox();
+            this.chkBottomRight1 = new System.Windows.Forms.CheckBox();
             this.txtBottomRight1 = new MetroFramework.Controls.MetroTextBox();
-            this.chkStatus3 = new MetroFramework.Controls.MetroCheckBox();
+            this.chkStatus3 = new System.Windows.Forms.CheckBox();
             this.txtStatus3 = new MetroFramework.Controls.MetroTextBox();
-            this.chkStatus2 = new MetroFramework.Controls.MetroCheckBox();
+            this.chkStatus2 = new System.Windows.Forms.CheckBox();
             this.txtStatus2 = new MetroFramework.Controls.MetroTextBox();
-            this.chkStatus1 = new MetroFramework.Controls.MetroCheckBox();
+            this.chkStatus1 = new System.Windows.Forms.CheckBox();
             this.txtStatus1 = new MetroFramework.Controls.MetroTextBox();
-            this.chkMessageTypeAllowed = new MetroFramework.Controls.MetroCheckBox();
+            this.chkMessageTypeAllowed = new System.Windows.Forms.CheckBox();
             this.gboHeldBlock = new MetroFramework.Controls.MetroTile();
-            this.chkHeldBlockAllowed = new MetroFramework.Controls.MetroCheckBox();
+            this.chkHeldBlockAllowed = new System.Windows.Forms.CheckBox();
             this.gboCustomBlocks = new MetroFramework.Controls.MetroTile();
             this.clbBlocks = new System.Windows.Forms.CheckedListBox();
-            this.chkCustomBlocksAllowed = new MetroFramework.Controls.MetroCheckBox();
+            this.chkCustomBlocksAllowed = new System.Windows.Forms.CheckBox();
             this.gboClickDistance = new MetroFramework.Controls.MetroTile();
-            this.chkClickDistanceAllowed = new MetroFramework.Controls.MetroCheckBox();
+            this.chkClickDistanceAllowed = new System.Windows.Forms.CheckBox();
             this.lblAboutCPE = new MetroFramework.Controls.MetroLabel();
             this.gboEnvColors.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numHourLength)).BeginInit();
@@ -119,7 +119,6 @@
             this.chkTimeBasedSky.Size = new System.Drawing.Size(105, 15);
             this.chkTimeBasedSky.TabIndex = 4;
             this.chkTimeBasedSky.Text = "Time Based Sky";
-            this.chkTimeBasedSky.UseSelectable = true;
             // 
             // chkEnvColorsAllowed
             // 
@@ -129,7 +128,6 @@
             this.chkEnvColorsAllowed.Size = new System.Drawing.Size(58, 15);
             this.chkEnvColorsAllowed.TabIndex = 3;
             this.chkEnvColorsAllowed.Text = "Enable";
-            this.chkEnvColorsAllowed.UseSelectable = true;
             // 
             // gboMessageType
             // 
@@ -174,7 +172,6 @@
             this.chkAnnouncementMT.Size = new System.Drawing.Size(179, 15);
             this.chkAnnouncementMT.TabIndex = 14;
             this.chkAnnouncementMT.Text = "Show Announcements at Top";
-            this.chkAnnouncementMT.UseSelectable = true;
             // 
             // chkBottomRight3
             // 
@@ -183,7 +180,6 @@
             this.chkBottomRight3.Name = "chkBottomRight3";
             this.chkBottomRight3.Size = new System.Drawing.Size(16, 0);
             this.chkBottomRight3.TabIndex = 12;
-            this.chkBottomRight3.UseSelectable = true;
             // 
             // txtBottomRight3
             // 
@@ -222,7 +218,6 @@
             this.chkBottomRight2.Name = "chkBottomRight2";
             this.chkBottomRight2.Size = new System.Drawing.Size(16, 0);
             this.chkBottomRight2.TabIndex = 10;
-            this.chkBottomRight2.UseSelectable = true;
             // 
             // txtBottomRight2
             // 
@@ -261,7 +256,6 @@
             this.chkBottomRight1.Name = "chkBottomRight1";
             this.chkBottomRight1.Size = new System.Drawing.Size(16, 0);
             this.chkBottomRight1.TabIndex = 8;
-            this.chkBottomRight1.UseSelectable = true;
             // 
             // txtBottomRight1
             // 
@@ -300,7 +294,6 @@
             this.chkStatus3.Name = "chkStatus3";
             this.chkStatus3.Size = new System.Drawing.Size(16, 0);
             this.chkStatus3.TabIndex = 6;
-            this.chkStatus3.UseSelectable = true;
             // 
             // txtStatus3
             // 
@@ -339,7 +332,6 @@
             this.chkStatus2.Name = "chkStatus2";
             this.chkStatus2.Size = new System.Drawing.Size(16, 0);
             this.chkStatus2.TabIndex = 4;
-            this.chkStatus2.UseSelectable = true;
             // 
             // txtStatus2
             // 
@@ -378,7 +370,6 @@
             this.chkStatus1.Name = "chkStatus1";
             this.chkStatus1.Size = new System.Drawing.Size(16, 0);
             this.chkStatus1.TabIndex = 2;
-            this.chkStatus1.UseSelectable = true;
             // 
             // txtStatus1
             // 
@@ -418,7 +409,6 @@
             this.chkMessageTypeAllowed.Size = new System.Drawing.Size(65, 15);
             this.chkMessageTypeAllowed.TabIndex = 0;
             this.chkMessageTypeAllowed.Text = "Enabled";
-            this.chkMessageTypeAllowed.UseSelectable = true;
             // 
             // gboHeldBlock
             // 
@@ -440,7 +430,6 @@
             this.chkHeldBlockAllowed.Size = new System.Drawing.Size(58, 15);
             this.chkHeldBlockAllowed.TabIndex = 0;
             this.chkHeldBlockAllowed.Text = "Enable";
-            this.chkHeldBlockAllowed.UseSelectable = true;
             // 
             // gboCustomBlocks
             // 
@@ -471,7 +460,6 @@
             this.chkCustomBlocksAllowed.Size = new System.Drawing.Size(58, 15);
             this.chkCustomBlocksAllowed.TabIndex = 1;
             this.chkCustomBlocksAllowed.Text = "Enable";
-            this.chkCustomBlocksAllowed.UseSelectable = true;
             // 
             // gboClickDistance
             // 
@@ -493,7 +481,6 @@
             this.chkClickDistanceAllowed.Size = new System.Drawing.Size(58, 15);
             this.chkClickDistanceAllowed.TabIndex = 0;
             this.chkClickDistanceAllowed.Text = "Enable";
-            this.chkClickDistanceAllowed.UseSelectable = true;
             // 
             // lblAboutCPE
             // 
@@ -537,31 +524,31 @@
         internal MetroFramework.Controls.MetroTile gboEnvColors;
         internal System.Windows.Forms.NumericUpDown numHourLength;
         internal MetroFramework.Controls.MetroLabel lblHourLength;
-        internal MetroFramework.Controls.MetroCheckBox chkTimeBasedSky;
-        internal MetroFramework.Controls.MetroCheckBox chkEnvColorsAllowed;
+        internal System.Windows.Forms.CheckBox chkTimeBasedSky;
+        internal System.Windows.Forms.CheckBox chkEnvColorsAllowed;
         internal MetroFramework.Controls.MetroTile gboMessageType;
         internal MetroFramework.Controls.MetroButton btnSeeKeyWords;
-        internal MetroFramework.Controls.MetroCheckBox chkAnnouncementMT;
-        internal MetroFramework.Controls.MetroCheckBox chkBottomRight3;
+        internal System.Windows.Forms.CheckBox chkAnnouncementMT;
+        internal System.Windows.Forms.CheckBox chkBottomRight3;
         internal MetroFramework.Controls.MetroTextBox txtBottomRight3;
-        internal MetroFramework.Controls.MetroCheckBox chkBottomRight2;
+        internal System.Windows.Forms.CheckBox chkBottomRight2;
         internal MetroFramework.Controls.MetroTextBox txtBottomRight2;
-        internal MetroFramework.Controls.MetroCheckBox chkBottomRight1;
+        internal System.Windows.Forms.CheckBox chkBottomRight1;
         internal MetroFramework.Controls.MetroTextBox txtBottomRight1;
-        internal MetroFramework.Controls.MetroCheckBox chkStatus3;
+        internal System.Windows.Forms.CheckBox chkStatus3;
         internal MetroFramework.Controls.MetroTextBox txtStatus3;
-        internal MetroFramework.Controls.MetroCheckBox chkStatus2;
+        internal System.Windows.Forms.CheckBox chkStatus2;
         internal MetroFramework.Controls.MetroTextBox txtStatus2;
-        internal MetroFramework.Controls.MetroCheckBox chkStatus1;
+        internal System.Windows.Forms.CheckBox chkStatus1;
         internal MetroFramework.Controls.MetroTextBox txtStatus1;
-        internal MetroFramework.Controls.MetroCheckBox chkMessageTypeAllowed;
+        internal System.Windows.Forms.CheckBox chkMessageTypeAllowed;
         internal MetroFramework.Controls.MetroTile gboHeldBlock;
-        internal MetroFramework.Controls.MetroCheckBox chkHeldBlockAllowed;
+        internal System.Windows.Forms.CheckBox chkHeldBlockAllowed;
         internal MetroFramework.Controls.MetroTile gboCustomBlocks;
         internal System.Windows.Forms.CheckedListBox clbBlocks;
-        internal MetroFramework.Controls.MetroCheckBox chkCustomBlocksAllowed;
+        internal System.Windows.Forms.CheckBox chkCustomBlocksAllowed;
         internal MetroFramework.Controls.MetroTile gboClickDistance;
-        internal MetroFramework.Controls.MetroCheckBox chkClickDistanceAllowed;
+        internal System.Windows.Forms.CheckBox chkClickDistanceAllowed;
         internal MetroFramework.Controls.MetroLabel lblAboutCPE;
     }
 }

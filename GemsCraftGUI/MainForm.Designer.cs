@@ -1,7 +1,7 @@
 ﻿using GemsCraftGUI.ConfigGUI;
 using MetroFramework.Controls;
 using System.Windows.Forms;
-
+using static GemsCraftGUI.Program;
 namespace GemsCraftGUI
 {
     partial class MainForm
@@ -64,7 +64,7 @@ namespace GemsCraftGUI
             this.tabControl1.Location = new System.Drawing.Point(23, 63);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(1325, 1006);
+            this.tabControl1.Size = new System.Drawing.Size(687, 550);
             this.tabControl1.TabIndex = 0;
             this.tabControl1.UseSelectable = true;
             // 
@@ -90,7 +90,7 @@ namespace GemsCraftGUI
             this.ServerTab.Location = new System.Drawing.Point(4, 38);
             this.ServerTab.Name = "ServerTab";
             this.ServerTab.Padding = new System.Windows.Forms.Padding(3);
-            this.ServerTab.Size = new System.Drawing.Size(1317, 964);
+            this.ServerTab.Size = new System.Drawing.Size(679, 508);
             this.ServerTab.TabIndex = 1;
             this.ServerTab.Text = "Server";
             this.ServerTab.VerticalScrollbarBarColor = true;
@@ -102,7 +102,7 @@ namespace GemsCraftGUI
             // 
             this.ThemeBox.FormattingEnabled = true;
             this.ThemeBox.ItemHeight = 23;
-            this.ThemeBox.Location = new System.Drawing.Point(542, 240);
+            this.ThemeBox.Location = new System.Drawing.Point(546, 205);
             this.ThemeBox.Name = "ThemeBox";
             this.ThemeBox.Size = new System.Drawing.Size(121, 29);
             this.ThemeBox.TabIndex = 20;
@@ -114,7 +114,7 @@ namespace GemsCraftGUI
             this.btnRestart.Enabled = false;
             this.btnRestart.Location = new System.Drawing.Point(542, 62);
             this.btnRestart.Name = "btnRestart";
-            this.btnRestart.Size = new System.Drawing.Size(143, 10);
+            this.btnRestart.Size = new System.Drawing.Size(137, 23);
             this.btnRestart.TabIndex = 18;
             this.btnRestart.Text = "Restart";
             this.btnRestart.UseSelectable = true;
@@ -123,9 +123,9 @@ namespace GemsCraftGUI
             // pStop
             // 
             this.pStop.Enabled = false;
-            this.pStop.Location = new System.Drawing.Point(542, 33);
+            this.pStop.Location = new System.Drawing.Point(542, 34);
             this.pStop.Name = "pStop";
-            this.pStop.Size = new System.Drawing.Size(143, 10);
+            this.pStop.Size = new System.Drawing.Size(137, 23);
             this.pStop.TabIndex = 17;
             this.pStop.Text = "Stop";
             this.pStop.UseSelectable = true;
@@ -135,7 +135,7 @@ namespace GemsCraftGUI
             // 
             this.bStart.Location = new System.Drawing.Point(541, 6);
             this.bStart.Name = "bStart";
-            this.bStart.Size = new System.Drawing.Size(144, 10);
+            this.bStart.Size = new System.Drawing.Size(137, 23);
             this.bStart.TabIndex = 16;
             this.bStart.Text = "Start";
             this.bStart.UseSelectable = true;
@@ -150,13 +150,12 @@ namespace GemsCraftGUI
             this.logBox.Enabled = false;
             this.logBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.logBox.HideSelection = false;
-            this.logBox.Location = new System.Drawing.Point(3, 32);
+            this.logBox.Location = new System.Drawing.Point(11, 32);
             this.logBox.Name = "logBox";
             this.logBox.ReadOnly = true;
-            this.logBox.Size = new System.Drawing.Size(1081, 581);
+            this.logBox.Size = new System.Drawing.Size(525, 444);
             this.logBox.TabIndex = 14;
             this.logBox.Text = "";
-            this.logBox.Visible = false;
             // 
             // playerListLabel
             // 
@@ -164,7 +163,7 @@ namespace GemsCraftGUI
             this.playerListLabel.AutoSize = true;
             this.playerListLabel.BackColor = System.Drawing.Color.Transparent;
             this.playerListLabel.ForeColor = System.Drawing.Color.Black;
-            this.playerListLabel.Location = new System.Drawing.Point(1089, 259);
+            this.playerListLabel.Location = new System.Drawing.Point(546, 237);
             this.playerListLabel.Name = "playerListLabel";
             this.playerListLabel.Size = new System.Drawing.Size(64, 19);
             this.playerListLabel.TabIndex = 12;
@@ -176,31 +175,31 @@ namespace GemsCraftGUI
             this.bVoice.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bVoice.BackColor = System.Drawing.Color.WhiteSmoke;
             this.bVoice.Enabled = false;
-            this.bVoice.Location = new System.Drawing.Point(1196, 944);
+            this.bVoice.Location = new System.Drawing.Point(642, 471);
             this.bVoice.Name = "bVoice";
-            this.bVoice.Size = new System.Drawing.Size(37, 10);
+            this.bVoice.Size = new System.Drawing.Size(37, 31);
             this.bVoice.TabIndex = 13;
             this.bVoice.Text = "V";
             this.bVoice.UseSelectable = true;
+            this.bVoice.Visible = false;
             // 
             // console
             // 
             this.console.Enabled = false;
-            this.console.Location = new System.Drawing.Point(6, 546);
+            this.console.Location = new System.Drawing.Point(11, 482);
             this.console.Name = "console";
-            this.console.Size = new System.Drawing.Size(636, 20);
+            this.console.Size = new System.Drawing.Size(667, 20);
             this.console.TabIndex = 15;
             // 
             // picServerStatus
             // 
             this.picServerStatus.Image = global::GemsCraftGUI.Properties.Resources.server_off;
-            this.picServerStatus.Location = new System.Drawing.Point(546, 91);
+            this.picServerStatus.Location = new System.Drawing.Point(541, 91);
             this.picServerStatus.Name = "picServerStatus";
-            this.picServerStatus.Size = new System.Drawing.Size(143, 72);
+            this.picServerStatus.Size = new System.Drawing.Size(138, 143);
             this.picServerStatus.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.picServerStatus.TabIndex = 19;
             this.picServerStatus.TabStop = false;
-            this.picServerStatus.Click += new System.EventHandler(this.picServerStatus_Click);
             // 
             // playerList
             // 
@@ -210,16 +209,16 @@ namespace GemsCraftGUI
             this.playerList.Enabled = false;
             this.playerList.FormattingEnabled = true;
             this.playerList.IntegralHeight = false;
-            this.playerList.Location = new System.Drawing.Point(1090, 281);
+            this.playerList.Location = new System.Drawing.Point(541, 259);
             this.playerList.Name = "playerList";
-            this.playerList.Size = new System.Drawing.Size(144, 332);
+            this.playerList.Size = new System.Drawing.Size(138, 217);
             this.playerList.TabIndex = 11;
             // 
             // URLLabel
             // 
             this.URLLabel.AutoSize = true;
             this.URLLabel.ForeColor = System.Drawing.Color.Black;
-            this.URLLabel.Location = new System.Drawing.Point(11, 10);
+            this.URLLabel.Location = new System.Drawing.Point(7, 10);
             this.URLLabel.Name = "URLLabel";
             this.URLLabel.Size = new System.Drawing.Size(35, 19);
             this.URLLabel.TabIndex = 9;
@@ -229,9 +228,9 @@ namespace GemsCraftGUI
             // 
             this.bPlay.BackColor = System.Drawing.Color.WhiteSmoke;
             this.bPlay.Enabled = false;
-            this.bPlay.Location = new System.Drawing.Point(488, 4);
+            this.bPlay.Location = new System.Drawing.Point(488, 6);
             this.bPlay.Name = "bPlay";
-            this.bPlay.Size = new System.Drawing.Size(48, 10);
+            this.bPlay.Size = new System.Drawing.Size(48, 20);
             this.bPlay.TabIndex = 8;
             this.bPlay.Text = "Play";
             this.bPlay.UseSelectable = true;
@@ -277,7 +276,7 @@ namespace GemsCraftGUI
             this.tabPage1.Location = new System.Drawing.Point(4, 38);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(1317, 964);
+            this.tabPage1.Size = new System.Drawing.Size(679, 508);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Config";
             this.tabPage1.VerticalScrollbarBarColor = true;
@@ -295,7 +294,7 @@ namespace GemsCraftGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1354, 1084);
+            this.ClientSize = new System.Drawing.Size(731, 637);
             this.Controls.Add(this.tabControl1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
@@ -327,112 +326,7 @@ namespace GemsCraftGUI
         internal MetroButton pStop;
         internal MetroButton btnRestart;
         internal PictureBox picServerStatus;
-        //DO NOT MODIFY THE HANDLERS REGION!
-        //YOU COULD POTENTIALLY MESS UP THE PROGRAM IF MODIFED AND NOT NOTICED
-        #region Handlers
-        //Fixes all event handlers that were lost on the GUI switch
-        void ConfigEventHandlers()
-        {
-            //All the Config Handlers
-            //this.HeartBeatUrlComboBox.SelectedIndexChanged += new System.EventHandler(this.HeartBeatUrlComboBox_SelectedIndexChanged);
-            this.nMaxPlayersPerWorld.Validating += new System.ComponentModel.CancelEventHandler(this.nMaxPlayerPerWorld_Validating);
-            this.cDefaultRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultRank_SelectedIndexChanged);
-            this.bMeasure.Click += new System.EventHandler(this.bMeasure_Click);
-            this.nMaxPlayers.ValueChanged += new System.EventHandler(this.nMaxPlayers_ValueChanged);
-            this.bChangelog.Click += new System.EventHandler(this.bChangelog_Click);
-            this.bCredits.Click += new System.EventHandler(this.bCredits_Click);
-            this.bReadme.Click += new System.EventHandler(this.bReadme_Click);
-            this.bGreeting.Click += new System.EventHandler(this.bGreeting_Click);
-            this.xAnnouncements.CheckedChanged += new System.EventHandler(this.xAnnouncements_CheckedChanged);
-            this.bRules.Click += new System.EventHandler(this.bRules_Click);
-            this.bAnnouncements.Click += new System.EventHandler(this.bAnnouncements_Click);
-            this.xRankPrefixesInChat.CheckedChanged += new System.EventHandler(this.xRankPrefixesInChat_CheckedChanged);
-            this.bColorMe.Click += new System.EventHandler(this.bColorMe_Click);
-            this.bColorWarning.Click += new System.EventHandler(this.bColorWarning_Click);
-            this.bColorSys.Click += new System.EventHandler(this.bColorSys_Click);
-            this.bColorPM.Click += new System.EventHandler(this.bColorPM_Click);
-            this.bColorAnnouncement.Click += new System.EventHandler(this.bColorAnnouncement_Click);
-            this.bColorHelp.Click += new System.EventHandler(this.bColorHelp_Click);
-            this.bColorSay.Click += new System.EventHandler(this.bColorSay_Click);
-            this.bMapPath.Click += new System.EventHandler(this.bMapPath_Click);
-            this.xMapPath.CheckedChanged += new System.EventHandler(this.xMapPath_CheckedChanged);
-            this.cDefaultBuildRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultBuildRank_SelectedIndexChanged);
-            this.bWorldEdit.Click += new System.EventHandler(this.bWorldEdit_Click);
-            this.bAddWorld.Click += new System.EventHandler(this.bAddWorld_Click);
-            this.bWorldDelete.Click += new System.EventHandler(this.bWorldDel_Click);
-            this.dgvWorlds.SelectionChanged += new System.EventHandler(this.dgvWorlds_Click);
-            this.dgvWorlds.Click += new System.EventHandler(this.dgvWorlds_Click);
-            this.bLowerRank.Click += new System.EventHandler(this.bLowerRank_Click);
-            this.bRaiseRank.Click += new System.EventHandler(this.bRaiseRank_Click);
-            this.nFillLimit.ValueChanged += new System.EventHandler(this.nFillLimit_ValueChanged);
-            this.nCopyPasteSlots.ValueChanged += new System.EventHandler(this.nCopyPasteSlots_ValueChanged);
-            this.xAllowSecurityCircumvention.CheckedChanged += new System.EventHandler(this.xAllowSecurityCircumvention_CheckedChanged);
-            this.nAntiGriefSeconds.ValueChanged += new System.EventHandler(this.nAntiGriefSeconds_ValueChanged);
-            this.bColorRank.Click += new System.EventHandler(this.bColorRank_Click);
-            this.xDrawLimit.CheckedChanged += new System.EventHandler(this.xDrawLimit_CheckedChanged);
-            this.nDrawLimit.ValueChanged += new System.EventHandler(this.nDrawLimit_ValueChanged);
-            this.nKickIdle.ValueChanged += new System.EventHandler(this.nKickIdle_ValueChanged);
-            this.xAntiGrief.CheckedChanged += new System.EventHandler(this.xAntiGrief_CheckedChanged);
-            this.xKickIdle.CheckedChanged += new System.EventHandler(this.xKickIdle_CheckedChanged);
-            this.nAntiGriefBlocks.ValueChanged += new System.EventHandler(this.nAntiGriefBlocks_ValueChanged);
-            this.xReserveSlot.CheckedChanged += new System.EventHandler(this.xReserveSlot_CheckedChanged);
-            this.tPrefix.Validating += new System.ComponentModel.CancelEventHandler(this.tPrefix_Validating);
-            this.tRankName.Validating += new System.ComponentModel.CancelEventHandler(this.tRankName_Validating);
-            this.bDeleteRank.Click += new System.EventHandler(this.bDeleteRank_Click);
-            this.vPermissions.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.vPermissions_ItemChecked);
-            this.bAddRank.Click += new System.EventHandler(this.bAddRank_Click);
-            this.vRanks.SelectedIndexChanged += new System.EventHandler(this.vRanks_SelectedIndexChanged);
-            this.cBlockDBAutoEnableRank.SelectedIndexChanged += new System.EventHandler(this.cBlockDBAutoEnableRank_SelectedIndexChanged);
-            this.xBlockDBAutoEnable.CheckedChanged += new System.EventHandler(this.xBlockDBAutoEnable_CheckedChanged);
-            this.xBlockDBEnabled.CheckedChanged += new System.EventHandler(this.xBlockDBEnabled_CheckedChanged);
-            this.cPatrolledRank.SelectedIndexChanged += new System.EventHandler(this.cPatrolledRank_SelectedIndexChanged);
-            this.xAnnounceRankChanges.CheckedChanged += new System.EventHandler(this.xAnnounceRankChanges_CheckedChanged);
-            this.xAntispamKicks.CheckedChanged += new System.EventHandler(this.xSpamChatKick_CheckedChanged);
-            this.xMaxConnectionsPerIP.CheckedChanged += new System.EventHandler(this.xMaxConnectionsPerIP_CheckedChanged);
-            this.cVerifyNames.SelectedIndexChanged += new System.EventHandler(this.cVerifyNames_SelectedIndexChanged);
-            this.bUpdate.Click += new System.EventHandler(this.bUpdate_Click);
-            this.xSaveInterval.CheckedChanged += new System.EventHandler(this.xSaveAtInterval_CheckedChanged);
-            this.xMaxBackupSize.CheckedChanged += new System.EventHandler(this.xMaxBackupSize_CheckedChanged);
-            this.xMaxBackups.CheckedChanged += new System.EventHandler(this.xMaxBackups_CheckedChanged);
-            this.xBackupInterval.CheckedChanged += new System.EventHandler(this.xBackupAtInterval_CheckedChanged);
-            this.xLogLimit.CheckedChanged += new System.EventHandler(this.xLogLimit_CheckedChanged);
-            this.vLogFileOptions.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.vLogFileOptions_ItemChecked);
-            this.vConsoleOptions.ItemChecked += new System.Windows.Forms.ItemCheckedEventHandler(this.vConsoleOptions_ItemChecked);
-            this.xServPass.CheckedChanged += new System.EventHandler(this.xServPass_CheckedChanged);
-            this.xChanPass.CheckedChanged += new System.EventHandler(this.xChanPass_CheckedChanged);
-            this.xIRCListShowNonEnglish.CheckedChanged += new System.EventHandler(this.xIRCListShowNonEnglish_CheckedChanged);
-            this.bColorIRC.Click += new System.EventHandler(this.bColorIRC_Click);
-            this.xIRCRegisteredNick.CheckedChanged += new System.EventHandler(this.xIRCRegisteredNick_CheckedChanged);
-            this.xIRCBotEnabled.CheckedChanged += new System.EventHandler(this.xIRC_CheckedChanged);
-            this.cIRCList.SelectedIndexChanged += new System.EventHandler(this.cIRCList_SelectedIndexChanged);
-            this.nMaxUndoStates.ValueChanged += new System.EventHandler(this.nMaxUndo_ValueChanged);
-            this.tIP.Validating += new System.ComponentModel.CancelEventHandler(this.tIP_Validating);
-            this.xIP.CheckedChanged += new System.EventHandler(this.xIP_CheckedChanged);
-            this.nMaxUndo.ValueChanged += new System.EventHandler(this.nMaxUndo_ValueChanged);
-            this.xMaxUndo.CheckedChanged += new System.EventHandler(this.xMaxUndo_CheckedChanged);
-            this.websiteURL.TextChanged += new System.EventHandler(this.websiteURL_TextChanged);
-            this.ReqsEditor.Click += new System.EventHandler(this.ReqsEditor_Click);
-            this.SwearEditor.Click += new System.EventHandler(this.SwearEditor_Click);
-            this.CustomColor.Click += new System.EventHandler(this.button1_Click);
-            this.CustomText.Click += new System.EventHandler(this.label1_Click);
-            this.bOK.Click += new System.EventHandler(this.bSave_Click);
-            this.bCancel.Click += new System.EventHandler(this.bCancel_Click);
-            this.bResetTab.Click += new System.EventHandler(this.bResetTab_Click);
-            this.bResetAll.Click += new System.EventHandler(this.bResetAll_Click);
-            this.bApply.Click += new System.EventHandler(this.bApply_Click);
-            this.bColorGlobal.Click += new System.EventHandler(this.bColorGlobal_Click);
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConfigUI_FormClosing);
-            this.Load += new System.EventHandler(this.MainForm_Load);
-        }
-
-        void StartServerHandlers()
-        {
-            //Server Handlers
-            this.bPlay.Click += new System.EventHandler(this.bPlay_Click);
-            this.logBox.TextChanged += new System.EventHandler(this.logBox_TextChanged);
-            this.bVoice.Click += new System.EventHandler(this.bVoice_Click);
-        }
-        #endregion
+        
         internal MetroComboBox ThemeBox;
         internal MetroTabPage tabPage1;
         internal MetroComboBox cinternal;

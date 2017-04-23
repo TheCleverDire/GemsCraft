@@ -28,14 +28,15 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.mcbPrison = new MetroFramework.Controls.MetroCheckBox();
+            this.mcbPrison = new System.Windows.Forms.CheckBox();
             this.cboPrison = new MetroFramework.Controls.MetroComboBox();
             this.label6 = new MetroFramework.Controls.MetroLabel();
-            this.xWoMEnableEnvExtensions = new MetroFramework.Controls.MetroCheckBox();
+            this.xWoMEnableEnvExtensions = new System.Windows.Forms.CheckBox();
             this.bMapPath = new MetroFramework.Controls.MetroButton();
-            this.xMapPath = new MetroFramework.Controls.MetroCheckBox();
+            this.xMapPath = new System.Windows.Forms.CheckBox();
             this.tMapPath = new MetroFramework.Controls.MetroTextBox();
             this.lDefaultBuildRank = new MetroFramework.Controls.MetroLabel();
             this.cDefaultBuildRank = new MetroFramework.Controls.MetroComboBox();
@@ -52,6 +53,7 @@
             this.dgvcBackup = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.dgvcHidden = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.dgvcBlockDB = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dgvWorlds)).BeginInit();
             this.SuspendLayout();
             // 
@@ -60,10 +62,9 @@
             this.mcbPrison.AutoSize = true;
             this.mcbPrison.Location = new System.Drawing.Point(354, 83);
             this.mcbPrison.Name = "mcbPrison";
-            this.mcbPrison.Size = new System.Drawing.Size(101, 15);
+            this.mcbPrison.Size = new System.Drawing.Size(97, 17);
             this.mcbPrison.TabIndex = 40;
             this.mcbPrison.Text = "Prison Enabled";
-            this.mcbPrison.UseSelectable = true;
             // 
             // cboPrison
             // 
@@ -90,12 +91,11 @@
             // 
             this.xWoMEnableEnvExtensions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.xWoMEnableEnvExtensions.AutoSize = true;
-            this.xWoMEnableEnvExtensions.Location = new System.Drawing.Point(23, 481);
+            this.xWoMEnableEnvExtensions.Location = new System.Drawing.Point(23, 479);
             this.xWoMEnableEnvExtensions.Name = "xWoMEnableEnvExtensions";
-            this.xWoMEnableEnvExtensions.Size = new System.Drawing.Size(239, 15);
+            this.xWoMEnableEnvExtensions.Size = new System.Drawing.Size(227, 17);
             this.xWoMEnableEnvExtensions.TabIndex = 37;
             this.xWoMEnableEnvExtensions.Text = "Enable Env Extensions (/MapEdit or /Env)";
-            this.xWoMEnableEnvExtensions.UseSelectable = true;
             // 
             // bMapPath
             // 
@@ -113,12 +113,11 @@
             // 
             this.xMapPath.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.xMapPath.AutoSize = true;
-            this.xMapPath.Location = new System.Drawing.Point(23, 454);
+            this.xMapPath.Location = new System.Drawing.Point(23, 452);
             this.xMapPath.Name = "xMapPath";
-            this.xMapPath.Size = new System.Drawing.Size(185, 15);
+            this.xMapPath.Size = new System.Drawing.Size(165, 17);
             this.xMapPath.TabIndex = 34;
             this.xMapPath.Text = "Custom path for storing maps:";
-            this.xMapPath.UseSelectable = true;
             // 
             // tMapPath
             // 
@@ -315,6 +314,12 @@
             this.dgvcBlockDB.ThreeState = true;
             this.dgvcBlockDB.Width = 60;
             // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 1;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // Worlds
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -345,12 +350,12 @@
 
         #endregion
 
-        internal MetroFramework.Controls.MetroCheckBox mcbPrison;
+        internal System.Windows.Forms.CheckBox mcbPrison;
         internal MetroFramework.Controls.MetroComboBox cboPrison;
         internal MetroFramework.Controls.MetroLabel label6;
-        internal MetroFramework.Controls.MetroCheckBox xWoMEnableEnvExtensions;
+        internal System.Windows.Forms.CheckBox xWoMEnableEnvExtensions;
         internal MetroFramework.Controls.MetroButton bMapPath;
-        internal MetroFramework.Controls.MetroCheckBox xMapPath;
+        internal System.Windows.Forms.CheckBox xMapPath;
         internal MetroFramework.Controls.MetroTextBox tMapPath;
         internal MetroFramework.Controls.MetroLabel lDefaultBuildRank;
         internal MetroFramework.Controls.MetroComboBox cDefaultBuildRank;
@@ -367,5 +372,6 @@
         internal System.Windows.Forms.DataGridViewComboBoxColumn dgvcBackup;
         internal System.Windows.Forms.DataGridViewCheckBoxColumn dgvcHidden;
         internal System.Windows.Forms.DataGridViewCheckBoxColumn dgvcBlockDB;
+        private System.Windows.Forms.Timer timer1;
     }
 }

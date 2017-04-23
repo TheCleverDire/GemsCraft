@@ -30,26 +30,26 @@
         {
             this.groupBox5 = new MetroFramework.Controls.MetroTile();
             this.bUpdate = new MetroFramework.Controls.MetroButton();
-            this.checkUpdate = new MetroFramework.Controls.MetroCheckBox();
+            this.checkUpdate = new System.Windows.Forms.CheckBox();
             this.gDataBackup = new MetroFramework.Controls.MetroTile();
-            this.xBackupDataOnStartup = new MetroFramework.Controls.MetroCheckBox();
+            this.xBackupDataOnStartup = new System.Windows.Forms.CheckBox();
             this.gSaving = new MetroFramework.Controls.MetroTile();
             this.nSaveInterval = new System.Windows.Forms.NumericUpDown();
             this.lSaveIntervalUnits = new MetroFramework.Controls.MetroLabel();
-            this.xSaveInterval = new MetroFramework.Controls.MetroCheckBox();
+            this.xSaveInterval = new System.Windows.Forms.CheckBox();
             this.gBackups = new MetroFramework.Controls.MetroTile();
-            this.xBackupOnlyWhenChanged = new MetroFramework.Controls.MetroCheckBox();
+            this.xBackupOnlyWhenChanged = new System.Windows.Forms.CheckBox();
             this.lMaxBackupSize = new MetroFramework.Controls.MetroLabel();
-            this.xMaxBackupSize = new MetroFramework.Controls.MetroCheckBox();
+            this.xMaxBackupSize = new System.Windows.Forms.CheckBox();
             this.nMaxBackupSize = new System.Windows.Forms.NumericUpDown();
-            this.xMaxBackups = new MetroFramework.Controls.MetroCheckBox();
-            this.xBackupOnStartup = new MetroFramework.Controls.MetroCheckBox();
+            this.xMaxBackups = new System.Windows.Forms.CheckBox();
+            this.xBackupOnStartup = new System.Windows.Forms.CheckBox();
             this.lMaxBackups = new MetroFramework.Controls.MetroLabel();
             this.nMaxBackups = new System.Windows.Forms.NumericUpDown();
             this.nBackupInterval = new System.Windows.Forms.NumericUpDown();
             this.lBackupIntervalUnits = new MetroFramework.Controls.MetroLabel();
-            this.xBackupInterval = new MetroFramework.Controls.MetroCheckBox();
-            this.xBackupOnJoin = new MetroFramework.Controls.MetroCheckBox();
+            this.xBackupInterval = new System.Windows.Forms.CheckBox();
+            this.xBackupOnJoin = new System.Windows.Forms.CheckBox();
             this.groupBox5.SuspendLayout();
             this.gDataBackup.SuspendLayout();
             this.gSaving.SuspendLayout();
@@ -92,7 +92,6 @@
             this.checkUpdate.Size = new System.Drawing.Size(197, 15);
             this.checkUpdate.TabIndex = 22;
             this.checkUpdate.Text = "Automatically Check for Updates";
-            this.checkUpdate.UseSelectable = true;
             // 
             // gDataBackup
             // 
@@ -115,7 +114,6 @@
             this.xBackupDataOnStartup.Size = new System.Drawing.Size(249, 15);
             this.xBackupDataOnStartup.TabIndex = 0;
             this.xBackupDataOnStartup.Text = "Backup PlayerDB and IP ban list on startup.";
-            this.xBackupDataOnStartup.UseSelectable = true;
             // 
             // gSaving
             // 
@@ -156,7 +154,6 @@
             this.xSaveInterval.Size = new System.Drawing.Size(110, 15);
             this.xSaveInterval.TabIndex = 0;
             this.xSaveInterval.Text = "Save maps every";
-            this.xSaveInterval.UseSelectable = true;
             // 
             // gBackups
             // 
@@ -190,7 +187,6 @@
             this.xBackupOnlyWhenChanged.Size = new System.Drawing.Size(250, 15);
             this.xBackupOnlyWhenChanged.TabIndex = 4;
             this.xBackupOnlyWhenChanged.Text = "Skip timed backups if map hasn\'t changed.";
-            this.xBackupOnlyWhenChanged.UseSelectable = true;
             // 
             // lMaxBackupSize
             // 
@@ -209,7 +205,6 @@
             this.xMaxBackupSize.Size = new System.Drawing.Size(308, 15);
             this.xMaxBackupSize.TabIndex = 9;
             this.xMaxBackupSize.Text = "Delete old backups if the directory takes up more than";
-            this.xMaxBackupSize.UseSelectable = true;
             // 
             // nMaxBackupSize
             // 
@@ -231,7 +226,6 @@
             this.xMaxBackups.Size = new System.Drawing.Size(240, 15);
             this.xMaxBackups.TabIndex = 6;
             this.xMaxBackups.Text = "Delete old backups if there are more than";
-            this.xMaxBackups.UseSelectable = true;
             // 
             // xBackupOnStartup
             // 
@@ -242,7 +236,6 @@
             this.xBackupOnStartup.Size = new System.Drawing.Size(161, 15);
             this.xBackupOnStartup.TabIndex = 0;
             this.xBackupOnStartup.Text = "Create backups on startup";
-            this.xBackupOnStartup.UseSelectable = true;
             // 
             // lMaxBackups
             // 
@@ -289,7 +282,6 @@
             this.xBackupInterval.Size = new System.Drawing.Size(135, 15);
             this.xBackupInterval.TabIndex = 1;
             this.xBackupInterval.Text = "Create backups every";
-            this.xBackupInterval.UseSelectable = true;
             // 
             // xBackupOnJoin
             // 
@@ -299,7 +291,6 @@
             this.xBackupOnJoin.Size = new System.Drawing.Size(267, 15);
             this.xBackupOnJoin.TabIndex = 5;
             this.xBackupOnJoin.Text = "Create backup whenever a player joins a world";
-            this.xBackupOnJoin.UseSelectable = true;
             // 
             // SavingBackup
             // 
@@ -332,25 +323,25 @@
 
         internal MetroFramework.Controls.MetroTile groupBox5;
         internal MetroFramework.Controls.MetroButton bUpdate;
-        internal MetroFramework.Controls.MetroCheckBox checkUpdate;
+        internal System.Windows.Forms.CheckBox checkUpdate;
         internal MetroFramework.Controls.MetroTile gDataBackup;
-        internal MetroFramework.Controls.MetroCheckBox xBackupDataOnStartup;
+        internal System.Windows.Forms.CheckBox xBackupDataOnStartup;
         internal MetroFramework.Controls.MetroTile gSaving;
         internal System.Windows.Forms.NumericUpDown nSaveInterval;
         internal MetroFramework.Controls.MetroLabel lSaveIntervalUnits;
-        internal MetroFramework.Controls.MetroCheckBox xSaveInterval;
+        internal System.Windows.Forms.CheckBox xSaveInterval;
         internal MetroFramework.Controls.MetroTile gBackups;
-        internal MetroFramework.Controls.MetroCheckBox xBackupOnlyWhenChanged;
+        internal System.Windows.Forms.CheckBox xBackupOnlyWhenChanged;
         internal MetroFramework.Controls.MetroLabel lMaxBackupSize;
-        internal MetroFramework.Controls.MetroCheckBox xMaxBackupSize;
+        internal System.Windows.Forms.CheckBox xMaxBackupSize;
         internal System.Windows.Forms.NumericUpDown nMaxBackupSize;
-        internal MetroFramework.Controls.MetroCheckBox xMaxBackups;
-        internal MetroFramework.Controls.MetroCheckBox xBackupOnStartup;
+        internal System.Windows.Forms.CheckBox xMaxBackups;
+        internal System.Windows.Forms.CheckBox xBackupOnStartup;
         internal MetroFramework.Controls.MetroLabel lMaxBackups;
         internal System.Windows.Forms.NumericUpDown nMaxBackups;
         internal System.Windows.Forms.NumericUpDown nBackupInterval;
         internal MetroFramework.Controls.MetroLabel lBackupIntervalUnits;
-        internal MetroFramework.Controls.MetroCheckBox xBackupInterval;
-        internal MetroFramework.Controls.MetroCheckBox xBackupOnJoin;
+        internal System.Windows.Forms.CheckBox xBackupInterval;
+        internal System.Windows.Forms.CheckBox xBackupOnJoin;
     }
 }

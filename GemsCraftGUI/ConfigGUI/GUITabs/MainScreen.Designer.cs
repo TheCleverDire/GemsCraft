@@ -40,6 +40,7 @@
             this.tileCpe = new MetroFramework.Controls.MetroTile();
             this.tileMisc = new MetroFramework.Controls.MetroTile();
             this.tileAdvanced = new MetroFramework.Controls.MetroTile();
+            this.metroButton1 = new MetroFramework.Controls.MetroButton();
             this.SuspendLayout();
             // 
             // tileGeneral
@@ -73,6 +74,7 @@
             this.tileChat.TabIndex = 2;
             this.tileChat.Text = "Chat";
             this.tileChat.UseSelectable = true;
+            this.tileChat.Click += new System.EventHandler(this.tileChat_Click);
             // 
             // tileWorlds
             // 
@@ -83,6 +85,7 @@
             this.tileWorlds.TabIndex = 3;
             this.tileWorlds.Text = "Worlds";
             this.tileWorlds.UseSelectable = true;
+            this.tileWorlds.Click += new System.EventHandler(this.tileWorlds_Click);
             // 
             // tileIrc
             // 
@@ -93,6 +96,7 @@
             this.tileIrc.TabIndex = 7;
             this.tileIrc.Text = "IRC";
             this.tileIrc.UseSelectable = true;
+            this.tileIrc.Click += new System.EventHandler(this.tileIrc_Click);
             // 
             // tileLogging
             // 
@@ -103,6 +107,7 @@
             this.tileLogging.TabIndex = 6;
             this.tileLogging.Text = "Logging";
             this.tileLogging.UseSelectable = true;
+            this.tileLogging.Click += new System.EventHandler(this.tileLogging_Click);
             // 
             // tileSavingAndBackup
             // 
@@ -113,6 +118,7 @@
             this.tileSavingAndBackup.TabIndex = 5;
             this.tileSavingAndBackup.Text = "Saving and Backup";
             this.tileSavingAndBackup.UseSelectable = true;
+            this.tileSavingAndBackup.Click += new System.EventHandler(this.tileSavingAndBackup_Click);
             // 
             // tileSecurity
             // 
@@ -123,6 +129,7 @@
             this.tileSecurity.TabIndex = 4;
             this.tileSecurity.Text = "Security";
             this.tileSecurity.UseSelectable = true;
+            this.tileSecurity.Click += new System.EventHandler(this.tileSecurity_Click);
             // 
             // tileAbout
             // 
@@ -133,6 +140,7 @@
             this.tileAbout.TabIndex = 11;
             this.tileAbout.Text = "About";
             this.tileAbout.UseSelectable = true;
+            this.tileAbout.Click += new System.EventHandler(this.tileAbout_Click);
             // 
             // tileCpe
             // 
@@ -143,6 +151,7 @@
             this.tileCpe.TabIndex = 10;
             this.tileCpe.Text = "CPE";
             this.tileCpe.UseSelectable = true;
+            this.tileCpe.Click += new System.EventHandler(this.tileCpe_Click);
             // 
             // tileMisc
             // 
@@ -153,6 +162,7 @@
             this.tileMisc.TabIndex = 9;
             this.tileMisc.Text = "Misc";
             this.tileMisc.UseSelectable = true;
+            this.tileMisc.Click += new System.EventHandler(this.tileMisc_Click);
             // 
             // tileAdvanced
             // 
@@ -163,12 +173,24 @@
             this.tileAdvanced.TabIndex = 8;
             this.tileAdvanced.Text = "Advanced";
             this.tileAdvanced.UseSelectable = true;
+            this.tileAdvanced.Click += new System.EventHandler(this.tileAdvanced_Click);
+            // 
+            // metroButton1
+            // 
+            this.metroButton1.Location = new System.Drawing.Point(508, 343);
+            this.metroButton1.Name = "metroButton1";
+            this.metroButton1.Size = new System.Drawing.Size(156, 30);
+            this.metroButton1.TabIndex = 12;
+            this.metroButton1.Text = "Save";
+            this.metroButton1.UseSelectable = true;
+            this.metroButton1.Click += new System.EventHandler(this.metroButton1_Click);
             // 
             // MainScreen
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(687, 550);
+            this.Controls.Add(this.metroButton1);
             this.Controls.Add(this.tileAbout);
             this.Controls.Add(this.tileCpe);
             this.Controls.Add(this.tileMisc);
@@ -202,5 +224,6 @@
         internal MetroFramework.Controls.MetroTile tileCpe;
         internal MetroFramework.Controls.MetroTile tileMisc;
         internal MetroFramework.Controls.MetroTile tileAdvanced;
+        private MetroFramework.Controls.MetroButton metroButton1;
     }
 }

@@ -58,7 +58,7 @@
             this.bGreeting = new MetroFramework.Controls.MetroButton();
             this.lAnnouncementsUnits = new MetroFramework.Controls.MetroLabel();
             this.nAnnouncements = new System.Windows.Forms.NumericUpDown();
-            this.xAnnouncements = new MetroFramework.Controls.MetroCheckBox();
+            this.xAnnouncements = new System.Windows.Forms.CheckBox();
             this.bRules = new MetroFramework.Controls.MetroButton();
             this.bAnnouncements = new MetroFramework.Controls.MetroButton();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -523,13 +523,13 @@
             // xAnnouncements
             // 
             this.xAnnouncements.AutoSize = true;
-            this.xAnnouncements.BackColor = System.Drawing.Color.Firebrick;
+            this.xAnnouncements.BackColor = System.Drawing.Color.Transparent;
             this.xAnnouncements.Location = new System.Drawing.Point(24, 26);
             this.xAnnouncements.Name = "xAnnouncements";
-            this.xAnnouncements.Size = new System.Drawing.Size(172, 15);
+            this.xAnnouncements.Size = new System.Drawing.Size(161, 17);
             this.xAnnouncements.TabIndex = 0;
             this.xAnnouncements.Text = "Show announcements every";
-            this.xAnnouncements.UseSelectable = true;
+            this.xAnnouncements.UseVisualStyleBackColor = false;
             // 
             // bRules
             // 
@@ -626,7 +626,7 @@
         internal MetroFramework.Controls.MetroButton bGreeting;
         internal MetroFramework.Controls.MetroLabel lAnnouncementsUnits;
         internal System.Windows.Forms.NumericUpDown nAnnouncements;
-        internal MetroFramework.Controls.MetroCheckBox xAnnouncements;
+        internal System.Windows.Forms.CheckBox xAnnouncements;
         internal MetroFramework.Controls.MetroButton bRules;
         internal MetroFramework.Controls.MetroButton bAnnouncements;
     }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.metroButton1 = new MetroFramework.Controls.MetroButton();
             this.gPermissionLimits = new MetroFramework.Controls.MetroTile();
             this.permissionLimitBoxContainer = new System.Windows.Forms.FlowLayoutPanel();
@@ -40,21 +41,21 @@
             this.lFillLimit = new MetroFramework.Controls.MetroLabel();
             this.nCopyPasteSlots = new System.Windows.Forms.NumericUpDown();
             this.lCopyPasteSlots = new MetroFramework.Controls.MetroLabel();
-            this.xAllowSecurityCircumvention = new MetroFramework.Controls.MetroCheckBox();
+            this.xAllowSecurityCircumvention = new System.Windows.Forms.CheckBox();
             this.lAntiGrief1 = new MetroFramework.Controls.MetroLabel();
             this.lAntiGrief3 = new MetroFramework.Controls.MetroLabel();
             this.nAntiGriefSeconds = new System.Windows.Forms.NumericUpDown();
             this.bColorRank = new MetroFramework.Controls.MetroButton();
-            this.xDrawLimit = new MetroFramework.Controls.MetroCheckBox();
+            this.xDrawLimit = new System.Windows.Forms.CheckBox();
             this.lDrawLimitUnits = new MetroFramework.Controls.MetroLabel();
             this.lKickIdleUnits = new MetroFramework.Controls.MetroLabel();
             this.nDrawLimit = new System.Windows.Forms.NumericUpDown();
             this.nKickIdle = new System.Windows.Forms.NumericUpDown();
-            this.xAntiGrief = new MetroFramework.Controls.MetroCheckBox();
+            this.xAntiGrief = new System.Windows.Forms.CheckBox();
             this.lAntiGrief2 = new MetroFramework.Controls.MetroLabel();
-            this.xKickIdle = new MetroFramework.Controls.MetroCheckBox();
+            this.xKickIdle = new System.Windows.Forms.CheckBox();
             this.nAntiGriefBlocks = new System.Windows.Forms.NumericUpDown();
-            this.xReserveSlot = new MetroFramework.Controls.MetroCheckBox();
+            this.xReserveSlot = new System.Windows.Forms.CheckBox();
             this.tPrefix = new MetroFramework.Controls.MetroTextBox();
             this.lPrefix = new MetroFramework.Controls.MetroLabel();
             this.lRankColor = new MetroFramework.Controls.MetroLabel();
@@ -66,6 +67,7 @@
             this.bAddRank = new MetroFramework.Controls.MetroButton();
             this.lPermissions = new MetroFramework.Controls.MetroLabel();
             this.vRanks = new System.Windows.Forms.ListBox();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.gPermissionLimits.SuspendLayout();
             this.gRankOptions.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nFillLimit)).BeginInit();
@@ -247,10 +249,9 @@
             this.xAllowSecurityCircumvention.AutoSize = true;
             this.xAllowSecurityCircumvention.Location = new System.Drawing.Point(12, 165);
             this.xAllowSecurityCircumvention.Name = "xAllowSecurityCircumvention";
-            this.xAllowSecurityCircumvention.Size = new System.Drawing.Size(266, 15);
+            this.xAllowSecurityCircumvention.Size = new System.Drawing.Size(240, 17);
             this.xAllowSecurityCircumvention.TabIndex = 16;
             this.xAllowSecurityCircumvention.Text = "Allow removing own access/build restrictions.";
-            this.xAllowSecurityCircumvention.UseSelectable = true;
             // 
             // lAntiGrief1
             // 
@@ -291,10 +292,9 @@
             this.xDrawLimit.AutoSize = true;
             this.xDrawLimit.Location = new System.Drawing.Point(12, 190);
             this.xDrawLimit.Name = "xDrawLimit";
-            this.xDrawLimit.Size = new System.Drawing.Size(77, 15);
+            this.xDrawLimit.Size = new System.Drawing.Size(71, 17);
             this.xDrawLimit.TabIndex = 17;
             this.xDrawLimit.Text = "Draw limit";
-            this.xDrawLimit.UseSelectable = true;
             // 
             // lDrawLimitUnits
             // 
@@ -348,10 +348,9 @@
             this.xAntiGrief.AutoSize = true;
             this.xAntiGrief.Location = new System.Drawing.Point(12, 108);
             this.xAntiGrief.Name = "xAntiGrief";
-            this.xAntiGrief.Size = new System.Drawing.Size(207, 15);
+            this.xAntiGrief.Size = new System.Drawing.Size(192, 17);
             this.xAntiGrief.TabIndex = 10;
             this.xAntiGrief.Text = "Enable grief / autoclicker detection";
-            this.xAntiGrief.UseSelectable = true;
             // 
             // lAntiGrief2
             // 
@@ -367,10 +366,9 @@
             this.xKickIdle.AutoSize = true;
             this.xKickIdle.Location = new System.Drawing.Point(12, 78);
             this.xKickIdle.Name = "xKickIdle";
-            this.xKickIdle.Size = new System.Drawing.Size(95, 15);
+            this.xKickIdle.Size = new System.Drawing.Size(89, 17);
             this.xKickIdle.TabIndex = 7;
             this.xKickIdle.Text = "Kick if idle for";
-            this.xKickIdle.UseSelectable = true;
             // 
             // nAntiGriefBlocks
             // 
@@ -389,10 +387,9 @@
             this.xReserveSlot.AutoSize = true;
             this.xReserveSlot.Location = new System.Drawing.Point(12, 51);
             this.xReserveSlot.Name = "xReserveSlot";
-            this.xReserveSlot.Size = new System.Drawing.Size(120, 15);
+            this.xReserveSlot.Size = new System.Drawing.Size(116, 17);
             this.xReserveSlot.TabIndex = 4;
             this.xReserveSlot.Text = "Reserve player slot";
-            this.xReserveSlot.UseSelectable = true;
             // 
             // tPrefix
             // 
@@ -553,6 +550,12 @@
             this.vRanks.Size = new System.Drawing.Size(146, 357);
             this.vRanks.TabIndex = 12;
             // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Interval = 1;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // Ranks
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -571,6 +574,7 @@
             this.Controls.Add(this.vRanks);
             this.Name = "Ranks";
             this.Text = "Ranks";
+            this.Load += new System.EventHandler(this.Ranks_Load);
             this.gPermissionLimits.ResumeLayout(false);
             this.gRankOptions.ResumeLayout(false);
             this.gRankOptions.PerformLayout();
@@ -599,21 +603,21 @@
         internal MetroFramework.Controls.MetroLabel lFillLimit;
         internal System.Windows.Forms.NumericUpDown nCopyPasteSlots;
         internal MetroFramework.Controls.MetroLabel lCopyPasteSlots;
-        internal MetroFramework.Controls.MetroCheckBox xAllowSecurityCircumvention;
+        internal System.Windows.Forms.CheckBox xAllowSecurityCircumvention;
         internal MetroFramework.Controls.MetroLabel lAntiGrief1;
         internal MetroFramework.Controls.MetroLabel lAntiGrief3;
         internal System.Windows.Forms.NumericUpDown nAntiGriefSeconds;
         internal MetroFramework.Controls.MetroButton bColorRank;
-        internal MetroFramework.Controls.MetroCheckBox xDrawLimit;
+        internal System.Windows.Forms.CheckBox xDrawLimit;
         internal MetroFramework.Controls.MetroLabel lDrawLimitUnits;
         internal MetroFramework.Controls.MetroLabel lKickIdleUnits;
         internal System.Windows.Forms.NumericUpDown nDrawLimit;
         internal System.Windows.Forms.NumericUpDown nKickIdle;
-        internal MetroFramework.Controls.MetroCheckBox xAntiGrief;
+        internal System.Windows.Forms.CheckBox xAntiGrief;
         internal MetroFramework.Controls.MetroLabel lAntiGrief2;
-        internal MetroFramework.Controls.MetroCheckBox xKickIdle;
+        internal System.Windows.Forms.CheckBox xKickIdle;
         internal System.Windows.Forms.NumericUpDown nAntiGriefBlocks;
-        internal MetroFramework.Controls.MetroCheckBox xReserveSlot;
+        internal System.Windows.Forms.CheckBox xReserveSlot;
         internal MetroFramework.Controls.MetroTextBox tPrefix;
         internal MetroFramework.Controls.MetroLabel lPrefix;
         internal MetroFramework.Controls.MetroLabel lRankColor;
@@ -625,5 +629,6 @@
         internal MetroFramework.Controls.MetroButton bAddRank;
         internal MetroFramework.Controls.MetroLabel lPermissions;
         internal System.Windows.Forms.ListBox vRanks;
+        private System.Windows.Forms.Timer timer1;
     }
 }

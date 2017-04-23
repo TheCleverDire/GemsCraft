@@ -30,23 +30,23 @@
         {
             this.gIRCAdv = new MetroFramework.Controls.MetroTile();
             this.tServPass = new MetroFramework.Controls.MetroTextBox();
-            this.xServPass = new MetroFramework.Controls.MetroCheckBox();
+            this.xServPass = new System.Windows.Forms.CheckBox();
             this.tChanPass = new MetroFramework.Controls.MetroTextBox();
-            this.xChanPass = new MetroFramework.Controls.MetroCheckBox();
-            this.xIRCListShowNonEnglish = new MetroFramework.Controls.MetroCheckBox();
+            this.xChanPass = new System.Windows.Forms.CheckBox();
+            this.xIRCListShowNonEnglish = new System.Windows.Forms.CheckBox();
             this.gIRCOptions = new MetroFramework.Controls.MetroTile();
-            this.xIRCBotAnnounceServerEvents = new MetroFramework.Controls.MetroCheckBox();
-            this.xIRCUseColor = new MetroFramework.Controls.MetroCheckBox();
+            this.xIRCBotAnnounceServerEvents = new System.Windows.Forms.CheckBox();
+            this.xIRCUseColor = new System.Windows.Forms.CheckBox();
             this.lIRCNoForwardingMessage = new MetroFramework.Controls.MetroLabel();
-            this.xIRCBotAnnounceIRCJoins = new MetroFramework.Controls.MetroCheckBox();
+            this.xIRCBotAnnounceIRCJoins = new System.Windows.Forms.CheckBox();
             this.bColorIRC = new MetroFramework.Controls.MetroButton();
             this.lColorIRC = new MetroFramework.Controls.MetroLabel();
-            this.xIRCBotForwardFromIRC = new MetroFramework.Controls.MetroCheckBox();
-            this.xIRCBotAnnounceServerJoins = new MetroFramework.Controls.MetroCheckBox();
-            this.xIRCBotForwardFromServer = new MetroFramework.Controls.MetroCheckBox();
+            this.xIRCBotForwardFromIRC = new System.Windows.Forms.CheckBox();
+            this.xIRCBotAnnounceServerJoins = new System.Windows.Forms.CheckBox();
+            this.xIRCBotForwardFromServer = new System.Windows.Forms.CheckBox();
             this.gIRCNetwork = new MetroFramework.Controls.MetroTile();
             this.lIRCDelayUnits = new MetroFramework.Controls.MetroLabel();
-            this.xIRCRegisteredNick = new MetroFramework.Controls.MetroCheckBox();
+            this.xIRCRegisteredNick = new System.Windows.Forms.CheckBox();
             this.tIRCNickServMessage = new MetroFramework.Controls.MetroTextBox();
             this.lIRCNickServMessage = new MetroFramework.Controls.MetroLabel();
             this.tIRCNickServ = new MetroFramework.Controls.MetroTextBox();
@@ -64,7 +64,7 @@
             this.lIRCBotNick = new MetroFramework.Controls.MetroLabel();
             this.tIRCBotNick = new MetroFramework.Controls.MetroTextBox();
             this.lIRCList = new MetroFramework.Controls.MetroLabel();
-            this.xIRCBotEnabled = new MetroFramework.Controls.MetroCheckBox();
+            this.xIRCBotEnabled = new System.Windows.Forms.CheckBox();
             this.cIRCList = new MetroFramework.Controls.MetroComboBox();
             this.gIRCAdv.SuspendLayout();
             this.gIRCOptions.SuspendLayout();
@@ -127,7 +127,6 @@
             this.xServPass.Size = new System.Drawing.Size(130, 15);
             this.xServPass.TabIndex = 2;
             this.xServPass.Text = "Use Server Password";
-            this.xServPass.UseSelectable = true;
             // 
             // tChanPass
             // 
@@ -168,7 +167,6 @@
             this.xChanPass.Size = new System.Drawing.Size(142, 15);
             this.xChanPass.TabIndex = 0;
             this.xChanPass.Text = "Use Channel Password";
-            this.xChanPass.UseSelectable = true;
             // 
             // xIRCListShowNonEnglish
             // 
@@ -179,7 +177,6 @@
             this.xIRCListShowNonEnglish.Size = new System.Drawing.Size(170, 15);
             this.xIRCListShowNonEnglish.TabIndex = 10;
             this.xIRCListShowNonEnglish.Text = "Show non-English networks";
-            this.xIRCListShowNonEnglish.UseSelectable = true;
             // 
             // gIRCOptions
             // 
@@ -210,7 +207,6 @@
             this.xIRCBotAnnounceServerEvents.Size = new System.Drawing.Size(397, 15);
             this.xIRCBotAnnounceServerEvents.TabIndex = 7;
             this.xIRCBotAnnounceServerEvents.Text = "Announce SERVER events (kicks, bans, promotions, demotions) on IRC.";
-            this.xIRCBotAnnounceServerEvents.UseSelectable = true;
             // 
             // xIRCUseColor
             // 
@@ -220,7 +216,6 @@
             this.xIRCUseColor.Size = new System.Drawing.Size(140, 15);
             this.xIRCUseColor.TabIndex = 2;
             this.xIRCUseColor.Text = "Use text colors on IRC.";
-            this.xIRCUseColor.UseSelectable = true;
             // 
             // lIRCNoForwardingMessage
             // 
@@ -240,7 +235,6 @@
             this.xIRCBotAnnounceIRCJoins.Size = new System.Drawing.Size(294, 15);
             this.xIRCBotAnnounceIRCJoins.TabIndex = 6;
             this.xIRCBotAnnounceIRCJoins.Text = "Announce people joining/leaving the IRC channels.";
-            this.xIRCBotAnnounceIRCJoins.UseSelectable = true;
             // 
             // bColorIRC
             // 
@@ -268,7 +262,6 @@
             this.xIRCBotForwardFromIRC.Size = new System.Drawing.Size(224, 15);
             this.xIRCBotForwardFromIRC.TabIndex = 4;
             this.xIRCBotForwardFromIRC.Text = "Forward ALL chat from IRC to SERVER.";
-            this.xIRCBotForwardFromIRC.UseSelectable = true;
             // 
             // xIRCBotAnnounceServerJoins
             // 
@@ -278,7 +271,6 @@
             this.xIRCBotAnnounceServerJoins.Size = new System.Drawing.Size(265, 15);
             this.xIRCBotAnnounceServerJoins.TabIndex = 5;
             this.xIRCBotAnnounceServerJoins.Text = "Announce people joining/leaving the SERVER.";
-            this.xIRCBotAnnounceServerJoins.UseSelectable = true;
             // 
             // xIRCBotForwardFromServer
             // 
@@ -288,7 +280,6 @@
             this.xIRCBotForwardFromServer.Size = new System.Drawing.Size(224, 15);
             this.xIRCBotForwardFromServer.TabIndex = 3;
             this.xIRCBotForwardFromServer.Text = "Forward ALL chat from SERVER to IRC.";
-            this.xIRCBotForwardFromServer.UseSelectable = true;
             // 
             // gIRCNetwork
             // 
@@ -337,7 +328,6 @@
             this.xIRCRegisteredNick.Size = new System.Drawing.Size(78, 15);
             this.xIRCRegisteredNick.TabIndex = 13;
             this.xIRCRegisteredNick.Text = "Registered";
-            this.xIRCRegisteredNick.UseSelectable = true;
             // 
             // tIRCNickServMessage
             // 
@@ -641,7 +631,6 @@
             this.xIRCBotEnabled.Size = new System.Drawing.Size(140, 15);
             this.xIRCBotEnabled.TabIndex = 7;
             this.xIRCBotEnabled.Text = "Enable IRC integration";
-            this.xIRCBotEnabled.UseSelectable = true;
             // 
             // cIRCList
             // 
@@ -686,23 +675,23 @@
 
         internal MetroFramework.Controls.MetroTile gIRCAdv;
         internal MetroFramework.Controls.MetroTextBox tServPass;
-        internal MetroFramework.Controls.MetroCheckBox xServPass;
+        internal System.Windows.Forms.CheckBox xServPass;
         internal MetroFramework.Controls.MetroTextBox tChanPass;
-        internal MetroFramework.Controls.MetroCheckBox xChanPass;
-        internal MetroFramework.Controls.MetroCheckBox xIRCListShowNonEnglish;
+        internal System.Windows.Forms.CheckBox xChanPass;
+        internal System.Windows.Forms.CheckBox xIRCListShowNonEnglish;
         internal MetroFramework.Controls.MetroTile gIRCOptions;
-        internal MetroFramework.Controls.MetroCheckBox xIRCBotAnnounceServerEvents;
-        internal MetroFramework.Controls.MetroCheckBox xIRCUseColor;
+        internal System.Windows.Forms.CheckBox xIRCBotAnnounceServerEvents;
+        internal System.Windows.Forms.CheckBox xIRCUseColor;
         internal MetroFramework.Controls.MetroLabel lIRCNoForwardingMessage;
-        internal MetroFramework.Controls.MetroCheckBox xIRCBotAnnounceIRCJoins;
+        internal System.Windows.Forms.CheckBox xIRCBotAnnounceIRCJoins;
         internal MetroFramework.Controls.MetroButton bColorIRC;
         internal MetroFramework.Controls.MetroLabel lColorIRC;
-        internal MetroFramework.Controls.MetroCheckBox xIRCBotForwardFromIRC;
-        internal MetroFramework.Controls.MetroCheckBox xIRCBotAnnounceServerJoins;
-        internal MetroFramework.Controls.MetroCheckBox xIRCBotForwardFromServer;
+        internal System.Windows.Forms.CheckBox xIRCBotForwardFromIRC;
+        internal System.Windows.Forms.CheckBox xIRCBotAnnounceServerJoins;
+        internal System.Windows.Forms.CheckBox xIRCBotForwardFromServer;
         internal MetroFramework.Controls.MetroTile gIRCNetwork;
         internal MetroFramework.Controls.MetroLabel lIRCDelayUnits;
-        internal MetroFramework.Controls.MetroCheckBox xIRCRegisteredNick;
+        internal System.Windows.Forms.CheckBox xIRCRegisteredNick;
         internal MetroFramework.Controls.MetroTextBox tIRCNickServMessage;
         internal MetroFramework.Controls.MetroLabel lIRCNickServMessage;
         internal MetroFramework.Controls.MetroTextBox tIRCNickServ;
@@ -720,7 +709,7 @@
         internal MetroFramework.Controls.MetroLabel lIRCBotNick;
         internal MetroFramework.Controls.MetroTextBox tIRCBotNick;
         internal MetroFramework.Controls.MetroLabel lIRCList;
-        internal MetroFramework.Controls.MetroCheckBox xIRCBotEnabled;
+        internal System.Windows.Forms.CheckBox xIRCBotEnabled;
         internal MetroFramework.Controls.MetroComboBox cIRCList;
     }
 }

@@ -28,21 +28,21 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.xAutoRank = new MetroFramework.Controls.MetroCheckBox();
+            this.xAutoRank = new System.Windows.Forms.CheckBox();
             this.nMaxUndoStates = new System.Windows.Forms.NumericUpDown();
             this.lMaxUndoStates = new MetroFramework.Controls.MetroLabel();
             this.lIPWarning = new MetroFramework.Controls.MetroLabel();
             this.tIP = new MetroFramework.Controls.MetroTextBox();
-            this.xIP = new MetroFramework.Controls.MetroCheckBox();
+            this.xIP = new System.Windows.Forms.CheckBox();
             this.lConsoleName = new MetroFramework.Controls.MetroLabel();
             this.tConsoleName = new MetroFramework.Controls.MetroTextBox();
             this.nMaxUndo = new System.Windows.Forms.NumericUpDown();
             this.lMaxUndoUnits = new MetroFramework.Controls.MetroLabel();
-            this.xMaxUndo = new MetroFramework.Controls.MetroCheckBox();
-            this.xRelayAllBlockUpdates = new MetroFramework.Controls.MetroCheckBox();
-            this.xNoPartialPositionUpdates = new MetroFramework.Controls.MetroCheckBox();
+            this.xMaxUndo = new System.Windows.Forms.CheckBox();
+            this.xRelayAllBlockUpdates = new System.Windows.Forms.CheckBox();
+            this.xNoPartialPositionUpdates = new System.Windows.Forms.CheckBox();
             this.lAdvancedWarning = new MetroFramework.Controls.MetroLabel();
-            this.xLowLatencyMode = new MetroFramework.Controls.MetroCheckBox();
+            this.xLowLatencyMode = new System.Windows.Forms.CheckBox();
             this.lProcessPriority = new MetroFramework.Controls.MetroLabel();
             this.cProcessPriority = new MetroFramework.Controls.MetroComboBox();
             this.nTickInterval = new System.Windows.Forms.NumericUpDown();
@@ -69,7 +69,6 @@
             this.xAutoRank.Size = new System.Drawing.Size(113, 15);
             this.xAutoRank.TabIndex = 24;
             this.xAutoRank.Text = "Enable AutoRank";
-            this.xAutoRank.UseSelectable = true;
             // 
             // nMaxUndoStates
             // 
@@ -145,7 +144,6 @@
             this.xIP.Size = new System.Drawing.Size(95, 15);
             this.xIP.TabIndex = 18;
             this.xIP.Text = "Designated IP";
-            this.xIP.UseSelectable = true;
             // 
             // lConsoleName
             // 
@@ -227,7 +225,6 @@
             this.xMaxUndo.Size = new System.Drawing.Size(100, 15);
             this.xMaxUndo.TabIndex = 4;
             this.xMaxUndo.Text = "Limit /undo to";
-            this.xMaxUndo.UseSelectable = true;
             // 
             // xRelayAllBlockUpdates
             // 
@@ -238,7 +235,6 @@
             this.xRelayAllBlockUpdates.TabIndex = 1;
             this.xRelayAllBlockUpdates.Text = "When a player changes a block, send him the redundant update packet anyway (origi" +
     "nal behavior).";
-            this.xRelayAllBlockUpdates.UseSelectable = true;
             // 
             // xNoPartialPositionUpdates
             // 
@@ -248,7 +244,6 @@
             this.xNoPartialPositionUpdates.Size = new System.Drawing.Size(311, 15);
             this.xNoPartialPositionUpdates.TabIndex = 2;
             this.xNoPartialPositionUpdates.Text = "Do not use partial position updates (opcodes 9, 10, 11).";
-            this.xNoPartialPositionUpdates.UseSelectable = true;
             // 
             // lAdvancedWarning
             // 
@@ -270,7 +265,6 @@
             this.xLowLatencyMode.TabIndex = 3;
             this.xLowLatencyMode.Text = "Low-latency mode (disables Nagle\'s algorithm, reducing latency but increasing ban" +
     "dwidth use).";
-            this.xLowLatencyMode.UseSelectable = true;
             // 
             // lProcessPriority
             // 
@@ -461,21 +455,21 @@
 
         #endregion
 
-        internal MetroFramework.Controls.MetroCheckBox xAutoRank;
+        internal System.Windows.Forms.CheckBox xAutoRank;
         internal System.Windows.Forms.NumericUpDown nMaxUndoStates;
         internal MetroFramework.Controls.MetroLabel lMaxUndoStates;
         internal MetroFramework.Controls.MetroLabel lIPWarning;
         internal MetroFramework.Controls.MetroTextBox tIP;
-        internal MetroFramework.Controls.MetroCheckBox xIP;
+        internal System.Windows.Forms.CheckBox xIP;
         internal MetroFramework.Controls.MetroLabel lConsoleName;
         internal MetroFramework.Controls.MetroTextBox tConsoleName;
         internal System.Windows.Forms.NumericUpDown nMaxUndo;
         internal MetroFramework.Controls.MetroLabel lMaxUndoUnits;
-        internal MetroFramework.Controls.MetroCheckBox xMaxUndo;
-        internal MetroFramework.Controls.MetroCheckBox xRelayAllBlockUpdates;
-        internal MetroFramework.Controls.MetroCheckBox xNoPartialPositionUpdates;
+        internal System.Windows.Forms.CheckBox xMaxUndo;
+        internal System.Windows.Forms.CheckBox xRelayAllBlockUpdates;
+        internal System.Windows.Forms.CheckBox xNoPartialPositionUpdates;
         internal MetroFramework.Controls.MetroLabel lAdvancedWarning;
-        internal MetroFramework.Controls.MetroCheckBox xLowLatencyMode;
+        internal System.Windows.Forms.CheckBox xLowLatencyMode;
         internal MetroFramework.Controls.MetroLabel lProcessPriority;
         internal MetroFramework.Controls.MetroComboBox cProcessPriority;
         internal System.Windows.Forms.NumericUpDown nTickInterval;

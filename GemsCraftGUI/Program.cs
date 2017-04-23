@@ -14,20 +14,20 @@ namespace GemsCraftGUI
 {
     static class Program
     {
-        internal static MainForm MainFormGUI = new MainForm();
-        internal static MainScreen MainScreenGUI = new MainScreen();
+        internal static MainForm MainFormGUI;
+        internal static MainScreen MainScreenGUI;
 
-        internal static General GeneralScreen = new General();
-        internal static Ranks RankScreen = new Ranks();
-        internal static ConfigGUI.GUITabs.ConfigScreens.Chat ChatScreen = new ConfigGUI.GUITabs.ConfigScreens.Chat();
-        internal static Worlds WorldScreen = new Worlds();
-        internal static Security SecurityScreen = new Security();
-        internal static SavingBackup SavingBackupScreen = new SavingBackup();
-        internal static Logging LoggingScreen = new Logging();
-        internal static Irc IrcScreen = new Irc();
-        internal static Advanced AdvancedScreen = new Advanced();
-        internal static Misc MiscScreen = new Misc();
-        internal static Cpe CpeScreen = new Cpe();
+        internal static General GeneralScreen;
+        internal static Ranks RankScreen;
+        internal static ConfigGUI.GUITabs.ConfigScreens.Chat ChatScreen;
+        internal static Worlds WorldScreen;
+        internal static Security SecurityScreen;
+        internal static SavingBackup SavingBackupScreen;
+        internal static Logging LoggingScreen;
+        internal static Irc IrcScreen;
+        internal static Advanced AdvancedScreen;
+        internal static Misc MiscScreen;
+        internal static Cpe CpeScreen;
 
         /// <summary>
         /// The main entry point for the application.

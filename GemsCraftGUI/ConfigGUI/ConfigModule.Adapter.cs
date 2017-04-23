@@ -12,16 +12,17 @@ using fCraft;
 using fCraft.ConfigGUI;
 using JetBrains.Annotations;
 using static GemsCraftGUI.Program;
+
 namespace GemsCraftGUI.ConfigGUI.GUITabs
 {
     partial class ConfigModule
     {
         // Moved SaveEverything() to Adapter
-        void SaveEverything()
+        internal static void SaveEverything()
         {
             using (LogRecorder applyLogger = new LogRecorder())
             {
-                SaveConfig();
+                MainForm.SaveConfig();
                 if (applyLogger.HasMessages)
                 {
                     MessageBox.Show(applyLogger.MessageString, "Some problems were encountered with the selected values.");
@@ -39,60 +40,7 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs
 
         #region Loading & Applying Config
 
-        void LoadConfig()
-        {
-            string missingFileMsg = null;
-            if (!File.Exists(Paths.WorldListFileName) && !File.Exists(Paths.ConfigFileName))
-            {
-                missingFileMsg =
-                    $"Configuration ({Paths.ConfigFileName}) and world list ({Paths.WorldListFileName}) were not found. Using defaults.";
-            }
-            else if (!File.Exists(Paths.ConfigFileName))
-            {
-                missingFileMsg = $"Configuration ({Paths.ConfigFileName}) was not found. Using defaults.";
-            }
-            else if (!File.Exists(Paths.WorldListFileName))
-            {
-                missingFileMsg = $"World list ({Paths.WorldListFileName}) was not found. Assuming 0 worlds.";
-            }
-            if (missingFileMsg != null)
-            {
-                MessageBox.Show(missingFileMsg);
-            }
-
-            using (var loadLogger = new LogRecorder())
-            {
-                if (Config.Load(false, false))
-                {
-                    if (loadLogger.HasMessages)
-                    {
-                        MessageBox.Show(loadLogger.MessageString, "Config loading warnings");
-                    }
-                }
-                else
-                {
-                    MessageBox.Show(loadLogger.MessageString, "Error occured while trying to load config");
-                }
-            }
-
-            ApplyTabGeneral();
-            ApplyTabChat();
-            ApplyTabWorlds(); // also reloads world list
-            ApplyTabRanks();
-            ApplyTabSecurity();
-            ApplyTabSavingAndBackup();
-            ApplyTabLogging();
-            ApplyTabIrc();
-            ApplyTabAdvanced();
-            ApplyTabCpe();
-            AddChangeHandler(new MainScreen(), SomethingChanged);
-            WorldScreen.dgvWorlds.CellValueChanged += delegate
-            {
-                SomethingChanged(null, null);
-            };
-
-            AddChangeHandler(ChatScreen, HandleTabChatChange);
-        }
+        
 
         #region Change Detection
 
@@ -298,10 +246,10 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs
             GeneralScreen.nAnnouncements.Value = GeneralScreen.xAnnouncements.Checked ? ConfigKey.AnnouncementInterval.GetInt() : 1;
 
             // UpdaterSettingsWindow
-            _updaterWindow.BackupBeforeUpdate = ConfigKey.BackupBeforeUpdate.Enabled();
-            _updaterWindow.RunBeforeUpdate = ConfigKey.RunBeforeUpdate.GetString();
-            _updaterWindow.RunAfterUpdate = ConfigKey.RunAfterUpdate.GetString();
-            _updaterWindow.UpdaterMode = ConfigKey.UpdaterMode.GetEnum<UpdaterMode>();
+            UpdaterWindow.BackupBeforeUpdate = ConfigKey.BackupBeforeUpdate.Enabled();
+            UpdaterWindow.RunBeforeUpdate = ConfigKey.RunBeforeUpdate.GetString();
+            UpdaterWindow.RunAfterUpdate = ConfigKey.RunAfterUpdate.GetString();
+            UpdaterWindow.UpdaterMode = ConfigKey.UpdaterMode.GetEnum<UpdaterMode>();
         }
 
 
@@ -415,7 +363,7 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs
 
         void ApplyTabRanks()
         {
-            _selectedRank = null;
+            SelectedRank = null;
             RebuildRankList();
             DisableRankOptions();
         }
@@ -851,10 +799,10 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs
         {
             ConfigKey.CheckForUpdates.TrySetValue(SavingBackupScreen.checkUpdate.Checked.ToString());
             // UpdaterSettingsWindow
-            ConfigKey.UpdaterMode.TrySetValue(_updaterWindow.UpdaterMode);
-            ConfigKey.BackupBeforeUpdate.TrySetValue(_updaterWindow.BackupBeforeUpdate);
-            ConfigKey.RunBeforeUpdate.TrySetValue(_updaterWindow.RunBeforeUpdate);
-            ConfigKey.RunAfterUpdate.TrySetValue(_updaterWindow.RunAfterUpdate);
+            ConfigKey.UpdaterMode.TrySetValue(UpdaterWindow.UpdaterMode);
+            ConfigKey.BackupBeforeUpdate.TrySetValue(UpdaterWindow.BackupBeforeUpdate);
+            ConfigKey.RunBeforeUpdate.TrySetValue(UpdaterWindow.RunBeforeUpdate);
+            ConfigKey.RunAfterUpdate.TrySetValue(UpdaterWindow.RunAfterUpdate);
 
             ConfigKey.SaveInterval.TrySetValue(SavingBackupScreen.xSaveInterval.Checked ? SavingBackupScreen.nSaveInterval.Value : 0);
             ConfigKey.BackupOnStartup.TrySetValue(SavingBackupScreen.xBackupOnStartup.Checked);
@@ -991,12 +939,6 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs
             ConfigKey.EnvColorsEnabled.TrySetValue(CpeScreen.chkEnvColorsAllowed.Checked);
             ConfigKey.TimeSkyEnabled.TrySetValue(CpeScreen.chkTimeBasedSky.Checked);
             ConfigKey.GameTimeHourMinutes.TrySetValue(CpeScreen.numHourLength.Value);
-        }
-        void SaveConfig()
-        {
-            
-
-            
         }
 
         private readonly ConfigKey[] _cbConfigs = {

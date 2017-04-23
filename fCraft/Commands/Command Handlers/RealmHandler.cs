@@ -784,11 +784,8 @@ namespace fCraft
                             {
                                 player.Message("{0}&S is no longer barred from building in {1}",
                                                 info.ClassyName, realm.ClassyName);
-                                if (target != null)
-                                {
-                                    target.Message("You can now build in realm {0}&S (removed from blacklist by {1}&S).",
-                                                    realm.ClassyName, player.ClassyName);
-                                }
+                                target?.Message("You can now build in realm {0}&S (removed from blacklist by {1}&S).",
+                                    realm.ClassyName, player.ClassyName);
                             }
                             else
                             {

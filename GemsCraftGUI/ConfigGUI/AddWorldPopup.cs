@@ -12,7 +12,7 @@ using System.Windows.Forms;
 using fCraft.GUI;
 using fCraft.MapConversion;
 using GemsCraftGUI;
-
+using static GemsCraftGUI.ConfigGUI.GUITabs.ConfigModule;
 
 namespace fCraft.ConfigGUI {
     sealed partial class AddWorldPopup : Form {
@@ -109,7 +109,7 @@ namespace fCraft.ConfigGUI {
 
         void LoadMap( object sender, EventArgs args ) {
             // Fill in the "Copy existing world" combobox
-            foreach( WorldListEntry otherWorld in MainForm.Worlds ) {
+            foreach( WorldListEntry otherWorld in Worlds ) {
                 if( otherWorld != World ) {
                     cWorld.Items.Add( otherWorld.Name + " (" + otherWorld.Description + ")" );
                     copyOptionsList.Add( otherWorld );

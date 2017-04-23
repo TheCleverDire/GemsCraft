@@ -30,7 +30,7 @@
         {
             this.gLogFile = new MetroFramework.Controls.MetroTile();
             this.lLogFileOptionsDescription = new MetroFramework.Controls.MetroLabel();
-            this.xLogLimit = new MetroFramework.Controls.MetroCheckBox();
+            this.xLogLimit = new System.Windows.Forms.CheckBox();
             this.vLogFileOptions = new MetroFramework.Controls.MetroListView();
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lLogLimitUnits = new MetroFramework.Controls.MetroLabel();
@@ -84,7 +84,6 @@
             this.xLogLimit.Size = new System.Drawing.Size(76, 15);
             this.xLogLimit.TabIndex = 4;
             this.xLogLimit.Text = "Only keep";
-            this.xLogLimit.UseSelectable = true;
             // 
             // vLogFileOptions
             // 
@@ -222,7 +221,7 @@
 
         internal MetroFramework.Controls.MetroTile gLogFile;
         internal MetroFramework.Controls.MetroLabel lLogFileOptionsDescription;
-        internal MetroFramework.Controls.MetroCheckBox xLogLimit;
+        internal System.Windows.Forms.CheckBox xLogLimit;
         internal MetroFramework.Controls.MetroListView vLogFileOptions;
         internal System.Windows.Forms.ColumnHeader columnHeader2;
         internal MetroFramework.Controls.MetroLabel lLogLimitUnits;

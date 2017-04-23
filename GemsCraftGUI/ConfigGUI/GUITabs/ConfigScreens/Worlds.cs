@@ -18,5 +18,27 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
         {
             InitializeComponent();
         }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (!Enabled)
+            {
+                foreach (Control c in Controls)
+                {
+                    if (c.HasChildren)
+                    {
+                        foreach (Control cx in c.Controls)
+                        {
+                            cx.Enabled = false;
+                        }
+                        c.Enabled = false;
+                    }
+                    else
+                    {
+                        c.Enabled = false;
+                    }
+                }
+            }
+        }
     }
 }
