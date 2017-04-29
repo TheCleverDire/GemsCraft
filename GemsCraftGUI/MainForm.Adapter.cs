@@ -181,6 +181,7 @@ namespace GemsCraftGUI
             MiscScreen.CustomAliases.Text = ConfigKey.CustomAliasName.GetString(); // TODO - Move to ApplyTabMisc()
             GeneralScreen.tMOTD.Text = ConfigKey.MOTD.GetString();
             MiscScreen.websiteURL.Text = ConfigKey.WebsiteURL.GetString(); // TODO - Move to ApplyTabMisc()
+            MiscScreen.chkSocial.Checked = ConfigKey.SocialMediaEnabled.Enabled();
 
             GeneralScreen.nMaxPlayers.Value = ConfigKey.MaxPlayers.GetInt();
             CheckMaxPlayersPerWorldValue();

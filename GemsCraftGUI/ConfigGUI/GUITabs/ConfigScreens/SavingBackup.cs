@@ -12,7 +12,7 @@ using static GemsCraftGUI.ConfigGUI.GUITabs.ConfigModule;
 
 namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
 {
-    public partial class SavingBackup : MetroForm
+    public partial class SavingBackup : ExtendedMetroForm
     {
         public SavingBackup()
         {

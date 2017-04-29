@@ -62,7 +62,7 @@
             this.chatPreview1.AutoScroll = true;
             this.chatPreview1.Location = new System.Drawing.Point(22, 336);
             this.chatPreview1.Name = "chatPreview1";
-            this.chatPreview1.Size = new System.Drawing.Size(637, 190);
+            this.chatPreview1.Size = new System.Drawing.Size(637, 222);
             this.chatPreview1.TabIndex = 5;
             // 
             // gAppearence
@@ -86,56 +86,68 @@
             // xShowConnectionMessages
             // 
             this.xShowConnectionMessages.AutoSize = true;
+            this.xShowConnectionMessages.BackColor = System.Drawing.Color.Transparent;
             this.xShowConnectionMessages.Location = new System.Drawing.Point(325, 45);
             this.xShowConnectionMessages.Name = "xShowConnectionMessages";
-            this.xShowConnectionMessages.Size = new System.Drawing.Size(282, 15);
+            this.xShowConnectionMessages.Size = new System.Drawing.Size(272, 17);
             this.xShowConnectionMessages.TabIndex = 4;
             this.xShowConnectionMessages.Text = "Show a message when players join/leave SERVER.";
+            this.xShowConnectionMessages.UseVisualStyleBackColor = false;
             // 
             // xShowJoinedWorldMessages
             // 
             this.xShowJoinedWorldMessages.AutoSize = true;
+            this.xShowJoinedWorldMessages.BackColor = System.Drawing.Color.Transparent;
             this.xShowJoinedWorldMessages.Location = new System.Drawing.Point(325, 20);
             this.xShowJoinedWorldMessages.Name = "xShowJoinedWorldMessages";
-            this.xShowJoinedWorldMessages.Size = new System.Drawing.Size(246, 15);
+            this.xShowJoinedWorldMessages.Size = new System.Drawing.Size(227, 17);
             this.xShowJoinedWorldMessages.TabIndex = 3;
             this.xShowJoinedWorldMessages.Text = "Show a message when players join worlds.";
+            this.xShowJoinedWorldMessages.UseVisualStyleBackColor = false;
             // 
             // xRankColorsInWorldNames
             // 
             this.xRankColorsInWorldNames.AutoSize = true;
+            this.xRankColorsInWorldNames.BackColor = System.Drawing.Color.Transparent;
             this.xRankColorsInWorldNames.Location = new System.Drawing.Point(325, 70);
             this.xRankColorsInWorldNames.Name = "xRankColorsInWorldNames";
-            this.xRankColorsInWorldNames.Size = new System.Drawing.Size(233, 15);
+            this.xRankColorsInWorldNames.Size = new System.Drawing.Size(211, 17);
             this.xRankColorsInWorldNames.TabIndex = 5;
             this.xRankColorsInWorldNames.Text = "Color world names based on build rank.";
+            this.xRankColorsInWorldNames.UseVisualStyleBackColor = false;
             // 
             // xRankPrefixesInList
             // 
             this.xRankPrefixesInList.AutoSize = true;
+            this.xRankPrefixesInList.BackColor = System.Drawing.Color.Transparent;
             this.xRankPrefixesInList.Location = new System.Drawing.Point(44, 70);
             this.xRankPrefixesInList.Name = "xRankPrefixesInList";
-            this.xRankPrefixesInList.Size = new System.Drawing.Size(206, 15);
+            this.xRankPrefixesInList.Size = new System.Drawing.Size(191, 17);
             this.xRankPrefixesInList.TabIndex = 2;
             this.xRankPrefixesInList.Text = "Prefixes in player list (breaks skins).";
+            this.xRankPrefixesInList.UseVisualStyleBackColor = false;
             // 
             // xRankPrefixesInChat
             // 
             this.xRankPrefixesInChat.AutoSize = true;
+            this.xRankPrefixesInChat.BackColor = System.Drawing.Color.Transparent;
             this.xRankPrefixesInChat.Location = new System.Drawing.Point(25, 45);
             this.xRankPrefixesInChat.Name = "xRankPrefixesInChat";
-            this.xRankPrefixesInChat.Size = new System.Drawing.Size(124, 15);
+            this.xRankPrefixesInChat.Size = new System.Drawing.Size(119, 17);
             this.xRankPrefixesInChat.TabIndex = 1;
             this.xRankPrefixesInChat.Text = "Show rank prefixes.";
+            this.xRankPrefixesInChat.UseVisualStyleBackColor = false;
             // 
             // xRankColorsInChat
             // 
             this.xRankColorsInChat.AutoSize = true;
+            this.xRankColorsInChat.BackColor = System.Drawing.Color.Transparent;
             this.xRankColorsInChat.Location = new System.Drawing.Point(25, 20);
             this.xRankColorsInChat.Name = "xRankColorsInChat";
-            this.xRankColorsInChat.Size = new System.Drawing.Size(116, 15);
+            this.xRankColorsInChat.Size = new System.Drawing.Size(111, 17);
             this.xRankColorsInChat.TabIndex = 0;
             this.xRankColorsInChat.Text = "Show rank colors.";
+            this.xRankColorsInChat.UseVisualStyleBackColor = false;
             // 
             // gChatColors
             // 
@@ -314,7 +326,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(673, 548);
+            this.ClientSize = new System.Drawing.Size(673, 590);
             this.Controls.Add(this.chatPreview1);
             this.Controls.Add(this.gAppearence);
             this.Controls.Add(this.gChatColors);

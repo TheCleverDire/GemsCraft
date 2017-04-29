@@ -739,7 +739,27 @@ message type if character count is less than 64")]
         TimeSkyEnabled,
         [IntKey(ConfigSection.Cpe, 12,
             @"Configures how many hours are in an in-game day.")]
-        GameTimeHourMinutes
+        GameTimeHourMinutes,
+        #endregion
+
+        #region Other
+        [BoolKey(ConfigSection.Advanced, false,
+            @"Enables/Disables Social Media functions in GemsCraft"
+            )]
+        SocialMediaEnabled,
+        [BoolKey(ConfigSection.Advanced, false,
+            @"Tells server if Twitter is authenticated"
+            )]
+        TwitterAuthenticated,
+
+        [StringKey(ConfigSection.Advanced, "", 
+            @"The Access Token to keep authenticated")]
+        TwitterAccessToken,
+
+        [StringKey(ConfigSection.Advanced, "",
+            @"The Access Token Secret to keep authenticated")]
+        TwitterAccessSecret,
+
         #endregion
     }
 }

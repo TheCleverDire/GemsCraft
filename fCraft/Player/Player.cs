@@ -36,7 +36,7 @@ namespace fCraft
         {
             return PrisonData.Obj.Prisoners.Any(p => Info.Name == p.Username);
         }
-
+        
         /// <summary> The godly pseudo-player for commands called from the server console.
         /// Console has all the permissions granted.
         /// Note that Player.Console.World is always null,

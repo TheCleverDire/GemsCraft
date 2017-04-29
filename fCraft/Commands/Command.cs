@@ -13,6 +13,10 @@ namespace fCraft {
         public string Name { get; private set; } // lowercase name of the command
         public bool IsConfirmed; // whether this command has been confirmed by the user (with /ok)
 
+        public void PrintUsage(Player source)
+        {
+            Descriptor.PrintUsage(source);
+        }
         /// <summary> Creates a copy of an existing command. </summary>
         public Command( [NotNull] Command other ) {
             if( other == null ) throw new ArgumentNullException( "other" );

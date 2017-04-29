@@ -91,13 +91,56 @@ namespace fCraft {
             #region PrisonCommands
 
             CommandManager.RegisterCommand(CdArrest);
-            //CommandManager.RegisterCommand(CdFree);
-            //CommandManager.RegisterCommand(CdSetPrisonEnd);
+            CommandManager.RegisterCommand(CdFreePrisoner);
+            //CommandManager.RegisterCommand(CdPrisonBail);
 
             #endregion
         }
 
         #region PrisonCommands
+
+        
+
+
+        private static readonly CommandDescriptor CdFreePrisoner = new CommandDescriptor
+        {
+            Name = "FreePrisoner",
+            Aliases = new[] { "prisonfree", "bustout" },
+            IsConsoleSafe = true,
+            Category = CommandCategory.Moderation,
+            Permissions = new[] { Permission.PrisonFree },
+            Help = "Frees a player from prison",
+            Usage = "/FreePrisoner Player Reason",
+            Handler = FreePrisonerHandler
+        };
+
+        private static void FreePrisonerHandler(Player source, Command cmd)
+        {
+            try
+            {
+                var pName = cmd.Next();
+                var reason = cmd.Next();
+                foreach (var p in PrisonData.Obj.Prisoners)
+                {
+                    if (p.Username != pName)
+                    {
+                        source.Message("&4Either player doesn't exist or player is not in prison");
+                    }
+                    else
+                    {
+                        Prison.RemovePlayer(
+                            Server.FindPlayerOrPrintMatches(source, pName, true, true),
+                            reason,
+                            source
+                        );
+                    }
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                CdFreePrisoner.PrintUsage(source);
+            }
+        }
 
         private static readonly CommandDescriptor CdArrest = new CommandDescriptor
         {

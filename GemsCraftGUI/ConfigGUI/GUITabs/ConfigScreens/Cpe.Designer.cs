@@ -102,6 +102,7 @@
             0,
             0,
             0});
+            this.numHourLength.ValueChanged += new System.EventHandler(this.numHourLength_ValueChanged);
             // 
             // lblHourLength
             // 
@@ -114,20 +115,26 @@
             // chkTimeBasedSky
             // 
             this.chkTimeBasedSky.AutoSize = true;
+            this.chkTimeBasedSky.BackColor = System.Drawing.Color.Transparent;
             this.chkTimeBasedSky.Location = new System.Drawing.Point(6, 45);
             this.chkTimeBasedSky.Name = "chkTimeBasedSky";
-            this.chkTimeBasedSky.Size = new System.Drawing.Size(105, 15);
+            this.chkTimeBasedSky.Size = new System.Drawing.Size(103, 17);
             this.chkTimeBasedSky.TabIndex = 4;
             this.chkTimeBasedSky.Text = "Time Based Sky";
+            this.chkTimeBasedSky.UseVisualStyleBackColor = false;
+            this.chkTimeBasedSky.CheckedChanged += new System.EventHandler(this.chkTimeBasedSky_CheckedChanged);
             // 
             // chkEnvColorsAllowed
             // 
             this.chkEnvColorsAllowed.AutoSize = true;
+            this.chkEnvColorsAllowed.BackColor = System.Drawing.Color.Transparent;
             this.chkEnvColorsAllowed.Location = new System.Drawing.Point(6, 20);
             this.chkEnvColorsAllowed.Name = "chkEnvColorsAllowed";
-            this.chkEnvColorsAllowed.Size = new System.Drawing.Size(58, 15);
+            this.chkEnvColorsAllowed.Size = new System.Drawing.Size(59, 17);
             this.chkEnvColorsAllowed.TabIndex = 3;
             this.chkEnvColorsAllowed.Text = "Enable";
+            this.chkEnvColorsAllowed.UseVisualStyleBackColor = false;
+            this.chkEnvColorsAllowed.CheckedChanged += new System.EventHandler(this.chkEnvColorsAllowed_CheckedChanged);
             // 
             // gboMessageType
             // 
@@ -163,23 +170,29 @@
             this.btnSeeKeyWords.TabIndex = 15;
             this.btnSeeKeyWords.Text = "Key Words";
             this.btnSeeKeyWords.UseSelectable = true;
+            this.btnSeeKeyWords.Click += new System.EventHandler(this.btnSeeKeyWords_Click);
             // 
             // chkAnnouncementMT
             // 
             this.chkAnnouncementMT.AutoSize = true;
+            this.chkAnnouncementMT.BackColor = System.Drawing.Color.Transparent;
             this.chkAnnouncementMT.Location = new System.Drawing.Point(7, 43);
             this.chkAnnouncementMT.Name = "chkAnnouncementMT";
-            this.chkAnnouncementMT.Size = new System.Drawing.Size(179, 15);
+            this.chkAnnouncementMT.Size = new System.Drawing.Size(167, 17);
             this.chkAnnouncementMT.TabIndex = 14;
             this.chkAnnouncementMT.Text = "Show Announcements at Top";
+            this.chkAnnouncementMT.UseVisualStyleBackColor = false;
             // 
             // chkBottomRight3
             // 
             this.chkBottomRight3.AutoSize = true;
+            this.chkBottomRight3.BackColor = System.Drawing.Color.Transparent;
             this.chkBottomRight3.Location = new System.Drawing.Point(195, 112);
             this.chkBottomRight3.Name = "chkBottomRight3";
-            this.chkBottomRight3.Size = new System.Drawing.Size(16, 0);
+            this.chkBottomRight3.Size = new System.Drawing.Size(15, 14);
             this.chkBottomRight3.TabIndex = 12;
+            this.chkBottomRight3.UseVisualStyleBackColor = false;
+            this.chkBottomRight3.CheckedChanged += new System.EventHandler(this.chkBottomRight3_CheckedChanged);
             // 
             // txtBottomRight3
             // 
@@ -214,10 +227,13 @@
             // chkBottomRight2
             // 
             this.chkBottomRight2.AutoSize = true;
+            this.chkBottomRight2.BackColor = System.Drawing.Color.Transparent;
             this.chkBottomRight2.Location = new System.Drawing.Point(195, 139);
             this.chkBottomRight2.Name = "chkBottomRight2";
-            this.chkBottomRight2.Size = new System.Drawing.Size(16, 0);
+            this.chkBottomRight2.Size = new System.Drawing.Size(15, 14);
             this.chkBottomRight2.TabIndex = 10;
+            this.chkBottomRight2.UseVisualStyleBackColor = false;
+            this.chkBottomRight2.CheckedChanged += new System.EventHandler(this.chkBottomRight2_CheckedChanged);
             // 
             // txtBottomRight2
             // 
@@ -252,10 +268,13 @@
             // chkBottomRight1
             // 
             this.chkBottomRight1.AutoSize = true;
+            this.chkBottomRight1.BackColor = System.Drawing.Color.Transparent;
             this.chkBottomRight1.Location = new System.Drawing.Point(195, 166);
             this.chkBottomRight1.Name = "chkBottomRight1";
-            this.chkBottomRight1.Size = new System.Drawing.Size(16, 0);
+            this.chkBottomRight1.Size = new System.Drawing.Size(15, 14);
             this.chkBottomRight1.TabIndex = 8;
+            this.chkBottomRight1.UseVisualStyleBackColor = false;
+            this.chkBottomRight1.CheckedChanged += new System.EventHandler(this.chkBottomRight1_CheckedChanged);
             // 
             // txtBottomRight1
             // 
@@ -290,10 +309,13 @@
             // chkStatus3
             // 
             this.chkStatus3.AutoSize = true;
+            this.chkStatus3.BackColor = System.Drawing.Color.Transparent;
             this.chkStatus3.Location = new System.Drawing.Point(195, 75);
             this.chkStatus3.Name = "chkStatus3";
-            this.chkStatus3.Size = new System.Drawing.Size(16, 0);
+            this.chkStatus3.Size = new System.Drawing.Size(15, 14);
             this.chkStatus3.TabIndex = 6;
+            this.chkStatus3.UseVisualStyleBackColor = false;
+            this.chkStatus3.CheckedChanged += new System.EventHandler(this.chkStatus3_CheckedChanged);
             // 
             // txtStatus3
             // 
@@ -328,10 +350,13 @@
             // chkStatus2
             // 
             this.chkStatus2.AutoSize = true;
+            this.chkStatus2.BackColor = System.Drawing.Color.Transparent;
             this.chkStatus2.Location = new System.Drawing.Point(195, 48);
             this.chkStatus2.Name = "chkStatus2";
-            this.chkStatus2.Size = new System.Drawing.Size(16, 0);
+            this.chkStatus2.Size = new System.Drawing.Size(15, 14);
             this.chkStatus2.TabIndex = 4;
+            this.chkStatus2.UseVisualStyleBackColor = false;
+            this.chkStatus2.CheckedChanged += new System.EventHandler(this.chkStatus2_CheckedChanged);
             // 
             // txtStatus2
             // 
@@ -366,10 +391,13 @@
             // chkStatus1
             // 
             this.chkStatus1.AutoSize = true;
+            this.chkStatus1.BackColor = System.Drawing.Color.Transparent;
             this.chkStatus1.Location = new System.Drawing.Point(195, 21);
             this.chkStatus1.Name = "chkStatus1";
-            this.chkStatus1.Size = new System.Drawing.Size(16, 0);
+            this.chkStatus1.Size = new System.Drawing.Size(15, 14);
             this.chkStatus1.TabIndex = 2;
+            this.chkStatus1.UseVisualStyleBackColor = false;
+            this.chkStatus1.CheckedChanged += new System.EventHandler(this.chkStatus1_CheckedChanged);
             // 
             // txtStatus1
             // 
@@ -404,11 +432,14 @@
             // chkMessageTypeAllowed
             // 
             this.chkMessageTypeAllowed.AutoSize = true;
+            this.chkMessageTypeAllowed.BackColor = System.Drawing.Color.Transparent;
             this.chkMessageTypeAllowed.Location = new System.Drawing.Point(7, 21);
             this.chkMessageTypeAllowed.Name = "chkMessageTypeAllowed";
-            this.chkMessageTypeAllowed.Size = new System.Drawing.Size(65, 15);
+            this.chkMessageTypeAllowed.Size = new System.Drawing.Size(65, 17);
             this.chkMessageTypeAllowed.TabIndex = 0;
             this.chkMessageTypeAllowed.Text = "Enabled";
+            this.chkMessageTypeAllowed.UseVisualStyleBackColor = false;
+            this.chkMessageTypeAllowed.CheckedChanged += new System.EventHandler(this.chkMessageTypeAllowed_CheckedChanged);
             // 
             // gboHeldBlock
             // 
@@ -425,11 +456,14 @@
             // chkHeldBlockAllowed
             // 
             this.chkHeldBlockAllowed.AutoSize = true;
+            this.chkHeldBlockAllowed.BackColor = System.Drawing.Color.Transparent;
             this.chkHeldBlockAllowed.Location = new System.Drawing.Point(7, 21);
             this.chkHeldBlockAllowed.Name = "chkHeldBlockAllowed";
-            this.chkHeldBlockAllowed.Size = new System.Drawing.Size(58, 15);
+            this.chkHeldBlockAllowed.Size = new System.Drawing.Size(59, 17);
             this.chkHeldBlockAllowed.TabIndex = 0;
             this.chkHeldBlockAllowed.Text = "Enable";
+            this.chkHeldBlockAllowed.UseVisualStyleBackColor = false;
+            this.chkHeldBlockAllowed.CheckedChanged += new System.EventHandler(this.chkHeldBlockAllowed_CheckedChanged);
             // 
             // gboCustomBlocks
             // 
@@ -455,11 +489,14 @@
             // chkCustomBlocksAllowed
             // 
             this.chkCustomBlocksAllowed.AutoSize = true;
+            this.chkCustomBlocksAllowed.BackColor = System.Drawing.Color.Transparent;
             this.chkCustomBlocksAllowed.Location = new System.Drawing.Point(6, 21);
             this.chkCustomBlocksAllowed.Name = "chkCustomBlocksAllowed";
-            this.chkCustomBlocksAllowed.Size = new System.Drawing.Size(58, 15);
+            this.chkCustomBlocksAllowed.Size = new System.Drawing.Size(59, 17);
             this.chkCustomBlocksAllowed.TabIndex = 1;
             this.chkCustomBlocksAllowed.Text = "Enable";
+            this.chkCustomBlocksAllowed.UseVisualStyleBackColor = false;
+            this.chkCustomBlocksAllowed.CheckedChanged += new System.EventHandler(this.chkCustomBlocksAllowed_CheckedChanged);
             // 
             // gboClickDistance
             // 
@@ -476,11 +513,14 @@
             // chkClickDistanceAllowed
             // 
             this.chkClickDistanceAllowed.AutoSize = true;
+            this.chkClickDistanceAllowed.BackColor = System.Drawing.Color.Transparent;
             this.chkClickDistanceAllowed.Location = new System.Drawing.Point(7, 21);
             this.chkClickDistanceAllowed.Name = "chkClickDistanceAllowed";
-            this.chkClickDistanceAllowed.Size = new System.Drawing.Size(58, 15);
+            this.chkClickDistanceAllowed.Size = new System.Drawing.Size(59, 17);
             this.chkClickDistanceAllowed.TabIndex = 0;
             this.chkClickDistanceAllowed.Text = "Enable";
+            this.chkClickDistanceAllowed.UseVisualStyleBackColor = false;
+            this.chkClickDistanceAllowed.CheckedChanged += new System.EventHandler(this.chkClickDistanceAllowed_CheckedChanged);
             // 
             // lblAboutCPE
             // 

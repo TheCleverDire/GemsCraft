@@ -12,7 +12,7 @@ using static GemsCraftGUI.ConfigGUI.GUITabs.ConfigModule;
 
 namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
 {
-    public partial class Worlds : MetroForm
+    public partial class Worlds : ExtendedMetroForm
     {
         public Worlds()
         {

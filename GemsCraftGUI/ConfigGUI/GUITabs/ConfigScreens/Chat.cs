@@ -12,7 +12,7 @@ using static GemsCraftGUI.ConfigGUI.GUITabs.ConfigModule;
 
 namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
 {
-    public partial class Chat : MetroForm
+    public partial class Chat : ExtendedMetroForm
     {
         public Chat()
         {

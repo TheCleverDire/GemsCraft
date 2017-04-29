@@ -12,7 +12,7 @@ using static GemsCraftGUI.ConfigGUI.GUITabs.ConfigModule;
 
 namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
 {
-    public partial class Security : MetroForm
+    public partial class Security : ExtendedMetroForm
     {
         public Security()
         {

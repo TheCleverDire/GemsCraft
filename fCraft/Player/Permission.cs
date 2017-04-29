@@ -306,6 +306,11 @@ namespace fCraft {
         /// <summary>
         /// Permission to use the dragon command
         /// </summary>
-        Dragon
+        Dragon,
+
+        /// <summary>
+        /// Ability to use /post command
+        /// </summary>
+        Social
     }
 }

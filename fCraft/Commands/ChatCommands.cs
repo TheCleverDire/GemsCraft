@@ -5,6 +5,7 @@ using System.Linq;
 using System.Diagnostics;
 using System.Threading;
 using fCraft.fSystem;
+using fCraft.Network;
 
 namespace fCraft
 {
@@ -57,9 +58,74 @@ namespace fCraft
             CommandManager.RegisterCommand(CdBarf);
             CommandManager.RegisterCommand(CdSecret);
 
+            CommandManager.RegisterCommand(CdPost);
 
             Player.Moved += Player_IsBack;
         }
+
+        private static readonly CommandDescriptor CdPost = new CommandDescriptor
+        {
+            Name = "Post",
+            Category = CommandCategory.Chat,
+            IsConsoleSafe = true,
+            Permissions = new[] {Permission.Chat, Permission.Social},
+            Usage = "/Post [Media Site] [Text]",
+            Help = "Posts to either the assigned Facebook or Twitter page designated by the server.",
+            Handler = PostHandler
+        };
+        public static IEnumerable<string> SplitByLength(this string str, int maxLength)
+        {
+            int index = 0;
+            while (index + maxLength < str.Length)
+            {
+                yield return str.Substring(index, maxLength);
+                index += maxLength;
+            }
+
+            yield return str.Substring(index);
+        }
+        private static void PostHandler(Player source, Command cmd)
+        {
+            try
+            {
+                
+                var tweet = cmd.NextAll();
+                if (tweet == null) throw new ArgumentNullException();
+                var name = source.Info.DisplayedName ?? source.Info.Name;
+                var hope = name + " says: " + tweet;
+            
+                if (tweet.Length > 140)
+                {
+                    var set = name + " says: ";
+                    var length = set.Length;
+                    var reqLength = 133 - length;
+                    var parts = SplitByLength(tweet, reqLength);
+                    if (parts.ToList().Count > 3)
+                    {
+                        source.Message("&4Post is too long to be posted. Sorry");
+                        return;
+                    }
+                    var loopCount = 0;
+                    foreach (var part in parts)
+                    {
+                        var key = " (" + (loopCount + 1) + "/" + parts.ToList().Count + ") ";
+                        SocialMedia.PostToTwitter(set + key + part, source);
+                        loopCount++;
+                    }
+                    Server.Message("&1Twitter Post&f: (" + name + "&f) - " + tweet);
+                }
+                else
+                {
+                    SocialMedia.PostToTwitter(hope, source);
+                    Server.Message("&1Twitter Post&f: (" + name + "&f) - " + tweet);
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                CdPost.PrintUsage(source);
+            }
+        }
+
         static readonly CommandDescriptor CdSay = new CommandDescriptor
         {
             Name = "Say",

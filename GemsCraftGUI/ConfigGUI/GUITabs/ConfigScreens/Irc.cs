@@ -12,7 +12,7 @@ using static GemsCraftGUI.ConfigGUI.GUITabs.ConfigModule;
 
 namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
 {
-    public partial class Irc : MetroForm
+    public partial class Irc : ExtendedMetroForm
     {
         public Irc()
         {

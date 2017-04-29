@@ -86,6 +86,7 @@
             this.metroButton1.TabIndex = 21;
             this.metroButton1.Text = "Select All";
             this.metroButton1.UseSelectable = true;
+            this.metroButton1.Click += new System.EventHandler(this.metroButton1_Click);
             // 
             // gPermissionLimits
             // 
@@ -247,11 +248,13 @@
             // xAllowSecurityCircumvention
             // 
             this.xAllowSecurityCircumvention.AutoSize = true;
+            this.xAllowSecurityCircumvention.BackColor = System.Drawing.Color.Transparent;
             this.xAllowSecurityCircumvention.Location = new System.Drawing.Point(12, 165);
             this.xAllowSecurityCircumvention.Name = "xAllowSecurityCircumvention";
             this.xAllowSecurityCircumvention.Size = new System.Drawing.Size(240, 17);
             this.xAllowSecurityCircumvention.TabIndex = 16;
             this.xAllowSecurityCircumvention.Text = "Allow removing own access/build restrictions.";
+            this.xAllowSecurityCircumvention.UseVisualStyleBackColor = false;
             // 
             // lAntiGrief1
             // 
@@ -290,11 +293,13 @@
             // xDrawLimit
             // 
             this.xDrawLimit.AutoSize = true;
+            this.xDrawLimit.BackColor = System.Drawing.Color.Transparent;
             this.xDrawLimit.Location = new System.Drawing.Point(12, 190);
             this.xDrawLimit.Name = "xDrawLimit";
             this.xDrawLimit.Size = new System.Drawing.Size(71, 17);
             this.xDrawLimit.TabIndex = 17;
             this.xDrawLimit.Text = "Draw limit";
+            this.xDrawLimit.UseVisualStyleBackColor = false;
             // 
             // lDrawLimitUnits
             // 
@@ -346,11 +351,13 @@
             // xAntiGrief
             // 
             this.xAntiGrief.AutoSize = true;
+            this.xAntiGrief.BackColor = System.Drawing.Color.Transparent;
             this.xAntiGrief.Location = new System.Drawing.Point(12, 108);
             this.xAntiGrief.Name = "xAntiGrief";
             this.xAntiGrief.Size = new System.Drawing.Size(192, 17);
             this.xAntiGrief.TabIndex = 10;
             this.xAntiGrief.Text = "Enable grief / autoclicker detection";
+            this.xAntiGrief.UseVisualStyleBackColor = false;
             // 
             // lAntiGrief2
             // 
@@ -364,11 +371,13 @@
             // xKickIdle
             // 
             this.xKickIdle.AutoSize = true;
+            this.xKickIdle.BackColor = System.Drawing.Color.Transparent;
             this.xKickIdle.Location = new System.Drawing.Point(12, 78);
             this.xKickIdle.Name = "xKickIdle";
             this.xKickIdle.Size = new System.Drawing.Size(89, 17);
             this.xKickIdle.TabIndex = 7;
             this.xKickIdle.Text = "Kick if idle for";
+            this.xKickIdle.UseVisualStyleBackColor = false;
             // 
             // nAntiGriefBlocks
             // 
@@ -385,11 +394,13 @@
             // xReserveSlot
             // 
             this.xReserveSlot.AutoSize = true;
+            this.xReserveSlot.BackColor = System.Drawing.Color.Transparent;
             this.xReserveSlot.Location = new System.Drawing.Point(12, 51);
             this.xReserveSlot.Name = "xReserveSlot";
             this.xReserveSlot.Size = new System.Drawing.Size(116, 17);
             this.xReserveSlot.TabIndex = 4;
             this.xReserveSlot.Text = "Reserve player slot";
+            this.xReserveSlot.UseVisualStyleBackColor = false;
             // 
             // tPrefix
             // 
@@ -501,13 +512,14 @@
             this.vPermissions.FullRowSelect = true;
             this.vPermissions.GridLines = true;
             this.vPermissions.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.vPermissions.Location = new System.Drawing.Point(488, 82);
+            this.vPermissions.Location = new System.Drawing.Point(488, 73);
             this.vPermissions.MultiSelect = false;
             this.vPermissions.Name = "vPermissions";
             this.vPermissions.OwnerDraw = true;
+            this.vPermissions.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.vPermissions.ShowGroups = false;
             this.vPermissions.ShowItemToolTips = true;
-            this.vPermissions.Size = new System.Drawing.Size(171, 406);
+            this.vPermissions.Size = new System.Drawing.Size(171, 421);
             this.vPermissions.TabIndex = 20;
             this.vPermissions.UseCompatibleStateImageBehavior = false;
             this.vPermissions.UseSelectable = true;
@@ -531,7 +543,7 @@
             // 
             this.lPermissions.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.lPermissions.AutoSize = true;
-            this.lPermissions.Location = new System.Drawing.Point(488, 60);
+            this.lPermissions.Location = new System.Drawing.Point(488, 53);
             this.lPermissions.Name = "lPermissions";
             this.lPermissions.Size = new System.Drawing.Size(108, 19);
             this.lPermissions.TabIndex = 19;

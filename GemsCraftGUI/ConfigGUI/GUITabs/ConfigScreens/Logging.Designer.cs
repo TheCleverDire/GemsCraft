@@ -78,12 +78,14 @@
             // xLogLimit
             // 
             this.xLogLimit.AutoSize = true;
+            this.xLogLimit.BackColor = System.Drawing.Color.Transparent;
             this.xLogLimit.Enabled = false;
             this.xLogLimit.Location = new System.Drawing.Point(18, 390);
             this.xLogLimit.Name = "xLogLimit";
-            this.xLogLimit.Size = new System.Drawing.Size(76, 15);
+            this.xLogLimit.Size = new System.Drawing.Size(74, 17);
             this.xLogLimit.TabIndex = 4;
             this.xLogLimit.Text = "Only keep";
+            this.xLogLimit.UseVisualStyleBackColor = false;
             // 
             // vLogFileOptions
             // 

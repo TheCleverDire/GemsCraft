@@ -12,7 +12,7 @@ using static GemsCraftGUI.ConfigGUI.GUITabs.ConfigModule;
 
 namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
 {
-    public partial class Ranks : MetroForm
+    public partial class Ranks : ExtendedMetroForm
     {
         public Ranks()
         {
@@ -43,6 +43,15 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
                         c.Enabled = false;
                     }
                 }
+            }
+        }
+
+        private void metroButton1_Click(object sender, EventArgs e)
+        {
+            if (!vPermissions.Enabled) return;
+            for (var i = 0; i <= vPermissions.Items.Count - 1; i++)
+            {
+                vPermissions.Items[i].Checked = true;
             }
         }
     }

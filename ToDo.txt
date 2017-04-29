@@ -1,7 +1,8 @@
 - Release Cobblestone 1.0
--- Fix new GUI
-- Blockhunt game
-- Fix /rps (Rock Paper Scissors)
+-- Fix new GUI ( DONE ! )
+- Blockhunt game ( Postponed )
+- Prison System ( DONE! )
+- Fix /rps (Rock Paper Scissors) (ABANDONED)
 - Fix Updater
 - Social Commands
 - Android Remote

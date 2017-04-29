@@ -102,22 +102,26 @@
             // xBlockDBAutoEnable
             // 
             this.xBlockDBAutoEnable.AutoSize = true;
+            this.xBlockDBAutoEnable.BackColor = System.Drawing.Color.Transparent;
             this.xBlockDBAutoEnable.Enabled = false;
             this.xBlockDBAutoEnable.Location = new System.Drawing.Point(42, 55);
             this.xBlockDBAutoEnable.Name = "xBlockDBAutoEnable";
-            this.xBlockDBAutoEnable.Size = new System.Drawing.Size(351, 15);
+            this.xBlockDBAutoEnable.Size = new System.Drawing.Size(319, 17);
             this.xBlockDBAutoEnable.TabIndex = 1;
             this.xBlockDBAutoEnable.TabStop = false;
             this.xBlockDBAutoEnable.Text = "Automatically enable BlockDB on worlds that can be edited by";
+            this.xBlockDBAutoEnable.UseVisualStyleBackColor = false;
             // 
             // xBlockDBEnabled
             // 
             this.xBlockDBEnabled.AutoSize = true;
+            this.xBlockDBEnabled.BackColor = System.Drawing.Color.Transparent;
             this.xBlockDBEnabled.Location = new System.Drawing.Point(42, 30);
             this.xBlockDBEnabled.Name = "xBlockDBEnabled";
-            this.xBlockDBEnabled.Size = new System.Drawing.Size(239, 15);
+            this.xBlockDBEnabled.Size = new System.Drawing.Size(221, 17);
             this.xBlockDBEnabled.TabIndex = 0;
             this.xBlockDBEnabled.Text = "Enable BlockDB (per-block edit tracking).";
+            this.xBlockDBEnabled.UseVisualStyleBackColor = false;
             // 
             // gSecurityMisc
             // 
@@ -142,20 +146,24 @@
             // xAnnounceRankChangeReasons
             // 
             this.xAnnounceRankChangeReasons.AutoSize = true;
+            this.xAnnounceRankChangeReasons.BackColor = System.Drawing.Color.Transparent;
             this.xAnnounceRankChangeReasons.Location = new System.Drawing.Point(304, 109);
             this.xAnnounceRankChangeReasons.Name = "xAnnounceRankChangeReasons";
-            this.xAnnounceRankChangeReasons.Size = new System.Drawing.Size(249, 15);
+            this.xAnnounceRankChangeReasons.Size = new System.Drawing.Size(219, 17);
             this.xAnnounceRankChangeReasons.TabIndex = 6;
             this.xAnnounceRankChangeReasons.Text = "Announce promotion && demotion reasons";
+            this.xAnnounceRankChangeReasons.UseVisualStyleBackColor = false;
             // 
             // xRequireKickReason
             // 
             this.xRequireKickReason.AutoSize = true;
+            this.xRequireKickReason.BackColor = System.Drawing.Color.Transparent;
             this.xRequireKickReason.Location = new System.Drawing.Point(42, 59);
             this.xRequireKickReason.Name = "xRequireKickReason";
-            this.xRequireKickReason.Size = new System.Drawing.Size(125, 15);
+            this.xRequireKickReason.Size = new System.Drawing.Size(121, 17);
             this.xRequireKickReason.TabIndex = 1;
             this.xRequireKickReason.Text = "Require kick reason";
+            this.xRequireKickReason.UseVisualStyleBackColor = false;
             // 
             // lPatrolledRankAndBelow
             // 
@@ -189,38 +197,46 @@
             // xAnnounceRankChanges
             // 
             this.xAnnounceRankChanges.AutoSize = true;
+            this.xAnnounceRankChanges.BackColor = System.Drawing.Color.Transparent;
             this.xAnnounceRankChanges.Location = new System.Drawing.Point(304, 84);
             this.xAnnounceRankChanges.Name = "xAnnounceRankChanges";
-            this.xAnnounceRankChanges.Size = new System.Drawing.Size(226, 15);
+            this.xAnnounceRankChanges.Size = new System.Drawing.Size(201, 17);
             this.xAnnounceRankChanges.TabIndex = 5;
             this.xAnnounceRankChanges.Text = "Announce promotions and demotions";
+            this.xAnnounceRankChanges.UseVisualStyleBackColor = false;
             // 
             // xAnnounceKickAndBanReasons
             // 
             this.xAnnounceKickAndBanReasons.AutoSize = true;
+            this.xAnnounceKickAndBanReasons.BackColor = System.Drawing.Color.Transparent;
             this.xAnnounceKickAndBanReasons.Location = new System.Drawing.Point(304, 59);
             this.xAnnounceKickAndBanReasons.Name = "xAnnounceKickAndBanReasons";
-            this.xAnnounceKickAndBanReasons.Size = new System.Drawing.Size(234, 15);
+            this.xAnnounceKickAndBanReasons.Size = new System.Drawing.Size(219, 17);
             this.xAnnounceKickAndBanReasons.TabIndex = 4;
             this.xAnnounceKickAndBanReasons.Text = "Announce kick, ban, and unban reasons";
+            this.xAnnounceKickAndBanReasons.UseVisualStyleBackColor = false;
             // 
             // xRequireRankChangeReason
             // 
             this.xRequireRankChangeReason.AutoSize = true;
+            this.xRequireRankChangeReason.BackColor = System.Drawing.Color.Transparent;
             this.xRequireRankChangeReason.Location = new System.Drawing.Point(42, 109);
             this.xRequireRankChangeReason.Name = "xRequireRankChangeReason";
-            this.xRequireRankChangeReason.Size = new System.Drawing.Size(229, 15);
+            this.xRequireRankChangeReason.Size = new System.Drawing.Size(202, 17);
             this.xRequireRankChangeReason.TabIndex = 3;
             this.xRequireRankChangeReason.Text = "Require promotion && demotion reason";
+            this.xRequireRankChangeReason.UseVisualStyleBackColor = false;
             // 
             // xRequireBanReason
             // 
             this.xRequireBanReason.AutoSize = true;
+            this.xRequireBanReason.BackColor = System.Drawing.Color.Transparent;
             this.xRequireBanReason.Location = new System.Drawing.Point(42, 84);
             this.xRequireBanReason.Name = "xRequireBanReason";
-            this.xRequireBanReason.Size = new System.Drawing.Size(174, 15);
+            this.xRequireBanReason.Size = new System.Drawing.Size(161, 17);
             this.xRequireBanReason.TabIndex = 2;
             this.xRequireBanReason.Text = "Require ban && unban reason";
+            this.xRequireBanReason.UseVisualStyleBackColor = false;
             // 
             // gSpamChat
             // 
@@ -264,11 +280,13 @@
             // xAntispamKicks
             // 
             this.xAntispamKicks.AutoSize = true;
+            this.xAntispamKicks.BackColor = System.Drawing.Color.Transparent;
             this.xAntispamKicks.Location = new System.Drawing.Point(304, 61);
             this.xAntispamKicks.Name = "xAntispamKicks";
-            this.xAntispamKicks.Size = new System.Drawing.Size(72, 15);
+            this.xAntispamKicks.Size = new System.Drawing.Size(71, 17);
             this.xAntispamKicks.TabIndex = 8;
             this.xAntispamKicks.Text = "Kick after";
+            this.xAntispamKicks.UseVisualStyleBackColor = false;
             // 
             // lSpamMuteSeconds
             // 
@@ -404,21 +422,25 @@
             // xAllowUnverifiedLAN
             // 
             this.xAllowUnverifiedLAN.AutoSize = true;
+            this.xAllowUnverifiedLAN.BackColor = System.Drawing.Color.Transparent;
             this.xAllowUnverifiedLAN.Location = new System.Drawing.Point(42, 49);
             this.xAllowUnverifiedLAN.Name = "xAllowUnverifiedLAN";
-            this.xAllowUnverifiedLAN.Size = new System.Drawing.Size(476, 15);
+            this.xAllowUnverifiedLAN.Size = new System.Drawing.Size(436, 17);
             this.xAllowUnverifiedLAN.TabIndex = 2;
             this.xAllowUnverifiedLAN.Text = "Allow connections from LAN without name verification (192.168.0.0/16 and 10.0.0.0" +
     "/8)";
+            this.xAllowUnverifiedLAN.UseVisualStyleBackColor = false;
             // 
             // xMaxConnectionsPerIP
             // 
             this.xMaxConnectionsPerIP.AutoSize = true;
+            this.xMaxConnectionsPerIP.BackColor = System.Drawing.Color.Transparent;
             this.xMaxConnectionsPerIP.Location = new System.Drawing.Point(304, 22);
             this.xMaxConnectionsPerIP.Name = "xMaxConnectionsPerIP";
-            this.xMaxConnectionsPerIP.Size = new System.Drawing.Size(224, 15);
+            this.xMaxConnectionsPerIP.Size = new System.Drawing.Size(201, 17);
             this.xMaxConnectionsPerIP.TabIndex = 3;
             this.xMaxConnectionsPerIP.Text = "Limit number of connections per IP to";
+            this.xMaxConnectionsPerIP.UseVisualStyleBackColor = false;
             // 
             // lVerifyNames
             // 

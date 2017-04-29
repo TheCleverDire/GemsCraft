@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.gboDragon = new MetroFramework.Controls.MetroTile();
             this.clbDragonPermits = new System.Windows.Forms.CheckedListBox();
             this.cboDragonDefault = new MetroFramework.Controls.MetroComboBox();
@@ -49,10 +50,16 @@
             this.CustomName = new MetroFramework.Controls.MetroTextBox();
             this.label2 = new MetroFramework.Controls.MetroLabel();
             this.CustomAliases = new MetroFramework.Controls.MetroTextBox();
+            this.metroPanel1 = new MetroFramework.Controls.MetroTile();
+            this.btnTwitter = new System.Windows.Forms.Button();
+            this.chkSocial = new System.Windows.Forms.CheckBox();
+            this.TwitterTimer = new System.Windows.Forms.Timer(this.components);
+            this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
             this.gboDragon.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).BeginInit();
             this.groupBox1.SuspendLayout();
+            this.metroPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // gboDragon
@@ -389,11 +396,62 @@
             this.CustomAliases.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
             this.CustomAliases.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
             // 
+            // metroPanel1
+            // 
+            this.metroPanel1.ActiveControl = null;
+            this.metroPanel1.Controls.Add(this.metroLabel1);
+            this.metroPanel1.Controls.Add(this.btnTwitter);
+            this.metroPanel1.Controls.Add(this.chkSocial);
+            this.metroPanel1.Location = new System.Drawing.Point(236, 363);
+            this.metroPanel1.Name = "metroPanel1";
+            this.metroPanel1.Size = new System.Drawing.Size(382, 138);
+            this.metroPanel1.TabIndex = 32;
+            this.metroPanel1.Text = "Social Media";
+            this.metroPanel1.UseSelectable = true;
+            // 
+            // btnTwitter
+            // 
+            this.btnTwitter.Location = new System.Drawing.Point(29, 41);
+            this.btnTwitter.Name = "btnTwitter";
+            this.btnTwitter.Size = new System.Drawing.Size(138, 23);
+            this.btnTwitter.TabIndex = 4;
+            this.btnTwitter.Text = "Connect to Twitter";
+            this.btnTwitter.UseVisualStyleBackColor = true;
+            this.btnTwitter.Click += new System.EventHandler(this.btnTwitter_Click);
+            // 
+            // chkSocial
+            // 
+            this.chkSocial.AutoSize = true;
+            this.chkSocial.BackColor = System.Drawing.Color.Transparent;
+            this.chkSocial.Location = new System.Drawing.Point(29, 18);
+            this.chkSocial.Name = "chkSocial";
+            this.chkSocial.Size = new System.Drawing.Size(129, 17);
+            this.chkSocial.TabIndex = 2;
+            this.chkSocial.Text = "Enabled Social Media";
+            this.chkSocial.UseVisualStyleBackColor = false;
+            this.chkSocial.CheckedChanged += new System.EventHandler(this.chkSocial_CheckedChanged);
+            // 
+            // TwitterTimer
+            // 
+            this.TwitterTimer.Enabled = true;
+            this.TwitterTimer.Interval = 1;
+            this.TwitterTimer.Tick += new System.EventHandler(this.TwitterTimer_Tick);
+            // 
+            // metroLabel1
+            // 
+            this.metroLabel1.AutoSize = true;
+            this.metroLabel1.Location = new System.Drawing.Point(174, 44);
+            this.metroLabel1.Name = "metroLabel1";
+            this.metroLabel1.Size = new System.Drawing.Size(65, 19);
+            this.metroLabel1.TabIndex = 5;
+            this.metroLabel1.Text = "Status: {0}";
+            // 
             // Misc
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(647, 558);
+            this.Controls.Add(this.metroPanel1);
             this.Controls.Add(this.gboDragon);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox1);
@@ -406,6 +464,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).EndInit();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.metroPanel1.ResumeLayout(false);
+            this.metroPanel1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -433,5 +493,10 @@
         internal MetroFramework.Controls.MetroTextBox CustomName;
         internal MetroFramework.Controls.MetroLabel label2;
         internal MetroFramework.Controls.MetroTextBox CustomAliases;
+        internal MetroFramework.Controls.MetroTile metroPanel1;
+        internal System.Windows.Forms.CheckBox chkSocial;
+        internal System.Windows.Forms.Button btnTwitter;
+        internal System.Windows.Forms.Timer TwitterTimer;
+        private MetroFramework.Controls.MetroLabel metroLabel1;
     }
 }

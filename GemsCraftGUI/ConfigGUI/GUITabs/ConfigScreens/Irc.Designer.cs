@@ -122,11 +122,13 @@
             // xServPass
             // 
             this.xServPass.AutoSize = true;
+            this.xServPass.BackColor = System.Drawing.Color.Transparent;
             this.xServPass.Location = new System.Drawing.Point(219, 23);
             this.xServPass.Name = "xServPass";
-            this.xServPass.Size = new System.Drawing.Size(130, 15);
+            this.xServPass.Size = new System.Drawing.Size(128, 17);
             this.xServPass.TabIndex = 2;
             this.xServPass.Text = "Use Server Password";
+            this.xServPass.UseVisualStyleBackColor = false;
             // 
             // tChanPass
             // 
@@ -162,11 +164,13 @@
             // xChanPass
             // 
             this.xChanPass.AutoSize = true;
+            this.xChanPass.BackColor = System.Drawing.Color.Transparent;
             this.xChanPass.Location = new System.Drawing.Point(16, 23);
             this.xChanPass.Name = "xChanPass";
-            this.xChanPass.Size = new System.Drawing.Size(142, 15);
+            this.xChanPass.Size = new System.Drawing.Size(136, 17);
             this.xChanPass.TabIndex = 0;
             this.xChanPass.Text = "Use Channel Password";
+            this.xChanPass.UseVisualStyleBackColor = false;
             // 
             // xIRCListShowNonEnglish
             // 
@@ -174,7 +178,7 @@
             this.xIRCListShowNonEnglish.Enabled = false;
             this.xIRCListShowNonEnglish.Location = new System.Drawing.Point(474, 63);
             this.xIRCListShowNonEnglish.Name = "xIRCListShowNonEnglish";
-            this.xIRCListShowNonEnglish.Size = new System.Drawing.Size(170, 15);
+            this.xIRCListShowNonEnglish.Size = new System.Drawing.Size(157, 17);
             this.xIRCListShowNonEnglish.TabIndex = 10;
             this.xIRCListShowNonEnglish.Text = "Show non-English networks";
             // 
@@ -202,20 +206,24 @@
             // xIRCBotAnnounceServerEvents
             // 
             this.xIRCBotAnnounceServerEvents.AutoSize = true;
+            this.xIRCBotAnnounceServerEvents.BackColor = System.Drawing.Color.Transparent;
             this.xIRCBotAnnounceServerEvents.Location = new System.Drawing.Point(38, 109);
             this.xIRCBotAnnounceServerEvents.Name = "xIRCBotAnnounceServerEvents";
-            this.xIRCBotAnnounceServerEvents.Size = new System.Drawing.Size(397, 15);
+            this.xIRCBotAnnounceServerEvents.Size = new System.Drawing.Size(370, 17);
             this.xIRCBotAnnounceServerEvents.TabIndex = 7;
             this.xIRCBotAnnounceServerEvents.Text = "Announce SERVER events (kicks, bans, promotions, demotions) on IRC.";
+            this.xIRCBotAnnounceServerEvents.UseVisualStyleBackColor = false;
             // 
             // xIRCUseColor
             // 
             this.xIRCUseColor.AutoSize = true;
+            this.xIRCUseColor.BackColor = System.Drawing.Color.Transparent;
             this.xIRCUseColor.Location = new System.Drawing.Point(325, 34);
             this.xIRCUseColor.Name = "xIRCUseColor";
-            this.xIRCUseColor.Size = new System.Drawing.Size(140, 15);
+            this.xIRCUseColor.Size = new System.Drawing.Size(135, 17);
             this.xIRCUseColor.TabIndex = 2;
             this.xIRCUseColor.Text = "Use text colors on IRC.";
+            this.xIRCUseColor.UseVisualStyleBackColor = false;
             // 
             // lIRCNoForwardingMessage
             // 
@@ -230,11 +238,13 @@
             // xIRCBotAnnounceIRCJoins
             // 
             this.xIRCBotAnnounceIRCJoins.AutoSize = true;
+            this.xIRCBotAnnounceIRCJoins.BackColor = System.Drawing.Color.Transparent;
             this.xIRCBotAnnounceIRCJoins.Location = new System.Drawing.Point(325, 84);
             this.xIRCBotAnnounceIRCJoins.Name = "xIRCBotAnnounceIRCJoins";
-            this.xIRCBotAnnounceIRCJoins.Size = new System.Drawing.Size(294, 15);
+            this.xIRCBotAnnounceIRCJoins.Size = new System.Drawing.Size(270, 17);
             this.xIRCBotAnnounceIRCJoins.TabIndex = 6;
             this.xIRCBotAnnounceIRCJoins.Text = "Announce people joining/leaving the IRC channels.";
+            this.xIRCBotAnnounceIRCJoins.UseVisualStyleBackColor = false;
             // 
             // bColorIRC
             // 
@@ -257,29 +267,35 @@
             // xIRCBotForwardFromIRC
             // 
             this.xIRCBotForwardFromIRC.AutoSize = true;
+            this.xIRCBotForwardFromIRC.BackColor = System.Drawing.Color.Transparent;
             this.xIRCBotForwardFromIRC.Location = new System.Drawing.Point(38, 84);
             this.xIRCBotForwardFromIRC.Name = "xIRCBotForwardFromIRC";
-            this.xIRCBotForwardFromIRC.Size = new System.Drawing.Size(224, 15);
+            this.xIRCBotForwardFromIRC.Size = new System.Drawing.Size(216, 17);
             this.xIRCBotForwardFromIRC.TabIndex = 4;
             this.xIRCBotForwardFromIRC.Text = "Forward ALL chat from IRC to SERVER.";
+            this.xIRCBotForwardFromIRC.UseVisualStyleBackColor = false;
             // 
             // xIRCBotAnnounceServerJoins
             // 
             this.xIRCBotAnnounceServerJoins.AutoSize = true;
+            this.xIRCBotAnnounceServerJoins.BackColor = System.Drawing.Color.Transparent;
             this.xIRCBotAnnounceServerJoins.Location = new System.Drawing.Point(325, 59);
             this.xIRCBotAnnounceServerJoins.Name = "xIRCBotAnnounceServerJoins";
-            this.xIRCBotAnnounceServerJoins.Size = new System.Drawing.Size(265, 15);
+            this.xIRCBotAnnounceServerJoins.Size = new System.Drawing.Size(250, 17);
             this.xIRCBotAnnounceServerJoins.TabIndex = 5;
             this.xIRCBotAnnounceServerJoins.Text = "Announce people joining/leaving the SERVER.";
+            this.xIRCBotAnnounceServerJoins.UseVisualStyleBackColor = false;
             // 
             // xIRCBotForwardFromServer
             // 
             this.xIRCBotForwardFromServer.AutoSize = true;
+            this.xIRCBotForwardFromServer.BackColor = System.Drawing.Color.Transparent;
             this.xIRCBotForwardFromServer.Location = new System.Drawing.Point(38, 59);
             this.xIRCBotForwardFromServer.Name = "xIRCBotForwardFromServer";
-            this.xIRCBotForwardFromServer.Size = new System.Drawing.Size(224, 15);
+            this.xIRCBotForwardFromServer.Size = new System.Drawing.Size(216, 17);
             this.xIRCBotForwardFromServer.TabIndex = 3;
             this.xIRCBotForwardFromServer.Text = "Forward ALL chat from SERVER to IRC.";
+            this.xIRCBotForwardFromServer.UseVisualStyleBackColor = false;
             // 
             // gIRCNetwork
             // 
@@ -323,11 +339,13 @@
             // xIRCRegisteredNick
             // 
             this.xIRCRegisteredNick.AutoSize = true;
+            this.xIRCRegisteredNick.BackColor = System.Drawing.Color.Transparent;
             this.xIRCRegisteredNick.Location = new System.Drawing.Point(265, 101);
             this.xIRCRegisteredNick.Name = "xIRCRegisteredNick";
-            this.xIRCRegisteredNick.Size = new System.Drawing.Size(78, 15);
+            this.xIRCRegisteredNick.Size = new System.Drawing.Size(77, 17);
             this.xIRCRegisteredNick.TabIndex = 13;
             this.xIRCRegisteredNick.Text = "Registered";
+            this.xIRCRegisteredNick.UseVisualStyleBackColor = false;
             // 
             // tIRCNickServMessage
             // 
@@ -628,7 +646,7 @@
             this.xIRCBotEnabled.AutoSize = true;
             this.xIRCBotEnabled.Location = new System.Drawing.Point(23, 63);
             this.xIRCBotEnabled.Name = "xIRCBotEnabled";
-            this.xIRCBotEnabled.Size = new System.Drawing.Size(140, 15);
+            this.xIRCBotEnabled.Size = new System.Drawing.Size(132, 17);
             this.xIRCBotEnabled.TabIndex = 7;
             this.xIRCBotEnabled.Text = "Enable IRC integration";
             // 

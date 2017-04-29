@@ -39,6 +39,6 @@ namespace fCraft {
         /// <summary>
         /// Commands for games
         /// </summary>
-        Games = 1024
+        Games = 1024,
     }
 }

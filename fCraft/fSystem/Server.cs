@@ -570,7 +570,6 @@ namespace fCraft
             GlobalChat.Start();
 
             //Start Sky Colors
-            Logger.Log(LogType.Debug, "Ts");
             if (ConfigKey.EnvColorsEnabled.Enabled() && ConfigKey.TimeSkyEnabled.Enabled())
             {
                 WorldTime.CurrentHour = 6;

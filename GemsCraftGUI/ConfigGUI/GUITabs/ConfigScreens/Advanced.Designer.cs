@@ -64,11 +64,13 @@
             // xAutoRank
             // 
             this.xAutoRank.AutoSize = true;
+            this.xAutoRank.BackColor = System.Drawing.Color.Transparent;
             this.xAutoRank.Location = new System.Drawing.Point(9, 188);
             this.xAutoRank.Name = "xAutoRank";
-            this.xAutoRank.Size = new System.Drawing.Size(113, 15);
+            this.xAutoRank.Size = new System.Drawing.Size(110, 17);
             this.xAutoRank.TabIndex = 24;
             this.xAutoRank.Text = "Enable AutoRank";
+            this.xAutoRank.UseVisualStyleBackColor = false;
             // 
             // nMaxUndoStates
             // 
@@ -139,11 +141,13 @@
             // xIP
             // 
             this.xIP.AutoSize = true;
+            this.xIP.BackColor = System.Drawing.Color.Transparent;
             this.xIP.Location = new System.Drawing.Point(6, 109);
             this.xIP.Name = "xIP";
-            this.xIP.Size = new System.Drawing.Size(95, 15);
+            this.xIP.Size = new System.Drawing.Size(93, 17);
             this.xIP.TabIndex = 18;
             this.xIP.Text = "Designated IP";
+            this.xIP.UseVisualStyleBackColor = false;
             // 
             // lConsoleName
             // 
@@ -218,32 +222,38 @@
             // xMaxUndo
             // 
             this.xMaxUndo.AutoSize = true;
+            this.xMaxUndo.BackColor = System.Drawing.Color.Transparent;
             this.xMaxUndo.Checked = true;
             this.xMaxUndo.CheckState = System.Windows.Forms.CheckState.Checked;
             this.xMaxUndo.Location = new System.Drawing.Point(6, 72);
             this.xMaxUndo.Name = "xMaxUndo";
-            this.xMaxUndo.Size = new System.Drawing.Size(100, 15);
+            this.xMaxUndo.Size = new System.Drawing.Size(91, 17);
             this.xMaxUndo.TabIndex = 4;
             this.xMaxUndo.Text = "Limit /undo to";
+            this.xMaxUndo.UseVisualStyleBackColor = false;
             // 
             // xRelayAllBlockUpdates
             // 
             this.xRelayAllBlockUpdates.AutoSize = true;
+            this.xRelayAllBlockUpdates.BackColor = System.Drawing.Color.Transparent;
             this.xRelayAllBlockUpdates.Location = new System.Drawing.Point(6, 21);
             this.xRelayAllBlockUpdates.Name = "xRelayAllBlockUpdates";
-            this.xRelayAllBlockUpdates.Size = new System.Drawing.Size(543, 15);
+            this.xRelayAllBlockUpdates.Size = new System.Drawing.Size(494, 17);
             this.xRelayAllBlockUpdates.TabIndex = 1;
             this.xRelayAllBlockUpdates.Text = "When a player changes a block, send him the redundant update packet anyway (origi" +
     "nal behavior).";
+            this.xRelayAllBlockUpdates.UseVisualStyleBackColor = false;
             // 
             // xNoPartialPositionUpdates
             // 
             this.xNoPartialPositionUpdates.AutoSize = true;
+            this.xNoPartialPositionUpdates.BackColor = System.Drawing.Color.Transparent;
             this.xNoPartialPositionUpdates.Location = new System.Drawing.Point(6, 46);
             this.xNoPartialPositionUpdates.Name = "xNoPartialPositionUpdates";
-            this.xNoPartialPositionUpdates.Size = new System.Drawing.Size(311, 15);
+            this.xNoPartialPositionUpdates.Size = new System.Drawing.Size(287, 17);
             this.xNoPartialPositionUpdates.TabIndex = 2;
             this.xNoPartialPositionUpdates.Text = "Do not use partial position updates (opcodes 9, 10, 11).";
+            this.xNoPartialPositionUpdates.UseVisualStyleBackColor = false;
             // 
             // lAdvancedWarning
             // 
@@ -259,12 +269,14 @@
             // xLowLatencyMode
             // 
             this.xLowLatencyMode.AutoSize = true;
+            this.xLowLatencyMode.BackColor = System.Drawing.Color.Transparent;
             this.xLowLatencyMode.Location = new System.Drawing.Point(6, 64);
             this.xLowLatencyMode.Name = "xLowLatencyMode";
-            this.xLowLatencyMode.Size = new System.Drawing.Size(528, 15);
+            this.xLowLatencyMode.Size = new System.Drawing.Size(470, 17);
             this.xLowLatencyMode.TabIndex = 3;
             this.xLowLatencyMode.Text = "Low-latency mode (disables Nagle\'s algorithm, reducing latency but increasing ban" +
     "dwidth use).";
+            this.xLowLatencyMode.UseVisualStyleBackColor = false;
             // 
             // lProcessPriority
             // 

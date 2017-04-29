@@ -12,7 +12,7 @@ using MetroFramework.Forms;
 
 namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
 {
-    public partial class General : MetroForm
+    public partial class General : ExtendedMetroForm
     {
         public General()
         {
@@ -24,4 +24,6 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
 
         }
     }
+
+    
 }
