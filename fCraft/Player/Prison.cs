@@ -50,7 +50,6 @@ namespace fCraft
             }
             if (!Directory.Exists("Prison/")) Directory.CreateDirectory("Prison/");
             SetUpData();
-
             foreach (var w in WorldManager.Worlds)
             {
                 if (w.Name == Obj.World)

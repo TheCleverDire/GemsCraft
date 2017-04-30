@@ -312,6 +312,8 @@
     </Compile>
     <Compile Include="fSystem\MessageTypeManagement.cs" />
     <Compile Include="Utils\HeartbeatSaverUtil.cs" />
+    <Compile Include="Utils\PasswordAdvisor.cs" />
+    <Compile Include="Utils\PasswordScore.cs" />
     <Compile Include="Utils\Paths.cs" />
     <Compile Include="fSystem\Scheduler.cs" />
     <Compile Include="Games\PlayerProximityTracker.cs" />

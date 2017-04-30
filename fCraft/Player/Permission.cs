@@ -22,6 +22,11 @@ namespace fCraft {
         /// world-specific and zone-specific permissions. </summary>
         Delete,
 
+        /// <summary>
+        /// Enables the player to edit the configuration in-game with the /editconfig command
+        /// </summary>
+        EditConfig,
+
         /// <summary> Ability to place grass blocks. </summary>
         PlaceGrass,
 

@@ -369,8 +369,8 @@ namespace fCraft
             _serverInitialized = true;
         }
 
-        private static System.Timers.Timer WorldSkyTimer;
-        private static void OnTimedEvent(Object source, ElapsedEventArgs e)
+        private static System.Timers.Timer _worldSkyTimer;
+        private static void OnTimedEvent(object source, ElapsedEventArgs e)
         {
             try
             {
@@ -391,7 +391,7 @@ namespace fCraft
         public static bool StartServer()
         {
             //WorldTime.GetHourLength();
-            WorldSkyTimer = new System.Timers.Timer(WorldTime.GetDayPart());
+            _worldSkyTimer = new System.Timers.Timer(WorldTime.GetDayPart());
             if (IsRunning)
             {
                 throw new InvalidOperationException("Server is already running");
@@ -575,9 +575,9 @@ namespace fCraft
                 WorldTime.CurrentHour = 6;
                 WorldTime.UpdateWorldSky();
                 Logger.Log(LogType.SystemActivity, "Attempting to start World Sky Colors");
-                WorldSkyTimer.Elapsed += OnTimedEvent;
-                WorldSkyTimer.Enabled = true;
-                WorldSkyTimer.Start();
+                _worldSkyTimer.Elapsed += OnTimedEvent;
+                _worldSkyTimer.Enabled = true;
+                _worldSkyTimer.Start();
                 Logger.Log(LogType.SystemActivity, "Started World Sky Colors");
             }
             //send webpanel salt (unfinished)
@@ -709,12 +709,9 @@ namespace fCraft
                 };
                 if (shutdownParams.Delay >= ChatTimer.MinDuration)
                 {
-                    string timerMsg = String.Format("Server {0} ({1})",
-                                                     shutdownParams.Restart ? "restart" : "shutdown",
-                                                     shutdownParams.ReasonString);
-                    var nameOnTimer = shutdownParams.InitiatedBy == null
-                        ? Player.Console.Name
-                        : shutdownParams.InitiatedBy.Name;
+                    string timerMsg =
+                        $"Server {(shutdownParams.Restart ? "restart" : "shutdown")} ({shutdownParams.ReasonString})";
+                    var nameOnTimer = shutdownParams.InitiatedBy?.Name ?? Player.Console.Name;
                     _shutdownTimer = ChatTimer.Start(shutdownParams.Delay, timerMsg, nameOnTimer);
                 }
                 _shutdownThread.Start(shutdownParams);
@@ -766,21 +763,25 @@ namespace fCraft
             {
                 if (MonoCompat.IsMono)
                 {
-                    var proc = new ProcessStartInfo("mono")
+                    if (assemblyExecutable != null)
                     {
-                        Arguments = assemblyExecutable,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-                    Process.Start(proc);
+                        var proc = new ProcessStartInfo("mono")
+                        {
+                            Arguments = assemblyExecutable,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+                        Process.Start(proc);
+                    }
                 }
                 else
                 {
-                    var args = string.Format("--restart=\"{0}\" {1}",
-                                                 MonoCompat.PrependMono(assemblyExecutable),
-                                                 GetArgString());
+                    if (assemblyExecutable != null)
+                    {
+                        var args = $"--restart=\"{MonoCompat.PrependMono(assemblyExecutable)}\" {GetArgString()}";
 
-                    MonoCompat.StartDotNetProcess(Paths.UpdaterFileName, args, true);
+                        MonoCompat.StartDotNetProcess(Paths.UpdaterFileName, args, true);
+                    }
                 }
             }
             else if (Updater.RunAtShutdown)
@@ -793,17 +794,21 @@ namespace fCraft
 
                 if (MonoCompat.IsMono)
                 {
-                    var proc = new ProcessStartInfo("mono")
+                    if (assemblyExecutable != null)
                     {
-                        Arguments = assemblyExecutable,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-                    Process.Start(proc);
+                        var proc = new ProcessStartInfo("mono")
+                        {
+                            Arguments = assemblyExecutable,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+                        Process.Start(proc);
+                    }
                 }
                 else
                 {
-                    MonoCompat.StartDotNetProcess(assemblyExecutable, GetArgString(), true);
+                    if (assemblyExecutable != null)
+                        MonoCompat.StartDotNetProcess(assemblyExecutable, GetArgString(), true);
                 }
             }
 
@@ -1308,22 +1313,12 @@ namespace fCraft
             if (world == null) throw new ArgumentNullException("world");
             if (firstTime)
             {
-                return String.Format("&S{0} &Sconnected, joined {1}",
-                                      player.ClassyName,
-                                      world.ClassyName);
+                return $"&S{player.ClassyName} &Sconnected, joined {world.ClassyName}";
             }
             //use this if you want to show original names for people with displayednames
-            if (player.Info.DisplayedName != null)
-            {
-
-                return string.Format("&S{0} &S({1}&S) connected again, joined {2}",
-                                      player.ClassyName,
-                                      player.Name,
-                                      world.ClassyName);
-            }
-            return string.Format("&S{0} &Sconnected again, joined {1}",
-                player.ClassyName,
-                world.ClassyName);
+            return player.Info.DisplayedName != null 
+                ? $"&S{player.ClassyName} &S({player.Name}&S) connected again, joined {world.ClassyName}" 
+                : $"&S{player.ClassyName} &Sconnected again, joined {world.ClassyName}";
         }
 
 
@@ -1346,10 +1341,7 @@ namespace fCraft
                     player.Info.LeaveMsg = "left the server";
                 }
 
-                if (player.World != null)
-                {
-                    player.World.ReleasePlayer(player);
-                }
+                player.World?.ReleasePlayer(player);
                 PlayerIndex.Remove(player.Name);
                 UpdatePlayerList();
             }
@@ -1389,7 +1381,7 @@ namespace fCraft
                select b;
 
             var enumerable = bot as Bot[] ?? bot.ToArray();
-            return enumerable.Count() != 1 ? null : enumerable.First();
+            return enumerable.Length != 1 ? null : enumerable.First();
         }
 
         /// <summary>
@@ -1403,7 +1395,7 @@ namespace fCraft
                 select b;
 
             var enumerable = bot as Bot[] ?? bot.ToArray();
-            return enumerable.Count() != 1 ? null : enumerable.First();
+            return enumerable.Length != 1 ? null : enumerable.First();
         }
 
         /// <summary> Finds a player by name, using autocompletion.
@@ -1449,8 +1441,6 @@ namespace fCraft
             if (player == null) throw new ArgumentNullException("player");
             switch (name)
             {
-                case null:
-                    throw new ArgumentNullException("name");
                 case "-":
                     if (player.LastUsedPlayerName != null)
                     {
@@ -1509,8 +1499,7 @@ namespace fCraft
             if (player == null) throw new ArgumentNullException("player");
             switch (name)
             {
-                case null:
-                    throw new ArgumentNullException("name");
+                
                 case "-":
                     if (player.LastUsedPlayerName != null)
                     {
@@ -1584,24 +1573,24 @@ namespace fCraft
             InitiatedBy = initiatedBy;
         }
 
-        public ShutdownReason Reason { get; private set; }
+        public ShutdownReason Reason { get; }
 
         readonly string _customReasonString;
         [NotNull]
         public string ReasonString => _customReasonString ?? Reason.ToString();
 
         /// <summary> Delay before shutting down. </summary>
-        public TimeSpan Delay { get; private set; }
+        public TimeSpan Delay { get; }
 
         /// <summary> Whether 800Craft should try to forcefully kill the current process. </summary>
-        public bool KillProcess { get; private set; }
+        public bool KillProcess { get; }
 
         /// <summary> Whether the server is expected to restart itself after shutting down. </summary>
-        public bool Restart { get; private set; }
+        public bool Restart { get; }
 
         /// <summary> Player who initiated the shutdown. May be null or Console. </summary>
         [CanBeNull]
-        public Player InitiatedBy { get; private set; }
+        public Player InitiatedBy { get; }
     }
 
 

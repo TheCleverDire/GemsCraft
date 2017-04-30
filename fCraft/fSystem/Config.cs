@@ -167,6 +167,12 @@ namespace fCraft {
         /// <summary>  Supported version of the Minecraft classic protocol. </summary>
         public const int ProtocolVersion = 7;
 
+        internal static List<ConfigSection> ConfigSections = new List<ConfigSection>
+                    {
+                        ConfigSection.Advanced, ConfigSection.Chat, ConfigSection.Cpe,
+                        ConfigSection.General, ConfigSection.Irc, ConfigSection.Logging,
+                        ConfigSection.SavingAndBackup, ConfigSection.Security, ConfigSection.Worlds
+                    };
         /// <summary> Latest version of config.xml available at the time of building this copy of fCraft.
         /// Config.xml files saved with this build will have this version number embedded. </summary>
         public const int CurrentVersion = 156;

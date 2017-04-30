@@ -86,7 +86,10 @@ namespace GemsCraftGUI
 
         void LoadWorldList()
         {
-            if (ConfigModule.Worlds.Count > 0) ConfigModule.Worlds.Clear();
+            if (ConfigModule.Worlds.Count > 0)
+            {
+                ConfigModule.Worlds.Clear();
+            }
             if (!File.Exists(Paths.WorldListFileName)) return;
 
             try
@@ -139,6 +142,7 @@ namespace GemsCraftGUI
                     }
                 }
 
+                
                 PrisonData.SetUpData();
                 var prisonWorldAttr = PrisonData.Obj.World;
                 if (prisonWorldAttr != null)
@@ -149,7 +153,7 @@ namespace GemsCraftGUI
                         var loopCount = 0;
                         foreach (var v in WorldScreen.cboPrison.Items)
                         {
-                            if (v.ToString().ToLower() == prisonWorldAttr.ToLower())
+                            if (string.Equals(v.ToString(), prisonWorldAttr, StringComparison.CurrentCultureIgnoreCase))
                             {
                                 WorldScreen.cboPrison.SelectedIndex = loopCount;
                             }
@@ -160,7 +164,8 @@ namespace GemsCraftGUI
 
                 if (WorldScreen.cboPrison.SelectedIndex == -1)
                 {
-                    WorldScreen.cboPrison.SelectedIndex = 0;
+                    var si = WorldScreen.cboPrison.SelectedIndex;
+                    WorldScreen.cboPrison.SelectedIndex = 1;
                 }
             }
             catch (Exception ex)
@@ -342,6 +347,7 @@ namespace GemsCraftGUI
 
         void ApplyTabSecurity()
         {
+            SecurityScreen.txtRemotePass.Text = ConfigKey.OnTheGoPassword.GetString();
             ApplyEnum(SecurityScreen.cVerifyNames, ConfigKey.VerifyNames, NameVerificationMode.Balanced);
 
             SecurityScreen.nMaxConnectionsPerIP.Value = ConfigKey.MaxConnectionsPerIP.GetInt();
@@ -703,7 +709,9 @@ namespace GemsCraftGUI
             ConfigKey.DragonMagma.TrySetValue(MiscScreen.clbDragonPermits.GetItemChecked(1));
             ConfigKey.DragonLava.TrySetValue(MiscScreen.clbDragonPermits.GetItemChecked(2));
             ConfigKey.DragonRed.TrySetValue(MiscScreen.clbDragonPermits.GetItemChecked(3));
+            
             SaveWorldList();
+            
         }
 
         internal static void SaveAdvanced()
@@ -782,6 +790,7 @@ namespace GemsCraftGUI
 
         internal static void SaveSecurity()
         {
+            ConfigKey.OnTheGoPassword.TrySetValue(SecurityScreen.txtRemotePass.Text);
             WriteEnum<NameVerificationMode>(SecurityScreen.cVerifyNames, ConfigKey.VerifyNames);
 
             ConfigKey.MaxConnectionsPerIP.TrySetValue(SecurityScreen.xMaxConnectionsPerIP.Checked ? SecurityScreen.nMaxConnectionsPerIP.Value : 0);

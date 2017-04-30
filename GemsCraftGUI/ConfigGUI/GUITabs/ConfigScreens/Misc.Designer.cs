@@ -51,10 +51,10 @@
             this.label2 = new MetroFramework.Controls.MetroLabel();
             this.CustomAliases = new MetroFramework.Controls.MetroTextBox();
             this.metroPanel1 = new MetroFramework.Controls.MetroTile();
+            this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
             this.btnTwitter = new System.Windows.Forms.Button();
             this.chkSocial = new System.Windows.Forms.CheckBox();
             this.TwitterTimer = new System.Windows.Forms.Timer(this.components);
-            this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
             this.gboDragon.SuspendLayout();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.MaxCapsValue)).BeginInit();
@@ -129,14 +129,13 @@
             this.groupBox3.Name = "groupBox3";
             this.groupBox3.Size = new System.Drawing.Size(595, 142);
             this.groupBox3.TabIndex = 30;
-            this.groupBox3.TabStop = false;
             this.groupBox3.Text = "Other Configurations";
             this.groupBox3.UseSelectable = true;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(10, 73);
+            this.label5.Location = new System.Drawing.Point(10, 44);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(78, 19);
             this.label5.TabIndex = 28;
@@ -148,7 +147,7 @@
             // 
             // 
             this.websiteURL.CustomButton.Image = null;
-            this.websiteURL.CustomButton.Location = new System.Drawing.Point(192, 1);
+            this.websiteURL.CustomButton.Location = new System.Drawing.Point(283, 1);
             this.websiteURL.CustomButton.Name = "";
             this.websiteURL.CustomButton.Size = new System.Drawing.Size(19, 19);
             this.websiteURL.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
@@ -157,7 +156,7 @@
             this.websiteURL.CustomButton.UseSelectable = true;
             this.websiteURL.CustomButton.Visible = false;
             this.websiteURL.Lines = new string[0];
-            this.websiteURL.Location = new System.Drawing.Point(110, 67);
+            this.websiteURL.Location = new System.Drawing.Point(94, 44);
             this.websiteURL.MaxLength = 32767;
             this.websiteURL.Name = "websiteURL";
             this.websiteURL.PasswordChar = '\0';
@@ -166,7 +165,7 @@
             this.websiteURL.SelectionLength = 0;
             this.websiteURL.SelectionStart = 0;
             this.websiteURL.ShortcutsEnabled = true;
-            this.websiteURL.Size = new System.Drawing.Size(212, 21);
+            this.websiteURL.Size = new System.Drawing.Size(303, 21);
             this.websiteURL.TabIndex = 28;
             this.websiteURL.UseSelectable = true;
             this.websiteURL.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
@@ -175,7 +174,7 @@
             // ReqsEditor
             // 
             this.ReqsEditor.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.ReqsEditor.Location = new System.Drawing.Point(442, 94);
+            this.ReqsEditor.Location = new System.Drawing.Point(435, 61);
             this.ReqsEditor.Name = "ReqsEditor";
             this.ReqsEditor.Size = new System.Drawing.Size(125, 23);
             this.ReqsEditor.TabIndex = 26;
@@ -185,7 +184,7 @@
             // SwearEditor
             // 
             this.SwearEditor.BackColor = System.Drawing.Color.WhiteSmoke;
-            this.SwearEditor.Location = new System.Drawing.Point(442, 65);
+            this.SwearEditor.Location = new System.Drawing.Point(435, 32);
             this.SwearEditor.Name = "SwearEditor";
             this.SwearEditor.Size = new System.Drawing.Size(125, 23);
             this.SwearEditor.TabIndex = 25;
@@ -194,7 +193,7 @@
             // 
             // MaxCapsValue
             // 
-            this.MaxCapsValue.Location = new System.Drawing.Point(110, 32);
+            this.MaxCapsValue.Location = new System.Drawing.Point(110, 6);
             this.MaxCapsValue.Maximum = new decimal(new int[] {
             50,
             0,
@@ -217,7 +216,7 @@
             // MaxCaps
             // 
             this.MaxCaps.AutoSize = true;
-            this.MaxCaps.Location = new System.Drawing.Point(10, 34);
+            this.MaxCaps.Location = new System.Drawing.Point(10, 5);
             this.MaxCaps.Name = "MaxCaps";
             this.MaxCaps.Size = new System.Drawing.Size(101, 19);
             this.MaxCaps.TabIndex = 20;
@@ -240,7 +239,7 @@
             this.SwearBox.CustomButton.UseSelectable = true;
             this.SwearBox.CustomButton.Visible = false;
             this.SwearBox.Lines = new string[0];
-            this.SwearBox.Location = new System.Drawing.Point(442, 34);
+            this.SwearBox.Location = new System.Drawing.Point(435, 5);
             this.SwearBox.MaxLength = 64;
             this.SwearBox.Name = "SwearBox";
             this.SwearBox.PasswordChar = '\0';
@@ -258,7 +257,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(207, 34);
+            this.label3.Location = new System.Drawing.Point(200, 3);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(229, 19);
             this.label3.TabIndex = 23;
@@ -409,6 +408,15 @@
             this.metroPanel1.Text = "Social Media";
             this.metroPanel1.UseSelectable = true;
             // 
+            // metroLabel1
+            // 
+            this.metroLabel1.AutoSize = true;
+            this.metroLabel1.Location = new System.Drawing.Point(174, 44);
+            this.metroLabel1.Name = "metroLabel1";
+            this.metroLabel1.Size = new System.Drawing.Size(65, 19);
+            this.metroLabel1.TabIndex = 5;
+            this.metroLabel1.Text = "Status: {0}";
+            // 
             // btnTwitter
             // 
             this.btnTwitter.Location = new System.Drawing.Point(29, 41);
@@ -436,15 +444,6 @@
             this.TwitterTimer.Enabled = true;
             this.TwitterTimer.Interval = 1;
             this.TwitterTimer.Tick += new System.EventHandler(this.TwitterTimer_Tick);
-            // 
-            // metroLabel1
-            // 
-            this.metroLabel1.AutoSize = true;
-            this.metroLabel1.Location = new System.Drawing.Point(174, 44);
-            this.metroLabel1.Name = "metroLabel1";
-            this.metroLabel1.Size = new System.Drawing.Size(65, 19);
-            this.metroLabel1.TabIndex = 5;
-            this.metroLabel1.Text = "Status: {0}";
             // 
             // Misc
             // 

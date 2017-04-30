@@ -222,8 +222,7 @@ namespace fCraft {
             HighestRank
         }
     }
-
-
+    
     internal sealed class BoolKeyAttribute : ConfigKeyAttribute {
         public BoolKeyAttribute( ConfigSection section, bool defaultValue, string description )
             : base( section, typeof( bool ), defaultValue, description ) {

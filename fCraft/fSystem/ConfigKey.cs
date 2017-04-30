@@ -27,10 +27,7 @@ official server list (if server is public).",
 @"The website used for the server. Used for $website and /BanGrief",
 MinLength = 1, MaxLength = 64)]
         WebsiteURL,
-
-        [StringKey(ConfigSection.General, "True",
-@"Determines if the server should check for updates", MinLength = 4, MaxLength = 5)]
-        CheckForUpdates,
+        
 
         [StringKey(ConfigSection.General, "%CBlock",
 @"The word which swears will be replaced with",
@@ -44,7 +41,7 @@ right under the server name. May be left blank.
 Note: If WoM extensions are enabled, non-WoM users will not see this.",
             MinLength = 0, MaxLength = 64 )]
         MOTD,
-
+        
 
         [IntKey( ConfigSection.General, 20,
 @"Maximum number of players on the server. Having more players
@@ -200,6 +197,10 @@ make sure to move the map files before starting the server again." )]
 
         #region Security
 
+        [StringKey(ConfigSection.Security, "", 
+            @"Password for the On the Go mobile app")]
+        OnTheGoPassword,
+
         [EnumKey( ConfigSection.Security, NameVerificationMode.Balanced,
 @"Name verification ensures that connecting players are not impersonating
 someone else. Strict verification uses only the main verification method.
@@ -332,7 +333,7 @@ Set to 0 to disable periodic backups.",
         DefaultBackupInterval,
 
         [IntKey( ConfigSection.SavingAndBackup, 0,
-@"Maximum number of backup files that 800Craft should keep.
+@"Maximum number of backup files that GemsCraft should keep.
 If exceeded, oldest backups will be deleted first.",
             MinValue = 0 )]
         MaxBackups,
@@ -351,7 +352,7 @@ If exceeded, oldest backups will be deleted first.",
         HbSaverKey,
 
         [BoolKey(ConfigSection.Chat, true,
-@"Enables Global Chat (/Global) for IRC channel #800Craft esper.net")]
+@"Enables Global Chat (/Global) for IRC channel #gems_craft_global esper.net")]
         GCKey,
 
         #endregion
@@ -494,7 +495,7 @@ If enabled, the update check is done on-startup." )]
 @"Command to execute (via operating system's shell) after the update is applied." )]
         RunAfterUpdate,
 
-        [BoolKey( ConfigSection.Advanced, true,
+        [BoolKey(ConfigSection.Advanced, true,
 @"It is recommended to save a backup of all data files before updating.
 This setting allows the updater to do that for you." )]
         BackupBeforeUpdate,
@@ -511,8 +512,8 @@ You may use this option to disable the relative updates." )]
         NoPartialPositionUpdates,
 
         [EnumKey( ConfigSection.Advanced, ProcessPriorityClass.Normal,
-@"It is recommended to leave 800Craft at default priority.
-Setting this below ""Normal"" may starve 800Craft of resources.
+@"It is recommended to leave GemsCraft at default priority.
+Setting this below ""Normal"" may starve GemsCraft of resources.
 Setting this above ""Normal"" may slow down other software on your machine." )]
         ProcessPriority,
 
@@ -760,6 +761,7 @@ message type if character count is less than 64")]
             @"The Access Token Secret to keep authenticated")]
         TwitterAccessSecret,
 
+        
         #endregion
     }
 }

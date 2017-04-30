@@ -632,22 +632,22 @@ THE SOFTWARE.*/
             if (Option == null)
             {
                 CdList.PrintUsage(player);
-                player.Message("  Sections include: Staff, DisplayedNames, Idles, Portals, Rank, Top10, HaxOff, TopBuilders, MostTime, MostKicks, MostBans, MostPromos, MostLogins, Prisoners, and Donators");
+                player.Message("  Sections include: Staff, DisplayedNames, Idles, Portals, Rank, Top10, HaxOff, TopBuilders, MostTime, MostKicks, MostBans, MostPromos, MostLogins, ConfigItems, ConfigSections, Prisoners, and Donators");
                 return;
             }
             switch (Option.ToLower())
             {
                 default:
                     CdList.PrintUsage(player);
-                    player.Message("  Sections include: Staff, DisplayedNames, Idles, Portals, Rank, Top10, TopBuilders, MostTime, MostKicks, MostBans, MostPromos, MostLogins, Prisoners, and Donators");
+                    player.Message("  Sections include: Staff, DisplayedNames, Idles, Portals, Rank, Top10, TopBuilders, MostTime, MostKicks, MostBans, MostPromos, MostLogins, ConfigItems, ConfigSections, Prisoners, and Donators");
                     break;
                 case "top10":
-                    List<World> WorldNames = new List<World>(WorldManager.Worlds.Where(w => w.VisitCount > 0)
+                    var WorldNames = new List<World>(WorldManager.Worlds.Where(w => w.VisitCount > 0)
                                          .OrderBy(c => c.VisitCount)
                                          .ToArray()
                                          .Reverse());
-                    string list = WorldNames.Take(10).JoinToString(w => String.Format("{0}&S: {1}", w.ClassyName, w.VisitCount));
-                    if (WorldNames.Count() < 1)
+                    var list = WorldNames.Take(10).JoinToString(w => $"{w.ClassyName}&S: {w.VisitCount}");
+                    if (!WorldNames.Any())
                     {
                         player.Message("&WNo results found");
                         return;
@@ -942,12 +942,55 @@ THE SOFTWARE.*/
                     }
                     break;
                 case "prisoners":
-                    var text = "These players are in prison: ";
-                    foreach (var t in PrisonData.Obj.Prisoners)
+                    if (PrisonData.Obj.Prisoners.Count > 0)
                     {
-                        text += t + ", ";
+                        var text = "These players are in prison: ";
+
+                        foreach (var t in PrisonData.Obj.Prisoners)
+                        {
+                            text += t + ", ";
+                        }
+                        player.Message(text.Substring(0, text.Length - 2));
                     }
-                    player.Message(text.Substring(text.Length - 2));
+                    else
+                    {
+                        player.Message("&1No is in prison. &2H&3o&4o&5r&6a&7y&8!");
+                    }
+                    break;
+                case "configitems":
+                    var arg = cmd.Next();
+                    if (arg == null)
+                    {
+                        player.Message(
+                            "&cPlease specify one of the Config Sections (ex. /list configitems general. Use /list configsections to find out which ones there are.");
+                    }
+                    else
+                    {
+                        var message = "&8ConfigItems Include&S: ";
+                        foreach (var cs in Config.ConfigSections)
+                        {
+                            var toLow = cs.ToString("G").ToLower();
+                            if (toLow == arg.ToLower())
+                            {
+                                foreach (var item in cs.GetKeys())
+                                {
+                                    message += item.ToString("G") + ", ";
+                                }
+                                player.Message(message.Substring(0, message.Length - 2));
+                            }
+                            
+                        }
+                    }
+                    break;
+                case "configsections":
+                    var textVar = "These are the Config Sections:\n";
+                    var loopCount = 1;
+                    foreach (var cs in Config.ConfigSections)
+                    {
+                        textVar += "&f-&" + loopCount + " " + cs.ToString("G") + "\n";
+                        loopCount++;
+                    }
+                    player.Message(textVar);
                     break;
             }
         }
@@ -989,28 +1032,28 @@ THE SOFTWARE.*/
                                                         "*.txt",
                                                         SearchOption.TopDirectoryOnly);
 
-            for (int i = 0; i < sectionFiles.Length; i++)
+            foreach (string t in sectionFiles)
             {
-                string sectionFullName = Path.GetFileNameWithoutExtension(sectionFiles[i]);
+                string sectionFullName = Path.GetFileNameWithoutExtension(t);
                 if (sectionFullName == null) continue;
                 if (sectionFullName.StartsWith(sectionName, StringComparison.OrdinalIgnoreCase))
                 {
                     if (sectionFullName.Equals(sectionName, StringComparison.OrdinalIgnoreCase))
                     {
-                        reqFileName = sectionFiles[i];
+                        reqFileName = t;
                         break;
                     }
                     else if (reqFileName == null)
                     {
-                        reqFileName = sectionFiles[i];
+                        reqFileName = t;
                     }
                     else
                     {
                         var matches = sectionFiles.Select(f => Path.GetFileNameWithoutExtension(f))
-                                                  .Where(sn => sn != null && sn.StartsWith(sectionName));
+                            .Where(sn => sn != null && sn.StartsWith(sectionName));
                         // if there are multiple matches, print a list
                         player.Message("Multiple requirement sections matched \"{0}\": {1}",
-                                        sectionName, matches.JoinToString());
+                            sectionName, matches.JoinToString());
                     }
                 }
             }

@@ -57,11 +57,7 @@ namespace fCraft.ServerCLI
                 _useColor = !Server.HasArg(ArgKey.NoConsoleColor);
 
                 Server.InitServer(true); // true for being Cli
-
-                if (ConfigKey.CheckForUpdates.GetString() == "True")
-                {
-                    CheckForUpdates();
-                }
+            
                 Console.Title = "GemsCraft " + Updater.LatestStable + " - " + ConfigKey.ServerName.GetString();
 
                 if (!ConfigKey.ProcessPriority.IsBlank())

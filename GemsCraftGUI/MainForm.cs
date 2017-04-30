@@ -888,10 +888,6 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                 if (_shutdownPending) return;
 
                 BeginInvoke((Action)OnInitSuccess);
-                if (ConfigKey.CheckForUpdates.GetString() == "True")
-                {
-                    UpdateCheck();
-                }
 
 
                 // set process priority
@@ -1461,7 +1457,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             StartEnable();
             //LoadCustomThemes(); - Legacy
             
-            PrisonData.Init();
+            
         }
         #region PlayerViewer
 

@@ -602,6 +602,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                 {
                     WorldScreen.cMainWorld.SelectedIndex = 0;
                 }
+                
             }
             else
             {
@@ -614,6 +615,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         internal static void FillWorldList()
         {
             WorldScreen.cMainWorld.Items.Clear();
+            
             foreach (var world in Worlds)
             {
                 WorldScreen.cMainWorld.Items.Add(world.Name);
@@ -997,6 +999,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             MainFormGUI.playerList.Enabled = true;
             MainFormGUI.logBox.Enabled = true;
             MainFormGUI.bVoice.Enabled = true;
+          
             //ThemeBox.Enabled = true; - Legacy
         }
 

@@ -73,7 +73,118 @@ namespace fCraft {
                 }
             } );
 #endif
+
+            CommandManager.RegisterCommand(CdEditConfig);
         }
+
+        static readonly CommandDescriptor CdEditConfig = new CommandDescriptor
+        {
+            Name = "EditConfig",
+            Category = CommandCategory.Maintenance,
+            Aliases = new string[] { "configedit", "cedit", "editc", "ec", "ce"},
+            IsConsoleSafe = true,
+            IsHidden = false,
+            Permissions = new[] { Permission.EditConfig },
+            Help = "&SEdits the configuration of the server. &cThe Rank Configurations and the World Configurations are not editable",
+            Usage = "/editconfig [about/set/setdefault] [Config Item] [value (null if using setdefault or about)]",
+            Handler = EditConfig
+        };
+        
+        private static void EditConfig(Player source, Command cmd)
+        {
+            var message =
+                "&eWarning: Changes may not take effect until next server restart. For some, you can use /reload config";
+            try
+            {
+                var action = cmd.Next().ToLower();
+                var configItem = cmd.Next();
+                var value = cmd.NextAll();
+
+                if (configItem == null)
+                {
+                    source.Message(CdEditConfig.Help);
+                }
+                else
+                {
+                    
+                    configItem = configItem.ToLower();
+                    if (action == "about")
+                    {
+                        foreach (var configSection in Config.ConfigSections)
+                        {
+                            foreach (var configKey in configSection.GetKeys())
+                            {
+                                if (configItem == configKey.ToString("G"))
+                                {
+                                    source.Message(
+                                        "&2Config Item Info\n" +
+                                        "--------------------\n" +
+                                        "&1Base Name&f: " + configKey.ToString("G") + "\n" +
+                                        "&3Section&f: " + configKey.GetSection().ToString("G") + "\n" +
+                                        "&4Description&f: " + configKey.GetDescription() + "\n"
+                                    );
+                                }
+                            }
+                        }
+                    }
+                    else if (action == "setdefault")
+                    {
+                        var foundOne = false;
+                        foreach (var configSection in Config.ConfigSections)
+                        {
+                            /*if (configSection == ConfigSection.Worlds)
+                            {
+                                source.Message(
+                                    "&cEditing the Worlds section while the server is possible is not possible.");
+                                return;
+                            }*/
+                            foreach (var configKey in configSection.GetKeys())
+                            {
+                                if (configItem == configKey.ToString("G"))
+                                {
+                                    configKey.TrySetValue(configKey.GetDefault());
+                                    source.Message(message);
+                                    foundOne = true;
+                                }
+                            }
+                        }
+                        if (!foundOne) source.Message("&4Config item doesn't exit. Check your spelling: " + configItem);
+                        else Config.Save();
+                    }
+                    else if (action == "set")
+                    {
+                        var foundOne = false;
+                        foreach (var configSection in Config.ConfigSections)
+                        {
+                            /*if (configSection == ConfigSection.Worlds)
+                            {
+                                source.Message(
+                                    "&cEditing the Worlds section while the server is possible is not possible.");
+                                return;
+                            }*/
+                            foreach (var configKey in configSection.GetKeys())
+                            {
+                                if (configItem == configKey.ToString("G").ToLower())
+                                {
+                                    source.Message(
+                                        configKey.TrySetValue(value)
+                                            ? message
+                                            : "&4Error: Inappropiate format entered for config value. Please double check.");
+                                    foundOne = true;
+                                }
+                            }
+                        }
+                        if (!foundOne) source.Message("&4Config item doesn't exit. Check your spelling: " + configItem);
+                        else Config.Save();
+                    }
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                CdEditConfig.PrintUsage(source);
+            }
+        }
+
         #region LegendCraft
         /* Copyright (c) <2013-2014> <LeChosenOne, DingusBungus>
    Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -93,7 +204,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.*/
-        
+
         static readonly CommandDescriptor CdEdit = new CommandDescriptor
         {
             Name = "Edit",

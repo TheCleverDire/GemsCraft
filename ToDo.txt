@@ -1,12 +1,24 @@
 - Release Cobblestone 1.0
 -- Fix new GUI ( DONE ! )
-- Blockhunt game ( Postponed )
 - Prison System ( DONE! )
-- Fix /rps (Rock Paper Scissors) (ABANDONED)
 - Fix Updater
-- Social Commands
-- Android Remote
-- CCJump
-- Custom exit messages
--- Default set by ConfigGUI
--- players can use /exitmessage [message] to change it
+- Twitter Integration ( DONE ! )
+- Android Remote ( In Progress )
+- Edit Config In Game ( DONE ! )
+
+- Planned for Cobblestone 1.1 - The Game Update
+
+--> CCJump
+----> Extreme Parkour utilizing Classicube's super jump
+
+--> Quiz
+----> Predefined/Custom made quizzes
+
+--> Blockhunt
+----> Hide & Seek, player disquised as specific item in game
+
+--> Needle In Haystack
+----> Players try to find the designated block in a random designed map
+
+--> Hunger Games
+----> The classic loveable game where you brutally kill each other. Kid friendly.
