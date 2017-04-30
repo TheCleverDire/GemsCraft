@@ -52,6 +52,7 @@ namespace GemsCraftGUI
             this.tabPage1 = new MetroFramework.Controls.MetroTabPage();
             this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.tabControl1.SuspendLayout();
             this.ServerTab.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.picServerStatus)).BeginInit();
@@ -234,7 +235,7 @@ namespace GemsCraftGUI
             this.bPlay.TabIndex = 8;
             this.bPlay.Text = "Play";
             this.bPlay.UseSelectable = true;
-            this.bPlay.Click += new System.EventHandler(this.bPlay_Click);
+            this.bPlay.Click += new System.EventHandler(this.bPlay_Click_1);
             // 
             // uriDisplay
             // 
@@ -290,6 +291,11 @@ namespace GemsCraftGUI
             this.toolTip.IsBalloon = true;
             this.toolTip.ReshowDelay = 100;
             // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.FileName = "openFileDialog1";
+            this.openFileDialog1.Filter = "Executables|*.exe|All files|*.*";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -331,6 +337,7 @@ namespace GemsCraftGUI
         internal MetroTabPage tabPage1;
         internal MetroComboBox cinternal;
         internal MetroLabel linternal;
+        private OpenFileDialog openFileDialog1;
     }
 
 

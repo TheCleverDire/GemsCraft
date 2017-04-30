@@ -23,10 +23,13 @@ using GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens;
 using GemsCraftGUI.Properties;
 using GemsCraftGUI.ServerGUI;
 using JetBrains.Annotations;
+using MetroFramework.Controls;
 using Color = System.Drawing.Color;
 using MetroFramework.Forms;
+using Microsoft.VisualBasic;
 using static GemsCraftGUI.ConfigGUI.GUITabs.ConfigModule;
 using static GemsCraftGUI.Program;
+using static Microsoft.VisualBasic.Interaction;
 namespace GemsCraftGUI
 {
     public sealed partial class MainForm : MetroForm
@@ -94,12 +97,9 @@ namespace GemsCraftGUI
             ChatScreen.bColorGlobal.Click += new System.EventHandler(this.bColorGlobal_Click);
 
             // WorldScreen
-            WorldScreen.bMapPath.Click += new System.EventHandler(bMapPath_Click);
             WorldScreen.xMapPath.CheckedChanged += new System.EventHandler(ConfigModule.xMapPath_CheckedChanged);
             WorldScreen.cDefaultBuildRank.SelectedIndexChanged += new System.EventHandler(this.cDefaultBuildRank_SelectedIndexChanged);
-            WorldScreen.bWorldEdit.Click += new System.EventHandler(ConfigModule.bWorldEdit_Click);
-            WorldScreen.bAddWorld.Click += new System.EventHandler(ConfigModule.bAddWorld_Click);
-            WorldScreen.bWorldDelete.Click += new System.EventHandler(bWorldDel_Click);
+            
             WorldScreen.dgvWorlds.SelectionChanged += new System.EventHandler(ConfigModule.dgvWorlds_Click);
             WorldScreen.dgvWorlds.Click += new System.EventHandler(ConfigModule.dgvWorlds_Click);
 
@@ -175,7 +175,7 @@ namespace GemsCraftGUI
              this.Load += new System.EventHandler(this.MainForm_Load);*/
         }
 
-        void StartServerHandlers()
+        private void StartServerHandlers()
         {
             //Server Handlers
             MainFormGUI.bPlay.Click += new System.EventHandler(this.bPlay_Click);
@@ -1284,19 +1284,11 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             }
             console.Text = "";
         }
-
-
-
+        
         private void bPlay_Click(object sender, EventArgs e)
         {
-            try
-            {
-                Process.Start(uriDisplay.Text);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Could not open server URL. Please copy/paste it manually.");
-            }
+            
+            
         }
 
         private void logBox_TextChanged(object sender, EventArgs e)
@@ -1524,6 +1516,49 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                 // ignored
             }
         }
+
+        private string messageBoxMessage =
+            "You will now need to select the ClassicSharp exe. Do not select the launcher. ";
+        private void bPlay_Click_1(object sender, EventArgs e)
+        {
+            var filePath = "cc_location.txt";
+            if (!File.Exists(filePath) || File.ReadAllText(filePath) == string.Empty)
+            {
+                MessageBox.Show(messageBoxMessage);
+                openFileDialog1.Title = "Select ClassicSharp Launcher";
+                openFileDialog1.ShowDialog();
+                var filePathX = openFileDialog1.FileName;
+                if (filePathX.Substring(filePathX.LastIndexOf(".") + 1) != "exe")
+                {
+                    var addedMessage = "You must select an executable (exe)";
+                    if (messageBoxMessage != messageBoxMessage + addedMessage)
+                    {
+                        messageBoxMessage += addedMessage;
+                    }
+                    bPlay_Click_1(sender, e);
+                }
+                else
+                {
+                    var writer = File.CreateText(filePath);
+                    writer.WriteLine(filePathX);
+                    writer.Flush();
+                    writer.Close();
+                    MessageBox.Show("You must now click \"Play\" again to open ClassicSharp");
+                }
+            }
+            else
+            {
+                try
+                {
+                    Process.Start(openFileDialog1.FileName);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Sorry, something went wrong when trying to open ClassicSharp. Exception: " + ex.ToString());
+                }
+            }
+        }
+
         void engine_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
             SpeechSynthesizer reader = new SpeechSynthesizer();

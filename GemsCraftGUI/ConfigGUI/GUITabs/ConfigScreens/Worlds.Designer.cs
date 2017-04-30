@@ -29,8 +29,8 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             this.mcbPrison = new System.Windows.Forms.CheckBox();
             this.cboPrison = new MetroFramework.Controls.MetroComboBox();
             this.label6 = new MetroFramework.Controls.MetroLabel();
@@ -108,6 +108,7 @@
             this.bMapPath.TabIndex = 36;
             this.bMapPath.Text = "Browse";
             this.bMapPath.UseSelectable = true;
+            this.bMapPath.Click += new System.EventHandler(this.bMapPath_Click);
             // 
             // xMapPath
             // 
@@ -205,6 +206,7 @@
             this.bWorldEdit.TabIndex = 28;
             this.bWorldEdit.Text = "Edit";
             this.bWorldEdit.UseSelectable = true;
+            this.bWorldEdit.Click += new System.EventHandler(this.bWorldEdit_Click);
             // 
             // bAddWorld
             // 
@@ -215,6 +217,7 @@
             this.bAddWorld.TabIndex = 27;
             this.bAddWorld.Text = "Add World";
             this.bAddWorld.UseSelectable = true;
+            this.bAddWorld.Click += new System.EventHandler(this.bAddWorld_Click);
             // 
             // bWorldDelete
             // 
@@ -226,6 +229,7 @@
             this.bWorldDelete.TabIndex = 29;
             this.bWorldDelete.Text = "Delete World";
             this.bWorldDelete.UseSelectable = true;
+            this.bWorldDelete.Click += new System.EventHandler(this.bWorldDelete_Click);
             // 
             // dgvWorlds
             // 
@@ -249,8 +253,8 @@
             this.dgvWorlds.MultiSelect = false;
             this.dgvWorlds.Name = "dgvWorlds";
             this.dgvWorlds.RowHeadersVisible = false;
-            dataGridViewCellStyle2.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
-            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle8.Padding = new System.Windows.Forms.Padding(0, 1, 0, 1);
+            this.dgvWorlds.RowsDefaultCellStyle = dataGridViewCellStyle8;
             this.dgvWorlds.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvWorlds.Size = new System.Drawing.Size(636, 311);
             this.dgvWorlds.TabIndex = 26;
@@ -306,8 +310,8 @@
             // dgvcBlockDB
             // 
             this.dgvcBlockDB.DataPropertyName = "BlockDBEnabled";
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.dgvcBlockDB.DefaultCellStyle = dataGridViewCellStyle7;
             this.dgvcBlockDB.HeaderText = "BlockDB";
             this.dgvcBlockDB.Name = "dgvcBlockDB";
             this.dgvcBlockDB.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;

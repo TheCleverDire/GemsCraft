@@ -139,18 +139,7 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs
                 engine.Dispose();
             }
         }
-
-        internal static void bPlay_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                Process.Start(MainFormGUI.uriDisplay.Text);
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Could not open server URL. Please copy/paste it manually.");
-            }
-        }
+        
 
         internal static void nMaxPlayerPerWorld_Validating(object sender, CancelEventArgs e)
         {
@@ -510,19 +499,15 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             ApplyColor(RankScreen.bColorRank, picker.ColorIndex);
             SelectedRank.Color = fCraft.Color.Parse(picker.ColorIndex);
         }
-
-
-        void HandleTabChatChange(object sender, EventArgs args)
-        {
-            UpdateChatPreview();
-        }
+        
 
         void UpdateChatPreview()
         {
             List<string> lines = new List<string>();
             if (ChatScreen.xShowConnectionMessages.Checked)
             {
-                lines.Add(String.Format("&SPlayer {0}{1}LeChosenOne&S connected, joined {2}{3}main",
+                // ReSharper disable once UseStringInterpolation
+                lines.Add(string.Format("&SPlayer {0}{1}LeChosenOne&S connected, joined {2}{3}main",
                                           ChatScreen.xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                                           ChatScreen.xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : "",
                                           ChatScreen.xRankColorsInWorldNames.Checked ? RankManager.LowestRank.Color : "",
@@ -530,7 +515,8 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             }
             lines.Add("&R<*- This is an announcement -*>");
             lines.Add("&YThis is a /say announcement");
-            lines.Add(String.Format("{0}{1}LeChosenOne&F: This is a normal chat message",
+            // ReSharper disable once UseStringInterpolation
+            lines.Add(string.Format("{0}{1}LeChosenOne&F: This is a normal chat message",
                                       ChatScreen.xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                                       ChatScreen.xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : ""));
             lines.Add("&Pfrom Dingus: This is a private message /whisper");
@@ -543,7 +529,8 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                     midRank = RankManager.LowestRank.NextRankUp;
                 }
 
-                lines.Add(String.Format("&SPlayer {0}{1}Dingus&S joined {2}{3}SomeOtherMap",
+                // ReSharper disable once UseStringInterpolation
+                lines.Add(string.Format("&SPlayer {0}{1}Dingus&S joined {2}{3}SomeOtherMap",
                                           ChatScreen.xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                                           ChatScreen.xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : "",
                                           ChatScreen.xRankColorsInWorldNames.Checked ? midRank.Color : "",
@@ -552,20 +539,21 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             lines.Add("&SUnknown command \"kikc\", see &H/Commands");
             if (SecurityScreen.xAnnounceKickAndBanReasons.Checked)
             {
-                lines.Add(String.Format("&W{0}{1}LeChosenOne&W was kicked by {0}{1}Dingus&W: Reason goes here",
+                lines.Add(string.Format("&W{0}{1}LeChosenOne&W was kicked by {0}{1}Dingus&W: Reason goes here",
                                           ChatScreen.xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                                           ChatScreen.xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : ""));
             }
             else
             {
-                lines.Add(String.Format("&W{0}{1}CopperPenquin96&W was kicked by {0}{1}gamer1",
+                lines.Add(string.Format("&W{0}{1}CopperPenquin96&W was kicked by {0}{1}gamer1",
                                           ChatScreen.xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                                           ChatScreen.xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : ""));
             }
 
             if (ChatScreen.xShowConnectionMessages.Checked)
             {
-                lines.Add(String.Format("&S{0}{1}Bob&S left the server.",
+                // ReSharper disable once UseStringInterpolation
+                lines.Add(string.Format("&S{0}{1}Bob&S left the server.",
                                           ChatScreen.xRankColorsInChat.Checked ? RankManager.HighestRank.Color : "",
                                           ChatScreen.xRankPrefixesInChat.Checked ? RankManager.HighestRank.Prefix : ""));
             }
@@ -585,32 +573,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                 MessageBox.Show(e.Exception.ToString(), "An error occured in the world list");
             }
         }
-
-        internal static void bAddWorld_Click(object sender, EventArgs e)
-        {
-            AddWorldPopup popup = new AddWorldPopup(null);
-            if (popup.ShowDialog() == DialogResult.OK)
-            {
-                Worlds.Add(popup.World);
-                popup.World.LoadedBy = WorldListEntry.WorldInfoSignature;
-                popup.World.LoadedOn = DateTime.UtcNow;
-            }
-            if (WorldScreen.cMainWorld.SelectedItem == null)
-            {
-                FillWorldList();
-                if (WorldScreen.cMainWorld.Items.Count > 0)
-                {
-                    WorldScreen.cMainWorld.SelectedIndex = 0;
-                }
-                
-            }
-            else
-            {
-                string mainWorldName = WorldScreen.cMainWorld.SelectedItem.ToString();
-                FillWorldList();
-                WorldScreen.cMainWorld.SelectedItem = mainWorldName;
-            }
-        }
+        
 
         internal static void FillWorldList()
         {
@@ -643,101 +606,13 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             }
         }
 
-        internal static void bWorldEdit_Click(object sender, EventArgs e)
-        {
-            AddWorldPopup popup = new AddWorldPopup(Worlds[WorldScreen.dgvWorlds.SelectedRows[0].Index]);
-            if (popup.ShowDialog() == DialogResult.OK)
-            {
-                string oldName = Worlds[WorldScreen.dgvWorlds.SelectedRows[0].Index].Name;
-                Worlds[WorldScreen.dgvWorlds.SelectedRows[0].Index] = popup.World;
-                HandleWorldRename(oldName, popup.World.Name);
-            }
-        }
-
         internal static void dgvWorlds_Click(object sender, EventArgs e)
         {
             bool oneRowSelected = (WorldScreen.dgvWorlds.SelectedRows.Count == 1);
             WorldScreen.bWorldDelete.Enabled = oneRowSelected;
             WorldScreen.bWorldEdit.Enabled = oneRowSelected;
         }
-
-        internal static void bWorldDel_Click(object sender, EventArgs e)
-        {
-            if (WorldScreen.dgvWorlds.SelectedRows.Count > 0)
-            {
-                WorldListEntry world = Worlds[WorldScreen.dgvWorlds.SelectedRows[0].Index];
-
-                // prompt to delete map file, if it exists
-                if (File.Exists(world.FullFileName))
-                {
-                    string promptMessage = String.Format("Are you sure you want to delete world \"{0}\"?", world.Name);
-
-                    if (MessageBox.Show(promptMessage, "Deleting a world", MessageBoxButtons.YesNo) == DialogResult.No)
-                    {
-                        return;
-                    }
-
-                    string fileDeleteWarning = "Do you want to delete the map file (" + world.FileName + ") as well?";
-                    if (MessageBox.Show(fileDeleteWarning, "Warning", MessageBoxButtons.YesNo) == DialogResult.Yes)
-                    {
-                        try
-                        {
-                            File.Delete(world.FullFileName);
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show("You have to delete the file (" + world.FileName + ") manually. " +
-                                             "An error occured while trying to delete it automatically:" + Environment.NewLine + ex,
-                                             "Could not delete map file");
-                        }
-                    }
-                }
-
-                Worlds.Remove(world);
-
-                if (WorldScreen.cMainWorld.SelectedItem == null)
-                {
-                    // deleting non-main world
-                    FillWorldList();
-                    if (WorldScreen.cMainWorld.Items.Count > 0)
-                    {
-                        WorldScreen.cMainWorld.SelectedIndex = 0;
-                    }
-
-                }
-                else
-                {
-                    // deleting main world
-                    string mainWorldName = WorldScreen.cMainWorld.SelectedItem.ToString();
-                    FillWorldList();
-                    if (mainWorldName == world.Name)
-                    {
-                        MessageBox.Show("Main world has been reset.");
-                        if (WorldScreen.cMainWorld.Items.Count > 0)
-                        {
-                            WorldScreen.cMainWorld.SelectedIndex = 0;
-                        }
-                    }
-                    else
-                    {
-                        WorldScreen.cMainWorld.SelectedItem = mainWorldName;
-                    }
-                }
-            }
-        }
-
-        internal static void bMapPath_Click(object sender, EventArgs e)
-        {
-            FolderBrowserDialog dialog = new FolderBrowserDialog
-            {
-                SelectedPath = WorldScreen.tMapPath.Text,
-                Description = "Select a directory to save map files to"
-            };
-            if (dialog.ShowDialog() == DialogResult.OK)
-            {
-                WorldScreen.tMapPath.Text = dialog.SelectedPath;
-            }
-        }
+        
 
         internal static void nMaxUndo_ValueChanged(object sender, EventArgs e)
         {

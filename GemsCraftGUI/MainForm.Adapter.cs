@@ -161,11 +161,13 @@ namespace GemsCraftGUI
                         }
                     }
                 }
-
-                if (WorldScreen.cboPrison.SelectedIndex == -1)
+                if (ConfigKey.PrisonEnabled.Enabled())
                 {
-                    var si = WorldScreen.cboPrison.SelectedIndex;
-                    WorldScreen.cboPrison.SelectedIndex = 1;
+                    if (WorldScreen.cboPrison.SelectedIndex == -1)
+                    {
+                        var si = WorldScreen.cboPrison.SelectedIndex;
+                        WorldScreen.cboPrison.SelectedIndex = 1;
+                    }
                 }
             }
             catch (Exception ex)
@@ -985,7 +987,10 @@ namespace GemsCraftGUI
                 }
                 if (WorldScreen.mcbPrison.Enabled)
                 {
-                    PrisonData.Obj.World = WorldScreen.cboPrison.SelectedItem.ToString();
+                    var ws = WorldScreen;
+                    var cP = ws.cboPrison;
+                    var si = cP.SelectedItem;
+                    if (si != null) PrisonData.Obj.World = WorldScreen.cboPrison.SelectedItem.ToString();
                     if (!Directory.Exists("Prison/")) Directory.CreateDirectory("Prison/");
                     PrisonData.SaveData();
                 }
