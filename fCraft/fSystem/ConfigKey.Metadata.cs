@@ -207,6 +207,8 @@ namespace fCraft {
                     return RankManager.HighestRank;
                 case BlankValueMeaning.LowestRank:
                     return RankManager.LowestRank;
+                case BlankValueMeaning.OnTheGoRank:
+                    return RankManager.HighestRank;
                 case BlankValueMeaning.Invalid:
                     throw new FormatException( "Value may not be blank." );
                 default:
@@ -219,7 +221,8 @@ namespace fCraft {
             Invalid,
             LowestRank,
             DefaultRank,
-            HighestRank
+            HighestRank,
+            OnTheGoRank
         }
     }
     

@@ -18,7 +18,8 @@ namespace fCraft
                            HighestRank,
                            PatrolledRank,
                            DefaultBuildRank,
-                           BlockDbAutoEnableRank;
+                           BlockDbAutoEnableRank,
+                           OnTheGoRank;
 
 
         static RankManager()
@@ -43,6 +44,7 @@ namespace fCraft
             PatrolledRank = null;
             DefaultBuildRank = null;
             BlockDbAutoEnableRank = null;
+            OnTheGoRank = null;
         }
 
         /// <summary>

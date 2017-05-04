@@ -197,9 +197,27 @@ make sure to move the map files before starting the server again." )]
 
         #region Security
 
+        #region Security - GemsCraft On the Go
+        [BoolKey(ConfigSection.Security, false,
+            @"Enables the use of GemsCraft On the Go")]
+        OnTheGoEnabled,
+
         [StringKey(ConfigSection.Security, "", 
             @"Password for the On the Go mobile app")]
         OnTheGoPassword,
+
+        [IntKey(ConfigSection.Security, 65509,
+            @"Port number for On the Go to access with")]
+        OnTheGoPort,
+
+        [BoolKey(ConfigSection.Security, false,
+            @"Enables the On the Go User to edit the config")]
+        OnTheGoConfigEdit,
+
+        [RankKey(ConfigSection.Security, RankKeyAttribute.BlankValueMeaning.HighestRank,
+            @"The lowest rank to use GemsCraft On the Go")]
+        OntheGoRequiredRank,
+        #endregion
 
         [EnumKey( ConfigSection.Security, NameVerificationMode.Balanced,
 @"Name verification ensures that connecting players are not impersonating

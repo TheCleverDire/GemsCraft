@@ -245,6 +245,7 @@
     <Compile Include="Network\CPE.cs" />
     <Compile Include="Network\GlobalChat.cs" />
     <Compile Include="Network\PacketReader.cs" />
+    <Compile Include="Network\RemoteControl.cs" />
     <Compile Include="Network\SocialMedia.cs" />
     <Compile Include="Network\TitleExtractor.cs" />
     <Compile Include="Network\TwitterLogin.cs">

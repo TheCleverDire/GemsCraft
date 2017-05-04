@@ -33,8 +33,7 @@
             this.xBlockDBAutoEnable = new System.Windows.Forms.CheckBox();
             this.xBlockDBEnabled = new System.Windows.Forms.CheckBox();
             this.gSecurityMisc = new MetroFramework.Controls.MetroTile();
-            this.txtRemotePass = new MetroFramework.Controls.MetroTextBox();
-            this.lblRemotePassword = new MetroFramework.Controls.MetroLabel();
+            this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
             this.xAnnounceRankChangeReasons = new System.Windows.Forms.CheckBox();
             this.xRequireKickReason = new System.Windows.Forms.CheckBox();
             this.lPatrolledRankAndBelow = new MetroFramework.Controls.MetroLabel();
@@ -44,6 +43,8 @@
             this.xAnnounceKickAndBanReasons = new System.Windows.Forms.CheckBox();
             this.xRequireRankChangeReason = new System.Windows.Forms.CheckBox();
             this.xRequireBanReason = new System.Windows.Forms.CheckBox();
+            this.txtRemotePass = new MetroFramework.Controls.MetroTextBox();
+            this.lblRemotePassword = new MetroFramework.Controls.MetroLabel();
             this.gSpamChat = new MetroFramework.Controls.MetroTile();
             this.lAntispamMaxWarnings = new MetroFramework.Controls.MetroLabel();
             this.nAntispamMaxWarnings = new System.Windows.Forms.NumericUpDown();
@@ -62,7 +63,15 @@
             this.xMaxConnectionsPerIP = new System.Windows.Forms.CheckBox();
             this.lVerifyNames = new MetroFramework.Controls.MetroLabel();
             this.cVerifyNames = new MetroFramework.Controls.MetroComboBox();
-            this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
+            this.metroTile1 = new MetroFramework.Controls.MetroTile();
+            this.metroLabel3 = new MetroFramework.Controls.MetroLabel();
+            this.cboSelectOnTheGoRank = new MetroFramework.Controls.MetroComboBox();
+            this.metroLabel4 = new MetroFramework.Controls.MetroLabel();
+            this.chkAllowEditingConfig = new System.Windows.Forms.CheckBox();
+            this.chkOnTheGo = new System.Windows.Forms.CheckBox();
+            this.lPort = new MetroFramework.Controls.MetroLabel();
+            this.nPort = new System.Windows.Forms.NumericUpDown();
+            this.metroLabel2 = new MetroFramework.Controls.MetroLabel();
             this.gBlockDB.SuspendLayout();
             this.gSecurityMisc.SuspendLayout();
             this.gSpamChat.SuspendLayout();
@@ -72,6 +81,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.nAntispamMessageCount)).BeginInit();
             this.gVerify.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxConnectionsPerIP)).BeginInit();
+            this.metroTile1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nPort)).BeginInit();
             this.SuspendLayout();
             // 
             // gBlockDB
@@ -130,8 +141,6 @@
             // 
             this.gSecurityMisc.ActiveControl = null;
             this.gSecurityMisc.Controls.Add(this.metroLabel1);
-            this.gSecurityMisc.Controls.Add(this.txtRemotePass);
-            this.gSecurityMisc.Controls.Add(this.lblRemotePassword);
             this.gSecurityMisc.Controls.Add(this.xAnnounceRankChangeReasons);
             this.gSecurityMisc.Controls.Add(this.xRequireKickReason);
             this.gSecurityMisc.Controls.Add(this.lPatrolledRankAndBelow);
@@ -143,10 +152,116 @@
             this.gSecurityMisc.Controls.Add(this.xRequireBanReason);
             this.gSecurityMisc.Location = new System.Drawing.Point(23, 344);
             this.gSecurityMisc.Name = "gSecurityMisc";
-            this.gSecurityMisc.Size = new System.Drawing.Size(636, 178);
+            this.gSecurityMisc.Size = new System.Drawing.Size(332, 227);
             this.gSecurityMisc.TabIndex = 7;
             this.gSecurityMisc.Text = "Misc";
+            this.gSecurityMisc.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.gSecurityMisc.UseSelectable = true;
+            // 
+            // metroLabel1
+            // 
+            this.metroLabel1.AutoSize = true;
+            this.metroLabel1.Location = new System.Drawing.Point(434, 10);
+            this.metroLabel1.Name = "metroLabel1";
+            this.metroLabel1.Size = new System.Drawing.Size(0, 0);
+            this.metroLabel1.TabIndex = 12;
+            // 
+            // xAnnounceRankChangeReasons
+            // 
+            this.xAnnounceRankChangeReasons.AutoSize = true;
+            this.xAnnounceRankChangeReasons.BackColor = System.Drawing.Color.Transparent;
+            this.xAnnounceRankChangeReasons.Location = new System.Drawing.Point(8, 133);
+            this.xAnnounceRankChangeReasons.Name = "xAnnounceRankChangeReasons";
+            this.xAnnounceRankChangeReasons.Size = new System.Drawing.Size(219, 17);
+            this.xAnnounceRankChangeReasons.TabIndex = 6;
+            this.xAnnounceRankChangeReasons.Text = "Announce promotion && demotion reasons";
+            this.xAnnounceRankChangeReasons.UseVisualStyleBackColor = false;
+            // 
+            // xRequireKickReason
+            // 
+            this.xRequireKickReason.AutoSize = true;
+            this.xRequireKickReason.BackColor = System.Drawing.Color.Transparent;
+            this.xRequireKickReason.Location = new System.Drawing.Point(8, 10);
+            this.xRequireKickReason.Name = "xRequireKickReason";
+            this.xRequireKickReason.Size = new System.Drawing.Size(121, 17);
+            this.xRequireKickReason.TabIndex = 1;
+            this.xRequireKickReason.Text = "Require kick reason";
+            this.xRequireKickReason.UseVisualStyleBackColor = false;
+            // 
+            // lPatrolledRankAndBelow
+            // 
+            this.lPatrolledRankAndBelow.AutoSize = true;
+            this.lPatrolledRankAndBelow.Location = new System.Drawing.Point(233, 153);
+            this.lPatrolledRankAndBelow.Name = "lPatrolledRankAndBelow";
+            this.lPatrolledRankAndBelow.Size = new System.Drawing.Size(78, 19);
+            this.lPatrolledRankAndBelow.TabIndex = 9;
+            this.lPatrolledRankAndBelow.Text = "(and below)";
+            // 
+            // cPatrolledRank
+            // 
+            this.cPatrolledRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cPatrolledRank.FormattingEnabled = true;
+            this.cPatrolledRank.ItemHeight = 23;
+            this.cPatrolledRank.Location = new System.Drawing.Point(104, 153);
+            this.cPatrolledRank.Name = "cPatrolledRank";
+            this.cPatrolledRank.Size = new System.Drawing.Size(123, 29);
+            this.cPatrolledRank.TabIndex = 8;
+            this.cPatrolledRank.UseSelectable = true;
+            this.cPatrolledRank.SelectedIndexChanged += new System.EventHandler(this.cPatrolledRank_SelectedIndexChanged);
+            // 
+            // lPatrolledRank
+            // 
+            this.lPatrolledRank.AutoSize = true;
+            this.lPatrolledRank.Location = new System.Drawing.Point(8, 153);
+            this.lPatrolledRank.Name = "lPatrolledRank";
+            this.lPatrolledRank.Size = new System.Drawing.Size(90, 19);
+            this.lPatrolledRank.TabIndex = 7;
+            this.lPatrolledRank.Text = "Patrolled rank";
+            this.lPatrolledRank.Click += new System.EventHandler(this.lPatrolledRank_Click);
+            // 
+            // xAnnounceRankChanges
+            // 
+            this.xAnnounceRankChanges.AutoSize = true;
+            this.xAnnounceRankChanges.BackColor = System.Drawing.Color.Transparent;
+            this.xAnnounceRankChanges.Location = new System.Drawing.Point(8, 108);
+            this.xAnnounceRankChanges.Name = "xAnnounceRankChanges";
+            this.xAnnounceRankChanges.Size = new System.Drawing.Size(201, 17);
+            this.xAnnounceRankChanges.TabIndex = 5;
+            this.xAnnounceRankChanges.Text = "Announce promotions and demotions";
+            this.xAnnounceRankChanges.UseVisualStyleBackColor = false;
+            // 
+            // xAnnounceKickAndBanReasons
+            // 
+            this.xAnnounceKickAndBanReasons.AutoSize = true;
+            this.xAnnounceKickAndBanReasons.BackColor = System.Drawing.Color.Transparent;
+            this.xAnnounceKickAndBanReasons.Location = new System.Drawing.Point(8, 83);
+            this.xAnnounceKickAndBanReasons.Name = "xAnnounceKickAndBanReasons";
+            this.xAnnounceKickAndBanReasons.Size = new System.Drawing.Size(219, 17);
+            this.xAnnounceKickAndBanReasons.TabIndex = 4;
+            this.xAnnounceKickAndBanReasons.Text = "Announce kick, ban, and unban reasons";
+            this.xAnnounceKickAndBanReasons.UseVisualStyleBackColor = false;
+            // 
+            // xRequireRankChangeReason
+            // 
+            this.xRequireRankChangeReason.AutoSize = true;
+            this.xRequireRankChangeReason.BackColor = System.Drawing.Color.Transparent;
+            this.xRequireRankChangeReason.Location = new System.Drawing.Point(8, 60);
+            this.xRequireRankChangeReason.Name = "xRequireRankChangeReason";
+            this.xRequireRankChangeReason.Size = new System.Drawing.Size(202, 17);
+            this.xRequireRankChangeReason.TabIndex = 3;
+            this.xRequireRankChangeReason.Text = "Require promotion && demotion reason";
+            this.xRequireRankChangeReason.UseVisualStyleBackColor = false;
+            // 
+            // xRequireBanReason
+            // 
+            this.xRequireBanReason.AutoSize = true;
+            this.xRequireBanReason.BackColor = System.Drawing.Color.Transparent;
+            this.xRequireBanReason.Location = new System.Drawing.Point(8, 35);
+            this.xRequireBanReason.Name = "xRequireBanReason";
+            this.xRequireBanReason.Size = new System.Drawing.Size(161, 17);
+            this.xRequireBanReason.TabIndex = 2;
+            this.xRequireBanReason.Text = "Require ban && unban reason";
+            this.xRequireBanReason.UseVisualStyleBackColor = false;
             // 
             // txtRemotePass
             // 
@@ -164,7 +279,7 @@
             this.txtRemotePass.CustomButton.Visible = false;
             this.txtRemotePass.Lines = new string[] {
         "Password"};
-            this.txtRemotePass.Location = new System.Drawing.Point(226, 10);
+            this.txtRemotePass.Location = new System.Drawing.Point(83, 36);
             this.txtRemotePass.MaxLength = 32767;
             this.txtRemotePass.Name = "txtRemotePass";
             this.txtRemotePass.PasswordChar = '*';
@@ -184,106 +299,11 @@
             // lblRemotePassword
             // 
             this.lblRemotePassword.AutoSize = true;
-            this.lblRemotePassword.Location = new System.Drawing.Point(27, 10);
+            this.lblRemotePassword.Location = new System.Drawing.Point(14, 33);
             this.lblRemotePassword.Name = "lblRemotePassword";
-            this.lblRemotePassword.Size = new System.Drawing.Size(193, 19);
+            this.lblRemotePassword.Size = new System.Drawing.Size(63, 19);
             this.lblRemotePassword.TabIndex = 10;
-            this.lblRemotePassword.Text = "GemsCraft On the Go Passcode";
-            // 
-            // xAnnounceRankChangeReasons
-            // 
-            this.xAnnounceRankChangeReasons.AutoSize = true;
-            this.xAnnounceRankChangeReasons.BackColor = System.Drawing.Color.Transparent;
-            this.xAnnounceRankChangeReasons.Location = new System.Drawing.Point(304, 109);
-            this.xAnnounceRankChangeReasons.Name = "xAnnounceRankChangeReasons";
-            this.xAnnounceRankChangeReasons.Size = new System.Drawing.Size(219, 17);
-            this.xAnnounceRankChangeReasons.TabIndex = 6;
-            this.xAnnounceRankChangeReasons.Text = "Announce promotion && demotion reasons";
-            this.xAnnounceRankChangeReasons.UseVisualStyleBackColor = false;
-            // 
-            // xRequireKickReason
-            // 
-            this.xRequireKickReason.AutoSize = true;
-            this.xRequireKickReason.BackColor = System.Drawing.Color.Transparent;
-            this.xRequireKickReason.Location = new System.Drawing.Point(42, 59);
-            this.xRequireKickReason.Name = "xRequireKickReason";
-            this.xRequireKickReason.Size = new System.Drawing.Size(121, 17);
-            this.xRequireKickReason.TabIndex = 1;
-            this.xRequireKickReason.Text = "Require kick reason";
-            this.xRequireKickReason.UseVisualStyleBackColor = false;
-            // 
-            // lPatrolledRankAndBelow
-            // 
-            this.lPatrolledRankAndBelow.AutoSize = true;
-            this.lPatrolledRankAndBelow.Location = new System.Drawing.Point(257, 143);
-            this.lPatrolledRankAndBelow.Name = "lPatrolledRankAndBelow";
-            this.lPatrolledRankAndBelow.Size = new System.Drawing.Size(78, 19);
-            this.lPatrolledRankAndBelow.TabIndex = 9;
-            this.lPatrolledRankAndBelow.Text = "(and below)";
-            // 
-            // cPatrolledRank
-            // 
-            this.cPatrolledRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.cPatrolledRank.FormattingEnabled = true;
-            this.cPatrolledRank.ItemHeight = 23;
-            this.cPatrolledRank.Location = new System.Drawing.Point(128, 140);
-            this.cPatrolledRank.Name = "cPatrolledRank";
-            this.cPatrolledRank.Size = new System.Drawing.Size(123, 29);
-            this.cPatrolledRank.TabIndex = 8;
-            this.cPatrolledRank.UseSelectable = true;
-            // 
-            // lPatrolledRank
-            // 
-            this.lPatrolledRank.AutoSize = true;
-            this.lPatrolledRank.Location = new System.Drawing.Point(39, 143);
-            this.lPatrolledRank.Name = "lPatrolledRank";
-            this.lPatrolledRank.Size = new System.Drawing.Size(90, 19);
-            this.lPatrolledRank.TabIndex = 7;
-            this.lPatrolledRank.Text = "Patrolled rank";
-            // 
-            // xAnnounceRankChanges
-            // 
-            this.xAnnounceRankChanges.AutoSize = true;
-            this.xAnnounceRankChanges.BackColor = System.Drawing.Color.Transparent;
-            this.xAnnounceRankChanges.Location = new System.Drawing.Point(304, 84);
-            this.xAnnounceRankChanges.Name = "xAnnounceRankChanges";
-            this.xAnnounceRankChanges.Size = new System.Drawing.Size(201, 17);
-            this.xAnnounceRankChanges.TabIndex = 5;
-            this.xAnnounceRankChanges.Text = "Announce promotions and demotions";
-            this.xAnnounceRankChanges.UseVisualStyleBackColor = false;
-            // 
-            // xAnnounceKickAndBanReasons
-            // 
-            this.xAnnounceKickAndBanReasons.AutoSize = true;
-            this.xAnnounceKickAndBanReasons.BackColor = System.Drawing.Color.Transparent;
-            this.xAnnounceKickAndBanReasons.Location = new System.Drawing.Point(304, 59);
-            this.xAnnounceKickAndBanReasons.Name = "xAnnounceKickAndBanReasons";
-            this.xAnnounceKickAndBanReasons.Size = new System.Drawing.Size(219, 17);
-            this.xAnnounceKickAndBanReasons.TabIndex = 4;
-            this.xAnnounceKickAndBanReasons.Text = "Announce kick, ban, and unban reasons";
-            this.xAnnounceKickAndBanReasons.UseVisualStyleBackColor = false;
-            // 
-            // xRequireRankChangeReason
-            // 
-            this.xRequireRankChangeReason.AutoSize = true;
-            this.xRequireRankChangeReason.BackColor = System.Drawing.Color.Transparent;
-            this.xRequireRankChangeReason.Location = new System.Drawing.Point(42, 109);
-            this.xRequireRankChangeReason.Name = "xRequireRankChangeReason";
-            this.xRequireRankChangeReason.Size = new System.Drawing.Size(202, 17);
-            this.xRequireRankChangeReason.TabIndex = 3;
-            this.xRequireRankChangeReason.Text = "Require promotion && demotion reason";
-            this.xRequireRankChangeReason.UseVisualStyleBackColor = false;
-            // 
-            // xRequireBanReason
-            // 
-            this.xRequireBanReason.AutoSize = true;
-            this.xRequireBanReason.BackColor = System.Drawing.Color.Transparent;
-            this.xRequireBanReason.Location = new System.Drawing.Point(42, 84);
-            this.xRequireBanReason.Name = "xRequireBanReason";
-            this.xRequireBanReason.Size = new System.Drawing.Size(161, 17);
-            this.xRequireBanReason.TabIndex = 2;
-            this.xRequireBanReason.Text = "Require ban && unban reason";
-            this.xRequireBanReason.UseVisualStyleBackColor = false;
+            this.lblRemotePassword.Text = "Password";
             // 
             // gSpamChat
             // 
@@ -513,19 +533,124 @@
             this.cVerifyNames.TabIndex = 1;
             this.cVerifyNames.UseSelectable = true;
             // 
-            // metroLabel1
+            // metroTile1
             // 
-            this.metroLabel1.AutoSize = true;
-            this.metroLabel1.Location = new System.Drawing.Point(434, 10);
-            this.metroLabel1.Name = "metroLabel1";
-            this.metroLabel1.Size = new System.Drawing.Size(0, 0);
-            this.metroLabel1.TabIndex = 12;
+            this.metroTile1.ActiveControl = null;
+            this.metroTile1.Controls.Add(this.metroLabel3);
+            this.metroTile1.Controls.Add(this.cboSelectOnTheGoRank);
+            this.metroTile1.Controls.Add(this.metroLabel4);
+            this.metroTile1.Controls.Add(this.chkAllowEditingConfig);
+            this.metroTile1.Controls.Add(this.chkOnTheGo);
+            this.metroTile1.Controls.Add(this.lPort);
+            this.metroTile1.Controls.Add(this.nPort);
+            this.metroTile1.Controls.Add(this.metroLabel2);
+            this.metroTile1.Controls.Add(this.lblRemotePassword);
+            this.metroTile1.Controls.Add(this.txtRemotePass);
+            this.metroTile1.Location = new System.Drawing.Point(361, 344);
+            this.metroTile1.Name = "metroTile1";
+            this.metroTile1.Size = new System.Drawing.Size(298, 227);
+            this.metroTile1.TabIndex = 12;
+            this.metroTile1.Text = "GemsCraft On the Go";
+            this.metroTile1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.metroTile1.UseSelectable = true;
+            // 
+            // metroLabel3
+            // 
+            this.metroLabel3.AutoSize = true;
+            this.metroLabel3.Location = new System.Drawing.Point(147, 133);
+            this.metroLabel3.Name = "metroLabel3";
+            this.metroLabel3.Size = new System.Drawing.Size(79, 19);
+            this.metroLabel3.TabIndex = 19;
+            this.metroLabel3.Text = "(and above)";
+            // 
+            // cboSelectOnTheGoRank
+            // 
+            this.cboSelectOnTheGoRank.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.cboSelectOnTheGoRank.FormattingEnabled = true;
+            this.cboSelectOnTheGoRank.ItemHeight = 23;
+            this.cboSelectOnTheGoRank.Location = new System.Drawing.Point(18, 130);
+            this.cboSelectOnTheGoRank.Name = "cboSelectOnTheGoRank";
+            this.cboSelectOnTheGoRank.Size = new System.Drawing.Size(123, 29);
+            this.cboSelectOnTheGoRank.TabIndex = 18;
+            this.cboSelectOnTheGoRank.UseSelectable = true;
+            // 
+            // metroLabel4
+            // 
+            this.metroLabel4.AutoSize = true;
+            this.metroLabel4.Location = new System.Drawing.Point(18, 108);
+            this.metroLabel4.Name = "metroLabel4";
+            this.metroLabel4.Size = new System.Drawing.Size(66, 19);
+            this.metroLabel4.TabIndex = 17;
+            this.metroLabel4.Text = "Min. Rank";
+            // 
+            // chkAllowEditingConfig
+            // 
+            this.chkAllowEditingConfig.AutoSize = true;
+            this.chkAllowEditingConfig.BackColor = System.Drawing.Color.Transparent;
+            this.chkAllowEditingConfig.Location = new System.Drawing.Point(18, 88);
+            this.chkAllowEditingConfig.Name = "chkAllowEditingConfig";
+            this.chkAllowEditingConfig.Size = new System.Drawing.Size(145, 17);
+            this.chkAllowEditingConfig.TabIndex = 16;
+            this.chkAllowEditingConfig.Text = "Allow Config to Be Edited";
+            this.chkAllowEditingConfig.UseVisualStyleBackColor = false;
+            // 
+            // chkOnTheGo
+            // 
+            this.chkOnTheGo.AutoSize = true;
+            this.chkOnTheGo.BackColor = System.Drawing.Color.Transparent;
+            this.chkOnTheGo.Location = new System.Drawing.Point(18, 10);
+            this.chkOnTheGo.Name = "chkOnTheGo";
+            this.chkOnTheGo.Size = new System.Drawing.Size(145, 17);
+            this.chkOnTheGo.TabIndex = 15;
+            this.chkOnTheGo.Text = "Enable On the Go Usage";
+            this.chkOnTheGo.UseVisualStyleBackColor = false;
+            this.chkOnTheGo.CheckedChanged += new System.EventHandler(this.chkOnTheGo_CheckedChanged);
+            // 
+            // lPort
+            // 
+            this.lPort.AutoSize = true;
+            this.lPort.Location = new System.Drawing.Point(14, 66);
+            this.lPort.Name = "lPort";
+            this.lPort.Size = new System.Drawing.Size(84, 19);
+            this.lPort.TabIndex = 13;
+            this.lPort.Text = "Port number";
+            // 
+            // nPort
+            // 
+            this.nPort.Location = new System.Drawing.Point(104, 65);
+            this.nPort.Maximum = new decimal(new int[] {
+            65535,
+            0,
+            0,
+            0});
+            this.nPort.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            this.nPort.Name = "nPort";
+            this.nPort.Size = new System.Drawing.Size(75, 20);
+            this.nPort.TabIndex = 14;
+            this.nPort.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
+            // 
+            // metroLabel2
+            // 
+            this.metroLabel2.AutoSize = true;
+            this.metroLabel2.Location = new System.Drawing.Point(434, 10);
+            this.metroLabel2.Name = "metroLabel2";
+            this.metroLabel2.Size = new System.Drawing.Size(0, 0);
+            this.metroLabel2.TabIndex = 12;
             // 
             // Security
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(683, 533);
+            this.ClientSize = new System.Drawing.Size(683, 582);
+            this.Controls.Add(this.metroTile1);
             this.Controls.Add(this.gBlockDB);
             this.Controls.Add(this.gSecurityMisc);
             this.Controls.Add(this.gSpamChat);
@@ -545,6 +670,9 @@
             this.gVerify.ResumeLayout(false);
             this.gVerify.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.nMaxConnectionsPerIP)).EndInit();
+            this.metroTile1.ResumeLayout(false);
+            this.metroTile1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.nPort)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -583,8 +711,17 @@
         internal System.Windows.Forms.CheckBox xMaxConnectionsPerIP;
         internal MetroFramework.Controls.MetroLabel lVerifyNames;
         internal MetroFramework.Controls.MetroComboBox cVerifyNames;
-        private MetroFramework.Controls.MetroLabel lblRemotePassword;
+        internal MetroFramework.Controls.MetroLabel lblRemotePassword;
         internal MetroFramework.Controls.MetroTextBox txtRemotePass;
-        private MetroFramework.Controls.MetroLabel metroLabel1;
+        internal MetroFramework.Controls.MetroLabel metroLabel1;
+        internal MetroFramework.Controls.MetroTile metroTile1;
+        internal MetroFramework.Controls.MetroLabel metroLabel2;
+        internal System.Windows.Forms.CheckBox chkOnTheGo;
+        internal MetroFramework.Controls.MetroLabel lPort;
+        internal System.Windows.Forms.NumericUpDown nPort;
+        internal System.Windows.Forms.CheckBox chkAllowEditingConfig;
+        internal MetroFramework.Controls.MetroLabel metroLabel3;
+        internal MetroFramework.Controls.MetroComboBox cboSelectOnTheGoRank;
+        internal MetroFramework.Controls.MetroLabel metroLabel4;
     }
 }

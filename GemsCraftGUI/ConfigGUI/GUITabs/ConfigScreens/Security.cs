@@ -50,5 +50,24 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
                     break;
             }
         }
+
+        private void lPatrolledRank_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void cPatrolledRank_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+  
+        private void chkOnTheGo_CheckedChanged(object sender, EventArgs e)
+        {
+            foreach (Control control in metroTile1.Controls)
+            {
+                control.Enabled = chkOnTheGo.Checked;
+            }
+            chkOnTheGo.Enabled = true;
+        }
     }
 }

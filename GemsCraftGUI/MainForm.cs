@@ -2,7 +2,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -16,17 +15,14 @@ using fCraft;
 using fCraft.ConfigGUI;
 using fCraft.Events;
 using fCraft.GUI;
+using fCraft.Network;
 using fCraft.ServerGUI;
-using GemsCraftGUI.ConfigGUI;
 using GemsCraftGUI.ConfigGUI.GUITabs;
 using GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens;
 using GemsCraftGUI.Properties;
 using GemsCraftGUI.ServerGUI;
-using JetBrains.Annotations;
-using MetroFramework.Controls;
 using Color = System.Drawing.Color;
 using MetroFramework.Forms;
-using Microsoft.VisualBasic;
 using static GemsCraftGUI.ConfigGUI.GUITabs.ConfigModule;
 using static GemsCraftGUI.Program;
 using static Microsoft.VisualBasic.Interaction;
@@ -53,7 +49,7 @@ namespace GemsCraftGUI
             CpeScreen = new Cpe();
             Program.MainFormGUI = this;
             InitializeComponent();
-            ConfigEventHandlers();
+            //ConfigEventHandlers();
             WorldScreen.dgvcBlockDB.TrueValue = YesNoAuto.Yes;
             WorldScreen.dgvcBlockDB.FalseValue = YesNoAuto.No;
             WorldScreen.dgvcBlockDB.IndeterminateValue = YesNoAuto.Auto;
@@ -959,6 +955,10 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             console.Enabled = true;
             console.Text = "";
             picServerStatus.Image = Resources.server_on;
+            if (ConfigKey.OnTheGoEnabled.Enabled())
+            {
+                RemoteControl.StartRemoteServer();
+            }
         }
 
 
@@ -1433,7 +1433,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         internal void bStart_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Please note that once the server is started, you cannot modify " +
-                            "the Ranks or World Tabs in the Config");
+                            "the Ranks or World Screens in the Configuration");
             MainScreenGUI.tileWorlds.Enabled = false;
             MainScreenGUI.tileRanks.Enabled = false;
             MainFormGUI.StartUp(sender, e);
@@ -1448,9 +1448,9 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             MainFormGUI.playerList.MouseDoubleClick += MainFormGUI.playerList_MouseDoubleClick;
             StartEnable();
             //LoadCustomThemes(); - Legacy
-            
-            
+
         }
+
         #region PlayerViewer
 
         internal void playerList_MouseDoubleClick(object sender, MouseEventArgs e)

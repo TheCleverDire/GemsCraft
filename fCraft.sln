@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HeartbeatSaver", "Heartbeat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GemsCraft On the Go", "GemsCraft On the Go\GemsCraft On the Go.csproj", "{5C965DF9-0B6E-42CE-B377-61AB92A5FF5B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnTheGo Test CLI", "OnTheGo Test CLI\OnTheGo Test CLI.csproj", "{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug_Events|Any CPU = Debug_Events|Any CPU
@@ -208,6 +210,36 @@ Global
 		{5C965DF9-0B6E-42CE-B377-61AB92A5FF5B}.Release|x86.ActiveCfg = Release|Any CPU
 		{5C965DF9-0B6E-42CE-B377-61AB92A5FF5B}.Release|x86.Build.0 = Release|Any CPU
 		{5C965DF9-0B6E-42CE-B377-61AB92A5FF5B}.Release|x86.Deploy.0 = Release|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Events|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Events|Any CPU.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Events|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Events|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Events|x86.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Events|x86.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_IRC|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_IRC|Any CPU.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_IRC|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_IRC|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_IRC|x86.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_IRC|x86.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Scheduler|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Scheduler|Any CPU.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Scheduler|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Scheduler|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Scheduler|x86.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug_Scheduler|x86.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Debug|x86.Build.0 = Debug|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Release|x86.ActiveCfg = Release|Any CPU
+		{FF4C22B2-EFB4-4C92-9608-6F24E8220D1E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

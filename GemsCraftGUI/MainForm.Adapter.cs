@@ -349,7 +349,21 @@ namespace GemsCraftGUI
 
         void ApplyTabSecurity()
         {
+            SecurityScreen.chkOnTheGo.Checked = ConfigKey.OnTheGoEnabled.Enabled();
             SecurityScreen.txtRemotePass.Text = ConfigKey.OnTheGoPassword.GetString();
+            SecurityScreen.nPort.Value = ConfigKey.OnTheGoPort.GetInt();
+            SecurityScreen.chkAllowEditingConfig.Checked = ConfigKey.OnTheGoConfigEdit.Enabled();
+
+            if (ConfigKey.OntheGoRequiredRank.IsBlank())
+            {
+                GeneralScreen.cDefaultRank.SelectedIndex = 0;
+            }
+            else
+            {
+                RankManager.DefaultRank = Rank.Parse(ConfigKey.OntheGoRequiredRank.GetString());
+                SecurityScreen.cboSelectOnTheGoRank.SelectedIndex = RankManager.GetIndex(RankManager.OnTheGoRank);
+            }
+
             ApplyEnum(SecurityScreen.cVerifyNames, ConfigKey.VerifyNames, NameVerificationMode.Balanced);
 
             SecurityScreen.nMaxConnectionsPerIP.Value = ConfigKey.MaxConnectionsPerIP.GetInt();
@@ -792,7 +806,12 @@ namespace GemsCraftGUI
 
         internal static void SaveSecurity()
         {
+            ConfigKey.OnTheGoEnabled.TrySetValue(SecurityScreen.chkOnTheGo.Checked);
             ConfigKey.OnTheGoPassword.TrySetValue(SecurityScreen.txtRemotePass.Text);
+            ConfigKey.OnTheGoPort.TrySetValue(SecurityScreen.nPort.Value);
+            ConfigKey.OnTheGoConfigEdit.TrySetValue(SecurityScreen.chkAllowEditingConfig.Checked);
+            ConfigKey.DefaultRank.TrySetValue(SecurityScreen.cboSelectOnTheGoRank.SelectedIndex == 0 ? "" : RankManager.OnTheGoRank.FullName);
+
             WriteEnum<NameVerificationMode>(SecurityScreen.cVerifyNames, ConfigKey.VerifyNames);
 
             ConfigKey.MaxConnectionsPerIP.TrySetValue(SecurityScreen.xMaxConnectionsPerIP.Checked ? SecurityScreen.nMaxConnectionsPerIP.Value : 0);

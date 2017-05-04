@@ -418,6 +418,7 @@ namespace fCraft {
                 RankManager.DefaultBuildRank = Rank.Parse( ConfigKey.DefaultBuildRank.GetString() );
                 RankManager.PatrolledRank = Rank.Parse( ConfigKey.PatrolledRank.GetString() );
                 RankManager.BlockDbAutoEnableRank = Rank.Parse( ConfigKey.BlockDBAutoEnableRank.GetString() );
+                RankManager.OnTheGoRank = Rank.Parse(ConfigKey.OntheGoRequiredRank.GetString());
             }
 
             // key relation validation
@@ -525,6 +526,10 @@ namespace fCraft {
 
                 case ConfigKey.DefaultRank:
                     RankManager.DefaultRank = Rank.Parse( key.GetString() );
+                    break;
+
+                case ConfigKey.OntheGoRequiredRank:
+                    RankManager.OnTheGoRank = Rank.Parse(key.GetString() );
                     break;
 
                 case ConfigKey.BandwidthUseMode:

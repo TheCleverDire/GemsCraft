@@ -1,9 +1,24 @@
 - Release Cobblestone 1.0
 -- Fix new GUI ( DONE ! )
+- Colormode Command (When Colormode is set to on, each character displayed in the chat is a random color)
 - Prison System ( DONE! )
 - Fix Updater
 - Twitter Integration ( DONE ! )
 - Android Remote ( In Progress )
+--- Login
+--- Add Server Log/Chat in real time
+---> In the Server Config under Rank permissions
+------ there will be the option to allow only certain ranks
+------ to view the logs. If this permission is not enabled for a certain
+------ player, they will just see the in-game chat
+--- Add Editable Config
+--- Add Server Up/Down Image
+--- Add IRC Connection
+--- Add fCraft Plugin Viewer
+--- Add fCraft Player Viewer
+--- Add Map Viewer
+
+
 - Edit Config In Game ( DONE ! )
 
 - Planned for Cobblestone 1.1 - The Game Update
