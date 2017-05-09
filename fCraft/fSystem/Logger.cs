@@ -224,7 +224,7 @@ namespace fCraft
                 try
                 {
                     StringBuilder sb = new StringBuilder();
-                    sb.Append("version=").Append(Uri.EscapeDataString(Updater.LatestStable));
+                    sb.Append("version=").Append(Uri.EscapeDataString(Updater.LatestStable(false)));
                     sb.Append("&error=").Append(Uri.EscapeDataString(message));
 
                     if (MonoCompat.IsMono)

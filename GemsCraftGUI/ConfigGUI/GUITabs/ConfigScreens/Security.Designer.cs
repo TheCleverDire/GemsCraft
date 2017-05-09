@@ -164,9 +164,9 @@
             this.chkRequireLogin.BackColor = System.Drawing.Color.Transparent;
             this.chkRequireLogin.Location = new System.Drawing.Point(8, 188);
             this.chkRequireLogin.Name = "chkRequireLogin";
-            this.chkRequireLogin.Size = new System.Drawing.Size(265, 17);
+            this.chkRequireLogin.Size = new System.Drawing.Size(213, 17);
             this.chkRequireLogin.TabIndex = 20;
-            this.chkRequireLogin.Text = "Require On-the-Go Password to Connect to Server";
+            this.chkRequireLogin.Text = "Require Password to Connect to Server";
             this.chkRequireLogin.UseVisualStyleBackColor = false;
             // 
             // metroLabel1
@@ -520,6 +520,7 @@
             this.metroTile1.Text = "GemsCraft On the Go";
             this.metroTile1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.metroTile1.UseSelectable = true;
+            this.metroTile1.Visible = false;
             // 
             // metroLabel3
             // 

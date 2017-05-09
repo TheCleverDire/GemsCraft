@@ -805,7 +805,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                         try
                         {
                             //download new zip in current directory
-                            Process.Start("http://gemscraft.net/Version/" + Updater.LatestStable + ".zip");
+                            Process.Start("http://gemscraft.net/Version/" + Updater.LatestStable(false) + ".zip");
                         }
                         catch (Exception ex)
                         {

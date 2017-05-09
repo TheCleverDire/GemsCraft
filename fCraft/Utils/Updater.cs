@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Cache;
@@ -16,31 +17,61 @@ using JetBrains.Annotations;
 // ReSharper disable once CheckNamespace
 namespace fCraft {
     /// <summary> Checks for updates, and keeps track of current version/revision. </summary>
-    public static class Updater {
+    public static class Updater
+    {
 
         public static readonly ReleaseInfo CurrentRelease = new ReleaseInfo(
             206,
             151,
-            new DateTime( 2012, 07, 19, 1, 0, 0, DateTimeKind.Utc ),
+            new DateTime(2012, 07, 19, 1, 0, 0, DateTimeKind.Utc),
             "", "",
             ReleaseFlags.Feature
 #if DEBUG
             | ReleaseFlags.Dev
 #endif
- );
+        );
 
-        public static string UserAgent => "GemsCraft " + LatestStable;
+        public static string UserAgent => "GemsCraft " + LatestStable(false);
 
         public static string GetCurrentOnline()
         {
-            return TitleExtractor.pageTitle(CurrentVersionUrl);
-        }
-        public const string CurrentVersionUrl = "http://gemscraft.net/latest.html";
-        public const string LatestStable = "1.0";
+            var webRequest = WebRequest.Create(CurrentVersionUrl);
 
+            using (var response = webRequest.GetResponse())
+            using (var content = response.GetResponseStream())
+            using (var reader = new StreamReader(content))
+            {
+                var strContent = reader.ReadToEnd();
+                return strContent;
+            }
+        }
+
+        public const string CurrentVersionUrl = "http://gems.ml/Download/version.txt";
+
+        public static List<string> LatestStableList = new List<string>()
+        {
+            "Cobblestone", "1", "0", null, null
+        };
+
+        public static string LatestStable(bool ShowName)
+        {
+            string fullString = "";
+            if (ShowName) fullString += LatestStableList[0];
+            fullString += LatestStableList[1];
+            fullString += LatestStableList[2];
+            if (LatestStableList[3] != null)
+            {
+                fullString += LatestStableList[3];
+                if (LatestStableList[4] != null)
+                {
+                    fullString += LatestStableList[4];
+                }
+            }
+            return fullString;
+        }
         public static bool HasMostRecentVersion()
         {
-            return LatestStable.Equals(TitleExtractor.pageTitle(CurrentVersionUrl));
+            return LatestStable(true).Equals(TitleExtractor.pageTitle(CurrentVersionUrl));
         }
         public static string UpdateUrl { get; set; }
 

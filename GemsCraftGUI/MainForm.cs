@@ -55,7 +55,7 @@ namespace GemsCraftGUI
             WorldScreen.dgvcBlockDB.IndeterminateValue = YesNoAuto.Auto;
             Bold = new Font(Font, FontStyle.Bold);
             Shown += Init;
-            Text = "GemsCraft " + Updater.LatestStable;
+            Text = "GemsCraft " + Updater.LatestStable(false);
             foreach (var b in Player.CustomBlocks)
             {
                 CpeScreen.clbBlocks.Items.Add(b.ToString());
@@ -803,7 +803,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
                         try
                         {
                             //download new zip in current directory
-                            Process.Start("http://gemscraft.net/Version/" + Updater.LatestStable + ".zip");
+                            Process.Start("http://gemscraft.net/Version/" + Updater.LatestStable(false) + ".zip");
                         }
                         catch (Exception ex)
                         {
@@ -858,7 +858,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             Heartbeat.UriChanged += OnHeartbeatUriChanged;
             Server.PlayerListChanged += OnPlayerListChanged;
             Server.ShutdownEnded += OnServerShutdownEnded;
-            Text = "GemsCraft " + Updater.LatestStable + " - starting...";
+            Text = "GemsCraft " + Updater.LatestStable(false) + " - starting...";
             _startupThread = new Thread(StartupThread)
             {
                 Name = "GemsCraft ServerGUI Startup"
@@ -955,6 +955,9 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             console.Enabled = true;
             console.Text = "";
             picServerStatus.Image = Resources.server_on;
+
+            return;
+            // TODO - Release with Cobblestone 1.1
             if (ConfigKey.OnTheGoEnabled.Enabled())
             {
                 RemoteControl.StartRemoteServer();
@@ -1673,7 +1676,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             ConfigEventHandlers();
             if (!Updater.HasMostRecentVersion())
             {
-                MessageBox.Show("Your GemsCraft is out of date using version " + Updater.LatestStable + "! " +
+                MessageBox.Show("Your GemsCraft is out of date using version " + Updater.LatestStable(false) + "! " +
                                 "You should consider updating to " + Updater.GetCurrentOnline());
             }
             

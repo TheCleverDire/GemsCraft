@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("GemsCraftTwitter")]
+[assembly: AssemblyTitle("GemzLauncher")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("GemsCraftTwitter")]
+[assembly: AssemblyProduct("GemzLauncher")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("a23b9a38-00d3-4085-8672-e09e32bb72e7")]
+[assembly: Guid("97e80455-88d2-4a8a-9833-409519b8d186")]
 
 // Version information for an assembly consists of the following four values:
 //

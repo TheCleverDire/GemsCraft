@@ -133,11 +133,11 @@ namespace fCraft.fSystem
                 case "servername":
                     return ConfigKey.ServerName.GetString();
                 case "world":
-                    return p.World != null ? p.World.Name : "&4World Look Failed";
+                    return p.World?.Name ?? "&4World Look Failed";
                 case "rank":
                     return p.Info.Rank.Name;
                 case "version":
-                    return Updater.LatestStable;
+                    return Updater.LatestStable(true);
                 case "player":
                     return p.Info.Name;
                 case "lastcmd":

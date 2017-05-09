@@ -303,9 +303,9 @@ namespace fCraft
 
             if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Unstable))
             {
-                const string unstableMessage = "This build has been marked as UNSTABLE. " +
+                string unstableMessage = "This build has been marked as UNSTABLE. " +
                                                "Do not use except for debugging purposes. " +
-                                               "Latest non-broken build is " + Updater.LatestStable;
+                                               "Latest non-broken build is " + Updater.LatestStable(true);
 #if DEBUG
                 Logger.Log( LogType.Warning, unstableMessage );
 #else
@@ -1148,7 +1148,7 @@ namespace fCraft
             sb.Replace("{PLAYERS}", CountVisiblePlayers(player).ToString());
             sb.Replace("{WORLDS}", WorldManager.Worlds.Length.ToString());
             sb.Replace("{MOTD}", ConfigKey.MOTD.GetString());
-            sb.Replace("{VERSION}", Updater.LatestStable);
+            sb.Replace("{VERSION}", Updater.LatestStable(true));
             sb.Replace("{IRC_CHANNEL}",
                 ConfigKey.IRCBotEnabled.Enabled() ? ConfigKey.IRCBotChannels.GetString() : "(No IRC)");
             sb.Replace("{WEBSITE}", ConfigKey.WebsiteURL.GetString());

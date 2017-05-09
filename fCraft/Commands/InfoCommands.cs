@@ -323,7 +323,7 @@ namespace fCraft {
         };
         static void GemsHandler(Player player, Command cmd)
         {
-            player.Message(ConfigKey.ServerName + " is running &1Gems&2Craft&r Version " + Updater.LatestStable);
+            player.Message(ConfigKey.ServerName + " is running &1Gems&2Craft&r Version " + Updater.LatestStable(true));
         }
         static readonly CommandDescriptor CdName = new CommandDescriptor
         {
@@ -1979,11 +1979,11 @@ THE SOFTWARE.*/
 
             if( MonoCompat.IsMono ) {
                 player.Message( " Running &1Gems&2Craft&S {0}, under Mono {1}",
-                                Updater.LatestStable,
+                                Updater.LatestStable(true),
                                 MonoCompat.MonoVersionString );
             } else {
                 player.Message(" Running &1Gems&2Craft&S {0}, under .NET {1}",
-                                Updater.LatestStable,
+                                Updater.LatestStable(true),
                                 Environment.Version);
             }
 

@@ -7,7 +7,7 @@ namespace fCraft.GUI {
     public sealed partial class AboutWindow : Form {
         public AboutWindow() {
             InitializeComponent();
-            lSubheader.Text = String.Format( lSubheader.Text, Updater.LatestStable );
+            lSubheader.Text = String.Format( lSubheader.Text, Updater.LatestStable(true) );
         }
         private void lfCraft_LinkClicked( object sender, LinkLabelLinkClickedEventArgs e ) {
             try {

@@ -47,7 +47,7 @@ namespace fCraft.ServerCLI
             Logger.Logged += OnLogged;
             Heartbeat.UriChanged += OnHeartbeatUriChanged;
 
-            Console.Title = "GemsCraft " + Updater.LatestStable + " - starting...";
+            Console.Title = "GemsCraft " + Updater.LatestStable(true) + " - starting...";
 
 #if !DEBUG
             try
@@ -58,7 +58,7 @@ namespace fCraft.ServerCLI
 
                 Server.InitServer(true); // true for being Cli
             
-                Console.Title = "GemsCraft " + Updater.LatestStable + " - " + ConfigKey.ServerName.GetString();
+                Console.Title = "GemsCraft " + Updater.LatestStable(true) + " - " + ConfigKey.ServerName.GetString();
 
                 if (!ConfigKey.ProcessPriority.IsBlank())
                 {
@@ -74,7 +74,7 @@ namespace fCraft.ServerCLI
 
                 if (Server.StartServer())
                 {
-                    Console.WriteLine("** Running GemsCraft version {0} **", Updater.LatestStable);
+                    Console.WriteLine("** Running GemsCraft version {0} **", Updater.LatestStable(true));
                     Console.WriteLine("** Server is now ready. Type /Shutdown to exit safely. **");
 
                     while (!Server.IsShuttingDown)
@@ -119,7 +119,7 @@ namespace fCraft.ServerCLI
 
         static void ReportFailure(ShutdownReason reason)
         {
-            Console.Title = String.Format("GemsCraft {0} {1}", Updater.LatestStable, reason);
+            Console.Title = $"GemsCraft {Updater.LatestStable(true)} {reason}";
             if (_useColor) Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.WriteLine("** {0} **", reason);
             if (_useColor) Console.ResetColor();
