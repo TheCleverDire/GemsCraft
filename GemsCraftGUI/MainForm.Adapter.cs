@@ -350,7 +350,8 @@ namespace GemsCraftGUI
         void ApplyTabSecurity()
         {
             SecurityScreen.chkOnTheGo.Checked = ConfigKey.OnTheGoEnabled.Enabled();
-            SecurityScreen.txtRemotePass.Text = ConfigKey.OnTheGoPassword.GetString();
+            //SecurityScreen.txtRemotePass.Text = ConfigKey.OnTheGoPassword.GetString(); -- Obselete -- Never released --
+            SecurityScreen.chkRequireLogin.Checked = ConfigKey.OnTheGoPasswordRequired.Enabled();
             SecurityScreen.nPort.Value = ConfigKey.OnTheGoPort.GetInt();
             SecurityScreen.chkAllowEditingConfig.Checked = ConfigKey.OnTheGoConfigEdit.Enabled();
 
@@ -807,7 +808,7 @@ namespace GemsCraftGUI
         internal static void SaveSecurity()
         {
             ConfigKey.OnTheGoEnabled.TrySetValue(SecurityScreen.chkOnTheGo.Checked);
-            ConfigKey.OnTheGoPassword.TrySetValue(SecurityScreen.txtRemotePass.Text);
+            ConfigKey.OnTheGoPasswordRequired.TrySetValue(SecurityScreen.chkRequireLogin.Checked);
             ConfigKey.OnTheGoPort.TrySetValue(SecurityScreen.nPort.Value);
             ConfigKey.OnTheGoConfigEdit.TrySetValue(SecurityScreen.chkAllowEditingConfig.Checked);
             ConfigKey.DefaultRank.TrySetValue(SecurityScreen.cboSelectOnTheGoRank.SelectedIndex == 0 ? "" : RankManager.OnTheGoRank.FullName);

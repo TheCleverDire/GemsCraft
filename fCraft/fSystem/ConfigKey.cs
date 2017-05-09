@@ -202,6 +202,10 @@ make sure to move the map files before starting the server again." )]
             @"Enables the use of GemsCraft On the Go")]
         OnTheGoEnabled,
 
+        [BoolKey(ConfigSection.Security, false,
+            @"Requires the user to login each time they connect to the server.")]
+        OnTheGoPasswordRequired,
+
         [StringKey(ConfigSection.Security, "", 
             @"Password for the On the Go mobile app")]
         OnTheGoPassword,

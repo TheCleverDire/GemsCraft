@@ -2,8 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 
 namespace fCraft
@@ -418,6 +421,24 @@ namespace fCraft
 
     public static class EnumerableUtil
     {
+        public static string CalculateMd5Hash(this string input)
+        {
+            var md5 = MD5.Create();
+            var inputBytes = Encoding.ASCII.GetBytes(input);
+            var hash = md5.ComputeHash(inputBytes);
+            var sb = new StringBuilder();
+            foreach (var t in hash)
+            {
+                sb.Append(t.ToString("X2"));
+            }
+            return sb.ToString();
+        }
+        public static string[] GetWords(this string words)
+        {
+            MatchCollection matches = Regex.Matches(words, @"\b[\w']*\b");
+            var newList = (from Match p in matches select p.Value).ToList();
+            return newList.ToArray();
+        }
         /// <summary> Joins all items in a collection into one comma-separated string.
         /// If the items are not strings, .ToString() is called on them. </summary>
         public static string JoinToString<T>([NotNull] this IEnumerable<T> items)
@@ -499,7 +520,7 @@ namespace fCraft
     }
 
 
-    unsafe static class FormatUtil
+    static unsafe class FormatUtil
     {
         // Quicker StringBuilder.Append(int) by Sam Allen of http://www.dotnetperls.com
         public static StringBuilder Digits([NotNull] this StringBuilder builder, int number)
@@ -601,7 +622,7 @@ namespace fCraft
     }
 
 
-    public unsafe static class BufferUtil
+    public static unsafe class BufferUtil
     {
         public static void MemSet([NotNull] this byte[] array, byte value)
         {
@@ -735,4 +756,6 @@ namespace fCraft
             }
         }
     }
+
+    
 }

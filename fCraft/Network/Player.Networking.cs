@@ -21,6 +21,8 @@ namespace fCraft
     /// <summary> Represents a connection to a Minecraft client. Handles low-level interactions (e.g. networking). </summary>
     public sealed partial class Player
     {
+        public bool IsLoginFrozen;
+        public bool IsLoggedIn;
         public static int SocketTimeout { get; set; }
         public static bool RelayAllUpdates { get; set; }
         private const int SleepDelay = 5; // milliseconds
@@ -1080,6 +1082,23 @@ namespace fCraft
                          Name, RankManager.HighestRank.Name);
             }
 
+            if (Info.RemoteUserRegistered == false)
+            {
+                if (ConfigKey.OnTheGoPasswordRequired.Enabled())
+                {
+                    IsLoginFrozen = true;
+                    try
+                    {
+                        Info.Freeze(Console, false, false);
+                    }
+                    catch (Exception e)
+                    {
+                        Message(e.ToString());
+                    }
+                    MessageNow(
+                        "&fThis server requires that you login to join. &4Please use /register or /login to accomplish this task.");
+                }
+            }
             InitCopySlots();
 
             HasFullyConnected = true;

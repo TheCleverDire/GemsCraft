@@ -432,6 +432,12 @@ namespace fCraft
         /// Another way to check online status is to check if PlayerObject is null. </summary>
         public bool IsOnline { get; private set; }
 
+        /// <summary>
+        /// Password player must use to login to the server via remote control
+        /// </summary>
+        public string RemotePassword { get; set; }
+    
+
         /// <summary> If player is online, Player object associated with the session.
         /// If player is offline, null. </summary>
         [CanBeNull]
@@ -563,7 +569,7 @@ namespace fCraft
             { // LEGACY
                 info.LastFailedLoginIP = IPAddress.None;
             }
-            if (fields[14].Length > 0) Int32.TryParse(fields[14], out info.Money);
+            if (fields[14].Length > 0) int.TryParse(fields[14], out info.Money);
 
             fields[15].ToDateTime(ref info.FirstLoginDate);
 
@@ -572,11 +578,11 @@ namespace fCraft
             fields[17].ToTimeSpan(out info.TotalTime);
 
             // stats
-            if (fields[18].Length > 0) Int32.TryParse(fields[18], out info.BlocksBuilt);
-            if (fields[19].Length > 0) Int32.TryParse(fields[19], out info.BlocksDeleted);
-            Int32.TryParse(fields[20], out info.TimesVisited);
-            if (fields[20].Length > 0) Int32.TryParse(fields[21], out info.MessagesWritten);
-            Int32.TryParse(fields[22], out info.PromoCount);
+            if (fields[18].Length > 0) int.TryParse(fields[18], out info.BlocksBuilt);
+            if (fields[19].Length > 0) int.TryParse(fields[19], out info.BlocksDeleted);
+            int.TryParse(fields[20], out info.TimesVisited);
+            if (fields[20].Length > 0) int.TryParse(fields[21], out info.MessagesWritten);
+            int.TryParse(fields[22], out info.PromoCount);
 
             if (fields[23].Length > 0) info.MojangAccount = fields[23].ToString();
 
@@ -638,14 +644,7 @@ namespace fCraft
 
             if (fields.Length > 45)
             {
-                if (fields[45].Length == 0)
-                {
-                    info.IsHidden = false;
-                }
-                else
-                {
-                    info.IsHidden = info.Rank.Can(Permission.Hide);
-                }
+                info.IsHidden = fields[45].Length != 0 && info.Rank.Can(Permission.Hide);
             }
             if (fields.Length > 46)
             {
@@ -667,15 +666,28 @@ namespace fCraft
 
             if (fields.Length > 48)
             {
-                if (fields[48].Length > 0) Int32.TryParse(fields[48], out info.totalKillsTDM);
-                if (fields[49].Length > 0) Int32.TryParse(fields[49], out info.totalDeathsTDM);
+                if (fields[48].Length > 0) int.TryParse(fields[48], out info.totalKillsTDM);
+                if (fields[49].Length > 0) int.TryParse(fields[49], out info.totalDeathsTDM);
             }
             if (fields.Length > 50)
             {
-                if (fields[50].Length > 0) Int32.TryParse(fields[50], out info.totalKillsFFA);
-                if (fields[51].Length > 0) Int32.TryParse(fields[51], out info.totalDeathsFFA);
+                if (fields[50].Length > 0) int.TryParse(fields[50], out info.totalKillsFFA);
+                if (fields[51].Length > 0) int.TryParse(fields[51], out info.totalDeathsFFA);
             }
 
+            if (fields.Length > 51)
+            {
+                if (fields[53].Length != 0) info.RemoteUserRegistered = true;
+
+                if (fields[52].Length > 0)
+                {
+                    if (info.RemoteUserRegistered)
+                    {
+                        info.RemotePassword = fields[52];
+                    }
+                }
+                
+            }
             return info;
         }
 
@@ -800,14 +812,7 @@ namespace fCraft
 
             if (fields.Length > 45)
             {
-                if (fields[45].Length == 0)
-                {
-                    info.IsHidden = false;
-                }
-                else
-                {
-                    info.IsHidden = info.Rank.Can(Permission.Hide);
-                }
+                info.IsHidden = fields[45].Length != 0 && info.Rank.Can(Permission.Hide);
             }
 
             if (info.LastSeen < info.FirstLoginDate)
@@ -830,7 +835,24 @@ namespace fCraft
                 if (fields[50].Length > 0) Int32.TryParse(fields[50], out info.totalKillsFFA);
                 if (fields[51].Length > 0) Int32.TryParse(fields[51], out info.totalDeathsFFA);
             }
+            if (fields.Length > 51)
+            {
+                if (fields[52].Length > 0) info.RemotePassword = fields[52];
+            }
 
+            if (fields.Length > 51)
+            {
+                if (fields[53].Length != 0) info.RemoteUserRegistered = true;
+
+                if (fields[52].Length > 0)
+                {
+                    if (info.RemoteUserRegistered)
+                    {
+                        info.RemotePassword = fields[52];
+                    }
+                }
+
+            }
             return info;
         }
 
@@ -1350,8 +1372,15 @@ namespace fCraft
             sb.Append(',');
 
             if (totalDeathsFFA > 0) sb.Digits(totalDeathsFFA); // 51
+            sb.Append(',');
+
+            if (RemotePassword != null) sb.AppendEscaped(RemotePassword); // 52
+            sb.Append(',');
+
+            if (RemoteUserRegistered) sb.Append("r"); // 53
         }
 
+        public bool RemoteUserRegistered { get; set; }
 
         internal void Serialize([NotNull] BinaryWriter writer)
         {
@@ -1466,6 +1495,10 @@ namespace fCraft
             //FFA Stats            
             Write7BitEncodedInt(writer, totalKillsFFA); // 50
             Write7BitEncodedInt(writer, totalDeathsFFA); // 51
+
+            //Remote Password
+            writer.Write(RemotePassword); // 52
+            writer.Write(RemoteUserRegistered);
         }
 
 
@@ -1725,57 +1758,30 @@ namespace fCraft
 
         #region TimeSince_____ shortcuts
 
-        public TimeSpan TimeSinceRankChange
-        {
-            get { return DateTime.UtcNow.Subtract(RankChangeDate); }
-        }
+        public TimeSpan TimeSinceRankChange => DateTime.UtcNow.Subtract(RankChangeDate);
 
-        public TimeSpan TimeSinceBan
-        {
-            get { return DateTime.UtcNow.Subtract(BanDate); }
-        }
+        public TimeSpan TimeSinceBan => DateTime.UtcNow.Subtract(BanDate);
 
-        public TimeSpan TimeSinceUnban
-        {
-            get { return DateTime.UtcNow.Subtract(UnbanDate); }
-        }
+        public TimeSpan TimeSinceUnban => DateTime.UtcNow.Subtract(UnbanDate);
 
-        public TimeSpan TimeSinceFirstLogin
-        {
-            get { return DateTime.UtcNow.Subtract(FirstLoginDate); }
-        }
+        public TimeSpan TimeSinceFirstLogin => DateTime.UtcNow.Subtract(FirstLoginDate);
 
-        public TimeSpan TimeSinceLastLogin
-        {
-            get { return DateTime.UtcNow.Subtract(LastLoginDate); }
-        }
+        public TimeSpan TimeSinceLastLogin => DateTime.UtcNow.Subtract(LastLoginDate);
 
-        public TimeSpan TimeSinceLastKick
-        {
-            get { return DateTime.UtcNow.Subtract(LastKickDate); }
-        }
+        public TimeSpan TimeSinceLastKick => DateTime.UtcNow.Subtract(LastKickDate);
 
-        public TimeSpan TimeSinceLastSeen
-        {
-            get { return DateTime.UtcNow.Subtract(LastSeen); }
-        }
+        public TimeSpan TimeSinceLastSeen => DateTime.UtcNow.Subtract(LastSeen);
 
-        public TimeSpan TimeSinceFrozen
-        {
-            get { return DateTime.UtcNow.Subtract(FrozenOn); }
-        }
+        public TimeSpan TimeSinceFrozen => DateTime.UtcNow.Subtract(FrozenOn);
 
-        public TimeSpan TimeMutedLeft
-        {
-            get { return MutedUntil.Subtract(DateTime.UtcNow); }
-        }
+        public TimeSpan TimeMutedLeft => MutedUntil.Subtract(DateTime.UtcNow);
 
         #endregion
 
 
         public override string ToString()
         {
-            return String.Format("PlayerInfo({0},{1})", Name, Rank.Name);
+            return $"PlayerInfo({Name},{Rank.Name})";
         }
 
         public bool Can(Permission permission)

@@ -33,6 +33,7 @@
             this.xBlockDBAutoEnable = new System.Windows.Forms.CheckBox();
             this.xBlockDBEnabled = new System.Windows.Forms.CheckBox();
             this.gSecurityMisc = new MetroFramework.Controls.MetroTile();
+            this.chkRequireLogin = new System.Windows.Forms.CheckBox();
             this.metroLabel1 = new MetroFramework.Controls.MetroLabel();
             this.xAnnounceRankChangeReasons = new System.Windows.Forms.CheckBox();
             this.xRequireKickReason = new System.Windows.Forms.CheckBox();
@@ -43,8 +44,6 @@
             this.xAnnounceKickAndBanReasons = new System.Windows.Forms.CheckBox();
             this.xRequireRankChangeReason = new System.Windows.Forms.CheckBox();
             this.xRequireBanReason = new System.Windows.Forms.CheckBox();
-            this.txtRemotePass = new MetroFramework.Controls.MetroTextBox();
-            this.lblRemotePassword = new MetroFramework.Controls.MetroLabel();
             this.gSpamChat = new MetroFramework.Controls.MetroTile();
             this.lAntispamMaxWarnings = new MetroFramework.Controls.MetroLabel();
             this.nAntispamMaxWarnings = new System.Windows.Forms.NumericUpDown();
@@ -140,6 +139,7 @@
             // gSecurityMisc
             // 
             this.gSecurityMisc.ActiveControl = null;
+            this.gSecurityMisc.Controls.Add(this.chkRequireLogin);
             this.gSecurityMisc.Controls.Add(this.metroLabel1);
             this.gSecurityMisc.Controls.Add(this.xAnnounceRankChangeReasons);
             this.gSecurityMisc.Controls.Add(this.xRequireKickReason);
@@ -155,8 +155,19 @@
             this.gSecurityMisc.Size = new System.Drawing.Size(332, 227);
             this.gSecurityMisc.TabIndex = 7;
             this.gSecurityMisc.Text = "Misc";
-            this.gSecurityMisc.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
+            this.gSecurityMisc.TextAlign = System.Drawing.ContentAlignment.TopRight;
             this.gSecurityMisc.UseSelectable = true;
+            // 
+            // chkRequireLogin
+            // 
+            this.chkRequireLogin.AutoSize = true;
+            this.chkRequireLogin.BackColor = System.Drawing.Color.Transparent;
+            this.chkRequireLogin.Location = new System.Drawing.Point(8, 188);
+            this.chkRequireLogin.Name = "chkRequireLogin";
+            this.chkRequireLogin.Size = new System.Drawing.Size(265, 17);
+            this.chkRequireLogin.TabIndex = 20;
+            this.chkRequireLogin.Text = "Require On-the-Go Password to Connect to Server";
+            this.chkRequireLogin.UseVisualStyleBackColor = false;
             // 
             // metroLabel1
             // 
@@ -262,48 +273,6 @@
             this.xRequireBanReason.TabIndex = 2;
             this.xRequireBanReason.Text = "Require ban && unban reason";
             this.xRequireBanReason.UseVisualStyleBackColor = false;
-            // 
-            // txtRemotePass
-            // 
-            // 
-            // 
-            // 
-            this.txtRemotePass.CustomButton.Image = null;
-            this.txtRemotePass.CustomButton.Location = new System.Drawing.Point(179, 1);
-            this.txtRemotePass.CustomButton.Name = "";
-            this.txtRemotePass.CustomButton.Size = new System.Drawing.Size(21, 21);
-            this.txtRemotePass.CustomButton.Style = MetroFramework.MetroColorStyle.Blue;
-            this.txtRemotePass.CustomButton.TabIndex = 1;
-            this.txtRemotePass.CustomButton.Theme = MetroFramework.MetroThemeStyle.Light;
-            this.txtRemotePass.CustomButton.UseSelectable = true;
-            this.txtRemotePass.CustomButton.Visible = false;
-            this.txtRemotePass.Lines = new string[] {
-        "Password"};
-            this.txtRemotePass.Location = new System.Drawing.Point(83, 36);
-            this.txtRemotePass.MaxLength = 32767;
-            this.txtRemotePass.Name = "txtRemotePass";
-            this.txtRemotePass.PasswordChar = '*';
-            this.txtRemotePass.ScrollBars = System.Windows.Forms.ScrollBars.None;
-            this.txtRemotePass.SelectedText = "";
-            this.txtRemotePass.SelectionLength = 0;
-            this.txtRemotePass.SelectionStart = 0;
-            this.txtRemotePass.ShortcutsEnabled = true;
-            this.txtRemotePass.Size = new System.Drawing.Size(201, 23);
-            this.txtRemotePass.TabIndex = 11;
-            this.txtRemotePass.Text = "Password";
-            this.txtRemotePass.UseSelectable = true;
-            this.txtRemotePass.WaterMarkColor = System.Drawing.Color.FromArgb(((int)(((byte)(109)))), ((int)(((byte)(109)))), ((int)(((byte)(109)))));
-            this.txtRemotePass.WaterMarkFont = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Pixel);
-            this.txtRemotePass.Click += new System.EventHandler(this.txtRemotePass_Click);
-            // 
-            // lblRemotePassword
-            // 
-            this.lblRemotePassword.AutoSize = true;
-            this.lblRemotePassword.Location = new System.Drawing.Point(14, 33);
-            this.lblRemotePassword.Name = "lblRemotePassword";
-            this.lblRemotePassword.Size = new System.Drawing.Size(63, 19);
-            this.lblRemotePassword.TabIndex = 10;
-            this.lblRemotePassword.Text = "Password";
             // 
             // gSpamChat
             // 
@@ -544,8 +513,6 @@
             this.metroTile1.Controls.Add(this.lPort);
             this.metroTile1.Controls.Add(this.nPort);
             this.metroTile1.Controls.Add(this.metroLabel2);
-            this.metroTile1.Controls.Add(this.lblRemotePassword);
-            this.metroTile1.Controls.Add(this.txtRemotePass);
             this.metroTile1.Location = new System.Drawing.Point(361, 344);
             this.metroTile1.Name = "metroTile1";
             this.metroTile1.Size = new System.Drawing.Size(298, 227);
@@ -711,8 +678,6 @@
         internal System.Windows.Forms.CheckBox xMaxConnectionsPerIP;
         internal MetroFramework.Controls.MetroLabel lVerifyNames;
         internal MetroFramework.Controls.MetroComboBox cVerifyNames;
-        internal MetroFramework.Controls.MetroLabel lblRemotePassword;
-        internal MetroFramework.Controls.MetroTextBox txtRemotePass;
         internal MetroFramework.Controls.MetroLabel metroLabel1;
         internal MetroFramework.Controls.MetroTile metroTile1;
         internal MetroFramework.Controls.MetroLabel metroLabel2;
@@ -723,5 +688,6 @@
         internal MetroFramework.Controls.MetroLabel metroLabel3;
         internal MetroFramework.Controls.MetroComboBox cboSelectOnTheGoRank;
         internal MetroFramework.Controls.MetroLabel metroLabel4;
+        internal System.Windows.Forms.CheckBox chkRequireLogin;
     }
 }

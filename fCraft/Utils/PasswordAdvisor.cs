@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace fCraft.Utils
 {
@@ -26,6 +27,15 @@ namespace fCraft.Utils
                 score++;
 
             return (PasswordScore)score;
+        }
+
+        public static string GetColor(PasswordScore ps)
+        {
+            var ls = new List<string>
+            {
+                Color.Maroon, Color.Red, Color.Yellow, Color.Green, Color.Green
+            }.ToArray();
+            return ls[(int) ps];
         }
     }
 }

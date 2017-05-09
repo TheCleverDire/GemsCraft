@@ -38,7 +38,7 @@ namespace fCraft
          */
         public const int FormatVersion = 5;
 
-        const string Header = "fCraft PlayerDB | Row format: " +
+        const string Header = "GemsCraft (fCraft) PlayerDB | Row format: " +
                               "Name,IPAddress,Rank,RankChangeDate,RankChangedBy,Banned,BanDate,BannedBy," +
                               "UnbanDate,UnbannedBy,BanReason,UnbanReason,LastFailedLoginDate," +
                               "LastFailedLoginIP,Money,FirstLoginDate,LastLoginDate,TotalTime," +
@@ -47,7 +47,7 @@ namespace fCraft
                               "TimesBannedOthers,ID,RankChangeType,LastKickDate,LastSeen,BlocksDrawn," +
                               "LastKickBy,LastKickReason,BannedUntil,IsFrozen,FrozenBy,FrozenOn,MutedUntil,MutedBy," +
                               "Password,IsOnline,BandwidthUseMode,IsHidden,LastModified,DisplayedName,TotalTDMKills," +
-                              "TotalTDMDeaths, TotalFFAKills, TotalFFADeaths";
+                              "TotalTDMDeaths, TotalFFAKills, TotalFFADeaths, RemotePassword, RemoteUserRegistered";
 
 
         // used to ensure PlayerDB consistency when adding/removing PlayerDB entries

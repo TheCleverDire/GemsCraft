@@ -7,6 +7,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using fCraft.Network;
+using fCraft.Utils;
 using JetBrains.Annotations;
 
 namespace fCraft {
@@ -73,9 +75,172 @@ namespace fCraft {
             CommandManager.RegisterCommand(CdGemsVersion);
             CommandManager.RegisterCommand(CdGetPosition);
 
+            CommandManager.RegisterCommand(CdRegister);
+            CommandManager.RegisterCommand(CdChangePassword);
+            CommandManager.RegisterCommand(CdLogin);
+
 #if DEBUG_SCHEDULER
             CommandManager.RegisterCommand( cdTaskDebug );
 #endif
+        }
+
+        private static readonly CommandDescriptor CdLogin = new CommandDescriptor
+        {
+            Name = "Login",
+            IsConsoleSafe = false,
+            Category = CommandCategory.Info,
+            Usage = "/ChangePassword password",
+            UsableByFrozenPlayers = true,
+            Help = "Logs you in",
+            Handler = LoginHandler
+        };
+
+        private static void LoginHandler(Player source, Command cmd)
+        {
+            if (!ConfigKey.OnTheGoEnabled.Enabled() && !ConfigKey.OnTheGoPasswordRequired.Enabled())
+            {
+                source.Message("&cRegistration/Login is not needed on this server.");
+                return;
+            }
+            if (!ConfigKey.OnTheGoPasswordRequired.Enabled())
+            {
+                source.Message("&cRegistration/Login is not needed on this server.");
+                return;
+            }
+            if (source.IsLoggedIn)
+            {
+                source.Message("&eYou are already logged in.");
+                return;
+            }
+            string password = cmd.Next();
+            if (password == null)
+            {
+                CdRegister.PrintUsage(source);
+            }
+            else
+            {
+                try
+                {
+                    RemoteControl.Login(source.Info.Name, password);
+                    source.Message("&eYou have been successfully logged in.");
+                    if (!source.Info.IsFrozen || !source.IsLoginFrozen) return;
+                    source.Info.Unfreeze();
+                    source.IsLoginFrozen = false;
+                    source.IsLoggedIn = true;
+                }
+                catch
+                {
+                    source.Message("&cThere was an error attempting to login. Please try again later.");
+                }
+            }
+        }
+
+        private static readonly CommandDescriptor CdChangePassword = new CommandDescriptor
+        {
+            Name = "ChangePassword",
+            IsConsoleSafe = false,
+            Category = CommandCategory.Info,
+            Usage = "/ChangePassword [Old Password] [New Password]",
+            Help = "Changes your password",
+            UsableByFrozenPlayers = true,
+            Handler = ChangePasswordHandler
+        };
+
+        private static void ChangePasswordHandler(Player source, Command cmd)
+        {
+            if (!ConfigKey.OnTheGoEnabled.Enabled() && !ConfigKey.OnTheGoPasswordRequired.Enabled())
+            {
+                source.Message("&cRegistration/Login is not needed on this server.");
+                return;
+            }
+
+            string oldpassword = cmd.Next();
+            string newpassword = cmd.Next();
+            if (oldpassword == null || newpassword == null)
+            {
+                CdRegister.PrintUsage(source);
+            }
+            else
+            {
+                PasswordScore pScore = PasswordAdvisor.CheckStrength(newpassword);
+                string pColor = PasswordAdvisor.GetColor(pScore);
+                
+
+                try
+                {
+                    var registered = false;
+                    RemoteControl.ChangePassword(source.Info.Name, oldpassword, newpassword, out registered);
+                    if (!registered)
+                    {
+                        source.Message("&cYou are not yet registered. Please use /register");
+                        return;
+                    }
+
+                    source.Message("Your password is scored: " + pColor + pScore);
+                    source.Message("&eYour password has been changed.");
+                }
+                catch
+                {
+                    source.Message("&cThere was an error attempting to register you. Please try again later.");
+                }
+            }
+        }
+
+        private static readonly CommandDescriptor CdRegister = new CommandDescriptor
+        {
+            Name = "Register",
+            IsConsoleSafe = false,
+            Category = CommandCategory.Info,
+            Usage = "/Register password",
+            UsableByFrozenPlayers = true,
+            Help = "Registers you for server login/GemsCraft Mobile usage",
+            Handler = RegisterHandler
+        };
+
+        private static void RegisterHandler(Player source, Command cmd)
+        {
+            if (!ConfigKey.OnTheGoEnabled.Enabled() && !ConfigKey.OnTheGoPasswordRequired.Enabled())
+            {
+                source.Message("&cRegistration/Login is not needed on this server.");
+                return;
+            }
+            foreach (var p in RemoteControl.RegisteredPlayers)
+            {
+                if (source.Info.Name == p.Name)
+                {
+                    source.Message("&eYou are already registered.");
+                    return;
+                }
+            }
+            string password = cmd.Next();
+            if (password == null)
+            {
+                CdRegister.PrintUsage(source);
+            }
+            else
+            {
+                PasswordScore pScore = PasswordAdvisor.CheckStrength(password);
+                string pColor = PasswordAdvisor.GetColor(pScore);
+                source.Message("Your password is scored: " + pColor + pScore);
+
+                try
+                {
+                    RemoteControl.Register(source.Info.Name, password);
+                    source.Message("&eYou have been successfully registered. To login, use /login");
+                    if (source.Info.IsFrozen)
+                    {
+                        if (source.IsLoginFrozen)
+                        {
+                            source.Info.Unfreeze();
+                            source.IsLoginFrozen = false;
+                        }
+                    }
+                }
+                catch
+                {
+                    source.Message("&cThere was an error attempting to register you. Please try again later.");
+                }
+            }
         }
 
         private static readonly CommandDescriptor CdGetPosition = new CommandDescriptor

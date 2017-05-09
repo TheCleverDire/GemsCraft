@@ -19,10 +19,9 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
         public Security()
         {
             InitializeComponent();
-            txtRemotePass.TextChanged += txtRemotePass_Click;
         }
 
-        private void txtRemotePass_Click(object sender, EventArgs e)
+        /*private void txtRemotePass_Click(object sender, EventArgs e)
         {
             if (txtRemotePass.Text.ToLower() == "password") return;
            
@@ -49,7 +48,7 @@ namespace GemsCraftGUI.ConfigGUI.GUITabs.ConfigScreens
                     metroLabel1.Text = "Very strong";
                     break;
             }
-        }
+        }*/
 
         private void lPatrolledRank_Click(object sender, EventArgs e)
         {

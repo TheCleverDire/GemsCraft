@@ -803,8 +803,8 @@ namespace fCraft {
 
                 // Check if target is already frozen
                 if( IsFrozen ) {
-                    string msg = String.Format( "Player {0} is already frozen (by {1}).", Name, FrozenBy );
-                    string colorMsg = String.Format( "&SPlayer {0}&S is already frozen (by {1}&S).", ClassyName, FrozenByClassy );
+                    string msg = $"Player {Name} is already frozen (by {FrozenBy}).";
+                    string colorMsg = $"&SPlayer {ClassyName}&S is already frozen (by {FrozenByClassy}&S).";
                     throw new PlayerOpException( player, this, PlayerOpExceptionCode.NoActionNeeded, msg, colorMsg );
                 }
 
