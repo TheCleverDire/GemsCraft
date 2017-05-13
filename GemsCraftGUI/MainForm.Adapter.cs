@@ -218,12 +218,8 @@ namespace GemsCraftGUI
             GeneralScreen.xAnnouncements.Checked = ConfigKey.AnnouncementInterval.TryGetInt(out interval) && interval > 0;
 
             GeneralScreen.nAnnouncements.Value = GeneralScreen.xAnnouncements.Checked ? ConfigKey.AnnouncementInterval.GetInt() : 1;
+            
 
-            // UpdaterSettingsWindow
-            UpdaterWindow.BackupBeforeUpdate = ConfigKey.BackupBeforeUpdate.Enabled();
-            UpdaterWindow.RunBeforeUpdate = ConfigKey.RunBeforeUpdate.GetString();
-            UpdaterWindow.RunAfterUpdate = ConfigKey.RunAfterUpdate.GetString();
-            UpdaterWindow.UpdaterMode = ConfigKey.UpdaterMode.GetEnum<UpdaterMode>();
         }
 
 

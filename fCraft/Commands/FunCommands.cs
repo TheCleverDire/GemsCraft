@@ -45,10 +45,137 @@ namespace fCraft
             CommandManager.RegisterCommand(CdDragon);
             CommandManager.RegisterCommand(CdJoke);
             CommandManager.RegisterCommand(CdStab);
+            CommandManager.RegisterCommand(CdColorMode);
+            CommandManager.RegisterCommand(CdEndColorMode);
             Player.Moving += startDragon;
             Player.Moving += PlayerMoved;
         }
         
+        private static readonly CommandDescriptor CdColorMode = new CommandDescriptor
+        {
+            Name = "EnableColorMode",
+            Category = CommandCategory.Fun | CommandCategory.Chat,
+            Aliases = new[] { "setcolormode", "skittles", "rainbow" },
+            Permissions = new[] { Permission.UseColorCodes, Permission.ColorMode },
+            Usage = "/EnableColorMode [Null = Self/SetUser/All] [Specific Player if SetUser]",
+            IsConsoleSafe = true,
+            Help = "&1C&2O&3L&4O&5R&6! &f&eSee the rainbow &bTaste the rainbow",
+            Handler = ColorModeHandler
+        };
+
+        private static void ColorModeHandler(Player source, Command cmd)
+        {
+            string arg = cmd.Next();
+            string arg2 = cmd.Next();
+            if (arg == null)
+            {
+                var loopCount = 0;
+                foreach (var p in Server.Players)
+                {
+                    if (p.Info.Name == source.Info.Name)
+                    {
+                        Server.Players[loopCount].ColorModeEnabled = true;
+                    }
+                    loopCount++;
+                }
+                source.Message("&eColorMode is now enabled for just you.");
+            }
+            else if (arg.ToLower() == "setuser")
+            {
+                if (arg2 == null)
+                {
+                    CdColorMode.PrintUsage(source);
+                }
+                else
+                {
+                    var player = Server.FindPlayerOrPrintMatches(source, arg2, false, true);
+                    if (player != null)
+                    {
+                        var loopCount = 0;
+                        foreach (var p in Server.Players)
+                        {
+                            if (p.Info.Name == player.Info.Name)
+                            {
+                                Server.Players[loopCount].ColorModeEnabled = true;
+                            }
+                            loopCount++;
+                        }
+                        source.Message("&eColorMode is now enabled for " + player.Info.Name);
+                    }
+                }
+            }
+            else if (arg.ToLower() == "all") // Oh my
+            {
+                for (var x = 0; x <= Server.Players.Length - 1; x++)
+                {
+                    Server.Players[x].ColorModeEnabled = true;
+                }
+                source.Message("&eColorMode is now set for all players.");
+            }
+        }
+
+        private static readonly CommandDescriptor CdEndColorMode = new CommandDescriptor
+        {
+            Name = "DisableColorMode",
+            Category = CommandCategory.Fun | CommandCategory.Chat,
+            Aliases = new[] { "endcolormode", "eatskittles", "killrainbow" },
+            Permissions = new[] { Permission.UseColorCodes, Permission.ColorMode },
+            Usage = "/DisableColorMode [Null = Self/User/All] [Specific Player if User]",
+            IsConsoleSafe = true,
+            Help = "Disables ColorMode",
+            Handler = endColorModeHandler
+        };
+
+        private static void endColorModeHandler(Player source, Command cmd)
+        {
+            string arg = cmd.Next();
+            string arg2 = cmd.Next();
+            if (arg == null)
+            {
+                var loopCount = 0;
+                foreach (var p in Server.Players)
+                {
+                    if (p.Info.Name == source.Info.Name)
+                    {
+                        Server.Players[loopCount].ColorModeEnabled = false;
+                    }
+                    loopCount++;
+                }
+                source.Message("&eColorMode is now disabled for just you.");
+            }
+            else if (arg.ToLower() == "setuser")
+            {
+                if (arg2 == null)
+                {
+                    CdEndColorMode.PrintUsage(source);
+                }
+                else
+                {
+                    var player = Server.FindPlayerOrPrintMatches(source, arg2, false, true);
+                    if (player != null)
+                    {
+                        var loopCount = 0;
+                        foreach (var p in Server.Players)
+                        {
+                            if (p.Info.Name == player.Info.Name)
+                            {
+                                Server.Players[loopCount].ColorModeEnabled = false;
+                            }
+                            loopCount++;
+                        }
+                        source.Message("&eColorMode is now enabled for " + player.Info.Name);
+                    }
+                }
+            }
+            else if (arg.ToLower() == "all") // Oh my
+            {
+                for (var x = 0; x <= Server.Players.Length - 1; x++)
+                {
+                    Server.Players[x].ColorModeEnabled = false;
+                }
+                source.Message("&eColorMode is now set for all players.");
+            }
+        }
 
         private static readonly CommandDescriptor CdStab = new CommandDescriptor
         {

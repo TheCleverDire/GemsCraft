@@ -53,6 +53,10 @@ namespace fCraft {
         /// even if they have not visited the server yet. Also allows to
         /// manipulate players' records, and to promote/demote players in batches. </summary>
         EditPlayerDB,
+        /// <summary>
+        /// Use the Fun ColorMode Command
+        /// </summary>
+        ColorMode,
 
         /// <summary> Ability to use /Say command. </summary>
         Say,

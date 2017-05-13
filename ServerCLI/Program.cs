@@ -207,9 +207,9 @@ namespace fCraft.ServerCLI
 
             try
             {
-                if (!Updater.HasMostRecentVersion())
+                if (!Updater.IsUpdated())
                 {
-                    if (!Updater.HasMostRecentVersion())
+                    if (!Updater.IsUpdated())
 
                         Console.WriteLine(
                             "Server.Run: Your GemsCraft version is out of date. A GemsCraft Update is available!");
@@ -224,7 +224,8 @@ namespace fCraft.ServerCLI
                             try
                             {
                                 //download new zip in current directory
-                                Process.Start("http://gemscraft.net/Version/" + Updater.GetCurrentOnline() + ".zip");
+                                Process.Start("http://gemz.ml/Download/" + Updater.GetOnlineName() + "/"
+                                    + Updater.GetCurrentOnline(false) + ".zip");
                                 Console.WriteLine(
                                     "Downloading the latest GemsCraft Version. Please replace all the files (not folders) in your current folder with the new ones after shutting down.");
                             }

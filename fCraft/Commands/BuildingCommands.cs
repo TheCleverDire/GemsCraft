@@ -1613,7 +1613,7 @@ THE SOFTWARE.*/
                 return;
             }
 
-            // no need to set player.drawingInProgress here because this is done on the user thread
+            /*// no need to set player.drawingInProgress here because this is done on the user thread
             if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
             {
                 Logger.Log(LogType.UserActivity,
@@ -1621,10 +1621,9 @@ THE SOFTWARE.*/
                             player.Name,
                             undoState.Buffer.Count,
                             playerWorld.Name);
-            }
+            }*/ // Dev mode not a thing anymore
 
-            msg += String.Format( "Restoring {0} blocks. Type &H/Redo&S to reverse.",
-                                  undoState.Buffer.Count );
+            msg += $"Restoring {undoState.Buffer.Count} blocks. Type &H/Redo&S to reverse.";
             player.MessageNow( msg );
 
             var op = new UndoDrawOperation( player, undoState, false );

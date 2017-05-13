@@ -795,7 +795,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         {
             try
             {
-                if (Updater.HasMostRecentVersion())
+                if (!Updater.IsUpdated())
                 {
 
                     var answer = MessageBox.Show("A GemsCraft Update is available. Would you like to download the latest GemsCraft Version?", "GemsCraft Updater", MessageBoxButtons.YesNo);

@@ -1,250 +1,281 @@
 ﻿// Copyright 2009-2012 Matvei Stefarov <me@matvei.org>
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Cache;
-using System.Reflection;
 using System.Text;
-using System.Xml;
-using System.Xml.Linq;
-using fCraft.Events;
+using System.Windows.Forms;
 using fCraft.Network;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 // ReSharper disable once CheckNamespace
 namespace fCraft {
+    
     /// <summary> Checks for updates, and keeps track of current version/revision. </summary>
     public static class Updater
     {
-
-        public static readonly ReleaseInfo CurrentRelease = new ReleaseInfo(
-            206,
-            151,
-            new DateTime(2012, 07, 19, 1, 0, 0, DateTimeKind.Utc),
-            "", "",
-            ReleaseFlags.Feature
-#if DEBUG
-            | ReleaseFlags.Dev
-#endif
-        );
-
-        public static string UserAgent => "GemsCraft " + LatestStable(false);
-
-        public static string GetCurrentOnline()
+        public struct UpdaterVars
         {
-            var webRequest = WebRequest.Create(CurrentVersionUrl);
-
-            using (var response = webRequest.GetResponse())
-            using (var content = response.GetResponseStream())
-            using (var reader = new StreamReader(content))
-            {
-                var strContent = reader.ReadToEnd();
-                return strContent;
-            }
+            public string Name;
+            public string Major;
+            public string Minor;
+            public string Revision;
+            public string Build;
         }
 
-        public const string CurrentVersionUrl = "http://gems.ml/Download/version.txt";
+        public static string ExecutePhp(string url)
+        {
+            var req = (HttpWebRequest)WebRequest.Create(url.Replace("@", "%40"));
+            var res = req.GetResponse();
+            // Obtain a 'Stream' object associated with the response object.
+            var receiveStream = res.GetResponseStream();
+
+            var encode = Encoding.GetEncoding("utf-8");
+
+            // Pipe the stream to a higher level stream reader with the required encoding format. 
+            Debug.Assert(receiveStream != null, "receiveStream != null");
+            var readStream = new StreamReader(receiveStream, encode);
+            var read = new char[256];
+
+            // Read 256 charcters at a time.    
+            var count = readStream.Read(read, 0, 256);
+
+            var strf = "";
+            while (count > 0)
+            {
+                // Dump the 256 characters on a string and display the string onto the console.
+                var str = new string(read, 0, count);
+                Console.Write(str);
+                count = readStream.Read(read, 0, 256);
+                strf = str;
+            }
+
+            Console.WriteLine("");
+            // Release the resources of stream object.
+            readStream.Close();
+
+            // Release the resources of response object.
+            res.Close();
+            return strf;
+        }
+        public static string UserAgent => "GemsCraft " + LatestStable(false);
+
+        public static string GetOnlineName()
+        {
+            var dataObj = GetCurrentOnline();
+            return dataObj.Name;
+        }
+        public static string GetCurrentOnline(bool printName)
+        {
+            var dataObj = GetCurrentOnline();
+            string finalVersion = dataObj.Major + "." + dataObj.Minor;
+            if (printName) finalVersion = dataObj.Name + " " + finalVersion;
+            if (dataObj.Revision != "empty")
+            {
+                finalVersion += "." + dataObj.Revision;
+                if (dataObj.Build != "empty")
+                {
+                    finalVersion += "." + dataObj.Build;
+                }
+            }
+            return finalVersion;
+        }
+
+        public static UpdaterVars GetCurrentOnline()
+        {
+            var webResult = ExecutePhp("http://gemz.ml/Download/Version.php");
+            var dataObj = JsonConvert.DeserializeObject<UpdaterVars>(webResult);
+            return dataObj;
+        }
+        #region Comparing
+
+        private static readonly string[] Alphabet = {
+            "a", "b", "c", "d", "e", "f",
+            "g", "h", "i", "j", "k", "l",
+            "m", "n", "o", "p", "q", "s",
+            "t", "u", "v", "w", "x", "y",
+            "z",
+        };
+        public enum CompareResult { Var1, Var2 }
+        public static CompareResult CompareName(UpdaterVars uv1, UpdaterVars uv2)
+        {
+            // First, check phase
+            var p1 = uv1.Name.ToCharArray()[0].ToString();
+            int phase1 = -1;
+            var loopCount = 0;
+            foreach (var letter in Alphabet)
+            {
+                if (letter.ToLower() == p1.ToLower())
+                {
+                    phase1 = loopCount;
+                }
+                loopCount++;
+            }
+            loopCount = 0;
+            var p2 = uv2.Name.ToCharArray()[0].ToString();
+            int phase2 = -1;
+            foreach (var letter in Alphabet)
+            {
+                if (letter.ToLower() == p2.ToLower())
+                {
+                    phase2 = loopCount;
+                }
+                loopCount++;
+            }
+            if (phase1 == phase2) return CompareResult.Var1;
+            return phase1 > phase2 ? CompareResult.Var1 : CompareResult.Var2;
+        }
+
+        public static CompareResult CompareMajor(UpdaterVars uv1, UpdaterVars uv2)
+        {
+            var v1 = int.Parse(uv1.Major);
+            var v2 = int.Parse(uv2.Major);
+            if (v1 == v2) return CompareResult.Var1;
+            return v1 > v2 ? CompareResult.Var1 : CompareResult.Var2;
+        }
+
+        public static CompareResult CompareMinor(UpdaterVars uv1, UpdaterVars uv2)
+        {
+            var v1 = int.Parse(uv1.Minor);
+            var v2 = int.Parse(uv2.Minor);
+            if (v1 == v2) return CompareResult.Var1;
+            return v1 > v2 ? CompareResult.Var1 : CompareResult.Var2;
+        }
+
+        public static CompareResult CompareRevision(UpdaterVars uv1, UpdaterVars uv2)
+        {
+            var v1 = int.Parse(uv1.Revision);
+            var v2 = int.Parse(uv2.Revision);
+            if (v1 == v2) return CompareResult.Var1;
+            return v1 > v2 ? CompareResult.Var1 : CompareResult.Var2;
+        }
+
+        public static CompareResult CompareBuild(UpdaterVars uv1, UpdaterVars uv2)
+        {
+            var v1 = int.Parse(uv1.Major);
+            var v2 = int.Parse(uv2.Major);
+            if (v1 == v2) return CompareResult.Var1;
+            return v1 > v2 ? CompareResult.Var1 : CompareResult.Var2;
+        }
+
+        public static bool IsUpdated()
+        {
+            var user = LatestStable();
+            var online = GetCurrentOnline();
+
+            var name = CompareName(user, online);
+            var major = CompareMajor(user, online);
+            var minor = CompareMinor(user, online);
+            
+            
+            var GoodResult = true;
+
+            // Check Name
+            GoodResult = name != CompareResult.Var2;
+            if (!GoodResult) return false;
+
+            // Check Major
+            GoodResult = major != CompareResult.Var2;
+            if (!GoodResult) return false;
+
+            // Check Minor
+            GoodResult = minor != CompareResult.Var2;
+            if (!GoodResult) return false;
+
+            if (online.Revision == "empty")
+            {
+                return GoodResult;
+            }
+            // Check Revision
+            if (user.Revision != null)
+            {
+                var revision = CompareRevision(user, online);
+                GoodResult = revision != CompareResult.Var2;
+                if (!GoodResult) return false;
+                if (online.Build == "empty")
+                {
+                    return GoodResult;
+                }
+                // Check Build
+                if (user.Build != null)
+                {
+                    var build = CompareBuild(user, online);
+                    GoodResult = build != CompareResult.Var2;
+                    if (!GoodResult) return false;
+                }
+            }
+            return GoodResult;
+        }
+
+        #endregion
+
+        public const string CurrentVersionUrl = "http://gemz.ml/Download/Version.php";
 
         public static List<string> LatestStableList = new List<string>()
         {
             "Cobblestone", "1", "0", null, null
         };
 
-        public static string LatestStable(bool ShowName)
+        public static UpdaterVars LatestStable()
         {
-            string fullString = "";
-            if (ShowName) fullString += LatestStableList[0];
-            fullString += LatestStableList[1];
-            fullString += LatestStableList[2];
-            if (LatestStableList[3] != null)
+            return new UpdaterVars
             {
-                fullString += LatestStableList[3];
-                if (LatestStableList[4] != null)
+                Name = LatestStableList[0],
+                Major = LatestStableList[1],
+                Minor = LatestStableList[2],
+                Revision = LatestStableList[3],
+                Build = LatestStableList[4]
+            };
+        }
+        public static string LatestStable(bool printName)
+        {
+            var dataObj = LatestStable();
+            string finalVersion = dataObj.Major + "." + dataObj.Minor;
+            if (printName) finalVersion = dataObj.Name + " " + finalVersion;
+            if (dataObj.Revision != null)
+            {
+                finalVersion += "." + dataObj.Revision;
+                if (dataObj.Build != null)
                 {
-                    fullString += LatestStableList[4];
+                    finalVersion += "." + dataObj.Build;
                 }
             }
-            return fullString;
-        }
-        public static bool HasMostRecentVersion()
-        {
-            return LatestStable(true).Equals(TitleExtractor.pageTitle(CurrentVersionUrl));
+            return finalVersion;
         }
         public static string UpdateUrl { get; set; }
 
         public static bool RunAtShutdown { get; set; }
-    }
 
-
-    public sealed class ReleaseInfo {
-        internal ReleaseInfo( int version, int revision, DateTime releaseDate,
-                              string summary, string changeLog, ReleaseFlags releaseType ) {
-            Version = version;
-            Revision = revision;
-            Date = releaseDate;
-            Summary = summary;
-            ChangeLog = changeLog.Split('\n');
-            Flags = releaseType;
+        public static List<string> AllVersions()
+        {
+            return GetUrlSourceAsList("http://gemz.ml/Download/AllVersions.txt");
         }
+        public static List<string> GetUrlSourceAsList(string urlF)
+        {
+            var temp = "webcheck";
+            var c = File.CreateText(temp);
 
-        public ReleaseFlags Flags { get; private set; }
-
-        public string FlagsString => ReleaseFlagsToString( Flags );
-
-        public string[] FlagsList => ReleaseFlagsToStringArray( Flags );
-
-        public int Version { get; private set; }
-
-        public int Revision { get; private set; }
-
-        public DateTime Date { get; private set; }
-
-        public TimeSpan Age => DateTime.UtcNow.Subtract( Date );
-
-        public string Summary { get; private set; }
-
-        public string[] ChangeLog { get; private set; }
-
-        public static ReleaseFlags StringToReleaseFlags( [NotNull] string str ) {
-            if( str == null ) throw new ArgumentNullException( "str" );
-            ReleaseFlags flags = ReleaseFlags.None;
-            foreach (char t in str)
+            c.Close();
+            using (var client = new WebClient())
             {
-                switch( Char.ToUpper( t ) ) {
-                    case 'A':
-                        flags |= ReleaseFlags.APIChange;
-                        break;
-                    case 'B':
-                        flags |= ReleaseFlags.Bugfix;
-                        break;
-                    case 'C':
-                        flags |= ReleaseFlags.ConfigFormatChange;
-                        break;
-                    case 'D':
-                        flags |= ReleaseFlags.Dev;
-                        break;
-                    case 'F':
-                        flags |= ReleaseFlags.Feature;
-                        break;
-                    case 'M':
-                        flags |= ReleaseFlags.MapFormatChange;
-                        break;
-                    case 'P':
-                        flags |= ReleaseFlags.PlayerDBFormatChange;
-                        break;
-                    case 'S':
-                        flags |= ReleaseFlags.Security;
-                        break;
-                    case 'U':
-                        flags |= ReleaseFlags.Unstable;
-                        break;
-                    case 'O':
-                        flags |= ReleaseFlags.Optimized;
-                        break;
+                try
+                {
+                    client.DownloadFile(urlF, temp);
                 }
+                catch (Exception e)
+                {
+                    Logger.Log(LogType.Warning, "Unable to access webfile!");
+                }
+
             }
-            return flags;
-        }
-
-        public static string ReleaseFlagsToString( ReleaseFlags flags ) {
-            StringBuilder sb = new StringBuilder();
-            if( (flags & ReleaseFlags.APIChange) == ReleaseFlags.APIChange ) sb.Append( 'A' );
-            if( (flags & ReleaseFlags.Bugfix) == ReleaseFlags.Bugfix ) sb.Append( 'B' );
-            if( (flags & ReleaseFlags.ConfigFormatChange) == ReleaseFlags.ConfigFormatChange ) sb.Append( 'C' );
-            if( (flags & ReleaseFlags.Dev) == ReleaseFlags.Dev ) sb.Append( 'D' );
-            if( (flags & ReleaseFlags.Feature) == ReleaseFlags.Feature ) sb.Append( 'F' );
-            if( (flags & ReleaseFlags.MapFormatChange) == ReleaseFlags.MapFormatChange ) sb.Append( 'M' );
-            if( (flags & ReleaseFlags.PlayerDBFormatChange) == ReleaseFlags.PlayerDBFormatChange ) sb.Append( 'P' );
-            if( (flags & ReleaseFlags.Security) == ReleaseFlags.Security ) sb.Append( 'S' );
-            if( (flags & ReleaseFlags.Unstable) == ReleaseFlags.Unstable ) sb.Append( 'U' );
-            if( (flags & ReleaseFlags.Optimized) == ReleaseFlags.Optimized ) sb.Append( 'O' );
-            return sb.ToString();
-        }
-
-        public static string[] ReleaseFlagsToStringArray( ReleaseFlags flags ) {
-            List<string> list = new List<string>();
-            if( (flags & ReleaseFlags.APIChange) == ReleaseFlags.APIChange ) list.Add( "API Changes" );
-            if( (flags & ReleaseFlags.Bugfix) == ReleaseFlags.Bugfix ) list.Add( "Fixes" );
-            if( (flags & ReleaseFlags.ConfigFormatChange) == ReleaseFlags.ConfigFormatChange ) list.Add( "Config Changes" );
-            if( (flags & ReleaseFlags.Dev) == ReleaseFlags.Dev ) list.Add( "Developer" );
-            if( (flags & ReleaseFlags.Feature) == ReleaseFlags.Feature ) list.Add( "New Features" );
-            if( (flags & ReleaseFlags.MapFormatChange) == ReleaseFlags.MapFormatChange ) list.Add( "Map Format Changes" );
-            if( (flags & ReleaseFlags.PlayerDBFormatChange) == ReleaseFlags.PlayerDBFormatChange ) list.Add( "PlayerDB Changes" );
-            if( (flags & ReleaseFlags.Security) == ReleaseFlags.Security ) list.Add( "Security Patch" );
-            if( (flags & ReleaseFlags.Unstable) == ReleaseFlags.Unstable ) list.Add( "Unstable" );
-            if( (flags & ReleaseFlags.Optimized) == ReleaseFlags.Optimized ) list.Add( "Optimized" );
-            return list.ToArray();
-        }
-
-        public bool IsFlagged( ReleaseFlags flag ) {
-            return (Flags & flag) == flag;
+            return File.ReadAllLines(temp).ToList();
         }
     }
+    
 
-
-    #region Enums
-
-    /// <summary> Updater behavior. </summary>
-    public enum UpdaterMode {
-        /// <summary> Does not check for updates. </summary>
-        Disabled = 0,
-
-        /// <summary> Checks for updates and notifies of availability (in console/log). </summary>
-        Notify = 1,
-
-        /// <summary> Checks for updates, downloads them if available, and prompts to install.
-        /// Behavior is frontend-specific: in ServerGUI, a dialog is shown with the list of changes and
-        /// options to update immediately or next time. In ServerCLI, asks to type in 'y' to confirm updating
-        /// or press any other key to skip. '''Note: Requires user interaction
-        /// (if you restart the server remotely while unattended, it may get stuck on this dialog).''' </summary>
-        Prompt = 2,
-
-        /// <summary> Checks for updates, automatically downloads and installs the updates, and restarts the server. </summary>
-        Auto = 3,
-    }
-
-
-    /// <summary> A list of release flags/attributes.
-    /// Use binary flag logic (value & flag == flag) or Release.IsFlagged() to test for flags. </summary>
-    [Flags]
-    public enum ReleaseFlags {
-        None = 0,
-
-        /// <summary> The API was notably changed in this release. </summary>
-        APIChange = 1,
-
-        /// <summary> Bugs were fixed in this release. </summary>
-        Bugfix = 2,
-
-        /// <summary> Config.xml format was changed (and version was incremented) in this release. </summary>
-        ConfigFormatChange = 4,
-
-        /// <summary> This is a developer-only release, not to be used on live servers.
-        /// Untested/undertested releases are often marked as such. </summary>
-        Dev = 8,
-
-        /// <summary> A notable new feature was added in this release. </summary>
-        Feature = 16,
-
-        /// <summary> The map format was changed in this release (rare). </summary>
-        MapFormatChange = 32,
-
-        /// <summary> The PlayerDB format was changed in this release. </summary>
-        PlayerDBFormatChange = 64,
-
-        /// <summary> A security issue was addressed in this release. </summary>
-        Security = 128,
-
-        /// <summary> There are known or likely stability issues in this release. </summary>
-        Unstable = 256,
-
-        /// <summary> This release contains notable optimizations. </summary>
-        Optimized = 512
-    }
-
-    #endregion
+    
 }
 

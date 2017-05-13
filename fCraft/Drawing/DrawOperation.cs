@@ -144,14 +144,14 @@ namespace fCraft.Drawing {
 
             Context |= BlockChangeContext.Drawn;
             AnnounceCompletion = true;
-            if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
+            /*if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
             {
                 LogCompletion = true;
             }
             else
             {
                 LogCompletion = false;
-            }
+            }*/
         }
 
 
@@ -359,13 +359,13 @@ namespace fCraft.Drawing {
                     }
                 }
             }
-            if( AnnounceCompletion && Map.World != null && Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev)) {
+            /*if( AnnounceCompletion && Map.World != null && Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev)) {
                 Logger.Log( LogType.UserActivity,
                             "Player {0} executed {1} on world {2} (between {3} and {4}). Processed {5}, Updated {6}, Skipped {7}, Denied {8} blocks.",
                             Player.Name, Description, Map.World.Name,
                             Bounds.MinVertex, Bounds.MaxVertex,
                             BlocksProcessed, BlocksUpdated, BlocksSkipped, BlocksDenied );
-            }
+            }*/
         }
 
 
@@ -383,13 +383,13 @@ namespace fCraft.Drawing {
                                     BlocksProcessed, BlocksUpdated );
                 }
             }
-            if (LogCompletion && Map.World != null && Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
+            /*if (LogCompletion && Map.World != null && Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
             {
                 Logger.Log( LogType.UserActivity,
                             "Player {0} cancelled {1} on world {2}. Processed {3}, Updated {4}, Skipped {5}, Denied {6} blocks.",
                             Player, Description, Map.World.Name,
                             BlocksProcessed, BlocksUpdated, BlocksSkipped, BlocksDenied, Updater.CurrentRelease.FlagsString);
-            }
+            }*/
         }
 
 #if DEBUG_CHECK_DUPLICATE_COORDS

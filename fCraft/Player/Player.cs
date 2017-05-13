@@ -32,6 +32,7 @@ namespace fCraft
     /// For persistent state of a known player account, see PlayerInfo. </summary>
     public sealed partial class Player : IClassy
     {
+        public bool ColorModeEnabled = false;
         public bool IsPrisoner()
         {
             return PrisonData.Obj.Prisoners.Any(p => Info.Name == p.Username);

@@ -793,7 +793,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
         {
             try
             {
-                if (Updater.HasMostRecentVersion())
+                if (!Updater.IsUpdated())
                 {
 
                     var answer = MessageBox.Show("A GemsCraft Update is available. Would you like to download the latest GemsCraft Version?", "GemsCraft Updater", MessageBoxButtons.YesNo);
@@ -932,7 +932,7 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             try
             {
                 Logger.Log(LogType.SystemActivity,
-                    Updater.HasMostRecentVersion()
+                    Updater.IsUpdated()
                         ? "GemsCraft is up-to-date!"
                         : "GemsCraft is out-of-date! To update, run updateinstaller.exe!");
             }
@@ -1674,10 +1674,10 @@ Your rank is {RANK}&S. Type &H/Help&S for help.");
             tabPage1.Controls.Clear();
             tabPage1.Controls.Add(new ConfigGUI.GUITabs.MainScreen());
             ConfigEventHandlers();
-            if (!Updater.HasMostRecentVersion())
+            if (!Updater.IsUpdated())
             {
                 MessageBox.Show("Your GemsCraft is out of date using version " + Updater.LatestStable(false) + "! " +
-                                "You should consider updating to " + Updater.GetCurrentOnline());
+                                "You should consider updating to " + Updater.GetCurrentOnline(true));
             }
             
         }

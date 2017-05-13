@@ -21,7 +21,7 @@ namespace fCraft.ConfigGUI {
             set { tRunAfterUpdate.Text = value; }
         }
 
-        public UpdaterMode UpdaterMode {
+        /*public UpdaterMode UpdaterMode {
             get {
                 if( rDisabled.Checked ) return UpdaterMode.Disabled;
                 if( rNotify.Checked ) return UpdaterMode.Notify;
@@ -41,14 +41,14 @@ namespace fCraft.ConfigGUI {
                 }
             }
         }
-
-        public bool BackupBeforeUpdate {
+        */
+        /*public bool BackupBeforeUpdate {
             get { return xBackupBeforeUpdating.Checked; }
             set { xBackupBeforeUpdating.Checked = value; }
-        }
+        }*/
 
-        string oldRunBeforeUpdate, oldRunAfterUpdate;
-        UpdaterMode oldUpdaterMode;
+        //string oldRunBeforeUpdate, oldRunAfterUpdate;
+        /*UpdaterMode oldUpdaterMode;
         bool oldBackupBeforeUpdate;
 
         public UpdaterSettingsPopup() {
@@ -67,7 +67,7 @@ namespace fCraft.ConfigGUI {
                     BackupBeforeUpdate = oldBackupBeforeUpdate;
                 }
             };
-        }
+        }*/
 
         private void xRunBeforeUpdate_CheckedChanged( object sender, EventArgs e ) {
             tRunBeforeUpdate.Enabled = xRunBeforeUpdate.Checked;

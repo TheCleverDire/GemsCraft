@@ -11,18 +11,39 @@ using System.IO;
 using fCraft.fSystem;
 using fCraft.fSystem;
 
-namespace fCraft {
+namespace fCraft
+{
     /// <summary> Helper class for handling player-generated chat. </summary>
-    public static class Chat {
+    public static class Chat
+    {
+        private static Random _colorChooser = new Random();
+        internal static string GenRandomColor()
+        {
+            var list = new List<string>
+            {
+                null, "0", "1", "2", "3",
+                "4", "5", "6", "7", "8",
+                "9", "a", "b", "c", "d",
+                "e", "f"
+            };
+            return list[_colorChooser.Next(list.Count)];
+        }
+        internal static string GetColorMode(string text)
+        {
+            string newText = text.Aggregate("", (current, c) => current + ("&" + GenRandomColor() + c));
+            return newText;
+        }
         public static List<string> Swears = new List<string>();
         public static IEnumerable<Regex> badWordMatchers;
         /// <summary> Sends a global (white) chat. </summary>
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendGlobal( [NotNull] Player player, [NotNull] string rawMessage ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+        public static bool SendGlobal([NotNull] Player player, [NotNull] string sawMessage)
+        {
+            string rawMessage = player.ColorModeEnabled ? GetColorMode(sawMessage) : sawMessage;
+            if (player == null) throw new ArgumentNullException("player");
+            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
             string OriginalMessage = rawMessage;
             if (Server.Moderation && !Server.VoicedPlayers.Contains(player) && player.World != null)
             {
@@ -72,7 +93,7 @@ namespace fCraft {
                 rawMessage = rawMessage.Replace("$blue", "&9");
                 rawMessage = rawMessage.Replace("$black", "&0");
             }
-            
+
             if (!player.Can(Permission.ChatWithCaps))
             {
                 var caps = 0;
@@ -176,20 +197,18 @@ namespace fCraft {
             var recepientList = Server.Players.NotIgnoring(player); //if (player.World.WorldOnlyChat) recepientList = player.World.Players.NotIgnoring(player);
 
 
-            string formattedMessage = String.Format( "{0}&F: {1}",
-                                                     player.ClassyName,
-                                                     rawMessage );
+            string formattedMessage = $"{player.ClassyName}&F: {rawMessage}";
 
-            var e = new ChatSendingEventArgs( player,
+            var e = new ChatSendingEventArgs(player,
                                               rawMessage,
                                               formattedMessage,
                                               ChatMessageType.Global,
-                                              recepientList );
+                                              recepientList);
 
-            if( !SendInternal( e ) ) return false;
+            if (!SendInternal(e)) return false;
 
-            Logger.Log( LogType.GlobalChat,
-                        "{0}: {1}", player.Name, OriginalMessage );
+            Logger.Log(LogType.GlobalChat,
+                        "{0}: {1}", player.Name, OriginalMessage);
             return true;
         }
 
@@ -201,9 +220,7 @@ namespace fCraft {
             var recepientList = Server.Players.Can(Permission.ReadAdminChat)
                                               .NotIgnoring(player);
 
-            string formattedMessage = String.Format("&9(Admin){0}&b: {1}",
-                                                     player.ClassyName,
-                                                     rawMessage);
+            string formattedMessage = $"&9(Admin){player.ClassyName}&b: {rawMessage}";
 
             var e = new ChatSendingEventArgs(player,
                                               rawMessage,
@@ -217,7 +234,7 @@ namespace fCraft {
             return true;
         }
 
-       public static bool SendCustom(Player player, string rawMessage)
+        public static bool SendCustom(Player player, string rawMessage)
         {
             if (player == null) throw new ArgumentNullException("player");
             if (rawMessage == null) throw new ArgumentNullException("rawMessage");
@@ -246,26 +263,25 @@ namespace fCraft {
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendMe( [NotNull] Player player, [NotNull] string rawMessage ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+        public static bool SendMe([NotNull] Player player, [NotNull] string rawMessage)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
 
-            var recepientList = Server.Players.NotIgnoring( player );
+            var recepientList = Server.Players.NotIgnoring(player);
 
-            string formattedMessage = String.Format( "&M*{0} {1}",
-                                                     player.Name,
-                                                     rawMessage );
+            string formattedMessage = $"&M*{player.Name} {rawMessage}";
 
-            var e = new ChatSendingEventArgs( player,
+            var e = new ChatSendingEventArgs(player,
                                               rawMessage,
                                               formattedMessage,
                                               ChatMessageType.Me,
-                                              recepientList );
+                                              recepientList);
 
-            if( !SendInternal( e ) ) return false;
+            if (!SendInternal(e)) return false;
 
-            Logger.Log( LogType.GlobalChat,
-                        "(me){0}: {1}", player.Name, rawMessage );
+            Logger.Log(LogType.GlobalChat,
+                        "(me){0}: {1}", player.Name, rawMessage);
             return true;
         }
 
@@ -275,26 +291,26 @@ namespace fCraft {
         /// <param name="to"> Recepient player. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendPM( [NotNull] Player from, [NotNull] Player to, [NotNull] string rawMessage ) {
-            if( from == null ) throw new ArgumentNullException( "from" );
-            if( to == null ) throw new ArgumentNullException( "to" );
-            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+        public static bool SendPM([NotNull] Player from, [NotNull] Player to, [NotNull] string rawMessage)
+        {
+            if (from == null) throw new ArgumentNullException("from");
+            if (to == null) throw new ArgumentNullException("to");
+            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
             var recepientList = new[] { to };
 
-            string formattedMessage = String.Format( "&Pfrom {0}: {1}",
-                                                     from.Name, rawMessage );
+            string formattedMessage = $"&Pfrom {@from.Name}: {rawMessage}";
 
-            var e = new ChatSendingEventArgs( from,
+            var e = new ChatSendingEventArgs(from,
                                               rawMessage,
                                               formattedMessage,
                                               ChatMessageType.PM,
-                                              recepientList );
+                                              recepientList);
 
-            if( !SendInternal( e ) ) return false;
+            if (!SendInternal(e)) return false;
 
-            Logger.Log( LogType.PrivateChat,
+            Logger.Log(LogType.PrivateChat,
                         "{0} to {1}: {2}",
-                        from.Name, to.Name, rawMessage );
+                        from.Name, to.Name, rawMessage);
             return true;
         }
 
@@ -304,29 +320,30 @@ namespace fCraft {
         /// <param name="rank"> Target rank. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendRank( [NotNull] Player player, [NotNull] Rank rank, [NotNull] string rawMessage ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( rank == null ) throw new ArgumentNullException( "rank" );
-            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+        public static bool SendRank([NotNull] Player player, [NotNull] Rank rank, [NotNull] string rawMessage)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (rank == null) throw new ArgumentNullException("rank");
+            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
 
-            var recepientList = rank.Players.NotIgnoring( player ).Union( player );
+            var recepientList = rank.Players.NotIgnoring(player).Union(player);
 
-            string formattedMessage = String.Format( "&P({0}&P){1}: {2}",
+            string formattedMessage = String.Format("&P({0}&P){1}: {2}",
                                                      rank.ClassyName,
                                                      player.Name,
-                                                     rawMessage );
+                                                     rawMessage);
 
-            var e = new ChatSendingEventArgs( player,
+            var e = new ChatSendingEventArgs(player,
                                               rawMessage,
                                               formattedMessage,
                                               ChatMessageType.Rank,
-                                              recepientList );
+                                              recepientList);
 
-            if( !SendInternal( e ) ) return false;
+            if (!SendInternal(e)) return false;
 
-            Logger.Log( LogType.RankChat,
+            Logger.Log(LogType.RankChat,
                         "(rank {0}){1}: {2}",
-                        rank.Name, player.Name, rawMessage );
+                        rank.Name, player.Name, rawMessage);
             return true;
         }
 
@@ -369,24 +386,25 @@ namespace fCraft {
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendSay( [NotNull] Player player, [NotNull] string rawMessage ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+        public static bool SendSay([NotNull] Player player, [NotNull] string rawMessage)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
 
-            var recepientList = Server.Players.NotIgnoring( player );
+            var recepientList = Server.Players.NotIgnoring(player);
 
             string formattedMessage = Color.Say + rawMessage;
 
-            var e = new ChatSendingEventArgs( player,
+            var e = new ChatSendingEventArgs(player,
                                               rawMessage,
                                               formattedMessage,
                                               ChatMessageType.Say,
-                                              recepientList );
+                                              recepientList);
 
-            if( !SendInternal( e ) ) return false;
+            if (!SendInternal(e)) return false;
 
-            Logger.Log( LogType.GlobalChat,
-                        "(say){0}: {1}", player.Name, rawMessage );
+            Logger.Log(LogType.GlobalChat,
+                        "(say){0}: {1}", player.Name, rawMessage);
             return true;
         }
         public static bool SendSay([NotNull] Player player, [NotNull] string rawMessage, MessageType mType)
@@ -411,45 +429,48 @@ namespace fCraft {
         /// <param name="player"> Player writing the message. </param>
         /// <param name="rawMessage"> Message text. </param>
         /// <returns> True if message was sent, false if it was cancelled by an event callback. </returns>
-        public static bool SendStaff( [NotNull] Player player, [NotNull] string rawMessage ) {
-            if( player == null ) throw new ArgumentNullException( "player" );
-            if( rawMessage == null ) throw new ArgumentNullException( "rawMessage" );
+        public static bool SendStaff([NotNull] Player player, [NotNull] string rawMessage)
+        {
+            if (player == null) throw new ArgumentNullException("player");
+            if (rawMessage == null) throw new ArgumentNullException("rawMessage");
 
-            var recepientList = Server.Players.Can( Permission.ReadStaffChat )
-                                              .NotIgnoring( player )
-                                              .Union( player );
+            var recepientList = Server.Players.Can(Permission.ReadStaffChat)
+                                              .NotIgnoring(player)
+                                              .Union(player);
 
-            string formattedMessage = String.Format( "&P(staff){0}&P: {1}",
+            string formattedMessage = String.Format("&P(staff){0}&P: {1}",
                                                      player.ClassyName,
-                                                     rawMessage );
+                                                     rawMessage);
 
-            var e = new ChatSendingEventArgs( player,
+            var e = new ChatSendingEventArgs(player,
                                               rawMessage,
                                               formattedMessage,
                                               ChatMessageType.Staff,
-                                              recepientList );
+                                              recepientList);
 
-            if( !SendInternal( e ) ) return false;
+            if (!SendInternal(e)) return false;
 
-            Logger.Log( LogType.GlobalChat,
-                        "(staff){0}: {1}", player.Name, rawMessage );
+            Logger.Log(LogType.GlobalChat,
+                        "(staff){0}: {1}", player.Name, rawMessage);
             return true;
         }
 
 
-        static bool SendInternal( [NotNull] ChatSendingEventArgs e ) {
-            if( e == null ) throw new ArgumentNullException( "e" );
-            if( RaiseSendingEvent( e ) ) return false;
+        static bool SendInternal([NotNull] ChatSendingEventArgs e)
+        {
+            if (e == null) throw new ArgumentNullException("e");
+            if (RaiseSendingEvent(e)) return false;
 
-            int recepients = e.RecepientList.Message( e.FormattedMessage );
+            int recepients = e.RecepientList.Message(e.FormattedMessage);
 
             // Only increment the MessagesWritten count if someone other than
             // the player was on the recepient list.
-            if( recepients > 1 || (recepients == 1 && e.RecepientList.First() != e.Player) ) {
+            if (recepients > 1 || (recepients == 1 && e.RecepientList.First() != e.Player))
+            {
                 e.Player.Info.ProcessMessageWritten();
             }
 
-            RaiseSentEvent( e, recepients );
+            RaiseSentEvent(e, recepients);
             return true;
         }
 
@@ -457,57 +478,68 @@ namespace fCraft {
         /// <summary> Checks for unprintable or illegal characters in a message. </summary>
         /// <param name="message"> Message to check. </param>
         /// <returns> True if message contains invalid chars. False if message is clean. </returns>
-        public static bool ContainsInvalidChars( string message ) {
-            return message.Any( t => t < ' ' || t == '&' || t > '~' );
+        public static bool ContainsInvalidChars(string message)
+        {
+            return message.Any(t => t < ' ' || t == '&' || t > '~');
         }
 
 
         /// <summary> Determines the type of player-supplies message based on its syntax. </summary>
-        internal static RawMessageType GetRawMessageType( string message ) {
-            if( string.IsNullOrEmpty( message ) ) return RawMessageType.Invalid;
-            if( message == "/" ) return RawMessageType.RepeatCommand;
-            if( message.Equals( "/ok", StringComparison.OrdinalIgnoreCase ) ) return RawMessageType.Confirmation;
-            if( message.EndsWith( " /" ) ) return RawMessageType.PartialMessage;
-            if( message.EndsWith( " //" ) ) message = message.Substring( 0, message.Length - 1 );
+        internal static RawMessageType GetRawMessageType(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return RawMessageType.Invalid;
+            if (message == "/") return RawMessageType.RepeatCommand;
+            if (message.Equals("/ok", StringComparison.OrdinalIgnoreCase)) return RawMessageType.Confirmation;
+            if (message.EndsWith(" /")) return RawMessageType.PartialMessage;
+            if (message.EndsWith(" //")) message = message.Substring(0, message.Length - 1);
 
-            switch( message[0] ) {
+            switch (message[0])
+            {
                 case '/':
-                    if( message.Length < 2 ) {
+                    if (message.Length < 2)
+                    {
                         // message too short to be a command
                         return RawMessageType.Invalid;
                     }
-                    if( message[1] == '/' ) {
+                    if (message[1] == '/')
+                    {
                         // escaped slash in the beginning: "//blah"
                         return RawMessageType.Chat;
                     }
-                    if( message[1] != ' ' ) {
+                    if (message[1] != ' ')
+                    {
                         // normal command: "/cmd"
                         return RawMessageType.Command;
                     }
                     return RawMessageType.Invalid;
 
                 case '@':
-                    if( message.Length < 4 || message.IndexOf( ' ' ) == -1 ) {
+                    if (message.Length < 4 || message.IndexOf(' ') == -1)
+                    {
                         // message too short to be a PM or rank chat
                         return RawMessageType.Invalid;
                     }
-                    if( message[1] == '@' ) {
+                    if (message[1] == '@')
+                    {
                         return RawMessageType.RankChat;
                     }
-                    if( message[1] == '-' && message[2] == ' ' ) {
+                    if (message[1] == '-' && message[2] == ' ')
+                    {
                         // name shortcut: "@- blah"
                         return RawMessageType.PrivateChat;
                     }
-                    if( message[1] == ' ' && message.IndexOf( ' ', 2 ) != -1 ) {
+                    if (message[1] == ' ' && message.IndexOf(' ', 2) != -1)
+                    {
                         // alternative PM notation: "@ name blah"
                         return RawMessageType.PrivateChat;
                     }
-                    if( message[1] != ' ' ) {
+                    if (message[1] != ' ')
+                    {
                         // primary PM notation: "@name blah"
                         return RawMessageType.PrivateChat;
                     }
                     return RawMessageType.Invalid;
-                
+
                 case '!':
                     if (message.Length < 2 || message.IndexOf(' ') == -1)
                     {
@@ -537,18 +569,20 @@ namespace fCraft {
 
         #region Events
 
-        static bool RaiseSendingEvent( ChatSendingEventArgs args ) {
+        static bool RaiseSendingEvent(ChatSendingEventArgs args)
+        {
             var h = Sending;
-            if( h == null ) return false;
-            h( null, args );
+            if (h == null) return false;
+            h(null, args);
             return args.Cancel;
         }
 
 
-        static void RaiseSentEvent( ChatSendingEventArgs args, int count ) {
+        static void RaiseSentEvent(ChatSendingEventArgs args, int count)
+        {
             var h = Sent;
-            if( h != null ) h( null, new ChatSentEventArgs( args.Player, args.Message, args.FormattedMessage,
-                                                            args.MessageType, args.RecepientList, count ) );
+            if (h != null) h(null, new ChatSentEventArgs(args.Player, args.Message, args.FormattedMessage,
+                                                           args.MessageType, args.RecepientList, count));
         }
 
 
@@ -562,7 +596,8 @@ namespace fCraft {
     }
 
 
-    public enum ChatMessageType {
+    public enum ChatMessageType
+    {
         Other,
         Global,
         IRC,
@@ -577,7 +612,8 @@ namespace fCraft {
 
 
     /// <summary> Type of message sent by the player. Determined by CommandManager.GetMessageType() </summary>
-    public enum RawMessageType {
+    public enum RawMessageType
+    {
         /// <summary> Unparseable chat syntax (rare). </summary>
         Invalid,
 
@@ -601,17 +637,20 @@ namespace fCraft {
 
         /// <summary> Repeat of the last command ("/"). </summary>
         RepeatCommand,
-        
+
         /// <summary> Chat private to the world you are in. </summary>
         WorldChat,
     }
 }
 
 
-namespace fCraft.Events {
-    public sealed class ChatSendingEventArgs : EventArgs, IPlayerEvent, ICancellableEvent {
-        internal ChatSendingEventArgs( Player player, string message, string formattedMessage,
-                                       ChatMessageType messageType, IEnumerable<Player> recepientList ) {
+namespace fCraft.Events
+{
+    public sealed class ChatSendingEventArgs : EventArgs, IPlayerEvent, ICancellableEvent
+    {
+        internal ChatSendingEventArgs(Player player, string message, string formattedMessage,
+                                       ChatMessageType messageType, IEnumerable<Player> recepientList)
+        {
             Player = player;
             Message = message;
             MessageType = messageType;
@@ -628,9 +667,11 @@ namespace fCraft.Events {
     }
 
 
-    public sealed class ChatSentEventArgs : EventArgs, IPlayerEvent {
-        internal ChatSentEventArgs( Player player, string message, string formattedMessage,
-                                    ChatMessageType messageType, IEnumerable<Player> recepientList, int recepientCount ) {
+    public sealed class ChatSentEventArgs : EventArgs, IPlayerEvent
+    {
+        internal ChatSentEventArgs(Player player, string message, string formattedMessage,
+                                    ChatMessageType messageType, IEnumerable<Player> recepientList, int recepientCount)
+        {
             Player = player;
             Message = message;
             MessageType = messageType;

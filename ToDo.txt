@@ -1,10 +1,22 @@
-- Release Cobblestone 1.0
+-----> GEMSCRAFT TODO FILE <-----
+Key Words:
+- ( DONE ! ) -> Item is complete and ready to go.
+- ( In Progress ) -> Item is currently being worked on.
+- ( On Hold ) -> Item has been put on hold for now.
+- ( Set Aside ) -> Item has been abandoned for now, but might be resurrected later.
+- ( Abandoned ) -> Item has been completely abandoned and will not be returned to. It will be removed from the project comletely.
+
+
+--- Cobblestone 1.0 TODO ---
 -- Fix new GUI ( DONE ! )
-- Colormode Command (When Colormode is set to on, each character displayed in the chat is a random color)
+- Colormode Command (When Colormode is set to on, each character displayed in the chat is a random color) ( DONE ! )
 - Prison System ( DONE! )
-- Fix Updater ( In Progress )
+- Add GemzLauncher ( DONE! )
+- Add installer ( In Progress )
 - Twitter Integration ( DONE ! )
-- Android Remote ( In Progress - Scheduled for Cobblestone 1.1)
+
+--- Cobblestone 1.1 TODO ---
+- Android Remote ( On Hold )
 --- Login ( DONE ! )
 --- Add Server Log/Chat in real time
 ---> In the Server Config under Rank permissions
@@ -17,12 +29,9 @@
 --- Add fCraft Plugin Viewer
 --- Add fCraft Player Viewer
 --- Add Map Viewer
-
-
 - Edit Config In Game ( DONE ! )
 
-- Planned for Cobblestone 1.2 - The Game Update
-
+--- Cobblestone 1.2 TODO (The Game Update) ---
 --> CCJump
 ----> Extreme Parkour utilizing Classicube's super jump
 

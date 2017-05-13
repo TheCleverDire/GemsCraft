@@ -293,7 +293,7 @@ namespace fCraft
             MessageTypeManagement.MessageTimer.Elapsed += MessageTypeManagement.OnUpdateEvent;
             MessageTypeManagement.MessageTimer.Enabled = true;
             // warnings/disclaimers
-            if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
+            /*if (Updater.CurrentRelease.IsFlagged(ReleaseFlags.Dev))
             {
                 Logger.Log(LogType.Warning,
                             "You are using an unreleased developer version of GemsCraft. " +
@@ -311,7 +311,7 @@ namespace fCraft
 #else
                 throw new Exception(unstableMessage);
 #endif
-            }
+            }*/
 
             if (MonoCompat.IsMono && !MonoCompat.IsSGenCapable)
             {
