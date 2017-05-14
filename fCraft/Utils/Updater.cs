@@ -17,6 +17,13 @@ namespace fCraft {
     /// <summary> Checks for updates, and keeps track of current version/revision. </summary>
     public static class Updater
     {
+        public const string CurrentVersionUrl = "http://gemz.ml/Download/Version.php";
+
+        public static List<string> LatestStableList = new List<string>()
+        {
+            "Cobblestone", "1", "0", "0", null
+        };
+
         public struct UpdaterVars
         {
             public string Name;
@@ -212,12 +219,7 @@ namespace fCraft {
 
         #endregion
 
-        public const string CurrentVersionUrl = "http://gemz.ml/Download/Version.php";
-
-        public static List<string> LatestStableList = new List<string>()
-        {
-            "Cobblestone", "1", "0", null, null
-        };
+        
 
         public static UpdaterVars LatestStable()
         {
@@ -265,7 +267,7 @@ namespace fCraft {
                 {
                     client.DownloadFile(urlF, temp);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     Logger.Log(LogType.Warning, "Unable to access webfile!");
                 }

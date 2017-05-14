@@ -9,14 +9,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO;
 using fCraft.fSystem;
-using fCraft.fSystem;
 
 namespace fCraft
 {
     /// <summary> Helper class for handling player-generated chat. </summary>
     public static class Chat
     {
-        private static Random _colorChooser = new Random();
+        private static readonly Random ColorChooser = new Random();
         internal static string GenRandomColor()
         {
             var list = new List<string>
@@ -26,7 +25,7 @@ namespace fCraft
                 "9", "a", "b", "c", "d",
                 "e", "f"
             };
-            return list[_colorChooser.Next(list.Count)];
+            return list[ColorChooser.Next(list.Count)];
         }
         internal static string GetColorMode(string text)
         {

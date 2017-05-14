@@ -430,7 +430,7 @@ namespace fCraft
                     }
                 }
             }
-            catch (NullReferenceException ep)
+            catch (NullReferenceException)
             {
                 CdDragon.PrintUsage(player);
             }

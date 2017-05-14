@@ -184,7 +184,7 @@ namespace fCraft {
                     Prison.AddPlayer(p, arg3, source, DateTime.Now.Add(duration));
                 }
             }
-            catch (ArgumentNullException ex)
+            catch (ArgumentNullException)
             {
                 CdArrest.PrintUsage(source);
             }
