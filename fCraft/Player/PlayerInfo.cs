@@ -677,8 +677,15 @@ namespace fCraft
 
             if (fields.Length > 51)
             {
+                if (fields.Length == 52)
+                {
+                    List<string> f = fields.ToList<string>();
+                    f.Add("");
+                    f.Add(""); // Fixes Player DB issues between new versions
+                    fields = f.ToArray();
+                }
                 if (fields[53].Length != 0) info.RemoteUserRegistered = true;
-
+                
                 if (fields[52].Length > 0)
                 {
                     if (info.RemoteUserRegistered)

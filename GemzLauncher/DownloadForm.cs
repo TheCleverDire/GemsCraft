@@ -49,6 +49,7 @@ namespace GemzLauncher
                         {
                             foreach (var file in Directory.GetFiles(_extractPath))
                             {
+                                
                                 var f = Path.GetFileName(file).ToLower();
                                 if (f == "gemscraftgui.exe" || f == "servercli.exe" ||
                                     f == "servergui.exe" || f == "tutorial.exe" ||
@@ -62,6 +63,7 @@ namespace GemzLauncher
 
                     if (fileName == string.Empty) continue;
                     var fullPath = directoryName + "\\" + fileName;
+                    
                     using (var streamWriter = File.Create(fullPath))
                     {
                         var data = new byte[2048];

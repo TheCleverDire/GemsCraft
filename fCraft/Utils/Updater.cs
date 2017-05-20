@@ -21,7 +21,7 @@ namespace fCraft {
 
         public static List<string> LatestStableList = new List<string>()
         {
-            "Cobblestone", "1", "0", "0", null
+            "Cobblestone", "1", "0", "1", null
         };
 
         public struct UpdaterVars

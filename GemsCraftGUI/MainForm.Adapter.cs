@@ -48,16 +48,27 @@ namespace GemsCraftGUI
 
             using (var loadLogger = new LogRecorder())
             {
-                if (Config.Load(false, false))
+                try
                 {
-                    if (loadLogger.HasMessages)
+                    if (Config.Load(false, false))
                     {
-                        MessageBox.Show(loadLogger.MessageString, "Config loading warnings");
+                        if (loadLogger.HasMessages)
+                        {
+                            MessageBox.Show(loadLogger.MessageString, "Config loading warnings");
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show(loadLogger.MessageString, "Error occured while trying to load config");
                     }
                 }
-                else
+                catch (ArgumentException ex)
                 {
-                    MessageBox.Show(loadLogger.MessageString, "Error occured while trying to load config");
+                    var response = ex.Message;
+                    if (response != "An item with the same key has already been added.")
+                    {
+                        MessageBox.Show(loadLogger.MessageString, "Error occured while trying to load config");
+                    }
                 }
             }
 

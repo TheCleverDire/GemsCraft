@@ -114,6 +114,7 @@ namespace fCraft
 
         public static void SaveData()
         {
+            if (!Directory.Exists("Prison/")) Directory.CreateDirectory("Prison/");
             var fileWriter = File.CreateText(PrisonDataFile);
             fileWriter.Write(JsonConvert.SerializeObject(Obj, Formatting.Indented));
             fileWriter.Flush();

@@ -46,20 +46,29 @@ namespace GemzLauncher
             serverPanel.Controls.Clear();
             LauncherConfig.Load();
             var loopCount = 0;
-            foreach (ServerInfo sInfo in LauncherConfig.User.ServerPaths)
+            try
             {
-                var btn = new ServerButton
+                if (File.ReadAllText("launcher_config.json") == "") LauncherConfig.User = LauncherConfig.Default;
+                foreach (ServerInfo sInfo in LauncherConfig.User.ServerPaths)
                 {
-                    ID = loopCount,
-                    Name = "button" + loopCount,
-                    Tag = loopCount,
-                    Text = _defaultButton.Text,
-                    Height = _defaultButton.Height,
-                    Width = _defaultButton.Width
-                };
-                btn.Text = btn.Text.Replace("{Server}", GetServerName(loopCount));
-                serverPanel.Controls.Add(btn);
-                loopCount++;
+                    var btn = new ServerButton
+                    {
+                        ID = loopCount,
+                        Name = "button" + loopCount,
+                        Tag = loopCount,
+                        Text = _defaultButton.Text,
+                        Height = _defaultButton.Height,
+                        Width = _defaultButton.Width
+                    };
+                    btn.Click += ServerBtnClick;
+                    btn.Text = btn.Text.Replace("{Server}", GetServerName(loopCount));
+                    serverPanel.Controls.Add(btn);
+                    loopCount++;
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                LauncherConfig.User = LauncherConfig.Default;
             }
         }
 
@@ -67,12 +76,13 @@ namespace GemzLauncher
         {
             var button = (ServerButton)sender;
             if (button.ID < 0) return;
-            SelectedID = button.ID;
-
-            foreach (ServerButton btn in serverPanel.Controls)
+            var loopCount = 0;
+            foreach (ServerButton sb in serverPanel.Controls)
             {
-                button.BackColor = btn.ID == SelectedID ? Color.Aqua : Color.Transparent;
+                serverPanel.Controls[loopCount].BackColor = sb.ID == button.ID ? Color.Aqua : Color.Transparent;
+                loopCount++;
             }
+            SelectedID = button.ID;
         }
 
         private static string GetServerName(int id)
@@ -105,7 +115,23 @@ namespace GemzLauncher
                 LauncherConfig.User.ServerPaths[id].PreferCli
                 ? LauncherConfig.User.ServerPaths[id].CliPath
                 : LauncherConfig.User.ServerPaths[id].GuiPath;
-            Process.Start(new FileInfo(process).FullName);
+            var fullName = new FileInfo(process).FullName;
+            try
+            {
+                Process.Start(fullName);
+            }
+            catch (Win32Exception)
+            {
+                try
+                {
+                    var replace = fullName.Replace("GemsCraftGUI.exe", "ServerGUI.exe");
+                    Process.Start(replace);
+                }
+                catch
+                {
+                    MessageBox.Show("A fatal error has occured. You will need to reinstall the application.");
+                }
+            }
             Close();
         }
 
@@ -122,7 +148,7 @@ namespace GemzLauncher
             var chosen = dChooser.VersionSelected;
             var name = chosen.GetWords()[0];
             var code = chosen.Replace(name + " ", "");
-            var webFile = "http://gemz.ml/Download/" + name + "/" + code + ".zip";
+            var webFile = "http://gemz.ml/Download/0Base/" + name + "/" + code + ".zip";
             var pathToDownload = GetPath(); // prompts for folder to unzip to
 
             new DownloadForm(webFile, pathToDownload).ShowDialog();
@@ -196,6 +222,8 @@ namespace GemzLauncher
                     "WARNING", MessageBoxButtons.YesNo);
             if (result == DialogResult.No) return;
             Directory.Delete(sServer.MainPath(), true);
+            LauncherConfig.User.ServerPaths.RemoveAt(SelectedID);
+            LoadEverything();
         }
     }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using System.Xml.Linq;
 using fCraft.Events;
 using JetBrains.Annotations;
@@ -927,7 +928,17 @@ namespace fCraft {
                         Logger.Log( LogType.Error,
                                     "Config.Load: Could not parse a LegacyRankMapping entry: {0}", rankPair );
                     } else {
-                        RankManager.LegacyRankMapping.Add( fromRankID.Value, toRankID.Value );
+                        try
+                        {
+                            RankManager.LegacyRankMapping.Add(fromRankID.Value, toRankID.Value);
+                        }
+                        catch (ArgumentException ex)
+                        {
+                            if (!ex.Message.Contains("An item with the same key has already been added"))
+                            {
+                                MessageBox.Show("Something went wrong when trying to load the configuration.");
+                            }
+                        }
                     }
                 }
             }
