@@ -177,8 +177,8 @@ namespace GemzLauncher
             LauncherConfig.User.ServerPaths.Add(
                 new ServerInfo
                 {
-                    GuiPath = pathToDownload + "\\" + (name.ToLower() == "Alpha" ? "ConfigGUI.exe" : "GemsCraftGUI.exe"),
-                    CliPath = pathToDownload + "\\ServerCLI.exe"
+                    GuiPath = (pathToDownload + "\\" + (name.ToLower() == "Alpha" ? "ConfigGUI.exe" : "GemsCraftGUI.exe")).Replace("\\\\", "/"),
+                    CliPath = (pathToDownload + "\\ServerCLI.exe").Replace("\\\\", "/")
                 });
             LauncherConfig.Save();
             LoadEverything();
