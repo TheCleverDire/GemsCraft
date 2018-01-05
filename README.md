@@ -1,10 +1,11 @@
-﻿Cobblestone (In development)
+﻿GemsCraft Cobblestone (In development)
 
 #GemsCraft
+
 ![GemsCraft](http://i.imgur.com/pbO5NDl.png "Never argue with an idiot. They will drag you down to their level and beat you with experience")<br />
 
 Dowload the latest GemsCraft release here: 
-https://gemz.ml/ (Not ready)
+https://apotter96.com/software/GemsCraft
 
 Thank you for downloading GemsCraft, a custom Minecraft/ClassiCube server based on fCraft, 800craft, and LegendCraft.
 
@@ -31,7 +32,7 @@ GemsCraft is currently not supported on other systems. We are currently working 
 ####GemsCraft license
 LegendCraft code and binaries are licensed and distributed under the permissive MIT License, reproduced here: <br />
 
-Copyright < 2013- 2017 > apotter96
+Copyright < 2013- 2018 > apotter96
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
