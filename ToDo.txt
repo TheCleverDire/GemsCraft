@@ -85,3 +85,10 @@ Key Words:
 --> Day/Night Cycle, configurable
 --> Weather
 --> Disasters (On world specified, Tornado, EarthQuake, WildFire, etc.)
+--> New Games
+---> Twister
+------ Try to avoid the twisters. Each phase gets harder, and more obstacles. Moooooo
+---> Quakers
+------ Avoid the lava and debris that arises during a massive earthquake. Gets harder each phase with obstacles.
+---> Flaming
+------ It's your job to put out the fires as quickly as you can. Fire gets faster with each phase. If you get hit, game over.
