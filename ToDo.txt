@@ -92,3 +92,18 @@ Key Words:
 ------ Avoid the lava and debris that arises during a massive earthquake. Gets harder each phase with obstacles.
 ---> Flaming
 ------ It's your job to put out the fires as quickly as you can. Fire gets faster with each phase. If you get hit, game over.
+
+
+--- Cobblestone 1.8 TODO (The Survival Update) ---
+--> Duh? Survival Mode in Creative
+--> Virtual Chests
+
+
+
+--- Cobblestone 1.9 TODO (The Economy Update) ---
+--> $$$
+--> Shops!
+--> Purchase Admin/User created items/specials!
+
+
+Things on this list are Copyright (c) by apotter96. All rights reserved.
