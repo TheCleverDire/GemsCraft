@@ -6,25 +6,42 @@ Key Words:
 - ( Set Aside ) -> Item has been abandoned for now, but might be resurrected later.
 - ( Abandoned ) -> Item has been completely abandoned and will not be returned to. It will be removed from the project comletely.
 
---- Cobblestone 1.1 TODO ---
+
+---Cobblestone 1.1 TODO (The Recircuit Update) ---
+- Launcher ( In Progress )
+--- Import Servers ( In Progress )
+--- Servername on setup ( DONE ! )
+--- Move servers
+--- Nifty Turning Icon ( DONE ! )
+- Recode fCraft Platform ( In Progress )
+--- Prepare for Version 1.2 (The Beautiful Update)
+--- Prepare for Version 1.3 (The Mind Control Update)
+
+
+--- Cobblestone 1.2 TODO (The Beautiful Update) ---
+- Redo the current GUI, it didn't work well. ( On Hold )
+
+
+
+--- Cobblestone 1.3 TODO (The Mind Control Update) ---
 - Android Remote ( On Hold )
---- Login ( DONE ! )
+--- Login
 --- Add Server Log/Chat in real time
 ---> In the Server Config under Rank permissions
 ------ there will be the option to allow only certain ranks
 ------ to view the logs. If this permission is not enabled for a certain
 ------ player, they will just see the in-game chat
---- Add Editable Config ( In Progress )
+--- Add Editable Config
 --- Add Server Up/Down Image
 --- Add IRC Connection
 --- Add fCraft Plugin Viewer
 --- Add fCraft Player Viewer
 --- Add Map Viewer
-- Edit Config In Game ( DONE ! )
+- Edit Config In Game 
 
 
 
---- Cobblestone 1.2 TODO (The Game Update) ---
+--- Cobblestone 1.4 TODO (The Game Update) ---
 --> Points System
 ----> For each game, victory grants a certain amount of points, games define how much
 ----> Points can be converted into Server $
@@ -50,7 +67,7 @@ Key Words:
 
 
 
---- Cobblestone 1.3 TODO (The Magic Update) ---
+--- Cobblestone 1.5 TODO (The Magic Update) ---
 --> Magic System
 ----> When player executes /magic command
 --------- /magic set {block as wand} spellname
@@ -61,3 +78,10 @@ Key Words:
 ----> Wizard questline will be added
 
 --> ConfigGUI will get new "magical" images and general designs (layout will not change)
+
+
+
+--- Cobblestone 1.6 TODO (The Environmental Update) ---
+--> Day/Night Cycle, configurable
+--> Weather
+--> Disasters (On world specified, Tornado, EarthQuake, WildFire, etc.)
