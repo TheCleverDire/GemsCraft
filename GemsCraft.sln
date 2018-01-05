@@ -1,0 +1,67 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GemsCraft", "GemsCraft\GemsCraft.csproj", "{3E7E3B96-1355-4DEC-A068-30598D13E31E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GemsCraftGUI", "GemsCraftGUI\GemsCraftGUI.csproj", "{52944912-4BD6-449F-A466-5EB678F488E9}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "ftp://ftp.christplay.x10host.com", "ftp://ftp.christplay.x10host.com", "{A248ED91-D9FE-4530-8505-053B3D0FAD3A}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/ftp.christplay.x10host.com"
+		Debug.AspNetCompiler.PhysicalPath = "C:\Users\super\AppData\Local\Temp\VWDWebCache\ftp_ftp.christplay.x10host.com_apotter96@apotter96.com\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\ftp.christplay.x10host.com\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/ftp.christplay.x10host.com"
+		Release.AspNetCompiler.PhysicalPath = "C:\Users\super\AppData\Local\Temp\VWDWebCache\ftp_ftp.christplay.x10host.com_apotter96@apotter96.com\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\ftp.christplay.x10host.com\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/ftp.christplay.x10host.com"
+		Debug.AspNetCompiler.PhysicalPath = "C:\Users\super\AppData\Local\Temp\VWDWebCache\ftp_ftp.christplay.x10host.com_apotter96@apotter96.com\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\ftp.christplay.x10host.com\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/ftp.christplay.x10host.com"
+		Release.AspNetCompiler.PhysicalPath = "C:\Users\super\AppData\Local\Temp\VWDWebCache\ftp_ftp.christplay.x10host.com_apotter96@apotter96.com\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\ftp.christplay.x10host.com\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3E7E3B96-1355-4DEC-A068-30598D13E31E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E7E3B96-1355-4DEC-A068-30598D13E31E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E7E3B96-1355-4DEC-A068-30598D13E31E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E7E3B96-1355-4DEC-A068-30598D13E31E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52944912-4BD6-449F-A466-5EB678F488E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52944912-4BD6-449F-A466-5EB678F488E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52944912-4BD6-449F-A466-5EB678F488E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52944912-4BD6-449F-A466-5EB678F488E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A248ED91-D9FE-4530-8505-053B3D0FAD3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A248ED91-D9FE-4530-8505-053B3D0FAD3A}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{A248ED91-D9FE-4530-8505-053B3D0FAD3A}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
