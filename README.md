@@ -5,7 +5,7 @@
 ![GemsCraft](http://apotter96.com/software/GemsCraft/main.png "I wrote a song about a tortilla. Well actually, it's more of a wrap.")<br />
 
 Dowload the latest GemsCraft release here: 
-https://apotter96.com/software/GemsCraft
+http://apotter96.com/software/GemsCraft
 
 Thank you for downloading GemsCraft, a custom Minecraft/ClassiCube server based on fCraft, 800craft, and LegendCraft.
 
