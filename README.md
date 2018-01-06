@@ -7,6 +7,8 @@
 Dowload the latest GemsCraft release here: 
 http://apotter96.com/software/GemsCraft
 
+
+*** For the record, there was a tiny rumor that GemsCraft 1.2 was going to be codenamed "Dirt" as 1.0 and 1.1 was "Cobblestone", you know A, B, C, D. While you are on the right path, 1.2 will not be dirt as it will be the Beautiful Update. My decided name is a little bit more... blue... and shinier than the dirt. ***
 Thank you for downloading GemsCraft, a custom Minecraft/ClassiCube server based on fCraft, 800craft, and LegendCraft.
 
 Special thanks to fragmer, for creating fCraft! Special thanks to Jonty800, GlennMR and LaoTszy for their hard 
