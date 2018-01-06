@@ -2,7 +2,7 @@
 
 #GemsCraft
 
-![GemsCraft](http://i.imgur.com/pbO5NDl.png "Never argue with an idiot. They will drag you down to their level and beat you with experience")<br />
+![GemsCraft](http://apotter96.com/software/GemsCraft/main.png) "Never argue with an idiot. They will drag you down to their level and beat you with experience")<br />
 
 Dowload the latest GemsCraft release here: 
 https://apotter96.com/software/GemsCraft
