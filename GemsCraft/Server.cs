@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,7 +23,7 @@ namespace GemsCraft
         public void OpenApplication()
         {
             var path = TypeOfGems == ApplicationType.Legacy ? Dir + "ServerGUI.exe" : Dir + "GemsCraftGUI.exe";
-            Process.Start(path);
+            Process.Start(Path.GetFullPath(path));
         }
     }
     

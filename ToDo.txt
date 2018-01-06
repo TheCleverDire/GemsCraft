@@ -8,10 +8,10 @@ Key Words:
 
 
 ---Cobblestone 1.1 TODO (The Recircuit Update) ---
-- Launcher ( In Progress )
---- Import Servers ( In Progress )
+- Launcher ( DONE ! )
+--- Import Servers ( DONE ! )
 --- Servername on setup ( DONE ! )
---- Move servers
+--- Move servers ( DONE ! )
 --- Nifty Turning Icon ( DONE ! )
 - Recode fCraft Platform ( In Progress )
 --- Prepare for Version 1.2 (The Beautiful Update)

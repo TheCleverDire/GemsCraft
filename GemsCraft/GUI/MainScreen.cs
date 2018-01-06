@@ -1,27 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
-using GemsCraft;
 using GemsCraft.AppSystem;
-using GemsCraft.GUI;
 using GemsCraft.Network;
+using GemsCraftGUI;
 using MetroFramework;
 using MetroFramework.Forms;
 using Microsoft.VisualBasic;
-using Newtonsoft.Json;
 
-using static Microsoft.VisualBasic.Interaction;
-namespace GemsCraftGUI
+namespace GemsCraft.GUI
 {
     public partial class MainScreen : MetroForm
     {
@@ -36,13 +27,13 @@ namespace GemsCraftGUI
             string inputServerName = GetServerName(-1);
             DownloadServer(inputServerName);
         }
-        
+
         private readonly Server _serverObj = new Server();
         private void DownloadServer(string name)
         {
             _serverObj.Name = name;
             _serverObj.Dir = name + "/";
-            
+
             var window = new VersionSelector();
             window.Show();
 
@@ -83,16 +74,10 @@ namespace GemsCraftGUI
             }
             LocalServerList.Servers.Add(_serverObj);
             LocalServerList.Save();
-
-            MetroFramework.MetroMessageBox.Show(this, "The server was successfully setup.");
+            UpdateServerList();
+            MetroMessageBox.Show(this, "The server was successfully setup.");
         }
-        /*
-         * TODO
-         * Create a SAMPLE
-         * Config.xml for each version and add it to each download
-         * So that when the software downloads the server, it can update the server name as well
-         * 
-         */
+
         private string GetServerName(int errorCode)
         {
             while (true)
@@ -108,7 +93,7 @@ namespace GemsCraftGUI
                 {
                     superName += " Special characters other than a +, -, _, () are not allowed";
                 }
-                string result = InputBox(superName, "Server Name");
+                string result = Interaction.InputBox(superName, "Server Name");
                 if (result == "")
                 {
                     errorCode = 0;
@@ -132,6 +117,7 @@ namespace GemsCraftGUI
 
         private void MainScreen_Load(object sender, EventArgs e)
         {
+            metroLabel1.Text = UrlExecution.Execute("http://apotter96.com/php/Copyright.php?startyear=2013").Replace("&copy;", "©");
             UpdateServerList();
             if (serverBox.Items.Count == 0)
             {
@@ -182,7 +168,7 @@ namespace GemsCraftGUI
                 }
                 else
                 {
-                    MetroMessageBox.Show(this, "The server has been removed fromt the list. The files remain still.");
+                    MetroMessageBox.Show(this, "The server has been removed from the list. The files remain still.");
                 }
             }
         }
@@ -204,7 +190,7 @@ namespace GemsCraftGUI
             }
             else
             {
-                if (!File.Exists(path + "config.xml"))
+                if (!File.Exists(path + "\\config.xml"))
                 {
                     MetroMessageBox.Show(this,
                         "Unable to import server. config.xml does not exist.", "Error",
@@ -213,29 +199,100 @@ namespace GemsCraftGUI
                 }
                 else
                 {
-                    server.Dir = path;
-                    server.TypeOfGems = File.Exists(path + "GemsCraftGUI.exe") ? ApplicationType.Modern : ApplicationType.Legacy;
+                    server.Dir = path + "\\";
+                    server.TypeOfGems = File.Exists(path + "\\GemsCraftGUI.exe") ? ApplicationType.Modern : ApplicationType.Legacy;
                     if (server.TypeOfGems == ApplicationType.Legacy)
                     {
-                        if (!File.Exists("ServerGUI.exe"))
+                        if (!File.Exists(path + "\\ServerGUI.exe"))
                         {
                             MetroMessageBox.Show(this,
                                 "Unable to import server. ServerGUI.exe does not exist.", "Error",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Error);
+                            return;
                         }
                     }
-                    else
+                    XmlTextReader reader = new XmlTextReader(path + "\\config.xml");
+                    while (reader.Read())
                     {
-                        XmlTextReader reader = new XmlTextReader(path + "config.xml");
-                        while (reader.Read())
+                        // Reads the provided config for the name
+                        if (reader.Name.ToLower() == "configkey")
                         {
-                            // Do some work here on the data.
-                            MessageBox.Show(reader.Name);
+                            string attribute = reader.GetAttribute("key");
+                            if (attribute != null && attribute.ToLower() == "servername")
+                            {
+                                string attributeName = reader.GetAttribute("value");
+                                server.Name = attributeName;
+                            }
                         }
                     }
+                    LocalServerList.Servers.Add(server);
+                    LocalServerList.Save();
                 }
             }
+        }
+
+        private void btnMoveDirectory_Click(object sender, EventArgs e)
+        {
+            int index = serverBox.SelectedIndex;
+            if (index < 0)
+            {
+                MetroMessageBox.Show(this, "Please select a server to move", "Select a Server");
+                return;
+            }
+
+            Server server = LocalServerList.Servers[index];
+            DialogResult result = MetroMessageBox.Show(this,
+                "This will overwrite any files that share the same name in this new directory. Continue?", "Warning",
+                MessageBoxButtons.OKCancel);
+            if (result == DialogResult.OK)
+            {
+                StartMove(server, index);
+            }
+        }
+
+        private void StartMove(Server serverObj, int index)
+        {
+            Server server = serverObj;
+            string oldPath = server.Dir;
+            MoveServerDialog.ShowDialog();
+            string path = MoveServerDialog.SelectedPath + "\\";
+            if (!Directory.Exists(path))
+            {
+                MetroMessageBox.Show(this, "Please select an existing directory To place the contents in.\n" +
+                    "If you need to make a new folder, click the new folder button on the dialog screen.");
+                StartMove(server, index);
+            }
+
+            server.Dir = path;
+
+            try
+            {
+                foreach (string file in Directory.GetFiles(oldPath))
+                {
+                    File.Copy(file, path + Path.GetFileName(file), true);
+                    File.Delete(file);
+                }
+                Directory.Delete(oldPath);
+                LocalServerList.Servers[index] = server;
+                LocalServerList.Save();
+            }
+            catch
+            {
+                MetroMessageBox.Show(this,
+                    "Unable to migrate the server. Please make sure you have the correct permissions", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void openTimer_Tick(object sender, EventArgs e)
+        {
+            btnOpenServer.Enabled = serverBox.SelectedIndex >= 0;
+        }
+
+        private void btnOpenServer_Click(object sender, EventArgs e)
+        {
+            LocalServerList.Servers[serverBox.SelectedIndex].OpenApplication();
         }
     }
 }
